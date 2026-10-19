@@ -24,8 +24,8 @@
     const screen = urlParams.get('screen');
     const trip = INITIAL_BOOKINGS.find(b => b.id === 'BK-5021');
 
-    if (screen === 'overview') {
-      mobileView.openModal(trip, 'overview');
+    if (screen === 'overview' || screen === 'customer-details' || screen === 'customer') {
+      mobileView.openModal(trip, 'customer-details');
     } else if (screen === 'guests') {
       mobileView.openModal(trip, 'guests');
     } else if (screen === 'itinerary') {

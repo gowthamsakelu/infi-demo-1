@@ -1,15 +1,19 @@
-// Desktop / PC Admin View Renderer and Controller
-import { INITIAL_BOOKINGS, STAFF_MEMBERS } from './data.js';
+import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, getSpecialReqIconSvg } from './data.js';
 
 export function createDesktopView(container) {
   let bookings = [...INITIAL_BOOKINGS];
+  let vendors = [...VENDORS_LIST];
+  let teamMembers = [...STAFF_MEMBERS];
+  let contacts = [...CONTACTS_LIST];
   let activeTab = 'All Bookings';
   let searchQuery = '';
   let selectedCategory = 'ALL';
   let activeBooking = null; // Default: closed popup, table is full-width!
   let isDetailDrawerOpen = false;
-  let activeDetailTab = 'overview';
+  let activeDetailTab = 'customer-details';
   let guestSearchQuery = '';
+  let openDropdownItemId = null;
+  let modalActiveItem = null;
 
   container.innerHTML = `
     <div class="desktop-layout">
@@ -122,13 +126,6 @@ export function createDesktopView(container) {
           </div>
 
           <div class="desktop-header-actions">
-            <a href="/mobile.html" class="btn-secondary-desktop" style="text-decoration: none;" title="Open clean mobile responsive preview">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
-                <line x1="12" x2="12.01" y1="18" y2="18"/>
-              </svg>
-              Mobile View
-            </a>
             <button class="btn-secondary-desktop" id="desktop-export-btn" title="Download Bookings as CSV">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -325,7 +322,7 @@ export function createDesktopView(container) {
 
         <!-- Tabs -->
         <div class="sheet-tabs-nav">
-          <button class="sheet-tab-btn ${activeDetailTab === 'overview' ? 'active' : ''}" data-dt-tab="overview">Overview</button>
+          <button class="sheet-tab-btn ${activeDetailTab === 'customer-details' ? 'active' : ''}" data-dt-tab="customer-details">Customer Details</button>
           <button class="sheet-tab-btn ${activeDetailTab === 'guests' ? 'active' : ''}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">0</span>)</button>
           <button class="sheet-tab-btn ${activeDetailTab === 'itinerary' ? 'active' : ''}" data-dt-tab="itinerary">Itinerary</button>
           <button class="sheet-tab-btn ${activeDetailTab === 'updates' ? 'active' : ''}" data-dt-tab="updates">Updates</button>
@@ -370,6 +367,178 @@ export function createDesktopView(container) {
           </div>
         </div>
       </aside>
+
+      <!-- Desktop Modal 1: Edit Special Requirements -->
+      <div class="modal-overlay" id="desktop-special-req-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" x2="8" y1="13" y2="13"/>
+                <line x1="16" x2="8" y1="17" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <h3>Edit Special Requirements</h3>
+            </div>
+            <button class="sheet-close-btn" id="close-desktop-special-req-modal-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Current Requirements</label>
+              <div id="desktop-modal-reqs-current-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto;"></div>
+            </div>
+            <div class="form-group">
+              <label>Quick Add Presets</label>
+              <div class="modal-chip-grid" id="desktop-modal-presets-chip-grid"></div>
+            </div>
+            <div class="form-group">
+              <label>Add Custom Requirement</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="desktop-modal-custom-req-input" placeholder="e.g. Extra pillows, Non-smoking room" style="flex: 1;" />
+                <button class="btn-primary-desktop" id="desktop-btn-add-custom-req" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">+ Add</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-confirm-booking" id="desktop-btn-done-special-req" style="height: 40px; font-size: 13.5px; border-radius: 10px;">Save & Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Modal 2: Activity Details -->
+      <div class="modal-overlay" id="desktop-activity-details-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="item-icon-box item-icon-bus" id="desktop-modal-details-icon-box" style="width: 30px; height: 30px;"></div>
+              <h3 id="desktop-modal-details-title-text">Activity Details</h3>
+            </div>
+            <button class="sheet-close-btn" id="close-desktop-modal-details-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body" id="desktop-modal-details-body-content"></div>
+          <div class="modal-footer" style="display: flex; gap: 8px; justify-content: space-between;">
+            <button class="action-pill-btn" id="desktop-btn-modal-details-toggle-complete" style="padding: 8px 14px; font-size: 12.5px;">Mark Completed</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="action-pill-btn" id="desktop-btn-modal-details-edit-trigger" style="padding: 8px 14px; font-size: 12.5px;">Edit</button>
+              <button class="btn-primary-desktop" id="desktop-btn-modal-details-close-btn" style="padding: 8px 16px; border-radius: 10px; font-size: 13px;">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Modal 3: Edit Activity -->
+      <div class="modal-overlay" id="desktop-edit-activity-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3>Edit Itinerary Activity</h3>
+            <button class="sheet-close-btn" id="close-desktop-modal-edit-activity-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Activity Title</label>
+              <input type="text" id="desktop-modal-edit-act-title" placeholder="e.g. River Rafting (16 km)" />
+            </div>
+            <div class="form-group">
+              <label>Timing & Subtitle / Location</label>
+              <input type="text" id="desktop-modal-edit-act-subtitle" placeholder="e.g. 10:00 AM • Rishikesh" />
+            </div>
+            <div class="form-group">
+              <label>Category / Icon</label>
+              <select id="desktop-modal-edit-act-type">
+                <option value="transport">Transport / Bus</option>
+                <option value="hotel">Hotel / Accommodation</option>
+                <option value="sightseeing">Sightseeing / Tour</option>
+                <option value="activity">Sport / Adventure</option>
+                <option value="food">Restaurant / Meal</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="desktop-btn-cancel-edit-activity">Cancel</button>
+            <button class="btn-primary-desktop" id="desktop-btn-save-edit-activity" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Modal 4: Add Itinerary Event -->
+      <div class="modal-overlay" id="desktop-add-event-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3>Add Itinerary Event</h3>
+            <button class="sheet-close-btn" id="close-desktop-modal-add-event-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Select Day</label>
+              <select id="desktop-modal-add-event-day-select"></select>
+            </div>
+            <div class="form-group">
+              <label>Event Title</label>
+              <input type="text" id="desktop-modal-add-event-title" placeholder="e.g. Sunset Boat Cruise & Tea" />
+            </div>
+            <div class="form-group">
+              <label>Time & Subtitle / Location</label>
+              <input type="text" id="desktop-modal-add-event-subtitle" placeholder="e.g. 05:30 PM • 1-hour cruise with DJ" />
+            </div>
+            <div class="form-group">
+              <label>Category / Icon</label>
+              <select id="desktop-modal-add-event-type">
+                <option value="sightseeing">Sightseeing / Tour</option>
+                <option value="transport">Transport / Bus</option>
+                <option value="hotel">Hotel / Accommodation</option>
+                <option value="activity">Sport / Adventure</option>
+                <option value="food">Restaurant / Meal</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="desktop-btn-cancel-add-event">Cancel</button>
+            <button class="btn-primary-desktop" id="desktop-btn-submit-add-event" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Add to Itinerary</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Modal 5: Assign Coordinator / Vendor -->
+      <div class="modal-overlay" id="desktop-assign-modal">
+        <div class="modal-card" style="width: 520px;">
+          <div class="modal-header">
+            <h3>Assign Activity</h3>
+            <button class="sheet-close-btn" id="close-desktop-assign-modal-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <!-- Selected Activity Preview Card (Matches Mobile Screen 3) -->
+            <div class="assign-activity-card" id="desktop-assign-activity-card" style="margin: 0 0 14px 0; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 12px;">
+              <div style="width: 38px; height: 38px; border-radius: 10px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" id="desktop-assign-activity-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <h4 id="desktop-assign-activity-title" style="margin: 0; font-size: 13.5px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Activity Title</h4>
+                <p id="desktop-assign-activity-subtitle" style="margin: 2px 0 0 0; font-size: 12px; color: #64748B;">Time & Location</p>
+              </div>
+              <span class="tag-activity-pill" id="desktop-assign-activity-category" style="padding: 3px 8px; border-radius: 9999px; background: #EFF6FF; color: #2563EB; font-size: 11px; font-weight: 700; text-transform: uppercase;">ACTIVITY</span>
+            </div>
+
+            <div class="form-group">
+              <label>Select Assignee Category</label>
+              <div class="assign-tabs-row" style="margin-bottom: 6px;">
+                <button class="assign-tab-btn active" id="desktop-assign-tab-team">Team Members</button>
+                <button class="assign-tab-btn" id="desktop-assign-tab-vendors">Vendors</button>
+                <button class="assign-tab-btn" id="desktop-assign-tab-contacts">Contacts</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Choose Person / Supplier</label>
+              <div id="desktop-assign-picker-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="desktop-btn-cancel-assign">Cancel</button>
+            <button class="btn-primary-desktop" id="desktop-btn-confirm-assign" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Confirm Assignment</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -529,195 +698,254 @@ export function createDesktopView(container) {
     if (countBadge) countBadge.textContent = b.guests.length;
 
     // Header
+    const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
+    const custName = b.customer?.name || b.guest?.name || 'Customer';
+
     headerEl.innerHTML = `
-      <div class="sheet-card-top-row">
-        <div class="sheet-thumb">
-          <img src="${b.image}" alt="${b.title}" />
-        </div>
-        <div class="sheet-header-info">
-          <div class="sheet-tag-row">
-            <span class="card-type-badge ${b.typeClass}">${b.type}</span>
+      <div class="sheet-customer-header" style="border-radius: 0; padding: 18px 24px; border-bottom: 1px solid #F1F5F9;">
+        <div class="customer-avatar-badge" style="width: 52px; height: 52px; font-size: 18px;">${initials}</div>
+        <div class="customer-header-info">
+          <div class="customer-title-row">
+            <h2 class="customer-name-title" style="font-size: 19px;">${custName}</h2>
             <span class="status-pill ${b.statusClass}">
               <span class="dot"></span>
               ${b.status}
             </span>
           </div>
-          <h2 class="sheet-title">${b.title}</h2>
-          <p class="sheet-sub-id">Booking ID: <strong>${b.id}</strong></p>
-        </div>
-      </div>
-      <div class="sheet-stats-row">
-        <div class="stat-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-          </svg>
-          <span>${b.pax} Pax</span>
-        </div>
-        <div class="stat-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-            <line x1="16" x2="16" y1="2" y2="6"/>
-            <line x1="8" x2="8" y1="2" y2="6"/>
-            <line x1="3" x2="21" y1="10" y2="10"/>
-          </svg>
-          <span>${b.dates}</span>
-        </div>
-        <div class="stat-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M2 4v16"/>
-            <path d="M2 8h18a2 2 0 0 1 2 2v10"/>
-            <path d="M2 17h20"/>
-            <path d="M6 8v9"/>
-          </svg>
-          <span>${b.duration}</span>
-        </div>
-      </div>
-    `;
-
-    // Body content by tab
-    if (activeDetailTab === 'overview') {
-      bodyEl.innerHTML = `
-        <div class="detail-rows-list">
-          <!-- Lead Guest -->
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
+          <p class="customer-trip-subtitle">${b.title}</p>
+          <div class="customer-meta-chips">
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
               </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Lead Guest</span>
-              <div class="detail-value">${b.guest.name}</div>
-            </div>
-          </div>
-
-          <!-- Contact with action buttons -->
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              ${b.pax} Pax
+            </span>
+            <span class="meta-dot">•</span>
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
               </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Contact</span>
-              <div class="detail-value">${b.guest.phone}</div>
-            </div>
-            <div class="detail-contact-actions">
-              <button class="circle-action-btn btn-phone" title="Call Guest" id="action-call-guest">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
-              </button>
-              <button class="circle-action-btn btn-whatsapp" title="WhatsApp Guest" id="action-wa-guest">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                </svg>
-              </button>
-              <button class="circle-action-btn btn-email" title="Email Guest" id="action-email-guest">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect width="20" height="16" x="2" y="4" rx="2"/>
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Destination -->
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Destination</span>
-              <div class="detail-value">${b.destination}</div>
-            </div>
-            <button class="circle-action-btn btn-map" title="View Map" id="action-view-map">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                <line x1="9" x2="9" y1="3" y2="18"/>
-                <line x1="15" x2="15" y1="6" y2="21"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Booking Type -->
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                <rect width="20" height="14" x="2" y="6" rx="2"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Booking Type</span>
-              <div class="detail-value">${b.bookingType}</div>
-            </div>
-          </div>
-
-          <!-- Travel Date -->
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              ${b.duration}
+            </span>
+            <span class="meta-dot">•</span>
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
                 <line x1="16" x2="16" y1="2" y2="6"/>
                 <line x1="8" x2="8" y1="2" y2="6"/>
                 <line x1="3" x2="21" y1="10" y2="10"/>
               </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Travel Date</span>
-              <div class="detail-value">${b.travelDateFull || b.dates}</div>
-            </div>
+              ${b.dates}
+            </span>
           </div>
+        </div>
+      </div>
+    `;
 
-          <!-- Services -->
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m9 11 3 3L22 4"/>
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Included Services</span>
-              <div class="detail-value">${b.services}</div>
-            </div>
-          </div>
+    // Body content by tab
+    if (activeDetailTab === 'customer-details') {
+      const c = b.customer || {
+        name: b.guest.name,
+        initials: b.guest.name.split(' ').map(n=>n[0]).join('') || 'CU',
+        phone: b.guest.phone,
+        email: b.guest.email,
+        location: 'New Delhi, Delhi',
+        leadSource: 'Website',
+        preferredDestination: b.destination,
+        travelDates: `${b.dates} 2024`,
+        customerType: `Family (${b.pax} Pax)`,
+        budgetEst: b.price,
+        status: b.status,
+        shortDetails: b.notes || 'Trip details logged into operations queue.',
+        leadFlow: [
+          { date: '10 Nov', time: '10:30 AM', type: 'call', iconBg: 'icon-blue', title: 'Initial Inquiry (Call)', desc: 'Customer inquired about booking details and availability.', author: 'By Ruyi Admin' },
+          { date: '10 Nov', time: '02:15 PM', type: 'whatsapp', iconBg: 'icon-green', title: 'Shared Itinerary (WhatsApp)', desc: 'Sent day-wise details and pricing breakdown.', author: 'By Ruyi Admin' },
+          { date: '11 Nov', time: '11:00 AM', type: 'email', iconBg: 'icon-blue', title: 'Sent Quote & Voucher (Email)', desc: 'Dispatched voucher confirmation and receipt.', author: 'By Ruyi Admin' }
+        ]
+      };
 
-          <!-- Assigned Coordinator -->
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-              </svg>
+      bodyEl.innerHTML = `
+        <div class="customer-details-tab-content">
+          <!-- Card 1: Customer Information -->
+          <div class="details-section-card">
+            <div class="details-section-header">
+              <div class="section-header-left">
+                <div class="section-icon-circle blue-circle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </div>
+                <h3>Customer Information</h3>
+              </div>
+              <button class="btn-edit-action" id="desktop-edit-customer-btn" title="Edit Customer Details">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit
+              </button>
             </div>
-            <div class="detail-content">
-              <span class="detail-label">Assigned Coordinator</span>
-              <div class="assigned-avatar-pill">
-                ${b.assignedTo.avatar ? `<img src="${b.assignedTo.avatar}" alt="${b.assignedTo.name}" />` : ''}
-                <span class="detail-value">${b.assignedTo.name} (${b.assignedTo.role || 'Coordinator'})</span>
+
+            <div class="customer-info-grid">
+              <!-- Left Column: Row 1 -->
+              <div class="info-cell">
+                <span class="info-label">Customer Name</span>
+                <span class="info-value-bold">${c.name}</span>
+              </div>
+              <!-- Right Column: Row 1 -->
+              <div class="info-cell info-cell-email">
+                <span class="info-label">Email</span>
+                <div class="contact-value-row">
+                  <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
+                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect width="20" height="16" x="2" y="4" rx="2"/>
+                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Left Column: Row 2 -->
+              <div class="info-cell info-cell-contact">
+                <span class="info-label">Primary Contact</span>
+                <div class="contact-value-row">
+                  <span class="info-value-bold phone-number-val">${c.phone}</span>
+                  <div class="contact-action-btns">
+                    <button class="mini-icon-btn btn-call-green" title="Call" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                      </svg>
+                    </button>
+                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp for ${c.name}...', type: 'success' }}))">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Right Column: Row 2 -->
+              <div class="info-cell">
+                <span class="info-label">Lead Source</span>
+                <span class="info-value-text">${c.leadSource || 'Website'}</span>
+              </div>
+
+              <!-- Left Column: Row 3 -->
+              <div class="info-cell">
+                <span class="info-label">Travel Dates</span>
+                <span class="info-value-text">${c.travelDates || b.dates}</span>
+              </div>
+              <!-- Right Column: Row 3 -->
+              <div class="info-cell">
+                <span class="info-label">Location</span>
+                <span class="info-value-text">${c.location || 'New Delhi, Delhi'}</span>
+              </div>
+
+              <!-- Left Column: Row 4 -->
+              <div class="info-cell">
+                <span class="info-label">Preferred Destination</span>
+                <span class="info-value-text">${c.preferredDestination || b.destination}</span>
+              </div>
+              <!-- Right Column: Row 4 -->
+              <div class="info-cell">
+                <span class="info-label">Budget (Est.)</span>
+                <span class="info-value-bold" style="color: #0F172A;">${c.budgetEst || b.price}</span>
+              </div>
+
+              <!-- Left Column: Row 5 -->
+              <div class="info-cell">
+                <span class="info-label">Customer Type</span>
+                <span class="info-value-text">${c.customerType || 'Family (12 Pax)'}</span>
+              </div>
+              <!-- Right Column: Row 5 -->
+              <div class="info-cell">
+                <span class="info-label">Status</span>
+                <div>
+                  <span class="status-pill ${b.statusClass}" style="display: inline-flex;">
+                    <span class="dot"></span>
+                    ${c.status || b.status}
+                  </span>
+                </div>
               </div>
             </div>
-            <button class="btn-secondary-desktop" style="height: 30px; font-size: 12px; padding: 0 10px;" id="d-change-coordinator-btn">Change</button>
+
+            <!-- Short Details Card -->
+            <div class="short-details-card">
+              <div class="short-details-header">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" x2="8" y1="13" y2="13"/>
+                  <line x1="16" x2="8" y1="17" y2="17"/>
+                  <line x1="10" x2="8" y1="9" y2="9"/>
+                </svg>
+                <span>Short Details</span>
+              </div>
+              <p class="short-details-text">${c.shortDetails || b.notes || 'Trip details logged into operations queue.'}</p>
+            </div>
           </div>
 
-          <!-- Notes -->
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
+          <!-- Card 2: Lead Flow / Journey -->
+          <div class="details-section-card">
+            <div class="details-section-header">
+              <div class="section-header-left">
+                <div class="section-icon-circle blue-circle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                  </svg>
+                </div>
+                <h3>Lead Flow / Journey</h3>
+              </div>
+              <button class="btn-add-followup" id="desktop-add-followup-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" x2="12" y1="5" y2="19"/>
+                  <line x1="5" x2="19" y1="12" y2="12"/>
+                </svg>
+                Add Follow-up
+              </button>
             </div>
-            <div class="detail-content">
-              <span class="detail-label">Special Notes</span>
-              <div class="detail-value-sub">${b.notes}</div>
+
+            <div class="lead-journey-timeline">
+              ${(c.leadFlow && c.leadFlow.length > 0) ? c.leadFlow.map((step, idx) => `
+                <div class="journey-item">
+                  <div class="journey-time-col">
+                    <span class="journey-date">${step.date}</span>
+                    <span class="journey-time">${step.time}</span>
+                  </div>
+                  <div class="journey-track-col">
+                    <div class="journey-dot-icon ${step.iconBg || 'icon-blue'}">
+                      ${step.type === 'call' ? `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                      ` : step.type === 'whatsapp' ? `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                        </svg>
+                      ` : `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect width="20" height="16" x="2" y="4" rx="2"/>
+                          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                        </svg>
+                      `}
+                    </div>
+                    ${idx < c.leadFlow.length - 1 ? '<div class="journey-line"></div>' : ''}
+                  </div>
+                  <div class="journey-content-col">
+                    <div class="journey-item-header">
+                      <h4>${step.title}</h4>
+                      <span class="journey-author">${step.author || 'By Ruyi Admin'}</span>
+                    </div>
+                    <p class="journey-desc">${step.desc}</p>
+                  </div>
+                </div>
+              `).join('') : `
+                <p style="font-size: 13px; color: #94A3B8; text-align: center; padding: 16px 0;">No journey follow-ups recorded yet.</p>
+              `}
             </div>
           </div>
         </div>
@@ -728,8 +956,44 @@ export function createDesktopView(container) {
         g.name.toLowerCase().includes(guestSearchQuery.toLowerCase()) ||
         (g.phone && g.phone.includes(guestSearchQuery))
       );
+      const reqs = b.specialRequirements || [];
 
       bodyEl.innerHTML = `
+        <!-- Special Requirements Card (Image 1 reference) -->
+        <div class="special-req-card">
+          <div class="special-req-header">
+            <div class="special-req-title-left">
+              <div class="special-req-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" x2="8" y1="13" y2="13"/>
+                  <line x1="16" x2="8" y1="17" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+              </div>
+              <span class="special-req-title">Special Requirements</span>
+            </div>
+            <button class="special-req-edit-btn" id="desktop-edit-special-req-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                <path d="m15 5 4 4"/>
+              </svg>
+              Edit
+            </button>
+          </div>
+          <div class="special-req-chips-list">
+            ${reqs.length > 0 ? reqs.map(r => `
+              <span class="special-req-chip">
+                <span class="req-chip-icon">${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+                <span class="req-chip-text">${r.text}</span>
+              </span>
+            `).join('') : `
+              <span style="font-size: 12.5px; color: #94A3B8; font-style: italic;">No special requirements added yet. Click Edit to add.</span>
+            `}
+          </div>
+        </div>
+
         <div class="guests-sub-header">
           <div class="guest-search-box">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -787,6 +1051,25 @@ export function createDesktopView(container) {
       };
 
       bodyEl.innerHTML = `
+        <div class="itinerary-section-header-bar">
+          <h3>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+            Day-wise Schedule
+          </h3>
+          <button class="btn-add-event-pill" id="desktop-add-event-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" x2="12" y1="5" y2="19"/>
+              <line x1="5" x2="19" y1="12" y2="12"/>
+            </svg>
+            + Add Event
+          </button>
+        </div>
+
         <div class="itinerary-v2-container">
           ${days.map(d => `
             <div class="itinerary-day-section">
@@ -800,7 +1083,7 @@ export function createDesktopView(container) {
               </div>
               <div class="timeline-items-col">
                 ${d.items.map(item => `
-                  <div class="itinerary-card-item">
+                  <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-desktop-itinerary-item-id="${item.id}">
                     <div class="item-left-content">
                       ${getItemIcon(item.type)}
                       <div class="item-text-info">
@@ -809,17 +1092,72 @@ export function createDesktopView(container) {
                       </div>
                     </div>
                     <div class="item-right-content">
+                      ${item.completed ? `
+                        <span class="completed-pill-badge" title="Completed">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                          Completed
+                        </span>
+                      ` : ''}
                       ${item.assigned && item.assigned.isAssigned ? `
                         <span class="assigned-pill-badge">Assigned</span>
                         <img src="${item.assigned.avatar}" class="assigned-avatar-mini" alt="${item.assigned.name}" title="Assigned to ${item.assigned.name}" />
                       ` : ''}
-                      <button class="item-menu-btn" title="Actions" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Item options for: ${item.title}', type: 'info' }}))">
+                      <button class="item-menu-btn" data-trigger-desktop-item-menu="${item.id}" data-trigger-item-menu="${item.id}" title="Actions">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                           <circle cx="12" cy="12" r="1.5"/>
                           <circle cx="12" cy="5" r="1.5"/>
                           <circle cx="12" cy="19" r="1.5"/>
                         </svg>
                       </button>
+
+                      ${openDropdownItemId === item.id ? `
+                        <div class="item-dropdown-menu" id="desktop-active-item-dropdown">
+                          <button class="dropdown-item-btn" data-desktop-dropdown-act="assign" data-dropdown-act="assign" data-target-id="${item.id}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                              <circle cx="9" cy="7" r="4"/>
+                              <line x1="19" x2="19" y1="8" y2="14"/>
+                              <line x1="22" x2="16" y1="11" y2="11"/>
+                            </svg>
+                            <span>Assign</span>
+                          </button>
+                          <button class="dropdown-item-btn" data-desktop-dropdown-act="details" data-dropdown-act="details" data-target-id="${item.id}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                              <polyline points="14 2 14 8 20 8"/>
+                              <line x1="16" x2="8" y1="13" y2="13"/>
+                              <line x1="16" x2="8" y1="17" y2="17"/>
+                              <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                            <span>View Details</span>
+                          </button>
+                          <button class="dropdown-item-btn" data-desktop-dropdown-act="edit" data-dropdown-act="edit" data-target-id="${item.id}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                              <path d="m15 5 4 4"/>
+                            </svg>
+                            <span>Edit</span>
+                          </button>
+                          <button class="dropdown-item-btn" data-desktop-dropdown-act="complete" data-dropdown-act="complete" data-target-id="${item.id}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <rect width="18" height="18" x="3" y="3" rx="2"/>
+                              <polyline points="9 12 11 14 15 10"/>
+                            </svg>
+                            <span>${item.completed ? 'Mark as Incomplete' : 'Mark Complete'}</span>
+                          </button>
+                          <button class="dropdown-item-btn item-remove" data-desktop-dropdown-act="remove" data-dropdown-act="remove" data-target-id="${item.id}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <polyline points="3 6 5 6 21 6"/>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                              <line x1="10" x2="10" y1="11" y2="17"/>
+                              <line x1="14" x2="14" y1="11" y2="17"/>
+                            </svg>
+                            <span>Remove</span>
+                          </button>
+                        </div>
+                      ` : ''}
                     </div>
                   </div>
                 `).join('')}
@@ -844,6 +1182,238 @@ export function createDesktopView(container) {
         </div>
       `;
     }
+  }
+
+  // Desktop Modal Helpers
+  let desktopAssignTab = 'Team Members';
+  let desktopSelectedAssignee = null;
+
+  function openDesktopSpecialReqModal() {
+    const modal = container.querySelector('#desktop-special-req-modal');
+    if (!modal) return;
+    renderDesktopSpecialReqModalContent();
+    modal.classList.add('open');
+  }
+
+  function closeDesktopSpecialReqModal() {
+    const modal = container.querySelector('#desktop-special-req-modal');
+    if (modal) modal.classList.remove('open');
+    renderDetailPanel();
+  }
+
+  function renderDesktopSpecialReqModalContent() {
+    const listEl = container.querySelector('#desktop-modal-reqs-current-list');
+    const presetsEl = container.querySelector('#desktop-modal-presets-chip-grid');
+    if (!listEl || !presetsEl || !activeBooking) return;
+
+    activeBooking.specialRequirements = activeBooking.specialRequirements || [];
+    const reqs = activeBooking.specialRequirements;
+
+    listEl.innerHTML = reqs.length > 0 ? reqs.map(r => `
+      <div class="editable-req-item">
+        <div class="editable-req-item-left">
+          <span>${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+          <span>${r.text}</span>
+        </div>
+        <button class="btn-delete-req-pill" data-desktop-delete-req-id="${r.id}" title="Remove requirement">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    `).join('') : '<p style="font-size: 13px; color: #94A3B8; text-align: center; margin: 6px 0;">No requirements added yet.</p>';
+
+    presetsEl.innerHTML = SPECIAL_REQUIREMENTS_PRESETS.map(p => {
+      const alreadyHas = reqs.some(r => r.text.toLowerCase() === p.text.toLowerCase());
+      return `
+        <button class="preset-chip-btn ${alreadyHas ? 'is-active' : ''}" data-desktop-preset-text="${p.text}" data-desktop-preset-icon="${p.icon}" data-desktop-preset-color="${p.color}">
+          ${getSpecialReqIconSvg(p.icon, alreadyHas ? '#2563EB' : p.color)}
+          <span>${alreadyHas ? '✓ ' + p.text : '+ ' + p.text}</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  function openDesktopActivityDetailsModal(item) {
+    if (!item) return;
+    modalActiveItem = item;
+    const modal = container.querySelector('#desktop-activity-details-modal');
+    const titleText = container.querySelector('#desktop-modal-details-title-text');
+    const bodyContent = container.querySelector('#desktop-modal-details-body-content');
+    const toggleBtn = container.querySelector('#desktop-btn-modal-details-toggle-complete');
+
+    if (titleText) titleText.textContent = item.title;
+    if (toggleBtn) {
+      toggleBtn.textContent = item.completed ? 'Mark Incomplete' : 'Mark Completed ✓';
+      toggleBtn.style.color = item.completed ? '#DC2626' : '#16A34A';
+    }
+
+    let dayLabel = 'Day 1';
+    let dateLabel = '';
+    activeBooking.itineraryDays?.forEach(d => {
+      if (d.items.some(i => i.id === item.id)) {
+        dayLabel = d.day;
+        dateLabel = d.date;
+      }
+    });
+
+    if (bodyContent) {
+      bodyContent.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0;">
+            <div>
+              <span style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase;">Schedule</span>
+              <h4 style="margin: 2px 0 0 0; font-size: 14px; color: #0F172A;">${dayLabel} • ${dateLabel}</h4>
+            </div>
+            <span class="status-pill ${item.completed ? 'status-paid' : 'badge-tour'}">
+              <span class="dot"></span>
+              ${item.completed ? 'Completed ✓' : 'Scheduled'}
+            </span>
+          </div>
+
+          <div class="customer-info-grid" style="gap: 10px 14px;">
+            <div class="info-cell">
+              <span class="info-label">Activity Name</span>
+              <span class="info-value-bold">${item.title}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Timing & Subtitle</span>
+              <span class="info-value-text">${item.subtitle}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Category Type</span>
+              <span class="info-value-text" style="text-transform: capitalize;">${item.type}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Assigned Status</span>
+              <span class="info-value-bold" style="color: ${item.assigned?.isAssigned ? '#15803D' : '#D97706'};">
+                ${item.assigned?.isAssigned ? item.assigned.name : 'Unassigned'}
+              </span>
+            </div>
+          </div>
+
+          ${item.assigned?.isAssigned ? `
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #F0FDF4; border: 1px solid #DCFCE7; border-radius: 10px;">
+              <img src="${item.assigned.avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
+              <div>
+                <h5 style="margin: 0; font-size: 13px; font-weight: 700; color: #166534;">${item.assigned.name}</h5>
+                <p style="margin: 0; font-size: 11.5px; color: #15803D;">Assigned Coordinator</p>
+              </div>
+            </div>
+          ` : `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 10px;">
+              <span style="font-size: 12.5px; color: #1E40AF; font-weight: 600;">No vendor or staff assigned yet</span>
+              <button class="action-pill-btn" id="desktop-btn-modal-details-assign-now" style="background: #2563EB; color: #FFFFFF; border: none; padding: 5px 12px; font-size: 12px;">Assign Now</button>
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeDesktopActivityDetailsModal() {
+    const modal = container.querySelector('#desktop-activity-details-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function openDesktopEditActivityModal(item) {
+    if (!item) return;
+    modalActiveItem = item;
+    const modal = container.querySelector('#desktop-edit-activity-modal');
+    const titleInput = container.querySelector('#desktop-modal-edit-act-title');
+    const subtitleInput = container.querySelector('#desktop-modal-edit-act-subtitle');
+    const typeSelect = container.querySelector('#desktop-modal-edit-act-type');
+
+    if (titleInput) titleInput.value = item.title;
+    if (subtitleInput) subtitleInput.value = item.subtitle;
+    if (typeSelect) typeSelect.value = item.type || 'sightseeing';
+
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeDesktopEditActivityModal() {
+    const modal = container.querySelector('#desktop-edit-activity-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function openDesktopAddEventModal() {
+    const modal = container.querySelector('#desktop-add-event-modal');
+    const daySelect = container.querySelector('#desktop-modal-add-event-day-select');
+    const titleInput = container.querySelector('#desktop-modal-add-event-title');
+    const subtitleInput = container.querySelector('#desktop-modal-add-event-subtitle');
+
+    if (titleInput) titleInput.value = '';
+    if (subtitleInput) subtitleInput.value = '';
+
+    if (daySelect && activeBooking.itineraryDays) {
+      daySelect.innerHTML = activeBooking.itineraryDays.map((d, idx) => `
+        <option value="${idx}">${d.day} (${d.date})</option>
+      `).join('') + `<option value="new">+ Create New Day</option>`;
+    }
+
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeDesktopAddEventModal() {
+    const modal = container.querySelector('#desktop-add-event-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function openDesktopAssignModal(item) {
+    if (!item) return;
+    modalActiveItem = item;
+    const modal = container.querySelector('#desktop-assign-modal');
+    const actTitle = container.querySelector('#desktop-assign-activity-title');
+    const actSubtitle = container.querySelector('#desktop-assign-activity-subtitle');
+    const actCat = container.querySelector('#desktop-assign-activity-category');
+    if (actTitle) actTitle.textContent = item.title;
+    if (actSubtitle) actSubtitle.textContent = item.subtitle;
+    if (actCat) actCat.textContent = (item.type || 'activity').toUpperCase();
+
+    renderDesktopAssignList(desktopAssignTab);
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeDesktopAssignModal() {
+    const modal = container.querySelector('#desktop-assign-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function renderDesktopAssignList(tab) {
+    desktopAssignTab = tab;
+    const listEl = container.querySelector('#desktop-assign-picker-list');
+    if (!listEl) return;
+
+    let items = [];
+    if (tab === 'Team Members') {
+      items = teamMembers.map(m => ({ id: m.id, name: m.name, sub: m.role, avatar: m.avatar }));
+    } else if (tab === 'Vendors') {
+      items = vendors.map(v => ({ id: v.id, name: v.name, sub: v.service, avatar: v.image }));
+    } else {
+      items = contacts.map(c => ({ id: c.id, name: c.name, sub: c.role, avatar: c.avatar }));
+    }
+
+    if (!desktopSelectedAssignee && items.length > 0) {
+      desktopSelectedAssignee = items[0];
+    }
+
+    listEl.innerHTML = items.map(item => {
+      const isSel = desktopSelectedAssignee?.id === item.id;
+      return `
+        <div class="vendor-item-card ${isSel ? 'selected' : ''}" data-desktop-assign-select-id="${item.id}" style="padding: 8px 12px; cursor: pointer;">
+          <div class="vendor-item-left" style="gap: 10px;">
+            <div class="custom-radio ${isSel ? 'checked' : ''}">
+              ${isSel ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+            </div>
+            <img src="${item.avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
+            <div class="vendor-info">
+              <h4 style="font-size: 13.5px; margin: 0;">${item.name}</h4>
+              <p style="font-size: 12px; color: #64748B; margin: 0;">${item.sub}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   // Bind All Event Listeners
@@ -946,6 +1516,310 @@ export function createDesktopView(container) {
         return;
       }
 
+      // Close dropdown if clicked outside
+      if (!e.target.closest('.item-right-content') && openDropdownItemId) {
+        openDropdownItemId = null;
+        renderDetailPanel();
+      }
+
+      // Desktop Itinerary Three Dots `⋮` Button
+      const menuTrigger = e.target.closest('[data-trigger-desktop-item-menu], [data-trigger-item-menu]');
+      if (menuTrigger) {
+        e.stopPropagation();
+        const itemId = menuTrigger.getAttribute('data-trigger-desktop-item-menu') || 
+                       menuTrigger.getAttribute('data-trigger-item-menu') || 
+                       menuTrigger.dataset.triggerDesktopItemMenu || 
+                       menuTrigger.dataset.triggerItemMenu;
+        openDropdownItemId = openDropdownItemId === itemId ? null : itemId;
+        renderDetailPanel();
+        return;
+      }
+
+      // Desktop Itinerary Dropdown Menu Actions
+      const dropdownAct = e.target.closest('[data-desktop-dropdown-act], [data-dropdown-act]');
+      if (dropdownAct) {
+        e.stopPropagation();
+        const act = dropdownAct.getAttribute('data-desktop-dropdown-act') || 
+                    dropdownAct.getAttribute('data-dropdown-act') || 
+                    dropdownAct.dataset.desktopDropdownAct || 
+                    dropdownAct.dataset.dropdownAct;
+        const itemId = dropdownAct.getAttribute('data-target-id') || 
+                       dropdownAct.dataset.targetId;
+
+        let foundItem = null;
+        activeBooking?.itineraryDays?.forEach(d => {
+          const item = d.items.find(i => i.id === itemId);
+          if (item) foundItem = item;
+        });
+
+        openDropdownItemId = null;
+        renderDetailPanel();
+
+        if (act === 'assign') {
+          openDesktopAssignModal(foundItem);
+        } else if (act === 'details') {
+          openDesktopActivityDetailsModal(foundItem);
+        } else if (act === 'edit') {
+          openDesktopEditActivityModal(foundItem);
+        } else if (act === 'complete') {
+          if (foundItem) {
+            foundItem.completed = !foundItem.completed;
+            renderDetailPanel();
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { 
+                message: foundItem.completed ? `Marked "${foundItem.title}" as Complete! ✓` : `Marked "${foundItem.title}" as Scheduled`,
+                type: 'success' 
+              }
+            }));
+          }
+        } else if (act === 'remove') {
+          if (foundItem) {
+            activeBooking?.itineraryDays?.forEach(d => {
+              const idx = d.items.indexOf(foundItem);
+              if (idx !== -1) d.items.splice(idx, 1);
+            });
+            renderDetailPanel();
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Removed "${foundItem.title}" from itinerary`, type: 'info' }
+            }));
+          }
+        }
+        return;
+      }
+
+      // Desktop Special Requirements Modal Triggers & Actions
+      if (e.target.closest('#desktop-edit-special-req-btn')) {
+        openDesktopSpecialReqModal();
+        return;
+      }
+
+      const delReqBtn = e.target.closest('[data-desktop-delete-req-id]');
+      if (delReqBtn) {
+        const reqId = delReqBtn.dataset.desktopDeleteReqId;
+        if (activeBooking) {
+          activeBooking.specialRequirements = activeBooking.specialRequirements.filter(r => r.id !== reqId);
+          renderDesktopSpecialReqModalContent();
+        }
+        return;
+      }
+
+      const presetBtn = e.target.closest('[data-desktop-preset-text]');
+      if (presetBtn) {
+        const text = presetBtn.dataset.desktopPresetText;
+        const icon = presetBtn.dataset.desktopPresetIcon;
+        const color = presetBtn.dataset.desktopPresetColor;
+        if (activeBooking) {
+          activeBooking.specialRequirements = activeBooking.specialRequirements || [];
+          const existingIdx = activeBooking.specialRequirements.findIndex(r => r.text.toLowerCase() === text.toLowerCase());
+          if (existingIdx !== -1) {
+            activeBooking.specialRequirements.splice(existingIdx, 1);
+          } else {
+            activeBooking.specialRequirements.push({ id: 'SR-' + Date.now(), icon, text, color });
+          }
+          renderDesktopSpecialReqModalContent();
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-add-custom-req')) {
+        const input = container.querySelector('#desktop-modal-custom-req-input');
+        const val = input?.value?.trim();
+        if (val && activeBooking) {
+          activeBooking.specialRequirements = activeBooking.specialRequirements || [];
+          activeBooking.specialRequirements.push({
+            id: 'SR-' + Date.now(),
+            icon: 'leaf',
+            text: val,
+            color: '#2563EB'
+          });
+          input.value = '';
+          renderDesktopSpecialReqModalContent();
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-done-special-req') || e.target.closest('#close-desktop-special-req-modal-btn')) {
+        closeDesktopSpecialReqModal();
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: 'Special requirements updated successfully!', type: 'success' }
+        }));
+        return;
+      }
+
+      // Desktop Add Event Modal Triggers & Actions
+      if (e.target.closest('#desktop-add-event-btn')) {
+        openDesktopAddEventModal();
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-cancel-add-event') || e.target.closest('#close-desktop-modal-add-event-btn')) {
+        closeDesktopAddEventModal();
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-submit-add-event')) {
+        const dayVal = container.querySelector('#desktop-modal-add-event-day-select')?.value;
+        const title = container.querySelector('#desktop-modal-add-event-title')?.value?.trim();
+        const subtitle = container.querySelector('#desktop-modal-add-event-subtitle')?.value?.trim();
+        const type = container.querySelector('#desktop-modal-add-event-type')?.value || 'sightseeing';
+
+        if (!title) {
+          alert('Please enter an event title.');
+          return;
+        }
+
+        const newEvent = {
+          id: 'IT-EVT-' + Date.now(),
+          type,
+          icon: type === 'transport' ? 'bus' : type === 'hotel' ? 'bed' : type === 'activity' ? 'raft' : type === 'food' ? 'restaurant' : 'camera',
+          title,
+          subtitle: subtitle || 'Scheduled event',
+          assigned: null,
+          completed: false
+        };
+
+        if (activeBooking) {
+          activeBooking.itineraryDays = activeBooking.itineraryDays || [];
+
+          if (dayVal === 'new') {
+            const nextDayNum = activeBooking.itineraryDays.length + 1;
+            activeBooking.itineraryDays.push({
+              day: `Day ${nextDayNum}`,
+              date: 'TBD',
+              items: [newEvent]
+            });
+          } else {
+            const dIdx = parseInt(dayVal, 10);
+            if (activeBooking.itineraryDays[dIdx]) {
+              activeBooking.itineraryDays[dIdx].items.push(newEvent);
+            }
+          }
+
+          closeDesktopAddEventModal();
+          renderDetailPanel();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Added "${title}" to itinerary!`, type: 'success' }
+          }));
+        }
+        return;
+      }
+
+      // Desktop Activity Details Modal Actions
+      if (e.target.closest('#desktop-btn-modal-details-toggle-complete')) {
+        if (modalActiveItem) {
+          modalActiveItem.completed = !modalActiveItem.completed;
+          openDesktopActivityDetailsModal(modalActiveItem);
+          renderDetailPanel();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { 
+              message: modalActiveItem.completed ? `Marked "${modalActiveItem.title}" as Complete! ✓` : `Marked as Scheduled`,
+              type: 'success' 
+            }
+          }));
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-modal-details-edit-trigger')) {
+        const itemToEdit = modalActiveItem;
+        closeDesktopActivityDetailsModal();
+        openDesktopEditActivityModal(itemToEdit);
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-modal-details-assign-now')) {
+        const itemToAssign = modalActiveItem;
+        closeDesktopActivityDetailsModal();
+        openDesktopAssignModal(itemToAssign);
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-modal-details-close-btn') || e.target.closest('#close-desktop-modal-details-btn')) {
+        closeDesktopActivityDetailsModal();
+        return;
+      }
+
+      // Desktop Edit Activity Modal Actions
+      if (e.target.closest('#desktop-btn-cancel-edit-activity') || e.target.closest('#close-desktop-modal-edit-activity-btn')) {
+        closeDesktopEditActivityModal();
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-save-edit-activity')) {
+        const title = container.querySelector('#desktop-modal-edit-act-title')?.value?.trim();
+        const subtitle = container.querySelector('#desktop-modal-edit-act-subtitle')?.value?.trim();
+        const type = container.querySelector('#desktop-modal-edit-act-type')?.value;
+
+        if (title && modalActiveItem) {
+          modalActiveItem.title = title;
+          if (subtitle) modalActiveItem.subtitle = subtitle;
+          if (type) modalActiveItem.type = type;
+          closeDesktopEditActivityModal();
+          renderDetailPanel();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Updated "${title}" activity!`, type: 'success' }
+          }));
+        }
+        return;
+      }
+
+      // Desktop Assign Modal Actions
+      if (e.target.closest('#desktop-assign-tab-team')) {
+        container.querySelectorAll('.assign-tabs-row .assign-tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.closest('#desktop-assign-tab-team').classList.add('active');
+        renderDesktopAssignList('Team Members');
+        return;
+      }
+      if (e.target.closest('#desktop-assign-tab-vendors')) {
+        container.querySelectorAll('.assign-tabs-row .assign-tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.closest('#desktop-assign-tab-vendors').classList.add('active');
+        renderDesktopAssignList('Vendors');
+        return;
+      }
+      if (e.target.closest('#desktop-assign-tab-contacts')) {
+        container.querySelectorAll('.assign-tabs-row .assign-tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.closest('#desktop-assign-tab-contacts').classList.add('active');
+        renderDesktopAssignList('Contacts');
+        return;
+      }
+
+      const assignCard = e.target.closest('[data-desktop-assign-select-id]');
+      if (assignCard) {
+        const id = assignCard.dataset.desktopAssignSelectId;
+        let pool = desktopAssignTab === 'Team Members' ? teamMembers : desktopAssignTab === 'Vendors' ? vendors : contacts;
+        const found = pool.find(item => item.id === id);
+        if (found) {
+          desktopSelectedAssignee = {
+            id: found.id,
+            name: found.name,
+            avatar: found.avatar || found.image
+          };
+          renderDesktopAssignList(desktopAssignTab);
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-confirm-assign')) {
+        if (modalActiveItem && desktopSelectedAssignee) {
+          modalActiveItem.assigned = {
+            isAssigned: true,
+            name: desktopSelectedAssignee.name,
+            avatar: desktopSelectedAssignee.avatar
+          };
+          closeDesktopAssignModal();
+          renderDetailPanel();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Assigned ${desktopSelectedAssignee.name} to "${modalActiveItem.title}"!`, type: 'success' }
+          }));
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-btn-cancel-assign') || e.target.closest('#close-desktop-assign-modal-btn')) {
+        closeDesktopAssignModal();
+        return;
+      }
+
       // Checkbox click
       const chk = e.target.closest('[data-d-select-id]');
       if (chk) {
@@ -967,6 +1841,37 @@ export function createDesktopView(container) {
         const b = bookings.find(item => item.id === id);
         if (b) {
           openDrawer(b);
+        }
+        return;
+      }
+
+      // Edit Customer Button inside Drawer
+      if (e.target.closest('#desktop-edit-customer-btn')) {
+        const name = activeBooking?.customer?.name || activeBooking?.guest?.name || 'Customer';
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: `Editing customer details for ${name}...`, type: 'info' }
+        }));
+        return;
+      }
+
+      // Add Follow-up Button inside Drawer
+      if (e.target.closest('#desktop-add-followup-btn')) {
+        const note = prompt('Enter follow-up note (e.g. Call with customer regarding dates):');
+        if (note && activeBooking?.customer) {
+          activeBooking.customer.leadFlow = activeBooking.customer.leadFlow || [];
+          activeBooking.customer.leadFlow.unshift({
+            date: 'Today',
+            time: 'Just now',
+            type: 'call',
+            iconBg: 'icon-blue',
+            title: 'Follow-up Call (Logged)',
+            desc: note,
+            author: 'By Ruyi Admin'
+          });
+          renderDetailPanel();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'New follow-up added to journey!', type: 'success' }
+          }));
         }
         return;
       }

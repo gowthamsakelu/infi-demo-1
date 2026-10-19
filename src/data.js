@@ -15,13 +15,56 @@ export const INITIAL_BOOKINGS = [
     price: '₹36,000',
     rawPrice: 36000,
     category: 'New Bookings',
-    selected: true,
+    selected: false,
     guest: {
       name: 'Amit Verma',
-      phone: '9876543210',
-      email: 'amit.verma@example.com',
+      phone: '+91 98765 43210',
+      email: 'amit.verma@gmail.com',
       age: 42,
       isPrimary: true
+    },
+    customer: {
+      name: 'Amit Verma',
+      initials: 'AV',
+      phone: '+91 98765 43210',
+      email: 'amit.verma@gmail.com',
+      location: 'New Delhi, Delhi',
+      leadSource: 'Website',
+      preferredDestination: 'Haridwar, Rishikesh, Kashi',
+      travelDates: '12 Nov – 15 Nov 2024',
+      customerType: 'Family (12 Pax)',
+      budgetEst: '₹ 35,000 – 40,000',
+      status: 'Paid',
+      shortDetails: 'Planning a family pilgrimage tour to Haridwar, Rishikesh & Kashi. Senior citizens in group requiring comfortable AC tempo traveler, riverfront hotel stay, and priority Aarti access.',
+      leadFlow: [
+        {
+          date: '08 Nov',
+          time: '10:30 AM',
+          type: 'call',
+          iconBg: 'icon-blue',
+          title: 'Initial Inquiry (Call)',
+          desc: 'Discussed Haridwar & Kashi circuit options. Inquired about senior citizen comfort and hotel heating.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '08 Nov',
+          time: '04:15 PM',
+          type: 'whatsapp',
+          iconBg: 'icon-green',
+          title: 'Shared Itinerary (WhatsApp)',
+          desc: 'Sent customized day-wise itinerary options, tempo traveler details, and hotel pricing.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '10 Nov',
+          time: '11:20 AM',
+          type: 'email',
+          iconBg: 'icon-blue',
+          title: 'Sent Quote & Voucher (Email)',
+          desc: 'Dispatched booking voucher #BK-5021, payment receipt, and coordinator contact details.',
+          author: 'By Ruyi Admin'
+        }
+      ]
     },
     destination: 'Haridwar, Rishikesh, Kashi',
     bookingType: 'Tour Package',
@@ -46,6 +89,13 @@ export const INITIAL_BOOKINGS = [
       { id: 10, name: 'Meera Singh', age: 41, role: 'Family Friend', phone: '9876543219' },
       { id: 11, name: 'Kabir Singh', age: 15, role: 'Teen', phone: '9876543220' },
       { id: 12, name: 'Priya Singh', age: 12, role: 'Child', phone: '9876543221' }
+    ],
+    specialRequirements: [
+      { id: 'SR-1', icon: 'leaf', text: 'Vegetarian Food', color: '#16A34A' },
+      { id: 'SR-2', icon: 'bed', text: '2 Connecting Rooms', color: '#2563EB' },
+      { id: 'SR-3', icon: 'accessibility', text: 'Wheelchair Assistance', color: '#2563EB' },
+      { id: 'SR-4', icon: 'waves', text: 'Near Beach', color: '#0284C7' },
+      { id: 'SR-5', icon: 'smile', text: 'Kid Friendly Activities', color: '#EA580C' }
     ],
     itineraryDays: [
       {
@@ -150,7 +200,7 @@ export const INITIAL_BOOKINGS = [
       { time: '10:45 AM, Today', title: 'Payment Confirmed', desc: 'Received ₹36,000 via Razorpay (UPI - HDFC). Invoice generated #INV-9921.', user: 'System' },
       { time: '11:15 AM, Today', title: 'Assigned to Rahul Mehta', desc: 'Rahul Mehta confirmed trip coordinator role and initiated supplier booking.', user: 'KS Admin' },
       { time: '12:30 PM, Today', title: 'Hotel Grand Kedarnath Booked', desc: 'Confirmed 3 Luxury Family Suites with heating amenities.', user: 'Rahul Mehta' },
-      { time: '01:00 PM, Today', title: 'Welcome WhatsApp Sent', desc: 'Itinerary and packing list sent to Amit Verma (+91 9876543210).', user: 'System' }
+      { time: '01:00 PM, Today', title: 'Welcome WhatsApp Sent', desc: 'Itinerary and packing list sent to Amit Verma (+91 98765 43210).', user: 'System' }
     ]
   },
   {
@@ -171,10 +221,53 @@ export const INITIAL_BOOKINGS = [
     selected: false,
     guest: {
       name: 'Kavita Roy',
-      phone: '9811223344',
-      email: 'kavita.roy@example.com',
+      phone: '+91 98112 23344',
+      email: 'kavita.roy@gmail.com',
       age: 32,
       isPrimary: true
+    },
+    customer: {
+      name: 'Kavita Roy',
+      initials: 'KR',
+      phone: '+91 98112 23344',
+      email: 'kavita.roy@gmail.com',
+      location: 'Mumbai, Maharashtra',
+      leadSource: 'Instagram',
+      preferredDestination: 'Candolim Beach, North Goa',
+      travelDates: '18 Nov – 20 Nov 2024',
+      customerType: 'Friends Group (8 Pax)',
+      budgetEst: '₹ 22,000 – 26,000',
+      status: 'Part Paid',
+      shortDetails: 'Planning a private villa weekend getaway in Candolim North Goa with friends. Interested in private pool, private chef barbecue, and river cruise.',
+      leadFlow: [
+        {
+          date: '14 Nov',
+          time: '11:00 AM',
+          type: 'call',
+          iconBg: 'icon-blue',
+          title: 'Initial Inquiry (Call)',
+          desc: 'Customer called inquiring about luxury 4BHK villas with private pool near Candolim.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '14 Nov',
+          time: '02:30 PM',
+          type: 'whatsapp',
+          iconBg: 'icon-green',
+          title: 'Shared Itinerary (WhatsApp)',
+          desc: 'Shared Villa Sol Candolim photos, chef menu options, and weekend package rates.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '15 Nov',
+          time: '05:00 PM',
+          type: 'email',
+          iconBg: 'icon-blue',
+          title: 'Sent Quote (Email)',
+          desc: 'Sent deposit payment link of ₹10,000 and reservation confirmation agreement.',
+          author: 'By Ruyi Admin'
+        }
+      ]
     },
     destination: 'Candolim Beach, North Goa',
     bookingType: 'Luxury Villa Stay',
@@ -195,6 +288,29 @@ export const INITIAL_BOOKINGS = [
       { id: 6, name: 'Kunal Shah', age: 33, role: 'Adult', phone: '9811223349' },
       { id: 7, name: 'Arjun Das', age: 30, role: 'Adult', phone: '9811223350' },
       { id: 8, name: 'Sneha Das', age: 29, role: 'Adult', phone: '9811223351' }
+    ],
+    specialRequirements: [
+      { id: 'SR-21', icon: 'waves', text: 'Near Beach', color: '#0284C7' },
+      { id: 'SR-22', icon: 'utensils', text: 'Barbecue Setup', color: '#EA580C' },
+      { id: 'SR-23', icon: 'clock', text: 'Late Check-out (2 PM)', color: '#D97706' }
+    ],
+    itineraryDays: [
+      {
+        day: 'Day 1',
+        date: '18 Nov',
+        items: [
+          { id: 'IT-GOA-1', type: 'hotel', icon: 'bed', title: 'Villa Check-in & Pool Drinks', subtitle: '01:00 PM • Candolim Luxury Villa', assigned: null },
+          { id: 'IT-GOA-2', type: 'food', icon: 'restaurant', title: 'Sundowner Barbecue Dinner', subtitle: '07:30 PM • Chef on call setup', assigned: null }
+        ]
+      },
+      {
+        day: 'Day 2',
+        date: '19 Nov',
+        items: [
+          { id: 'IT-GOA-3', type: 'transport', icon: 'bus', title: 'North Goa Beach Drive', subtitle: '11:00 AM • Anjuna & Vagator cafes', assigned: null },
+          { id: 'IT-GOA-4', type: 'activity', icon: 'raft', title: 'Private Sunset Yacht Cruise', subtitle: '05:00 PM • Mandovi River', assigned: null }
+        ]
+      }
     ],
     itinerary: [
       { day: 'Day 1', date: '18 Nov', title: 'Check-in & Sundowner Party', desc: 'Welcome drinks at Candolim Villa, private pool leisure and barbecue dinner.' },
@@ -221,13 +337,56 @@ export const INITIAL_BOOKINGS = [
     price: '₹9,000',
     rawPrice: 9000,
     category: 'New Bookings',
-    selected: true,
+    selected: false,
     guest: {
       name: 'Deepak Chopra',
-      phone: '9711554433',
-      email: 'deepak.c@example.com',
+      phone: '+91 97115 54433',
+      email: 'deepak.c@gmail.com',
       age: 27,
       isPrimary: true
+    },
+    customer: {
+      name: 'Deepak Chopra',
+      initials: 'DC',
+      phone: '+91 97115 54433',
+      email: 'deepak.c@gmail.com',
+      location: 'Gurugram, Haryana',
+      leadSource: 'Google Search',
+      preferredDestination: 'Shivpuri to NIM Beach, Rishikesh',
+      travelDates: '10 Nov – 15 Nov 2024',
+      customerType: 'Adventure Group (6 Pax)',
+      budgetEst: '₹ 9,000 – 12,000',
+      status: 'Paid',
+      shortDetails: 'Group of college friends looking for high-adrenaline 24 km white water rafting, cliff jumping, and GoPro video coverage.',
+      leadFlow: [
+        {
+          date: '07 Nov',
+          time: '09:30 AM',
+          type: 'call',
+          iconBg: 'icon-blue',
+          title: 'Initial Inquiry (Call)',
+          desc: 'Group lead checked rapid conditions and safety gear certification.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '07 Nov',
+          time: '01:00 PM',
+          type: 'whatsapp',
+          iconBg: 'icon-green',
+          title: 'Shared Itinerary (WhatsApp)',
+          desc: 'Sent 24 KM Marine Drive to NIM beach slot details and waiver documents.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '08 Nov',
+          time: '10:15 AM',
+          type: 'email',
+          iconBg: 'icon-blue',
+          title: 'Sent Quote & Voucher (Email)',
+          desc: 'Payment of ₹9,000 verified. Guide and transport coordinator assigned.',
+          author: 'By Ruyi Admin'
+        }
+      ]
     },
     destination: 'Shivpuri to NIM Beach, Rishikesh',
     bookingType: 'Adventure Sport',
@@ -246,6 +405,21 @@ export const INITIAL_BOOKINGS = [
       { id: 4, name: 'Manish Tyagi', age: 27, role: 'Participant', phone: '9711554436' },
       { id: 5, name: 'Gaurav Bisht', age: 29, role: 'Participant', phone: '9711554437' },
       { id: 6, name: 'Siddharth Sen', age: 26, role: 'Participant', phone: '9711554438' }
+    ],
+    specialRequirements: [
+      { id: 'SR-31', icon: 'shield', text: 'First Aid & Medical Kit', color: '#DC2626' },
+      { id: 'SR-32', icon: 'camera', text: 'GoPro 4K Recording', color: '#2563EB' },
+      { id: 'SR-33', icon: 'leaf', text: 'Vegetarian Food', color: '#16A34A' }
+    ],
+    itineraryDays: [
+      {
+        day: 'Day 1',
+        date: '11 Nov',
+        items: [
+          { id: 'IT-RFT-1', type: 'activity', icon: 'raft', title: 'Marine Drive Briefing', subtitle: '09:00 AM • Safety instructions & gear fitment', assigned: null },
+          { id: 'IT-RFT-2', type: 'activity', icon: 'raft', title: '24 KM Grade 4 Rapids & Cliff Jump', subtitle: '10:00 AM • Shivpuri to NIM Beach', assigned: null }
+        ]
+      }
     ],
     itinerary: [
       { day: 'Day 1', date: '11 Nov', title: 'Marine Drive to NIM Beach Rafting', desc: 'Safety briefing at base camp, 24 km thrilling rapids, body surfing and cliff jumping.' }
@@ -272,10 +446,53 @@ export const INITIAL_BOOKINGS = [
     selected: false,
     guest: {
       name: 'Rohit Joshi',
-      phone: '9899112233',
-      email: 'rohit.j@example.com',
+      phone: '+91 98991 12233',
+      email: 'rohit.j@gmail.com',
       age: 35,
       isPrimary: true
+    },
+    customer: {
+      name: 'Rohit Joshi',
+      initials: 'RJ',
+      phone: '+91 98991 12233',
+      email: 'rohit.j@gmail.com',
+      location: 'Ahmedabad, Gujarat',
+      leadSource: 'Referral',
+      preferredDestination: 'Old Manali, Himachal Pradesh',
+      travelDates: '25 Nov – 28 Nov 2024',
+      customerType: 'Family (4 Pax)',
+      budgetEst: '₹ 26,500 – 30,000',
+      status: 'Pending',
+      shortDetails: 'Celebrating 5th wedding anniversary with spouse and two young kids. Looking for luxury pine chalet, Solang snow excursion, and evening bonfire.',
+      leadFlow: [
+        {
+          date: '18 Nov',
+          time: '12:15 PM',
+          type: 'call',
+          iconBg: 'icon-blue',
+          title: 'Initial Inquiry (Call)',
+          desc: 'Client requested cottage options with fireplace and snow view in Old Manali.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '18 Nov',
+          time: '03:45 PM',
+          type: 'whatsapp',
+          iconBg: 'icon-green',
+          title: 'Shared Itinerary (WhatsApp)',
+          desc: 'Sent pine chalet photos, anniversary cake arrangement details, and cab options.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '19 Nov',
+          time: '11:00 AM',
+          type: 'email',
+          iconBg: 'icon-blue',
+          title: 'Sent Quote (Email)',
+          desc: 'Sent comprehensive quote for 3N/4D with MAP meal plan and sightseeing.',
+          author: 'By Ruyi Admin'
+        }
+      ]
     },
     destination: 'Old Manali, Himachal Pradesh',
     bookingType: 'Resort Holiday',
@@ -292,6 +509,44 @@ export const INITIAL_BOOKINGS = [
       { id: 2, name: 'Aditi Joshi', age: 33, role: 'Spouse', phone: '9899112234' },
       { id: 3, name: 'Vihaan Joshi', age: 7, role: 'Child', phone: '9899112235' },
       { id: 4, name: 'Isha Joshi', age: 4, role: 'Child', phone: '9899112236' }
+    ],
+    specialRequirements: [
+      { id: 'SR-41', icon: 'smile', text: 'Kid Friendly Activities', color: '#EA580C' },
+      { id: 'SR-42', icon: 'baby', text: 'Baby Crib / Cot', color: '#8B5CF6' },
+      { id: 'SR-43', icon: 'bed', text: '2 Connecting Rooms', color: '#2563EB' }
+    ],
+    itineraryDays: [
+      {
+        day: 'Day 1',
+        date: '25 Nov',
+        items: [
+          { id: 'IT-MAN-1', type: 'hotel', icon: 'bed', title: 'Check-in at Pine Chalet', subtitle: '12:00 PM • Welcome tea & cedar walk', assigned: null },
+          { id: 'IT-MAN-2', type: 'activity', icon: 'raft', title: 'Evening Cedar Bonfire', subtitle: '07:00 PM • Private pine courtyard', assigned: null }
+        ]
+      },
+      {
+        day: 'Day 2',
+        date: '26 Nov',
+        items: [
+          { id: 'IT-MAN-3', type: 'transport', icon: 'bus', title: 'Solang Valley Snow Excursion', subtitle: '09:30 AM • Cable car & snow activities', assigned: null },
+          { id: 'IT-MAN-4', type: 'food', icon: 'restaurant', title: 'Riverside Trout Dinner', subtitle: '08:00 PM • Old Manali Cafe setup', assigned: null }
+        ]
+      },
+      {
+        day: 'Day 3',
+        date: '27 Nov',
+        items: [
+          { id: 'IT-MAN-5', type: 'activity', icon: 'camera', title: 'Naggar Castle & Heritage Walk', subtitle: '10:30 AM • Art gallery & historic fort', assigned: null },
+          { id: 'IT-MAN-6', type: 'activity', icon: 'raft', title: 'Vashisht Sulphur Springs', subtitle: '03:30 PM • Natural hot springs bath', assigned: null }
+        ]
+      },
+      {
+        day: 'Day 4',
+        date: '28 Nov',
+        items: [
+          { id: 'IT-MAN-7', type: 'transport', icon: 'bus', title: 'Check-out & Mall Road Transfer', subtitle: '10:00 AM • Luggage assistance & departure', assigned: null }
+        ]
+      }
     ],
     itinerary: [
       { day: 'Day 1', date: '25 Nov', title: 'Check-in at Pine Chalet', desc: 'Warm cider welcome, leisure walk through cedar woods.' },
@@ -321,10 +576,53 @@ export const INITIAL_BOOKINGS = [
     selected: false,
     guest: {
       name: 'Akash Goel',
-      phone: '9822446688',
-      email: 'akash.goel@example.com',
+      phone: '+91 98224 46688',
+      email: 'akash.goel@gmail.com',
       age: 24,
       isPrimary: true
+    },
+    customer: {
+      name: 'Akash Goel',
+      initials: 'AG',
+      phone: '+91 98224 46688',
+      email: 'akash.goel@gmail.com',
+      location: 'Chandigarh, Punjab',
+      leadSource: 'Instagram',
+      preferredDestination: 'Bir Billing, Himachal Pradesh',
+      travelDates: '5 Nov – 7 Nov 2024',
+      customerType: 'Couple (2 Pax)',
+      budgetEst: '₹ 6,000 – 8,000',
+      status: 'Pending',
+      shortDetails: 'Weekend tandem paragliding from Billing takeoff site to Bir landing ground with 4K GoPro recording.',
+      leadFlow: [
+        {
+          date: '02 Nov',
+          time: '03:00 PM',
+          type: 'call',
+          iconBg: 'icon-blue',
+          title: 'Initial Inquiry (Call)',
+          desc: 'Client inquired about morning wind conditions and pilot flight certifications.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '02 Nov',
+          time: '05:30 PM',
+          type: 'whatsapp',
+          iconBg: 'icon-green',
+          title: 'Shared Itinerary (WhatsApp)',
+          desc: 'Shared takeoff timings, safety guidelines, and 4K video recording details.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '03 Nov',
+          time: '10:00 AM',
+          type: 'email',
+          iconBg: 'icon-blue',
+          title: 'Sent Quote (Email)',
+          desc: 'Confirmed 2 flight slots with certified pilots pending final weather clearance.',
+          author: 'By Ruyi Admin'
+        }
+      ]
     },
     destination: 'Bir Billing, Himachal Pradesh',
     bookingType: 'Tandem Paragliding',
@@ -339,6 +637,28 @@ export const INITIAL_BOOKINGS = [
     guests: [
       { id: 1, name: 'Akash Goel', age: 24, role: 'Primary Contact', phone: '9822446688' },
       { id: 2, name: 'Riya Bansal', age: 23, role: 'Participant', phone: '9822446689' }
+    ],
+    specialRequirements: [
+      { id: 'SR-51', icon: 'camera', text: 'GoPro 4K Recording', color: '#2563EB' },
+      { id: 'SR-52', icon: 'clock', text: 'Early Morning Slot (7 AM)', color: '#D97706' }
+    ],
+    itineraryDays: [
+      {
+        day: 'Day 1',
+        date: '5 Nov',
+        items: [
+          { id: 'IT-BIR-1', type: 'activity', icon: 'raft', title: 'Billing 2400m Takeoff', subtitle: '07:30 AM • Tandem flight over pine forests', assigned: null },
+          { id: 'IT-BIR-2', type: 'food', icon: 'restaurant', title: 'Landing Site & Tibetan Cafe Lunch', subtitle: '12:30 PM • Organic garden cafe', assigned: null }
+        ]
+      },
+      {
+        day: 'Day 2',
+        date: '6 Nov',
+        items: [
+          { id: 'IT-BIR-3', type: 'activity', icon: 'camera', title: 'Chokling Monastery & Stupa Tour', subtitle: '09:30 AM • Tibetan cultural heritage walk', assigned: null },
+          { id: 'IT-BIR-4', type: 'transport', icon: 'bus', title: 'Return Drop to Pathankot', subtitle: '04:00 PM • Private cab departure', assigned: null }
+        ]
+      }
     ],
     itinerary: [
       { day: 'Day 1', date: '5 Nov', title: 'Billing Takeoff & Landing at Bir', desc: 'Transfer up to 2400m Billing launchpad, 30 min tandem flight gliding over tea gardens.' }
@@ -365,10 +685,53 @@ export const INITIAL_BOOKINGS = [
     selected: false,
     guest: {
       name: 'Mrs. Vandana Sehgal',
-      phone: '9810102030',
+      phone: '+91 98101 02030',
       email: 'vandana.sehgal@dps.edu',
       age: 48,
       isPrimary: true
+    },
+    customer: {
+      name: 'Mrs. Vandana Sehgal',
+      initials: 'VS',
+      phone: '+91 98101 02030',
+      email: 'vandana.sehgal@dps.edu',
+      location: 'New Delhi, Delhi',
+      leadSource: 'Corporate / School',
+      preferredDestination: 'Delhi - Agra - Mathura - Delhi',
+      travelDates: '10 Oct – 11 Oct 2024',
+      customerType: 'School Excursion (60 Pax)',
+      budgetEst: '₹ 1,20,000 – 1,40,000',
+      status: 'Paid',
+      shortDetails: 'Annual educational excursion for Grade 10 students visiting Taj Mahal, Agra Fort, and Fatehpur Sikri with 2 luxury BharatBenz buses and tour guides.',
+      leadFlow: [
+        {
+          date: '01 Oct',
+          time: '11:00 AM',
+          type: 'call',
+          iconBg: 'icon-blue',
+          title: 'Initial Inquiry (Call)',
+          desc: 'School administration submitted formal RFP for educational transport and meals.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '03 Oct',
+          time: '02:00 PM',
+          type: 'whatsapp',
+          iconBg: 'icon-green',
+          title: 'Shared Itinerary (WhatsApp)',
+          desc: 'Sent safety certifications, driver police verification, and detailed meal plans.',
+          author: 'By Ruyi Admin'
+        },
+        {
+          date: '05 Oct',
+          time: '04:30 PM',
+          type: 'email',
+          iconBg: 'icon-blue',
+          title: 'Sent Quote & Voucher (Email)',
+          desc: 'Signed contract and dispatched trip confirmation voucher #BK-5026.',
+          author: 'By Ruyi Admin'
+        }
+      ]
     },
     destination: 'Delhi - Agra - Mathura - Delhi',
     bookingType: 'School Excursion & Transport',
@@ -386,6 +749,30 @@ export const INITIAL_BOOKINGS = [
       { id: 3, name: 'Ms. Geeta Nair', age: 39, role: 'Teacher', phone: '9810102032' },
       { id: 4, name: 'Mr. Arvind Yadav', age: 42, role: 'Bus Coordinator', phone: '9810102033' }
     ],
+    specialRequirements: [
+      { id: 'SR-61', icon: 'shield', text: 'First Aid & Medical Kit', color: '#DC2626' },
+      { id: 'SR-62', icon: 'leaf', text: 'Vegetarian Food', color: '#16A34A' },
+      { id: 'SR-63', icon: 'smile', text: 'Kid Friendly Activities', color: '#EA580C' }
+    ],
+    itineraryDays: [
+      {
+        day: 'Day 1',
+        date: '10 Oct',
+        items: [
+          { id: 'IT-SCH-1', type: 'transport', icon: 'bus', title: 'Delhi Campus Departure', subtitle: '06:00 AM • 2x Luxury AC Buses', assigned: null },
+          { id: 'IT-SCH-2', type: 'activity', icon: 'camera', title: 'Taj Mahal Guided Heritage Tour', subtitle: '11:30 AM • UNESCO Heritage guide fitment', assigned: null },
+          { id: 'IT-SCH-3', type: 'activity', icon: 'raft', title: 'Agra Fort Architectural Walk', subtitle: '03:30 PM • Historic courtyards and palaces', assigned: null }
+        ]
+      },
+      {
+        day: 'Day 2',
+        date: '11 Oct',
+        items: [
+          { id: 'IT-SCH-4', type: 'activity', icon: 'camera', title: 'Fatehpur Sikri & Buland Darwaza', subtitle: '09:30 AM • Guided educational field session', assigned: null },
+          { id: 'IT-SCH-5', type: 'transport', icon: 'bus', title: 'Safe Return to Delhi Campus', subtitle: '03:00 PM • Evening tea stop & arrival at 7 PM', assigned: null }
+        ]
+      }
+    ],
     itinerary: [
       { day: 'Day 1', date: '10 Oct', title: 'Delhi to Agra Heritage Visit', desc: 'Taj Mahal and Agra Fort educational guided tour, overnight hotel stay.' },
       { day: 'Day 2', date: '11 Oct', title: 'Fatehpur Sikri & Return', desc: 'Buland Darwaza visit and safe return to Delhi campus by 7 PM.' }
@@ -397,9 +784,11 @@ export const INITIAL_BOOKINGS = [
 ];
 
 export const STAFF_MEMBERS = [
-  { id: 'ST-01', name: 'Rahul Mehta', role: 'Tour Manager', phone: '+91 98765 00111', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80', activeTrips: 4 },
-  { id: 'ST-02', name: 'Priya Sharma', role: 'Villa Concierge', phone: '+91 98765 00222', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80', activeTrips: 3 },
-  { id: 'ST-03', name: 'Karan Sapalia', role: 'Head of Operations', phone: '+91 98765 00333', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80', activeTrips: 6 }
+  { id: 'ST-01', name: 'Rahul Mehta', role: 'Tour Operations Manager', phone: '+91 98765 00111', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80', activeTrips: 4 },
+  { id: 'ST-02', name: 'Priya Sharma', role: 'Trip Coordinator', phone: '+91 98765 00222', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80', activeTrips: 3 },
+  { id: 'ST-03', name: 'Amit Patel', role: 'Senior Dispatch Lead', phone: '+91 98765 00333', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80', activeTrips: 5 },
+  { id: 'ST-04', name: 'Vikram Sethi', role: 'Fleet & Logistics Lead', phone: '+91 98765 00444', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80', activeTrips: 2 },
+  { id: 'ST-05', name: 'Karan Sapalia', role: 'Head of Operations', phone: '+91 98765 00555', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80', activeTrips: 6 }
 ];
 
 export const VENDORS_LIST = [
@@ -415,7 +804,7 @@ export const VENDORS_LIST = [
     id: 'V-02',
     name: 'Himalayan Adventures',
     phone: '+91 91234 52789',
-    service: 'Rafting • Rishikesh',
+    service: 'Rafting & Trekking • Rishikesh',
     image: '/images/kedarnath.jpg',
     selected: false
   },
@@ -426,6 +815,98 @@ export const VENDORS_LIST = [
     service: 'White Water Rafting • Kayaking',
     image: '/images/rishikesh.jpg',
     selected: false
+  },
+  {
+    id: 'V-04',
+    name: 'Garhwal Luxury Transport',
+    phone: '+91 98370 11223',
+    service: 'Fleet Services & Tempo Travelers',
+    image: '/images/manali.jpg',
+    selected: false
   }
 ];
+
+export const CONTACTS_LIST = [
+  {
+    id: 'CT-01',
+    name: 'Mohan Rawat',
+    phone: '+91 98371 22334',
+    role: 'Senior Mountain Driver',
+    details: 'Tempo Traveler (UK-07-TA-4421) • 12 Yrs Exp',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80'
+  },
+  {
+    id: 'CT-02',
+    name: 'Suresh Nautiyal',
+    phone: '+91 94120 55667',
+    role: 'Certified Rafting & Trek Guide',
+    details: 'Grade 4 Rafting License • River Rescue Certified',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80'
+  },
+  {
+    id: 'CT-03',
+    name: 'Dr. R.K. Joshi',
+    phone: '+91 98290 88776',
+    role: 'Camp Medical Officer',
+    details: 'High Altitude First Responder • Rishikesh Base',
+    avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&q=80'
+  },
+  {
+    id: 'CT-04',
+    name: 'Anita Negi',
+    phone: '+91 97600 33445',
+    role: 'Resort Front Desk Manager',
+    details: 'Hotel Ganga View • VIP Check-in Coordinator',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80'
+  },
+  {
+    id: 'CT-05',
+    name: 'Rajesh Bhandari',
+    phone: '+91 94101 99887',
+    role: 'Ganga Aarti & Temple Coordinator',
+    details: 'Har Ki Pauri Priority VIP Seating Priest',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80'
+  }
+];
+
+export const SPECIAL_REQUIREMENTS_PRESETS = [
+  { id: 'preset-1', icon: 'leaf', text: 'Vegetarian Food', color: '#16A34A' },
+  { id: 'preset-2', icon: 'bed', text: '2 Connecting Rooms', color: '#2563EB' },
+  { id: 'preset-3', icon: 'accessibility', text: 'Wheelchair Assistance', color: '#2563EB' },
+  { id: 'preset-4', icon: 'waves', text: 'Near Beach', color: '#0284C7' },
+  { id: 'preset-5', icon: 'smile', text: 'Kid Friendly Activities', color: '#EA580C' },
+  { id: 'preset-6', icon: 'baby', text: 'Baby Crib / Cot', color: '#8B5CF6' },
+  { id: 'preset-7', icon: 'clock', text: 'Late Check-out', color: '#D97706' },
+  { id: 'preset-8', icon: 'utensils', text: 'Jain / Non-Spicy Food', color: '#10B981' },
+  { id: 'preset-9', icon: 'shield', text: 'First Aid & Medical Kit', color: '#DC2626' }
+];
+
+export function getSpecialReqIconSvg(icon, color = '#2563EB') {
+  switch (icon) {
+    case 'leaf':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>`;
+    case 'bed':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>`;
+    case 'accessibility':
+    case 'wheelchair':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="4" r="1.5"/><path d="m19 19-5-3v-5l4.5-1.5"/><path d="M4 19a5 5 0 0 1 4.5-7.5"/><path d="M14 13.5V17a4 4 0 0 1-4 4"/></svg>`;
+    case 'waves':
+    case 'water':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>`;
+    case 'smile':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>`;
+    case 'baby':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.5 1.5.5 2 0"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9M5 6.3A9 9 0 0 0 3.2 10.2"/></svg>`;
+    case 'clock':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+    case 'utensils':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 2v19"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`;
+    case 'shield':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+    case 'camera':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`;
+    default:
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  }
+}
 

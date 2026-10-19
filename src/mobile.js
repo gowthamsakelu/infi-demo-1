@@ -1,54 +1,37 @@
-// Mobile View Renderer and Controller
-import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST } from './data.js';
+import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, getSpecialReqIconSvg } from './data.js';
 
 export function createMobileView(container, options = {}) {
   let bookings = [...INITIAL_BOOKINGS];
   let vendors = [...VENDORS_LIST];
+  let teamMembers = [...STAFF_MEMBERS];
+  let contacts = [...CONTACTS_LIST];
   let activeCategory = 'New Bookings'; // 'New Bookings', 'Assigned', 'Ongoing'
   let searchQuery = '';
   let activeModalBooking = bookings[0]; // Haridwar - Kashi Trip BK-5021
-  let activeModalTab = options.initialTab || 'overview'; // 'overview', 'guests', 'itinerary', 'updates'
+  let activeModalTab = options.initialTab || 'customer-details'; // 'customer-details', 'guests', 'itinerary', 'updates'
   let isModalOpen = options.autoOpenModal !== undefined ? options.autoOpenModal : false;
   let showAllGuests = false;
+  let modalActiveItem = null;
 
   // Itinerary & Assign State
   let openDropdownItemId = options.initialDropdownItemId || null; // e.g. 'IT-101' to preview Screen 2
   let isAssignSheetOpen = options.initialAssignSheetOpen || false; // to preview Screen 3
   let targetActivityItem = activeModalBooking.itineraryDays?.[1]?.items?.[1] || null; // River Rafting
-  let selectedVendorId = 'V-01'; // Adventure World
-  let assignVendorTab = 'Vendors';
+  let assignVendorTab = 'Team Members'; // 'Team Members', 'Vendors', 'Contacts'
+  let selectedAssignee = {
+    type: 'Team Members',
+    id: teamMembers[0].id,
+    name: teamMembers[0].name,
+    avatar: teamMembers[0].avatar,
+    roleOrService: teamMembers[0].role,
+    phone: teamMembers[0].phone
+  };
   let vendorSearchQuery = '';
   let optionalNoteText = '';
 
   // Root container structure
   container.innerHTML = `
     <div class="phone-device">
-      <!-- Status Bar -->
-      <div class="mobile-status-bar">
-        <span class="status-time">9:41</span>
-        <div class="status-bar-icons">
-          <!-- Signal Icon -->
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <rect x="2" y="16" width="3" height="5" rx="1"/>
-            <rect x="7" y="12" width="3" height="9" rx="1"/>
-            <rect x="12" y="8" width="3" height="13" rx="1"/>
-            <rect x="17" y="4" width="3" height="17" rx="1"/>
-          </svg>
-          <!-- Wifi Icon -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <path d="M5 13a10 10 0 0 1 14 0" />
-            <path d="M8.5 16.5a5 5 0 0 1 7 0" />
-            <path d="M12 20h.01" />
-          </svg>
-          <!-- Battery Icon -->
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <rect x="2" y="7" width="17" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
-            <rect x="4" y="9" width="11" height="6" rx="1.5"/>
-            <path d="M21 10.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-      </div>
-
       <!-- Scrollable Main Screen Content -->
       <div class="mobile-screen-content" id="mobile-screen-scroll">
         <!-- Header -->
@@ -119,15 +102,15 @@ export function createMobileView(container, options = {}) {
           </button>
         </div>
 
-        <!-- Selection / Bulk Action Bar -->
-        <div class="mobile-selection-bar">
+        <!-- Selection / Bulk Action Bar (Hidden by default, shown when items selected) -->
+        <div class="mobile-selection-bar" id="mobile-selection-bar" style="display: none;">
           <div class="selection-left">
-            <div class="custom-checkbox checked" id="mobile-select-all-box">
+            <div class="custom-checkbox" id="mobile-select-all-box">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <span id="mobile-selected-count">2 selected</span>
+            <span id="mobile-selected-count">0 selected</span>
           </div>
           <div class="selection-actions-right">
             <button class="action-pill-btn" id="mobile-bulk-assign-btn">
@@ -197,9 +180,6 @@ export function createMobileView(container, options = {}) {
         </button>
       </div>
 
-      <!-- Home Indicator -->
-      <div class="home-indicator"></div>
-
       <!-- Backdrop for Bottom Sheet Modal -->
       <div class="sheet-backdrop ${isModalOpen ? 'open' : ''}" id="mobile-sheet-backdrop"></div>
 
@@ -210,9 +190,9 @@ export function createMobileView(container, options = {}) {
           <!-- Populated dynamically -->
         </div>
 
-        <!-- Sheet Navigation Tabs (Overview, Guests, Itinerary, Updates) -->
+        <!-- Sheet Navigation Tabs (Customer Details, Guests, Itinerary, Updates) -->
         <div class="sheet-tabs-nav">
-          <button class="sheet-tab-btn ${activeModalTab === 'overview' ? 'active' : ''}" data-sheet-tab="overview">Overview</button>
+          <button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
           <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
           <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
           <button class="sheet-tab-btn ${activeModalTab === 'updates' ? 'active' : ''}" data-sheet-tab="updates">Updates</button>
@@ -319,13 +299,13 @@ export function createMobileView(container, options = {}) {
           <!-- Rendered dynamically -->
         </div>
 
-        <!-- Add New Vendor link -->
+        <!-- Add New Item link -->
         <button class="btn-add-new-vendor" id="btn-add-new-vendor-trigger">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" x2="12" y1="5" y2="19"/>
             <line x1="5" x2="19" y1="12" y2="12"/>
           </svg>
-          Add New Vendor
+          <span id="assign-add-btn-label">Add New Team Member</span>
         </button>
 
         <!-- Optional Note Input -->
@@ -350,6 +330,138 @@ export function createMobileView(container, options = {}) {
             </svg>
             Assign & Send on WhatsApp
           </button>
+        </div>
+      </div>
+
+      <!-- Modal 1: Edit Special Requirements -->
+      <div class="modal-overlay" id="mobile-special-req-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" x2="8" y1="13" y2="13"/>
+                <line x1="16" x2="8" y1="17" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <h3>Edit Special Requirements</h3>
+            </div>
+            <button class="sheet-close-btn" id="close-special-req-modal-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Current Requirements</label>
+              <div id="modal-reqs-current-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto;"></div>
+            </div>
+            <div class="form-group">
+              <label>Quick Add Presets</label>
+              <div class="modal-chip-grid" id="modal-presets-chip-grid"></div>
+            </div>
+            <div class="form-group">
+              <label>Add Custom Requirement</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="modal-custom-req-input" placeholder="e.g. Extra pillows, Non-smoking room" style="flex: 1;" />
+                <button class="btn-primary-desktop" id="btn-add-custom-req" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">+ Add</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-confirm-booking" id="btn-done-special-req" style="height: 40px; font-size: 13.5px; border-radius: 10px;">Save & Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal 2: Activity Details -->
+      <div class="modal-overlay" id="mobile-activity-details-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="item-icon-box item-icon-bus" id="modal-details-icon-box" style="width: 30px; height: 30px;"></div>
+              <h3 id="modal-details-title-text">Activity Details</h3>
+            </div>
+            <button class="sheet-close-btn" id="close-modal-details-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body" id="modal-details-body-content"></div>
+          <div class="modal-footer" style="display: flex; gap: 8px; justify-content: space-between;">
+            <button class="action-pill-btn" id="btn-modal-details-toggle-complete" style="padding: 8px 14px; font-size: 12.5px;">Mark Completed</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="action-pill-btn" id="btn-modal-details-edit-trigger" style="padding: 8px 14px; font-size: 12.5px;">Edit</button>
+              <button class="btn-primary-desktop" id="btn-modal-details-close-btn" style="padding: 8px 16px; border-radius: 10px; font-size: 13px;">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal 3: Edit Activity -->
+      <div class="modal-overlay" id="mobile-edit-activity-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3>Edit Itinerary Activity</h3>
+            <button class="sheet-close-btn" id="close-modal-edit-activity-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Activity Title</label>
+              <input type="text" id="modal-edit-act-title" placeholder="e.g. River Rafting (16 km)" />
+            </div>
+            <div class="form-group">
+              <label>Timing & Subtitle / Location</label>
+              <input type="text" id="modal-edit-act-subtitle" placeholder="e.g. 10:00 AM • Rishikesh" />
+            </div>
+            <div class="form-group">
+              <label>Category / Icon</label>
+              <select id="modal-edit-act-type">
+                <option value="transport">Transport / Bus</option>
+                <option value="hotel">Hotel / Accommodation</option>
+                <option value="sightseeing">Sightseeing / Tour</option>
+                <option value="activity">Sport / Adventure</option>
+                <option value="food">Restaurant / Meal</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="btn-cancel-edit-activity">Cancel</button>
+            <button class="btn-primary-desktop" id="btn-save-edit-activity" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal 4: Add Itinerary Event -->
+      <div class="modal-overlay" id="mobile-add-event-modal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3>Add Itinerary Event</h3>
+            <button class="sheet-close-btn" id="close-modal-add-event-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Select Day</label>
+              <select id="modal-add-event-day-select"></select>
+            </div>
+            <div class="form-group">
+              <label>Event Title</label>
+              <input type="text" id="modal-add-event-title" placeholder="e.g. Sunset Boat Cruise & Tea" />
+            </div>
+            <div class="form-group">
+              <label>Time & Subtitle / Location</label>
+              <input type="text" id="modal-add-event-subtitle" placeholder="e.g. 05:30 PM • 1-hour cruise with DJ" />
+            </div>
+            <div class="form-group">
+              <label>Category / Icon</label>
+              <select id="modal-add-event-type">
+                <option value="sightseeing">Sightseeing / Tour</option>
+                <option value="transport">Transport / Bus</option>
+                <option value="hotel">Hotel / Accommodation</option>
+                <option value="activity">Sport / Adventure</option>
+                <option value="food">Restaurant / Meal</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="btn-cancel-add-event">Cancel</button>
+            <button class="btn-primary-desktop" id="btn-submit-add-event" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Add to Itinerary</button>
+          </div>
         </div>
       </div>
     </div>
@@ -415,9 +527,14 @@ export function createMobileView(container, options = {}) {
     const countEl = container.querySelector('#mobile-selected-count');
     if (countEl) countEl.textContent = `${selectedCount} selected`;
 
+    const selBar = container.querySelector('#mobile-selection-bar');
+    if (selBar) {
+      selBar.style.display = selectedCount > 0 ? 'flex' : 'none';
+    }
+
     const allBox = container.querySelector('#mobile-select-all-box');
     if (allBox) {
-      allBox.className = selectedCount > 0 ? 'custom-checkbox checked' : 'custom-checkbox';
+      allBox.className = selectedCount > 0 ? (selectedCount === bookings.length ? 'custom-checkbox checked' : 'custom-checkbox checked') : 'custom-checkbox';
     }
   }
 
@@ -478,64 +595,62 @@ export function createMobileView(container, options = {}) {
               <path d="M2 17h20"/>
               <path d="M6 8v9"/>
             </svg>
-            <span>4D / 3N</span>
+            <span>${b.duration}</span>
           </div>
         </div>
       `;
     } else {
-      // Overview & Guests header (from earlier reference)
+      // Customer Details Header (Exact match to Image 3 reference)
+      const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
+      const custName = b.customer?.name || b.guest?.name || 'Customer';
+
       headerCard.innerHTML = `
         <div class="sheet-drag-handle-bar">
           <div class="sheet-handle"></div>
-          <button class="sheet-close-btn" id="mobile-sheet-close-btn">
+          <button class="sheet-close-btn" id="mobile-sheet-close-btn" title="Close">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
         </div>
-        <div class="sheet-header-card">
-          <div class="sheet-card-top-row">
-            <div class="sheet-thumb">
-              <img src="${b.image}" alt="${b.title}" />
+        <div class="sheet-customer-header">
+          <div class="customer-avatar-badge">${initials}</div>
+          <div class="customer-header-info">
+            <div class="customer-title-row">
+              <h2 class="customer-name-title">${custName}</h2>
+              <span class="status-pill ${b.statusClass}">
+                <span class="dot"></span>
+                ${b.status}
+              </span>
             </div>
-            <div class="sheet-header-info">
-              <div class="sheet-tag-row">
-                <span class="card-type-badge ${b.typeClass}">${b.type}</span>
-                <span class="status-pill ${b.statusClass}">
-                  <span class="dot"></span>
-                  ${b.status}
-                </span>
-              </div>
-              <h2 class="sheet-title">${b.title}</h2>
-              <p class="sheet-sub-id">Booking ID ${b.id}</p>
-            </div>
-          </div>
-          <div class="sheet-stats-row">
-            <div class="stat-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-              </svg>
-              <span>${b.pax} Pax</span>
-            </div>
-            <div class="stat-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                <line x1="16" x2="16" y1="2" y2="6"/>
-                <line x1="8" x2="8" y1="2" y2="6"/>
-                <line x1="3" x2="21" y1="10" y2="10"/>
-              </svg>
-              <span>${b.dates}</span>
-            </div>
-            <div class="stat-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M2 4v16"/>
-                <path d="M2 8h18a2 2 0 0 1 2 2v10"/>
-                <path d="M2 17h20"/>
-                <path d="M6 8v9"/>
-              </svg>
-              <span>4D / 3N</span>
+            <p class="customer-trip-subtitle">${b.title}</p>
+            <div class="customer-meta-chips">
+              <span class="meta-chip">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                </svg>
+                ${b.pax} Pax
+              </span>
+              <span class="meta-dot">•</span>
+              <span class="meta-chip">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                ${b.duration}
+              </span>
+              <span class="meta-dot">•</span>
+              <span class="meta-chip">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                  <line x1="16" x2="16" y1="2" y2="6"/>
+                  <line x1="8" x2="8" y1="2" y2="6"/>
+                  <line x1="3" x2="21" y1="10" y2="10"/>
+                </svg>
+                ${b.dates}
+              </span>
             </div>
           </div>
         </div>
@@ -620,172 +735,255 @@ export function createMobileView(container, options = {}) {
 
     const b = activeModalBooking;
 
-    // Overview Tab
-    if (activeModalTab === 'overview') {
+    // Customer Details Tab (Exact structure from Image 3 reference)
+    if (activeModalTab === 'customer-details') {
+      const c = b.customer || {
+        name: b.guest.name,
+        initials: b.guest.name.split(' ').map(n=>n[0]).join('') || 'CU',
+        phone: b.guest.phone,
+        email: b.guest.email,
+        location: 'New Delhi, Delhi',
+        leadSource: 'Website',
+        preferredDestination: b.destination,
+        travelDates: `${b.dates} 2024`,
+        customerType: `Family (${b.pax} Pax)`,
+        budgetEst: b.price,
+        status: b.status,
+        shortDetails: b.notes || 'Pilgrimage and family holiday tour package booked through Ruyi portal.',
+        leadFlow: [
+          { date: '10 Nov', time: '10:30 AM', type: 'call', iconBg: 'icon-blue', title: 'Initial Inquiry (Call)', desc: 'Customer inquired about booking details and availability.', author: 'By Ruyi Admin' },
+          { date: '10 Nov', time: '02:15 PM', type: 'whatsapp', iconBg: 'icon-green', title: 'Shared Itinerary (WhatsApp)', desc: 'Sent day-wise details and pricing breakdown.', author: 'By Ruyi Admin' },
+          { date: '11 Nov', time: '11:00 AM', type: 'email', iconBg: 'icon-blue', title: 'Sent Quote & Voucher (Email)', desc: 'Dispatched voucher confirmation and receipt.', author: 'By Ruyi Admin' }
+        ]
+      };
+
       bodyEl.innerHTML = `
-        <div class="detail-rows-list">
-          <div class="detail-row-item" id="row-click-guest">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Guest</span>
-              <div class="detail-value">${b.guest.name}</div>
-            </div>
-            <svg class="row-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </div>
-
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Contact</span>
-              <div class="detail-value">${b.guest.phone}</div>
-            </div>
-            <div class="detail-contact-actions">
-              <button class="circle-action-btn btn-phone" title="Call Guest" onclick="alert('Calling ${b.guest.name} (${b.guest.phone})...')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        <div class="customer-details-tab-content">
+          <!-- Card 1: Customer Information -->
+          <div class="details-section-card">
+            <div class="details-section-header">
+              <div class="section-header-left">
+                <div class="section-icon-circle blue-circle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </div>
+                <h3>Customer Information</h3>
+              </div>
+              <button class="btn-edit-action" id="btn-edit-customer" title="Edit Customer Details">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                 </svg>
-              </button>
-              <button class="circle-action-btn btn-whatsapp" title="WhatsApp Guest" onclick="alert('Opening WhatsApp for ${b.guest.name}...')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                </svg>
-              </button>
-              <button class="circle-action-btn btn-email" title="Email Guest" onclick="alert('Sending email to ${b.guest.email || 'guest@example.com'}...')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect width="20" height="16" x="2" y="4" rx="2"/>
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                </svg>
+                Edit
               </button>
             </div>
-          </div>
 
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Destination</span>
-              <div class="detail-value">${b.destination}</div>
-            </div>
-            <button class="circle-action-btn btn-map" title="View on Map" onclick="alert('Viewing map for ${b.destination}')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                <line x1="9" x2="9" y1="3" y2="18"/>
-                <line x1="15" x2="15" y1="6" y2="21"/>
-              </svg>
-            </button>
-          </div>
+            <div class="customer-info-grid">
+              <!-- Left Column: Row 1 -->
+              <div class="info-cell">
+                <span class="info-label">Customer Name</span>
+                <span class="info-value-bold">${c.name}</span>
+              </div>
+              <!-- Right Column: Row 1 -->
+              <div class="info-cell info-cell-email">
+                <span class="info-label">Email</span>
+                <div class="contact-value-row">
+                  <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
+                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="alert('Sending email to ${c.email}...')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect width="20" height="16" x="2" y="4" rx="2"/>
+                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
 
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                <rect width="20" height="14" x="2" y="6" rx="2"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Booking Type</span>
-              <div class="detail-value">${b.bookingType}</div>
-            </div>
-          </div>
+              <!-- Left Column: Row 2 -->
+              <div class="info-cell info-cell-contact">
+                <span class="info-label">Primary Contact</span>
+                <div class="contact-value-row">
+                  <span class="info-value-bold phone-number-val">${c.phone}</span>
+                  <div class="contact-action-btns">
+                    <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="alert('Calling ${c.name} (${c.phone})...')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                      </svg>
+                    </button>
+                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="alert('Opening WhatsApp for ${c.name} (${c.phone})...')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Right Column: Row 2 -->
+              <div class="info-cell">
+                <span class="info-label">Lead Source</span>
+                <span class="info-value-text">${c.leadSource || 'Website'}</span>
+              </div>
 
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                <line x1="16" x2="16" y1="2" y2="6"/>
-                <line x1="8" x2="8" y1="2" y2="6"/>
-                <line x1="3" x2="21" y1="10" y2="10"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Travel Date</span>
-              <div class="detail-value">${b.travelDateFull}</div>
-            </div>
-          </div>
+              <!-- Left Column: Row 3 -->
+              <div class="info-cell">
+                <span class="info-label">Travel Dates</span>
+                <span class="info-value-text">${c.travelDates || b.dates}</span>
+              </div>
+              <!-- Right Column: Row 3 -->
+              <div class="info-cell">
+                <span class="info-label">Location</span>
+                <span class="info-value-text">${c.location || 'New Delhi, Delhi'}</span>
+              </div>
 
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m9 11 3 3L22 4"/>
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Services</span>
-              <div class="detail-value">${b.services}</div>
-            </div>
-          </div>
+              <!-- Left Column: Row 4 -->
+              <div class="info-cell">
+                <span class="info-label">Preferred Destination</span>
+                <span class="info-value-text">${c.preferredDestination || b.destination}</span>
+              </div>
+              <!-- Right Column: Row 4 -->
+              <div class="info-cell">
+                <span class="info-label">Budget (Est.)</span>
+                <span class="info-value-bold" style="color: #0F172A;">${c.budgetEst || b.price}</span>
+              </div>
 
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="20" height="14" x="2" y="5" rx="2"/>
-                <line x1="2" x2="22" y1="10" y2="10"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <div class="detail-value">${b.assignedStatus}</div>
-            </div>
-            <svg class="row-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </div>
-
-          <div class="detail-row-item" id="row-click-staff">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-              </svg>
-            </div>
-            <div class="detail-content">
-              <span class="detail-label">Assigned To</span>
-              <div class="assigned-avatar-pill">
-                ${b.assignedTo.avatar ? `<img src="${b.assignedTo.avatar}" alt="${b.assignedTo.name}" />` : ''}
-                <span class="detail-value">${b.assignedTo.name}</span>
+              <!-- Left Column: Row 5 -->
+              <div class="info-cell">
+                <span class="info-label">Customer Type</span>
+                <span class="info-value-text">${c.customerType || 'Family (12 Pax)'}</span>
+              </div>
+              <!-- Right Column: Row 5 -->
+              <div class="info-cell">
+                <span class="info-label">Status</span>
+                <div>
+                  <span class="status-pill ${b.statusClass}" style="display: inline-flex;">
+                    <span class="dot"></span>
+                    ${c.status || b.status}
+                  </span>
+                </div>
               </div>
             </div>
-            <svg class="row-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
+
+            <!-- Short Details Card -->
+            <div class="short-details-card">
+              <div class="short-details-header">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" x2="8" y1="13" y2="13"/>
+                  <line x1="16" x2="8" y1="17" y2="17"/>
+                  <line x1="10" x2="8" y1="9" y2="9"/>
+                </svg>
+                <span>Short Details</span>
+              </div>
+              <p class="short-details-text">${c.shortDetails || b.notes || 'Trip details logged into operations queue.'}</p>
+            </div>
           </div>
 
-          <div class="detail-row-item">
-            <div class="detail-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
+          <!-- Card 2: Lead Flow / Journey -->
+          <div class="details-section-card">
+            <div class="details-section-header">
+              <div class="section-header-left">
+                <div class="section-icon-circle blue-circle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                  </svg>
+                </div>
+                <h3>Lead Flow / Journey</h3>
+              </div>
+              <button class="btn-add-followup" id="btn-add-followup-action">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" x2="12" y1="5" y2="19"/>
+                  <line x1="5" x2="19" y1="12" y2="12"/>
+                </svg>
+                Add Follow-up
+              </button>
             </div>
-            <div class="detail-content">
-              <span class="detail-label">Notes</span>
-              <div class="detail-value-sub">${b.notes}</div>
+
+            <div class="lead-journey-timeline">
+              ${(c.leadFlow && c.leadFlow.length > 0) ? c.leadFlow.map((step, idx) => `
+                <div class="journey-item">
+                  <div class="journey-time-col">
+                    <span class="journey-date">${step.date}</span>
+                    <span class="journey-time">${step.time}</span>
+                  </div>
+                  <div class="journey-track-col">
+                    <div class="journey-dot-icon ${step.iconBg || 'icon-blue'}">
+                      ${step.type === 'call' ? `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                      ` : step.type === 'whatsapp' ? `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                        </svg>
+                      ` : `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect width="20" height="16" x="2" y="4" rx="2"/>
+                          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                        </svg>
+                      `}
+                    </div>
+                    ${idx < c.leadFlow.length - 1 ? '<div class="journey-line"></div>' : ''}
+                  </div>
+                  <div class="journey-content-col">
+                    <div class="journey-item-header">
+                      <h4>${step.title}</h4>
+                      <span class="journey-author">${step.author || 'By Ruyi Admin'}</span>
+                    </div>
+                    <p class="journey-desc">${step.desc}</p>
+                  </div>
+                </div>
+              `).join('') : `
+                <p style="font-size: 13px; color: #94A3B8; text-align: center; padding: 16px 0;">No journey follow-ups recorded yet.</p>
+              `}
             </div>
           </div>
         </div>
       `;
     } 
-    // Guests Tab (Screen 4 from earlier)
+    // Guests Tab (Exact match to Image 1 reference with Special Requirements)
     else if (activeModalTab === 'guests') {
       const visibleGuests = showAllGuests ? b.guests : b.guests.slice(0, 4);
       const remainingCount = b.guests.length - 4;
+      const reqs = b.specialRequirements || [];
 
       bodyEl.innerHTML = `
+        <!-- Special Requirements Card (Image 1 reference) -->
+        <div class="special-req-card">
+          <div class="special-req-header">
+            <div class="special-req-title-left">
+              <div class="special-req-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" x2="8" y1="13" y2="13"/>
+                  <line x1="16" x2="8" y1="17" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+              </div>
+              <span class="special-req-title">Special Requirements</span>
+            </div>
+            <button class="special-req-edit-btn" id="mobile-edit-special-req-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                <path d="m15 5 4 4"/>
+              </svg>
+              Edit
+            </button>
+          </div>
+          <div class="special-req-chips-list">
+            ${reqs.length > 0 ? reqs.map(r => `
+              <span class="special-req-chip">
+                <span class="req-chip-icon">${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+                <span class="req-chip-text">${r.text}</span>
+              </span>
+            `).join('') : `
+              <span style="font-size: 12.5px; color: #94A3B8; font-style: italic;">No special requirements added yet. Click Edit to add.</span>
+            `}
+          </div>
+        </div>
+
         <div class="guests-sub-header">
           <div class="guest-search-box">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -837,11 +1035,30 @@ export function createMobileView(container, options = {}) {
         </div>
       `;
     }
-    // Itinerary Tab (Screens 1, 2, 4 from NEW reference!)
+    // Itinerary Tab (Screens 1, 2, 4 from reference with Details, Edit, Mark Complete, Add Event)
     else if (activeModalTab === 'itinerary') {
       const days = b.itineraryDays || [];
 
       bodyEl.innerHTML = `
+        <div class="itinerary-section-header-bar">
+          <h3>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+            Day-wise Schedule
+          </h3>
+          <button class="btn-add-event-pill" id="mobile-add-event-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" x2="12" y1="5" y2="19"/>
+              <line x1="5" x2="19" y1="12" y2="12"/>
+            </svg>
+            + Add Event
+          </button>
+        </div>
+
         <div class="itinerary-v2-container">
           ${days.map(dayGroup => `
             <div class="itinerary-day-section">
@@ -860,7 +1077,7 @@ export function createMobileView(container, options = {}) {
               <!-- Activity Items for this day -->
               <div class="timeline-items-col">
                 ${dayGroup.items.map(item => `
-                  <div class="itinerary-card-item" data-itinerary-item-id="${item.id}">
+                  <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-itinerary-item-id="${item.id}">
                     <div class="item-left-content">
                       ${getItemIconSvg(item.type)}
                       <div class="item-text-info">
@@ -870,6 +1087,16 @@ export function createMobileView(container, options = {}) {
                     </div>
 
                     <div class="item-right-content">
+                      <!-- Completed Pill Badge -->
+                      ${item.completed ? `
+                        <span class="completed-pill-badge" title="Completed">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                          Completed
+                        </span>
+                      ` : ''}
+
                       <!-- Assigned Badge & Avatar (Screen 4) -->
                       ${item.assigned && item.assigned.isAssigned ? `
                         <span class="assigned-pill-badge">Assigned</span>
@@ -919,14 +1146,7 @@ export function createMobileView(container, options = {}) {
                               <rect width="18" height="18" x="3" y="3" rx="2"/>
                               <polyline points="9 12 11 14 15 10"/>
                             </svg>
-                            <span>Mark Complete</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-dropdown-act="note" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                            </svg>
-                            <span>Add Note</span>
+                            <span>${item.completed ? 'Mark as Incomplete' : 'Mark Complete'}</span>
                           </button>
                           <button class="dropdown-item-btn item-remove" data-dropdown-act="remove" data-target-id="${item.id}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -969,42 +1189,127 @@ export function createMobileView(container, options = {}) {
 
   function renderAssignVendorsList() {
     const listEl = container.querySelector('#assign-vendors-list');
+    const searchInput = container.querySelector('#assign-vendor-search');
+    const addBtnLabel = container.querySelector('#assign-add-btn-label');
     if (!listEl) return;
 
-    let filtered = vendors.filter(v => {
-      return !vendorSearchQuery || 
-        v.name.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
-        v.service.toLowerCase().includes(vendorSearchQuery.toLowerCase());
-    });
+    if (assignVendorTab === 'Team Members') {
+      if (searchInput) searchInput.placeholder = 'Search team member by name, role or phone...';
+      if (addBtnLabel) addBtnLabel.textContent = 'Add New Team Member';
 
-    listEl.innerHTML = filtered.map(v => `
-      <div class="vendor-item-card ${v.id === selectedVendorId ? 'selected' : ''}" data-vendor-id="${v.id}">
-        <div class="vendor-item-left">
-          <div class="custom-radio ${v.id === selectedVendorId ? 'checked' : ''}">
-            ${v.id === selectedVendorId ? `
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                <polyline points="20 6 9 17 4 12"/>
+      const filtered = teamMembers.filter(m => {
+        return !vendorSearchQuery || 
+          m.name.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
+          m.role.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
+          m.phone.toLowerCase().includes(vendorSearchQuery.toLowerCase());
+      });
+
+      listEl.innerHTML = filtered.map(m => {
+        const isSelected = selectedAssignee?.id === m.id;
+        return `
+          <div class="vendor-item-card ${isSelected ? 'selected' : ''}" data-assign-type="Team Members" data-assign-id="${m.id}">
+            <div class="vendor-item-left">
+              <div class="custom-radio ${isSelected ? 'checked' : ''}">
+                ${isSelected ? `
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                ` : ''}
+              </div>
+              <img src="${m.avatar}" class="vendor-avatar" style="border-radius: 50%;" alt="${m.name}" />
+              <div class="vendor-info">
+                <h4>${m.name}</h4>
+                <p>${m.role} • ${m.phone}</p>
+              </div>
+            </div>
+            <span class="active-badge-pill" style="font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-weight: 700; flex-shrink: 0;">
+              ${m.activeTrips} Trips
+            </span>
+          </div>
+        `;
+      }).join('');
+    } else if (assignVendorTab === 'Vendors') {
+      if (searchInput) searchInput.placeholder = 'Search vendor by name, service or location...';
+      if (addBtnLabel) addBtnLabel.textContent = 'Add New Vendor';
+
+      const filtered = vendors.filter(v => {
+        return !vendorSearchQuery || 
+          v.name.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
+          v.service.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
+          v.phone.toLowerCase().includes(vendorSearchQuery.toLowerCase());
+      });
+
+      listEl.innerHTML = filtered.map(v => {
+        const isSelected = selectedAssignee?.id === v.id;
+        return `
+          <div class="vendor-item-card ${isSelected ? 'selected' : ''}" data-assign-type="Vendors" data-assign-id="${v.id}">
+            <div class="vendor-item-left">
+              <div class="custom-radio ${isSelected ? 'checked' : ''}">
+                ${isSelected ? `
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                ` : ''}
+              </div>
+              <img src="${v.image}" class="vendor-avatar" alt="${v.name}" />
+              <div class="vendor-info">
+                <h4>${v.name}</h4>
+                <p>${v.service ? `${v.service} • ` : ''}${v.phone}</p>
+              </div>
+            </div>
+            <button class="item-menu-btn" onclick="event.stopPropagation(); alert('Options for ${v.name}')" title="Vendor options">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="1"/>
+                <circle cx="12" cy="5" r="1"/>
+                <circle cx="12" cy="19" r="1"/>
               </svg>
-            ` : ''}
+            </button>
           </div>
-          <img src="${v.image}" class="vendor-avatar" alt="${v.name}" />
-          <div class="vendor-info">
-            <h4>${v.name}</h4>
-            <p>${v.service ? `${v.service} • ` : ''}${v.phone}</p>
+        `;
+      }).join('');
+    } else if (assignVendorTab === 'Contacts') {
+      if (searchInput) searchInput.placeholder = 'Search contact by name, role or phone...';
+      if (addBtnLabel) addBtnLabel.textContent = 'Add New Contact';
+
+      const filtered = contacts.filter(c => {
+        return !vendorSearchQuery || 
+          c.name.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
+          c.role.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
+          (c.details && c.details.toLowerCase().includes(vendorSearchQuery.toLowerCase())) ||
+          c.phone.toLowerCase().includes(vendorSearchQuery.toLowerCase());
+      });
+
+      listEl.innerHTML = filtered.map(c => {
+        const isSelected = selectedAssignee?.id === c.id;
+        return `
+          <div class="vendor-item-card ${isSelected ? 'selected' : ''}" data-assign-type="Contacts" data-assign-id="${c.id}">
+            <div class="vendor-item-left">
+              <div class="custom-radio ${isSelected ? 'checked' : ''}">
+                ${isSelected ? `
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                ` : ''}
+              </div>
+              <img src="${c.avatar}" class="vendor-avatar" style="border-radius: 50%;" alt="${c.name}" />
+              <div class="vendor-info">
+                <h4>${c.name}</h4>
+                <p>${c.role} • ${c.phone}</p>
+                ${c.details ? `<span style="font-size: 11px; color: #94A3B8; display: block; margin-top: 1px;">${c.details}</span>` : ''}
+              </div>
+            </div>
+            <a href="tel:${c.phone}" class="circle-action-btn btn-phone" style="width: 30px; height: 30px; flex-shrink: 0;" onclick="event.stopPropagation();" title="Call ${c.name}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </a>
           </div>
-        </div>
-        <button class="item-menu-btn" onclick="event.stopPropagation(); alert('Options for ${v.name}')" title="Vendor options">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="12" cy="12" r="1"/>
-            <circle cx="12" cy="5" r="1"/>
-            <circle cx="12" cy="19" r="1"/>
-          </svg>
-        </button>
-      </div>
-    `).join('');
+        `;
+      }).join('');
+    }
   }
 
-  function openModal(booking, tab = 'overview') {
+  function openModal(booking, tab = 'customer-details') {
     activeModalBooking = booking || bookings[0];
     activeModalTab = tab;
     isModalOpen = true;
@@ -1022,6 +1327,10 @@ export function createMobileView(container, options = {}) {
     const sheet = container.querySelector('#mobile-bottom-sheet');
     if (backdrop) backdrop.classList.add('open');
     if (sheet) sheet.classList.add('open');
+
+    // Ensure bottom nav is hidden so it never peeks beneath sheet
+    const bottomNav = container.querySelector('.mobile-bottom-nav');
+    if (bottomNav) bottomNav.style.setProperty('display', 'none', 'important');
   }
 
   function closeModal() {
@@ -1032,12 +1341,27 @@ export function createMobileView(container, options = {}) {
     const sheet = container.querySelector('#mobile-bottom-sheet');
     if (backdrop) backdrop.classList.remove('open');
     if (sheet) sheet.classList.remove('open');
+
+    // Restore bottom nav
+    const bottomNav = container.querySelector('.mobile-bottom-nav');
+    if (bottomNav) bottomNav.style.removeProperty('display');
   }
 
   function openAssignSheet(item) {
     targetActivityItem = item || activeModalBooking.itineraryDays?.[1]?.items?.[1];
     isAssignSheetOpen = true;
     openDropdownItemId = null;
+
+    // Completely hide bottom sheet so its sticky footer (Call, Message, etc.) cannot peek below!
+    const bottomSheet = container.querySelector('#mobile-bottom-sheet');
+    if (bottomSheet) {
+      bottomSheet.classList.add('hide-for-assign');
+      bottomSheet.style.setProperty('display', 'none', 'important');
+    }
+
+    // Completely hide bottom nav
+    const bottomNav = container.querySelector('.mobile-bottom-nav');
+    if (bottomNav) bottomNav.style.setProperty('display', 'none', 'important');
 
     // Update target activity card
     const cardEl = container.querySelector('#assign-activity-card-view');
@@ -1057,13 +1381,207 @@ export function createMobileView(container, options = {}) {
     renderAssignVendorsList();
 
     const sheet = container.querySelector('#mobile-assign-to-sheet');
-    if (sheet) sheet.classList.add('open');
+    if (sheet) {
+      sheet.classList.add('open');
+      sheet.style.setProperty('display', 'flex', 'important');
+    }
   }
 
   function closeAssignSheet() {
     isAssignSheetOpen = false;
     const sheet = container.querySelector('#mobile-assign-to-sheet');
-    if (sheet) sheet.classList.remove('open');
+    if (sheet) {
+      sheet.classList.remove('open');
+      sheet.style.removeProperty('display');
+    }
+
+    // Restore bottom sheet if modal was open
+    const bottomSheet = container.querySelector('#mobile-bottom-sheet');
+    if (bottomSheet && isModalOpen) {
+      bottomSheet.classList.remove('hide-for-assign');
+      bottomSheet.style.removeProperty('display');
+      bottomSheet.style.setProperty('display', 'flex', 'important');
+    }
+
+    // Restore bottom nav only if main modal is not open
+    const bottomNav = container.querySelector('.mobile-bottom-nav');
+    if (bottomNav && !isModalOpen) {
+      bottomNav.style.removeProperty('display');
+    }
+  }
+
+  // Modal Helpers
+  function openSpecialReqModal() {
+    const modal = container.querySelector('#mobile-special-req-modal');
+    if (!modal) return;
+    renderSpecialReqModalContent();
+    modal.classList.add('open');
+  }
+
+  function closeSpecialReqModal() {
+    const modal = container.querySelector('#mobile-special-req-modal');
+    if (modal) modal.classList.remove('open');
+    renderSheetBody();
+  }
+
+  function renderSpecialReqModalContent() {
+    const listEl = container.querySelector('#modal-reqs-current-list');
+    const presetsEl = container.querySelector('#modal-presets-chip-grid');
+    if (!listEl || !presetsEl || !activeModalBooking) return;
+
+    activeModalBooking.specialRequirements = activeModalBooking.specialRequirements || [];
+    const reqs = activeModalBooking.specialRequirements;
+
+    listEl.innerHTML = reqs.length > 0 ? reqs.map((r) => `
+      <div class="editable-req-item">
+        <div class="editable-req-item-left">
+          <span>${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+          <span>${r.text}</span>
+        </div>
+        <button class="btn-delete-req-pill" data-delete-req-id="${r.id}" title="Remove requirement">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    `).join('') : '<p style="font-size: 13px; color: #94A3B8; text-align: center; margin: 6px 0;">No requirements added yet.</p>';
+
+    presetsEl.innerHTML = SPECIAL_REQUIREMENTS_PRESETS.map(p => {
+      const alreadyHas = reqs.some(r => r.text.toLowerCase() === p.text.toLowerCase());
+      return `
+        <button class="preset-chip-btn ${alreadyHas ? 'is-active' : ''}" data-preset-text="${p.text}" data-preset-icon="${p.icon}" data-preset-color="${p.color}">
+          ${getSpecialReqIconSvg(p.icon, alreadyHas ? '#2563EB' : p.color)}
+          <span>${alreadyHas ? '✓ ' + p.text : '+ ' + p.text}</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  function openActivityDetailsModal(item) {
+    if (!item) return;
+    modalActiveItem = item;
+    const modal = container.querySelector('#mobile-activity-details-modal');
+    const titleText = container.querySelector('#modal-details-title-text');
+    const iconBox = container.querySelector('#modal-details-icon-box');
+    const bodyContent = container.querySelector('#modal-details-body-content');
+    const toggleBtn = container.querySelector('#btn-modal-details-toggle-complete');
+
+    if (titleText) titleText.textContent = item.title;
+    if (iconBox) iconBox.innerHTML = getItemIconSvg(item.type);
+    if (toggleBtn) {
+      toggleBtn.textContent = item.completed ? 'Mark Incomplete' : 'Mark Completed ✓';
+      toggleBtn.style.color = item.completed ? '#DC2626' : '#16A34A';
+    }
+
+    let dayLabel = 'Day 1';
+    let dateLabel = '';
+    activeModalBooking.itineraryDays?.forEach(d => {
+      if (d.items.some(i => i.id === item.id)) {
+        dayLabel = d.day;
+        dateLabel = d.date;
+      }
+    });
+
+    if (bodyContent) {
+      bodyContent.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0;">
+            <div>
+              <span style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase;">Schedule</span>
+              <h4 style="margin: 2px 0 0 0; font-size: 14px; color: #0F172A;">${dayLabel} • ${dateLabel}</h4>
+            </div>
+            <span class="status-pill ${item.completed ? 'status-paid' : 'badge-tour'}">
+              <span class="dot"></span>
+              ${item.completed ? 'Completed ✓' : 'Scheduled'}
+            </span>
+          </div>
+
+          <div class="customer-info-grid" style="gap: 10px 14px;">
+            <div class="info-cell">
+              <span class="info-label">Activity Name</span>
+              <span class="info-value-bold">${item.title}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Timing & Subtitle</span>
+              <span class="info-value-text">${item.subtitle}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Category Type</span>
+              <span class="info-value-text" style="text-transform: capitalize;">${item.type}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">Assigned Status</span>
+              <span class="info-value-bold" style="color: ${item.assigned?.isAssigned ? '#15803D' : '#D97706'};">
+                ${item.assigned?.isAssigned ? item.assigned.name : 'Unassigned'}
+              </span>
+            </div>
+          </div>
+
+          ${item.assigned?.isAssigned ? `
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #F0FDF4; border: 1px solid #DCFCE7; border-radius: 10px;">
+              <img src="${item.assigned.avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
+              <div>
+                <h5 style="margin: 0; font-size: 13px; font-weight: 700; color: #166534;">${item.assigned.name}</h5>
+                <p style="margin: 0; font-size: 11.5px; color: #15803D;">Assigned Coordinator</p>
+              </div>
+            </div>
+          ` : `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 10px;">
+              <span style="font-size: 12.5px; color: #1E40AF; font-weight: 600;">No vendor or staff assigned yet</span>
+              <button class="action-pill-btn" id="btn-modal-details-assign-now" style="background: #2563EB; color: #FFFFFF; border: none; padding: 5px 12px; font-size: 12px;">Assign Now</button>
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeActivityDetailsModal() {
+    const modal = container.querySelector('#mobile-activity-details-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function openEditActivityModal(item) {
+    if (!item) return;
+    modalActiveItem = item;
+    const modal = container.querySelector('#mobile-edit-activity-modal');
+    const titleInput = container.querySelector('#modal-edit-act-title');
+    const subtitleInput = container.querySelector('#modal-edit-act-subtitle');
+    const typeSelect = container.querySelector('#modal-edit-act-type');
+
+    if (titleInput) titleInput.value = item.title;
+    if (subtitleInput) subtitleInput.value = item.subtitle;
+    if (typeSelect) typeSelect.value = item.type || 'sightseeing';
+
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeEditActivityModal() {
+    const modal = container.querySelector('#mobile-edit-activity-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function openAddEventModal() {
+    const modal = container.querySelector('#mobile-add-event-modal');
+    const daySelect = container.querySelector('#modal-add-event-day-select');
+    const titleInput = container.querySelector('#modal-add-event-title');
+    const subtitleInput = container.querySelector('#modal-add-event-subtitle');
+
+    if (titleInput) titleInput.value = '';
+    if (subtitleInput) subtitleInput.value = '';
+
+    if (daySelect && activeModalBooking.itineraryDays) {
+      daySelect.innerHTML = activeModalBooking.itineraryDays.map((d, idx) => `
+        <option value="${idx}">${d.day} (${d.date})</option>
+      `).join('') + `<option value="new">+ Create New Day</option>`;
+    }
+
+    if (modal) modal.classList.add('open');
+  }
+
+  function closeAddEventModal() {
+    const modal = container.querySelector('#mobile-add-event-modal');
+    if (modal) modal.classList.remove('open');
   }
 
   function bindEvents() {
@@ -1117,6 +1635,37 @@ export function createMobileView(container, options = {}) {
 
     // Global Click Handler
     container.addEventListener('click', (e) => {
+      // Edit customer button
+      if (e.target.closest('#btn-edit-customer')) {
+        const name = activeModalBooking?.customer?.name || activeModalBooking?.guest?.name || 'Customer';
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: `Editing customer details for ${name}...`, type: 'info' }
+        }));
+        return;
+      }
+
+      // Add follow-up button
+      if (e.target.closest('#btn-add-followup-action')) {
+        const note = prompt('Enter follow-up note (e.g. Call with customer regarding dates):');
+        if (note && activeModalBooking?.customer) {
+          activeModalBooking.customer.leadFlow = activeModalBooking.customer.leadFlow || [];
+          activeModalBooking.customer.leadFlow.unshift({
+            date: 'Today',
+            time: 'Just now',
+            type: 'call',
+            iconBg: 'icon-blue',
+            title: 'Follow-up Call (Logged)',
+            desc: note,
+            author: 'By Ruyi Admin'
+          });
+          renderSheetBody();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'New follow-up added to journey!', type: 'success' }
+          }));
+        }
+        return;
+      }
+
       // Close dropdown if clicked outside
       if (!e.target.closest('.item-right-content') && openDropdownItemId) {
         openDropdownItemId = null;
@@ -1136,12 +1685,12 @@ export function createMobileView(container, options = {}) {
         return;
       }
 
-      // Card click
+      // Card click -> Open Modal on Customer Details
       const card = e.target.closest('.booking-card');
       if (card) {
         const id = card.dataset.bookingId;
         const b = bookings.find(item => item.id === id);
-        if (b) openModal(b, 'overview');
+        if (b) openModal(b, 'customer-details');
         return;
       }
 
@@ -1153,7 +1702,7 @@ export function createMobileView(container, options = {}) {
 
       // Itinerary Back Button `< Booking Details`
       if (e.target.closest('#itinerary-back-btn')) {
-        switchTab('overview');
+        switchTab('customer-details');
         return;
       }
 
@@ -1194,17 +1743,201 @@ export function createMobileView(container, options = {}) {
 
         if (act === 'assign') {
           openAssignSheet(foundItem);
+        } else if (act === 'details') {
+          openActivityDetailsModal(foundItem);
+        } else if (act === 'edit') {
+          openEditActivityModal(foundItem);
         } else if (act === 'complete') {
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Marked "${foundItem?.title}" as Complete!`, type: 'success' }
-          }));
+          if (foundItem) {
+            foundItem.completed = !foundItem.completed;
+            renderSheetBody();
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { 
+                message: foundItem.completed ? `Marked "${foundItem.title}" as Complete! ✓` : `Marked "${foundItem.title}" as Scheduled`,
+                type: 'success' 
+              }
+            }));
+          }
         } else if (act === 'remove') {
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Removed "${foundItem?.title}" from itinerary`, type: 'info' }
-          }));
+          if (foundItem) {
+            activeModalBooking.itineraryDays?.forEach(d => {
+              const idx = d.items.indexOf(foundItem);
+              if (idx !== -1) d.items.splice(idx, 1);
+            });
+            renderSheetBody();
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Removed "${foundItem.title}" from itinerary`, type: 'info' }
+            }));
+          }
+        }
+        return;
+      }
+
+      // Special Requirements Modal Triggers & Actions
+      if (e.target.closest('#mobile-edit-special-req-btn')) {
+        openSpecialReqModal();
+        return;
+      }
+
+      const delReqBtn = e.target.closest('[data-delete-req-id]');
+      if (delReqBtn) {
+        const reqId = delReqBtn.dataset.deleteReqId;
+        activeModalBooking.specialRequirements = activeModalBooking.specialRequirements.filter(r => r.id !== reqId);
+        renderSpecialReqModalContent();
+        return;
+      }
+
+      const presetBtn = e.target.closest('[data-preset-text]');
+      if (presetBtn) {
+        const text = presetBtn.dataset.presetText;
+        const icon = presetBtn.dataset.presetIcon;
+        const color = presetBtn.dataset.presetColor;
+        activeModalBooking.specialRequirements = activeModalBooking.specialRequirements || [];
+        const existingIdx = activeModalBooking.specialRequirements.findIndex(r => r.text.toLowerCase() === text.toLowerCase());
+        if (existingIdx !== -1) {
+          activeModalBooking.specialRequirements.splice(existingIdx, 1);
         } else {
+          activeModalBooking.specialRequirements.push({ id: 'SR-' + Date.now(), icon, text, color });
+        }
+        renderSpecialReqModalContent();
+        return;
+      }
+
+      if (e.target.closest('#btn-add-custom-req')) {
+        const input = container.querySelector('#modal-custom-req-input');
+        const val = input?.value?.trim();
+        if (val) {
+          activeModalBooking.specialRequirements = activeModalBooking.specialRequirements || [];
+          activeModalBooking.specialRequirements.push({
+            id: 'SR-' + Date.now(),
+            icon: 'leaf',
+            text: val,
+            color: '#2563EB'
+          });
+          input.value = '';
+          renderSpecialReqModalContent();
+        }
+        return;
+      }
+
+      if (e.target.closest('#btn-done-special-req') || e.target.closest('#close-special-req-modal-btn')) {
+        closeSpecialReqModal();
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: 'Special requirements updated successfully!', type: 'success' }
+        }));
+        return;
+      }
+
+      // Add Itinerary Event Modal Triggers & Actions
+      if (e.target.closest('#mobile-add-event-btn')) {
+        openAddEventModal();
+        return;
+      }
+
+      if (e.target.closest('#btn-cancel-add-event') || e.target.closest('#close-modal-add-event-btn')) {
+        closeAddEventModal();
+        return;
+      }
+
+      if (e.target.closest('#btn-submit-add-event')) {
+        const dayVal = container.querySelector('#modal-add-event-day-select')?.value;
+        const title = container.querySelector('#modal-add-event-title')?.value?.trim();
+        const subtitle = container.querySelector('#modal-add-event-subtitle')?.value?.trim();
+        const type = container.querySelector('#modal-add-event-type')?.value || 'sightseeing';
+
+        if (!title) {
+          alert('Please enter an event title.');
+          return;
+        }
+
+        const newEvent = {
+          id: 'IT-EVT-' + Date.now(),
+          type,
+          icon: type === 'transport' ? 'bus' : type === 'hotel' ? 'bed' : type === 'activity' ? 'raft' : type === 'food' ? 'restaurant' : 'camera',
+          title,
+          subtitle: subtitle || 'Scheduled activity',
+          assigned: null,
+          completed: false
+        };
+
+        activeModalBooking.itineraryDays = activeModalBooking.itineraryDays || [];
+
+        if (dayVal === 'new') {
+          const nextDayNum = activeModalBooking.itineraryDays.length + 1;
+          activeModalBooking.itineraryDays.push({
+            day: `Day ${nextDayNum}`,
+            date: 'TBD',
+            items: [newEvent]
+          });
+        } else {
+          const dIdx = parseInt(dayVal, 10);
+          if (activeModalBooking.itineraryDays[dIdx]) {
+            activeModalBooking.itineraryDays[dIdx].items.push(newEvent);
+          }
+        }
+
+        closeAddEventModal();
+        renderSheetBody();
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: `Added "${title}" to itinerary!`, type: 'success' }
+        }));
+        return;
+      }
+
+      // Activity Details Modal Actions
+      if (e.target.closest('#btn-modal-details-toggle-complete')) {
+        if (modalActiveItem) {
+          modalActiveItem.completed = !modalActiveItem.completed;
+          openActivityDetailsModal(modalActiveItem);
+          renderSheetBody();
           window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `${act.toUpperCase()}: ${foundItem?.title}`, type: 'info' }
+            detail: { 
+              message: modalActiveItem.completed ? `Marked "${modalActiveItem.title}" as Complete! ✓` : `Marked as Scheduled`,
+              type: 'success' 
+            }
+          }));
+        }
+        return;
+      }
+
+      if (e.target.closest('#btn-modal-details-edit-trigger')) {
+        const itemToEdit = modalActiveItem;
+        closeActivityDetailsModal();
+        openEditActivityModal(itemToEdit);
+        return;
+      }
+
+      if (e.target.closest('#btn-modal-details-assign-now')) {
+        const itemToAssign = modalActiveItem;
+        closeActivityDetailsModal();
+        openAssignSheet(itemToAssign);
+        return;
+      }
+
+      if (e.target.closest('#btn-modal-details-close-btn') || e.target.closest('#close-modal-details-btn')) {
+        closeActivityDetailsModal();
+        return;
+      }
+
+      // Edit Activity Modal Actions
+      if (e.target.closest('#btn-cancel-edit-activity') || e.target.closest('#close-modal-edit-activity-btn')) {
+        closeEditActivityModal();
+        return;
+      }
+
+      if (e.target.closest('#btn-save-edit-activity')) {
+        const title = container.querySelector('#modal-edit-act-title')?.value?.trim();
+        const subtitle = container.querySelector('#modal-edit-act-subtitle')?.value?.trim();
+        const type = container.querySelector('#modal-edit-act-type')?.value;
+
+        if (title && modalActiveItem) {
+          modalActiveItem.title = title;
+          if (subtitle) modalActiveItem.subtitle = subtitle;
+          if (type) modalActiveItem.type = type;
+          closeEditActivityModal();
+          renderSheetBody();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Updated "${title}" activity!`, type: 'success' }
           }));
         }
         return;
@@ -1222,48 +1955,114 @@ export function createMobileView(container, options = {}) {
         assignVendorTab = assignTabBtn.dataset.assignTab;
         container.querySelectorAll('.assign-tab-btn').forEach(b => b.classList.remove('active'));
         assignTabBtn.classList.add('active');
+        
+        // Ensure default selected assignee matches the active tab
+        if (assignVendorTab === 'Team Members' && (!selectedAssignee || selectedAssignee.type !== 'Team Members')) {
+          selectedAssignee = { type: 'Team Members', id: teamMembers[0].id, name: teamMembers[0].name, avatar: teamMembers[0].avatar, roleOrService: teamMembers[0].role, phone: teamMembers[0].phone };
+        } else if (assignVendorTab === 'Vendors' && (!selectedAssignee || selectedAssignee.type !== 'Vendors')) {
+          selectedAssignee = { type: 'Vendors', id: vendors[0].id, name: vendors[0].name, avatar: vendors[0].image, roleOrService: vendors[0].service, phone: vendors[0].phone };
+        } else if (assignVendorTab === 'Contacts' && (!selectedAssignee || selectedAssignee.type !== 'Contacts')) {
+          selectedAssignee = { type: 'Contacts', id: contacts[0].id, name: contacts[0].name, avatar: contacts[0].avatar, roleOrService: contacts[0].role, phone: contacts[0].phone };
+        }
+
         renderAssignVendorsList();
         return;
       }
 
-      // Vendor Item Selection
-      const vendorCard = e.target.closest('.vendor-item-card');
-      if (vendorCard) {
-        selectedVendorId = vendorCard.dataset.vendorId;
+      // Assign Item Selection (Team Member, Vendor, or Contact)
+      const assignCard = e.target.closest('.vendor-item-card');
+      if (assignCard) {
+        const type = assignCard.dataset.assignType;
+        const id = assignCard.dataset.assignId;
+        if (type === 'Team Members') {
+          const m = teamMembers.find(t => t.id === id);
+          if (m) selectedAssignee = { type, id: m.id, name: m.name, avatar: m.avatar, roleOrService: m.role, phone: m.phone };
+        } else if (type === 'Vendors') {
+          const v = vendors.find(t => t.id === id);
+          if (v) selectedAssignee = { type, id: v.id, name: v.name, avatar: v.image, roleOrService: v.service, phone: v.phone };
+        } else if (type === 'Contacts') {
+          const c = contacts.find(t => t.id === id);
+          if (c) selectedAssignee = { type, id: c.id, name: c.name, avatar: c.avatar, roleOrService: c.role, phone: c.phone };
+        }
         renderAssignVendorsList();
         return;
       }
 
-      // Add New Vendor Trigger
+      // Add New Item Trigger (Team Member, Vendor, or Contact)
       if (e.target.closest('#btn-add-new-vendor-trigger')) {
-        const vendorName = prompt('Enter New Vendor Company Name:');
-        if (vendorName) {
-          const newV = {
-            id: `V-0${vendors.length + 1}`,
-            name: vendorName,
-            phone: '+91 99887 76655',
-            service: 'Rishikesh Rafting & Safari',
-            image: '/images/rishikesh.jpg',
-            selected: false
-          };
-          vendors.push(newV);
-          selectedVendorId = newV.id;
-          renderAssignVendorsList();
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Added vendor "${vendorName}"!`, type: 'success' }
-          }));
+        if (assignVendorTab === 'Team Members') {
+          const name = prompt('Enter New Team Member Full Name:');
+          if (name) {
+            const role = prompt('Enter Member Role (e.g. Operations Coordinator):') || 'Operations Coordinator';
+            const newM = {
+              id: `ST-0${teamMembers.length + 1}`,
+              name,
+              role,
+              phone: '+91 98765 00999',
+              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+              activeTrips: 1
+            };
+            teamMembers.unshift(newM);
+            selectedAssignee = { type: 'Team Members', id: newM.id, name: newM.name, avatar: newM.avatar, roleOrService: newM.role, phone: newM.phone };
+            renderAssignVendorsList();
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Added team member "${name}"!`, type: 'success' }
+            }));
+          }
+        } else if (assignVendorTab === 'Vendors') {
+          const vendorName = prompt('Enter New Vendor Company Name:');
+          if (vendorName) {
+            const service = prompt('Enter Service (e.g. River Rafting & Camping):') || 'Rishikesh Rafting & Safari';
+            const newV = {
+              id: `V-0${vendors.length + 1}`,
+              name: vendorName,
+              phone: '+91 99887 76655',
+              service,
+              image: '/images/rishikesh.jpg',
+              selected: false
+            };
+            vendors.unshift(newV);
+            selectedAssignee = { type: 'Vendors', id: newV.id, name: newV.name, avatar: newV.image, roleOrService: newV.service, phone: newV.phone };
+            renderAssignVendorsList();
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Added vendor "${vendorName}"!`, type: 'success' }
+            }));
+          }
+        } else if (assignVendorTab === 'Contacts') {
+          const contactName = prompt('Enter New Contact Full Name:');
+          if (contactName) {
+            const role = prompt('Enter Role / Specialty (e.g. Driver, Guide, Resort Contact):') || 'Tour Contact';
+            const newC = {
+              id: `CT-0${contacts.length + 1}`,
+              name: contactName,
+              phone: '+91 98777 88990',
+              role,
+              details: 'On-ground operations contact',
+              avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80'
+            };
+            contacts.unshift(newC);
+            selectedAssignee = { type: 'Contacts', id: newC.id, name: newC.name, avatar: newC.avatar, roleOrService: newC.role, phone: newC.phone };
+            renderAssignVendorsList();
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Added contact "${contactName}"!`, type: 'success' }
+            }));
+          }
         }
         return;
       }
 
       // Submit WhatsApp Assignment (Screen 3 -> Screen 4)
       if (e.target.closest('#btn-submit-assign-whatsapp')) {
-        const vendor = vendors.find(v => v.id === selectedVendorId) || vendors[0];
+        const assignee = selectedAssignee || {
+          name: teamMembers[0].name,
+          avatar: teamMembers[0].avatar
+        };
+
         if (targetActivityItem) {
           targetActivityItem.assigned = {
             isAssigned: true,
-            name: vendor.name,
-            avatar: vendor.image
+            name: assignee.name,
+            avatar: assignee.avatar
           };
 
           // Also ensure Hotel Ganga View has assigned badge like Screen 4
@@ -1282,7 +2081,7 @@ export function createMobileView(container, options = {}) {
 
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { 
-            message: `Assigned ${vendor.name} to ${targetActivityItem?.title || 'Activity'} & WhatsApp details sent!`,
+            message: `Assigned ${assignee.name} (${assignVendorTab}) to ${targetActivityItem?.title || 'Activity'} & WhatsApp details sent!`,
             type: 'success' 
           }
         }));
@@ -1355,6 +2154,14 @@ export function createMobileView(container, options = {}) {
     switchTab,
     openAssignSheet,
     closeAssignSheet,
+    openSpecialReqModal,
+    closeSpecialReqModal,
+    openAddEventModal,
+    closeAddEventModal,
+    openActivityDetailsModal,
+    closeActivityDetailsModal,
+    openEditActivityModal,
+    closeEditActivityModal,
     setOpenDropdownItemId: (id) => {
       openDropdownItemId = id;
       renderSheetBody();
