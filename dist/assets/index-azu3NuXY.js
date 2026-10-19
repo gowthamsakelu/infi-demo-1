@@ -880,7 +880,7 @@
           <p>${m.subtitle}</p>
         </div>
         <span class="tag-activity-pill">${m.tag||`Activity`}</span>
-      `),S();let r=t.querySelector(`#mobile-assign-to-sheet`);r&&r.classList.add(`open`)}function E(){p=!1;let e=t.querySelector(`#mobile-assign-to-sheet`);e&&e.classList.remove(`open`)}function D(){let e=t.querySelector(`#mobile-search-input`);e&&e.addEventListener(`input`,e=>{s=e.target.value,v()});let n=t.querySelector(`#mobile-filter-btn`);n&&n.addEventListener(`click`,()=>{window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Filter dialog: All categories active`,type:`info`}}))}),t.querySelectorAll(`.tab-pill`).forEach(e=>{e.addEventListener(`click`,()=>{o=e.dataset.cat,t.querySelectorAll(`.tab-pill`).forEach(e=>e.classList.remove(`active`)),e.classList.add(`active`),v()})});let r=t.querySelector(`#mobile-select-all-box`);r&&r.addEventListener(`click`,()=>{let e=i.some(e=>!e.selected);i.forEach(t=>t.selected=e),v()});let l=t.querySelector(`#assign-vendor-search`);l&&l.addEventListener(`input`,e=>{_=e.target.value,S()}),t.addEventListener(`click`,e=>{!e.target.closest(`.item-right-content`)&&f&&(f=null,x());let n=e.target.closest(`.card-select-checkbox`);if(n){e.stopPropagation();let t=n.dataset.selectId,r=i.find(e=>e.id===t);r&&(r.selected=!r.selected,v());return}let r=e.target.closest(`.booking-card`);if(r){let e=r.dataset.bookingId,t=i.find(t=>t.id===e);t&&C(t,`overview`);return}if(e.target.closest(`#mobile-sheet-close-btn`)||e.target.id===`mobile-sheet-backdrop`){w();return}if(e.target.closest(`#itinerary-back-btn`)){O(`overview`);return}let o=e.target.closest(`.sheet-tab-btn`);if(o){let e=o.dataset.sheetTab;O(e);return}let s=e.target.closest(`[data-trigger-item-menu]`);if(s){e.stopPropagation();let t=s.dataset.triggerItemMenu;f=f===t?null:t,x();return}let l=e.target.closest(`[data-dropdown-act]`);if(l){e.stopPropagation();let t=l.dataset.dropdownAct,n=l.dataset.targetId,r=null;c.itineraryDays?.forEach(e=>{let t=e.items.find(e=>e.id===n);t&&(r=t)}),f=null,x(),t===`assign`?T(r):t===`complete`?window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Marked "${r?.title}" as Complete!`,type:`success`}})):t===`remove`?window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Removed "${r?.title}" from itinerary`,type:`info`}})):window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`${t.toUpperCase()}: ${r?.title}`,type:`info`}}));return}if(e.target.closest(`#close-assign-to-sheet-btn`)||e.target.closest(`#btn-cancel-assign-sheet`)){E();return}let u=e.target.closest(`.assign-tab-btn`);if(u){g=u.dataset.assignTab,t.querySelectorAll(`.assign-tab-btn`).forEach(e=>e.classList.remove(`active`)),u.classList.add(`active`),S();return}let p=e.target.closest(`.vendor-item-card`);if(p)h=p.dataset.vendorId,S();else if(e.target.closest(`#btn-add-new-vendor-trigger`)){let e=prompt(`Enter New Vendor Company Name:`);if(e){let t={id:`V-0${a.length+1}`,name:e,phone:`+91 99887 76655`,service:`Rishikesh Rafting & Safari`,image:`/images/rishikesh.jpg`,selected:!1};a.push(t),h=t.id,S(),window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Added vendor "${e}"!`,type:`success`}}))}}else if(e.target.closest(`#btn-submit-assign-whatsapp`)){let e=a.find(e=>e.id===h)||a[0];if(m){m.assigned={isAssigned:!0,name:e.name,avatar:e.image};let t=c.itineraryDays?.[0]?.items?.[1];t&&!t.assigned&&(t.assigned={isAssigned:!0,name:`Rahul Mehta`,avatar:`https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80`})}E(),x(),window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Assigned ${e.name} to ${m?.title||`Activity`} & WhatsApp details sent!`,type:`success`}}))}else e.target.closest(`#row-click-guest`)?O(`guests`):e.target.closest(`#toggle-more-guests-btn`)?(d=!d,x()):e.target.closest(`#mobile-add-guest-btn`)?window.dispatchEvent(new CustomEvent(`open-add-guest-modal`,{detail:{bookingId:c.id}})):e.target.closest(`#mobile-confirm-booking-btn`)&&window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Booking ${c.id} (${c.title}) confirmed successfully!`,type:`success`}}))})}function O(e){l=e,f=null,E(),y(),t.querySelectorAll(`.sheet-tab-btn`).forEach(e=>{e.classList.toggle(`active`,e.dataset.sheetTab===l)}),x()}return v(),y(),x(),S(),D(),u&&(C(c,l),f&&x(),p&&T(m)),{openModal:C,closeModal:w,switchTab:O,openAssignSheet:T,closeAssignSheet:E,setOpenDropdownItemId:e=>{f=e,x()},setSearch:e=>{s=e,v()},getBookings:()=>i,updateBooking:e=>{let t=i.findIndex(t=>t.id===e.id);t!==-1&&(i[t]=e,v(),c&&c.id===e.id&&(c=e,y(),x()))}}}function i(n){let r=[...e],i=`All Bookings`,a=``,o=r[0],s=`overview`;n.innerHTML=`
+      `),S();let r=t.querySelector(`#mobile-assign-to-sheet`);r&&r.classList.add(`open`)}function E(){p=!1;let e=t.querySelector(`#mobile-assign-to-sheet`);e&&e.classList.remove(`open`)}function D(){let e=t.querySelector(`#mobile-search-input`);e&&e.addEventListener(`input`,e=>{s=e.target.value,v()});let n=t.querySelector(`#mobile-filter-btn`);n&&n.addEventListener(`click`,()=>{window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Filter dialog: All categories active`,type:`info`}}))}),t.querySelectorAll(`.tab-pill`).forEach(e=>{e.addEventListener(`click`,()=>{o=e.dataset.cat,t.querySelectorAll(`.tab-pill`).forEach(e=>e.classList.remove(`active`)),e.classList.add(`active`),v()})});let r=t.querySelector(`#mobile-select-all-box`);r&&r.addEventListener(`click`,()=>{let e=i.some(e=>!e.selected);i.forEach(t=>t.selected=e),v()});let l=t.querySelector(`#assign-vendor-search`);l&&l.addEventListener(`input`,e=>{_=e.target.value,S()}),t.addEventListener(`click`,e=>{!e.target.closest(`.item-right-content`)&&f&&(f=null,x());let n=e.target.closest(`.card-select-checkbox`);if(n){e.stopPropagation();let t=n.dataset.selectId,r=i.find(e=>e.id===t);r&&(r.selected=!r.selected,v());return}let r=e.target.closest(`.booking-card`);if(r){let e=r.dataset.bookingId,t=i.find(t=>t.id===e);t&&C(t,`overview`);return}if(e.target.closest(`#mobile-sheet-close-btn`)||e.target.id===`mobile-sheet-backdrop`){w();return}if(e.target.closest(`#itinerary-back-btn`)){O(`overview`);return}let o=e.target.closest(`.sheet-tab-btn`);if(o){let e=o.dataset.sheetTab;O(e);return}let s=e.target.closest(`[data-trigger-item-menu]`);if(s){e.stopPropagation();let t=s.dataset.triggerItemMenu;f=f===t?null:t,x();return}let l=e.target.closest(`[data-dropdown-act]`);if(l){e.stopPropagation();let t=l.dataset.dropdownAct,n=l.dataset.targetId,r=null;c.itineraryDays?.forEach(e=>{let t=e.items.find(e=>e.id===n);t&&(r=t)}),f=null,x(),t===`assign`?T(r):t===`complete`?window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Marked "${r?.title}" as Complete!`,type:`success`}})):t===`remove`?window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Removed "${r?.title}" from itinerary`,type:`info`}})):window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`${t.toUpperCase()}: ${r?.title}`,type:`info`}}));return}if(e.target.closest(`#close-assign-to-sheet-btn`)||e.target.closest(`#btn-cancel-assign-sheet`)){E();return}let u=e.target.closest(`.assign-tab-btn`);if(u){g=u.dataset.assignTab,t.querySelectorAll(`.assign-tab-btn`).forEach(e=>e.classList.remove(`active`)),u.classList.add(`active`),S();return}let p=e.target.closest(`.vendor-item-card`);if(p)h=p.dataset.vendorId,S();else if(e.target.closest(`#btn-add-new-vendor-trigger`)){let e=prompt(`Enter New Vendor Company Name:`);if(e){let t={id:`V-0${a.length+1}`,name:e,phone:`+91 99887 76655`,service:`Rishikesh Rafting & Safari`,image:`/images/rishikesh.jpg`,selected:!1};a.push(t),h=t.id,S(),window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Added vendor "${e}"!`,type:`success`}}))}}else if(e.target.closest(`#btn-submit-assign-whatsapp`)){let e=a.find(e=>e.id===h)||a[0];if(m){m.assigned={isAssigned:!0,name:e.name,avatar:e.image};let t=c.itineraryDays?.[0]?.items?.[1];t&&!t.assigned&&(t.assigned={isAssigned:!0,name:`Rahul Mehta`,avatar:`https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80`})}E(),x(),window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Assigned ${e.name} to ${m?.title||`Activity`} & WhatsApp details sent!`,type:`success`}}))}else e.target.closest(`#row-click-guest`)?O(`guests`):e.target.closest(`#toggle-more-guests-btn`)?(d=!d,x()):e.target.closest(`#mobile-add-guest-btn`)?window.dispatchEvent(new CustomEvent(`open-add-guest-modal`,{detail:{bookingId:c.id}})):e.target.closest(`#mobile-confirm-booking-btn`)&&window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Booking ${c.id} (${c.title}) confirmed successfully!`,type:`success`}}))})}function O(e){l=e,f=null,E(),y(),t.querySelectorAll(`.sheet-tab-btn`).forEach(e=>{e.classList.toggle(`active`,e.dataset.sheetTab===l)}),x()}return v(),y(),x(),S(),D(),u&&(C(c,l),f&&x(),p&&T(m)),{openModal:C,closeModal:w,switchTab:O,openAssignSheet:T,closeAssignSheet:E,setOpenDropdownItemId:e=>{f=e,x()},setSearch:e=>{s=e,v()},getBookings:()=>i,updateBooking:e=>{let t=i.findIndex(t=>t.id===e.id);t!==-1&&(i[t]=e,v(),c&&c.id===e.id&&(c=e,y(),x()))}}}function i(n){let r=[...e],i=`All Bookings`,a=``,o=`ALL`,s=null,c=!1,l=`overview`,u=``;n.innerHTML=`
     <div class="desktop-layout">
       <!-- Left Sidebar -->
       <aside class="desktop-sidebar">
@@ -898,7 +898,7 @@
 
         <nav class="sidebar-nav">
           <span class="nav-section-title">Menu</span>
-          <a class="sidebar-nav-item" href="#dashboard">
+          <a class="sidebar-nav-item" href="#dashboard" id="nav-dashboard">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="7" height="9" x="3" y="3" rx="1"/>
@@ -910,7 +910,7 @@
             </div>
           </a>
 
-          <a class="sidebar-nav-item active" href="#bookings">
+          <a class="sidebar-nav-item active" href="#bookings" id="nav-bookings">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
@@ -918,10 +918,10 @@
               </svg>
               <span>Bookings</span>
             </div>
-            <span class="sidebar-badge">28</span>
+            <span class="sidebar-badge" id="sidebar-total-badge">28</span>
           </a>
 
-          <a class="sidebar-nav-item" href="#enquiries">
+          <a class="sidebar-nav-item" href="#enquiries" id="nav-enquiries">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -931,7 +931,7 @@
             <span class="sidebar-badge">5</span>
           </a>
 
-          <a class="sidebar-nav-item" href="#calendar">
+          <a class="sidebar-nav-item" href="#calendar" id="nav-calendar">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
@@ -945,7 +945,7 @@
 
           <span class="nav-section-title">Operations Team</span>
           ${t.map(e=>`
-            <div class="sidebar-nav-item" style="cursor: default;">
+            <div class="sidebar-nav-item staff-member-item" data-staff-id="${e.id}" style="cursor: pointer;" title="Filter trips assigned to ${e.name}">
               <div class="nav-left">
                 <img src="${e.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />
                 <span style="font-size: 13px;">${e.name}</span>
@@ -955,7 +955,7 @@
           `).join(``)}
 
           <span class="nav-section-title">System</span>
-          <a class="sidebar-nav-item" href="#settings">
+          <a class="sidebar-nav-item" href="#settings" id="nav-settings">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
@@ -987,10 +987,18 @@
               <path d="m21 21-4.3-4.3"/>
             </svg>
             <input type="text" id="desktop-search-input" placeholder="Search by booking ID, destination, or guest name..." />
+            <button id="desktop-search-clear" style="display: none; background: transparent; border: none; cursor: pointer; color: #94A3B8;">✕</button>
           </div>
 
           <div class="desktop-header-actions">
-            <button class="btn-secondary-desktop" id="desktop-export-btn">
+            <a href="/mobile.html" class="btn-secondary-desktop" style="text-decoration: none;" title="Open clean mobile responsive preview">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
+                <line x1="12" x2="12.01" y1="18" y2="18"/>
+              </svg>
+              Mobile View
+            </a>
+            <button class="btn-secondary-desktop" id="desktop-export-btn" title="Download Bookings as CSV">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
@@ -1015,7 +1023,7 @@
           </div>
         </header>
 
-        <!-- Body with Metrics, Table & Detail Panel -->
+        <!-- Body with Metrics and Full-Width Table (Spacious & Clean) -->
         <div class="desktop-body">
           <div class="desktop-content-col">
             <!-- Metrics Row -->
@@ -1029,7 +1037,7 @@
                 </div>
                 <div class="metric-info">
                   <h5>Total Bookings</h5>
-                  <h3>28</h3>
+                  <h3 id="stat-total-bookings">28</h3>
                   <div class="metric-trend">↑ +14.2% this month</div>
                 </div>
               </div>
@@ -1045,7 +1053,7 @@
                 </div>
                 <div class="metric-info">
                   <h5>Total Travelers</h5>
-                  <h3>142 Pax</h3>
+                  <h3 id="stat-total-pax">142 Pax</h3>
                   <div class="metric-trend">Active across 6 tours</div>
                 </div>
               </div>
@@ -1059,7 +1067,7 @@
                 </div>
                 <div class="metric-info">
                   <h5>Collected Revenue</h5>
-                  <h3>₹2,19,500</h3>
+                  <h3 id="stat-revenue">₹2,19,500</h3>
                   <div class="metric-trend">86% Settlement rate</div>
                 </div>
               </div>
@@ -1074,7 +1082,7 @@
                 </div>
                 <div class="metric-info">
                   <h5>Pending Due</h5>
-                  <h3>₹32,500</h3>
+                  <h3 id="stat-pending">₹32,500</h3>
                   <div class="metric-trend" style="color: #EA580C;">2 Bookings awaiting</div>
                 </div>
               </div>
@@ -1099,7 +1107,7 @@
                 </div>
 
                 <div class="toolbar-actions-group">
-                  <select id="desktop-category-filter" style="padding: 7px 12px; border-radius: 8px; border: 1px solid #CBD5E1; font-size: 13px; font-family: inherit;">
+                  <select id="desktop-category-filter" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #CBD5E1; font-size: 13.5px; font-family: inherit; font-weight: 500; background: #FFFFFF; color: #1E293B; cursor: pointer;">
                     <option value="ALL">All Categories</option>
                     <option value="TOUR">Tour Packages</option>
                     <option value="VILLA">Villas & Resorts</option>
@@ -1110,14 +1118,14 @@
               </div>
 
               <!-- Selection Banner -->
-              <div class="desktop-selection-bar" id="desktop-selection-banner">
+              <div class="desktop-selection-bar" id="desktop-selection-banner" style="display: none;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                  <div class="custom-checkbox checked" id="desktop-select-all-box">
+                  <div class="custom-checkbox" id="desktop-select-all-box">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
                   </div>
-                  <span id="desktop-selected-label">2 bookings selected</span>
+                  <span id="desktop-selected-label">0 bookings selected</span>
                 </div>
                 <div style="display: flex; gap: 8px;">
                   <button class="btn-secondary-desktop" style="height: 32px; font-size: 12.5px; padding: 0 12px;" id="desktop-bulk-assign-btn">
@@ -1126,6 +1134,9 @@
                   <button class="btn-secondary-desktop" style="height: 32px; font-size: 12.5px; padding: 0 12px;" id="desktop-bulk-paid-btn">
                     Mark as Paid
                   </button>
+                  <button class="btn-secondary-desktop" style="height: 32px; font-size: 12.5px; padding: 0 10px; color: #64748B;" id="desktop-bulk-clear-btn">
+                    Clear
+                  </button>
                 </div>
               </div>
 
@@ -1133,8 +1144,8 @@
               <table class="bookings-table">
                 <thead>
                   <tr>
-                    <th style="width: 40px;"></th>
-                    <th>Booking / Trip</th>
+                    <th style="width: 44px; text-align: center;"></th>
+                    <th style="min-width: 220px;">Booking / Trip</th>
                     <th>Category</th>
                     <th>Pax & Duration</th>
                     <th>Travel Dates</th>
@@ -1142,7 +1153,7 @@
                     <th>Assigned To</th>
                     <th>Status</th>
                     <th>Amount</th>
-                    <th>Action</th>
+                    <th style="text-align: right; padding-right: 24px;">Action</th>
                   </tr>
                 </thead>
                 <tbody id="desktop-table-body">
@@ -1151,138 +1162,173 @@
               </table>
             </div>
           </div>
-
-          <!-- Desktop Detail Slide-Over Side Panel -->
-          <div class="desktop-details-panel" id="desktop-details-panel">
-            <!-- Sheet Header Card -->
-            <div class="sheet-header-card" id="desktop-sheet-header">
-              <!-- Rendered dynamically -->
-            </div>
-
-            <!-- Tabs -->
-            <div class="sheet-tabs-nav">
-              <button class="sheet-tab-btn ${s===`overview`?`active`:``}" data-dt-tab="overview">Overview</button>
-              <button class="sheet-tab-btn ${s===`guests`?`active`:``}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">12</span>)</button>
-              <button class="sheet-tab-btn ${s===`itinerary`?`active`:``}" data-dt-tab="itinerary">Itinerary</button>
-              <button class="sheet-tab-btn ${s===`updates`?`active`:``}" data-dt-tab="updates">Updates</button>
-            </div>
-
-            <!-- Scrollable Detail Body -->
-            <div class="sheet-body-scroll" id="desktop-sheet-body">
-              <!-- Rendered dynamically -->
-            </div>
-
-            <!-- Sticky Footer Action -->
-            <div class="sheet-sticky-footer">
-              <button class="btn-confirm-booking" id="desktop-confirm-booking-btn">Confirm Booking</button>
-              <div class="sheet-quick-actions-grid">
-                <button class="quick-action-col-btn btn-act-call" id="desktop-act-call">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                  </svg>
-                  <span>Call</span>
-                </button>
-                <button class="quick-action-col-btn btn-act-msg" id="desktop-act-msg">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
-                  <span>Message</span>
-                </button>
-                <button class="quick-action-col-btn btn-act-fwd" id="desktop-act-fwd">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="m22 2-7 20-4-9-9-4Z"/>
-                    <path d="M22 2 11 13"/>
-                  </svg>
-                  <span>Forward</span>
-                </button>
-                <button class="quick-action-col-btn btn-act-more" id="desktop-act-more">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <circle cx="12" cy="12" r="1.5"/>
-                    <circle cx="19" cy="12" r="1.5"/>
-                    <circle cx="5" cy="12" r="1.5"/>
-                  </svg>
-                  <span>More</span>
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </main>
-    </div>
-  `;function c(){let e=n.querySelector(`#desktop-table-body`);if(!e)return;e.innerHTML=r.filter(e=>{let t=!a||e.title.toLowerCase().includes(a.toLowerCase())||e.destination.toLowerCase().includes(a.toLowerCase())||e.id.toLowerCase().includes(a.toLowerCase())||e.guest.name.toLowerCase().includes(a.toLowerCase()),n=i===`All Bookings`||e.category===i;return t&&n}).map(e=>`
-      <tr class="${e.id===o?.id?`row-selected`:``}" data-desktop-row-id="${e.id}">
-        <td>
-          <div class="custom-checkbox ${e.selected?`checked`:``}" data-d-select-id="${e.id}">
-            ${e.selected?`
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            `:``}
+
+      <!-- Slide-Over Drawer Backdrop Overlay -->
+      <div class="desktop-drawer-backdrop" id="desktop-drawer-backdrop"></div>
+
+      <!-- Slide-Over Detail Drawer (Popup on PC) -->
+      <aside class="desktop-details-drawer" id="desktop-details-drawer">
+        <!-- Top bar with title and close button -->
+        <div class="drawer-top-bar">
+          <div class="drawer-top-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              <rect width="20" height="14" x="2" y="6" rx="2"/>
+            </svg>
+            <span>Trip Details</span>
           </div>
-        </td>
-        <td>
-          <div class="table-booking-cell">
-            <div class="table-thumb">
-              <img src="${e.image}" alt="${e.title}" />
-            </div>
-            <div class="table-booking-info">
-              <h4>${e.title}</h4>
-              <p>${e.id} • ${e.destination}</p>
-            </div>
-          </div>
-        </td>
-        <td>
-          <span class="card-type-badge ${e.typeClass}">${e.type}</span>
-        </td>
-        <td>
-          <span style="font-weight: 600;">${e.pax} Pax</span>
-          <div style="font-size: 11.5px; color: #64748B;">${e.duration}</div>
-        </td>
-        <td>
-          <span style="font-weight: 500;">${e.dates}</span>
-        </td>
-        <td>
-          <span style="font-weight: 600; color: #0F172A;">${e.guest.name}</span>
-          <div style="font-size: 11.5px; color: #64748B;">${e.guest.phone}</div>
-        </td>
-        <td>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            ${e.assignedTo.avatar?`<img src="${e.assignedTo.avatar}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;" />`:``}
-            <span style="font-size: 13px; font-weight: 500;">${e.assignedTo.name}</span>
-          </div>
-        </td>
-        <td>
-          <span class="status-pill ${e.statusClass}">
-            <span class="dot"></span>
-            ${e.status}
-          </span>
-        </td>
-        <td>
-          <span style="font-size: 14.5px; font-weight: 700; color: #0F172A;">${e.price}</span>
-        </td>
-        <td>
-          <button class="circle-action-btn btn-map" title="View details" data-open-detail="${e.id}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"/>
+          <button class="drawer-close-btn" id="close-desktop-detail-btn" title="Close (Esc)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
-        </td>
-      </tr>
-    `).join(``);let t=r.filter(e=>e.selected).length,s=n.querySelector(`#desktop-selected-label`);s&&(s.textContent=`${t} bookings selected`);let c=n.querySelector(`#desktop-select-all-box`);c&&(c.className=t>0?`custom-checkbox checked`:`custom-checkbox`)}function l(){let e=n.querySelector(`#desktop-sheet-header`),t=n.querySelector(`#desktop-sheet-body`);if(!e||!t||!o)return;let r=o;e.innerHTML=`
+        </div>
+
+        <!-- Sheet Header Card -->
+        <div class="sheet-header-card" id="desktop-sheet-header">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Tabs -->
+        <div class="sheet-tabs-nav">
+          <button class="sheet-tab-btn ${l===`overview`?`active`:``}" data-dt-tab="overview">Overview</button>
+          <button class="sheet-tab-btn ${l===`guests`?`active`:``}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">0</span>)</button>
+          <button class="sheet-tab-btn ${l===`itinerary`?`active`:``}" data-dt-tab="itinerary">Itinerary</button>
+          <button class="sheet-tab-btn ${l===`updates`?`active`:``}" data-dt-tab="updates">Updates</button>
+        </div>
+
+        <!-- Scrollable Detail Body -->
+        <div class="sheet-body-scroll" id="desktop-sheet-body">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Sticky Footer Action -->
+        <div class="sheet-sticky-footer">
+          <button class="btn-confirm-booking" id="desktop-confirm-booking-btn">Confirm Booking</button>
+          <div class="sheet-quick-actions-grid">
+            <button class="quick-action-col-btn btn-act-call" id="desktop-act-call">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              <span>Call</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-msg" id="desktop-act-msg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Message</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-fwd" id="desktop-act-fwd">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="m22 2-7 20-4-9-9-4Z"/>
+                <path d="M22 2 11 13"/>
+              </svg>
+              <span>Forward</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-more" id="desktop-act-more">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="1.5"/>
+                <circle cx="19" cy="12" r="1.5"/>
+                <circle cx="5" cy="12" r="1.5"/>
+              </svg>
+              <span>More</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  `;function d(){let e=n.querySelector(`#desktop-table-body`);if(!e)return;let t=r.filter(e=>{let t=!a||e.title.toLowerCase().includes(a.toLowerCase())||e.destination.toLowerCase().includes(a.toLowerCase())||e.id.toLowerCase().includes(a.toLowerCase())||e.guest.name.toLowerCase().includes(a.toLowerCase())||e.guest.phone&&e.guest.phone.includes(a),n=i===`All Bookings`||e.category===i,r=o===`ALL`||e.type===o;return t&&n&&r});if(t.length===0){e.innerHTML=`
+        <tr>
+          <td colspan="10" style="text-align: center; padding: 48px 20px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; color: #64748B;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: #94A3B8;">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+              </svg>
+              <h4 style="font-size: 15px; color: #0F172A; font-weight: 700;">No bookings found</h4>
+              <p style="font-size: 13px;">No results matching your query. Try resetting filters.</p>
+              <button class="btn-secondary-desktop" id="btn-reset-filters" style="height: 32px; font-size: 12.5px; margin-top: 6px;">Reset Filters</button>
+            </div>
+          </td>
+        </tr>
+      `;return}e.innerHTML=t.map(e=>`
+        <tr class="${s&&s.id===e.id?`row-selected row-active`:``}" data-desktop-row-id="${e.id}">
+          <td style="text-align: center;">
+            <div class="custom-checkbox ${e.selected?`checked`:``}" data-d-select-id="${e.id}">
+              ${e.selected?`
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              `:``}
+            </div>
+          </td>
+          <td>
+            <div class="table-booking-cell">
+              <div class="table-thumb">
+                <img src="${e.image}" alt="${e.title}" />
+              </div>
+              <div class="table-booking-info">
+                <h4>${e.title}</h4>
+                <p>${e.id} • ${e.destination}</p>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="card-type-badge ${e.typeClass}">${e.type}</span>
+          </td>
+          <td>
+            <span style="font-weight: 600; color: #0F172A;">${e.pax} Pax</span>
+            <div style="font-size: 12px; color: #64748B;">${e.duration}</div>
+          </td>
+          <td>
+            <span style="font-weight: 500; color: #334155;">${e.dates}</span>
+          </td>
+          <td>
+            <span style="font-weight: 600; color: #0F172A;">${e.guest.name}</span>
+            <div style="font-size: 12px; color: #64748B;">${e.guest.phone}</div>
+          </td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              ${e.assignedTo.avatar?`<img src="${e.assignedTo.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />`:``}
+              <span style="font-size: 13px; font-weight: 500; color: #1E293B;">${e.assignedTo.name}</span>
+            </div>
+          </td>
+          <td>
+            <span class="status-pill ${e.statusClass}">
+              <span class="dot"></span>
+              ${e.status}
+            </span>
+          </td>
+          <td>
+            <span style="font-size: 15px; font-weight: 700; color: #0F172A;">${e.price}</span>
+          </td>
+          <td style="text-align: right; padding-right: 24px;">
+            <button class="row-view-details-btn" data-open-detail="${e.id}" title="View details for ${e.title}">
+              <span>View</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      `).join(``);let c=r.filter(e=>e.selected).length,l=n.querySelector(`#desktop-selection-banner`),u=n.querySelector(`#desktop-selected-label`),d=n.querySelector(`#desktop-select-all-box`);l&&(c>0?(l.style.display=`flex`,u&&(u.textContent=`${c} booking${c>1?`s`:``} selected`),d&&(d.className=(r.length,`custom-checkbox checked`))):(l.style.display=`none`,d&&(d.className=`custom-checkbox`)))}function f(e){s=e,c=!0,m(),d();let t=n.querySelector(`#desktop-details-drawer`),r=n.querySelector(`#desktop-drawer-backdrop`);t&&t.classList.add(`open`),r&&r.classList.add(`open`)}function p(){s=null,c=!1,d();let e=n.querySelector(`#desktop-details-drawer`),t=n.querySelector(`#desktop-drawer-backdrop`);e&&e.classList.remove(`open`),t&&t.classList.remove(`open`)}function m(){let e=n.querySelector(`#desktop-sheet-header`),t=n.querySelector(`#desktop-sheet-body`),r=n.querySelector(`#desktop-guest-count-badge`);if(!e||!t||!s)return;let i=s;if(r&&(r.textContent=i.guests.length),e.innerHTML=`
       <div class="sheet-card-top-row">
         <div class="sheet-thumb">
-          <img src="${r.image}" alt="${r.title}" />
+          <img src="${i.image}" alt="${i.title}" />
         </div>
         <div class="sheet-header-info">
           <div class="sheet-tag-row">
-            <span class="card-type-badge ${r.typeClass}">${r.type}</span>
-            <span class="status-pill ${r.statusClass}">
+            <span class="card-type-badge ${i.typeClass}">${i.type}</span>
+            <span class="status-pill ${i.statusClass}">
               <span class="dot"></span>
-              ${r.status}
+              ${i.status}
             </span>
           </div>
-          <h2 class="sheet-title">${r.title}</h2>
-          <p class="sheet-sub-id">Booking ID ${r.id}</p>
+          <h2 class="sheet-title">${i.title}</h2>
+          <p class="sheet-sub-id">Booking ID: <strong>${i.id}</strong></p>
         </div>
       </div>
       <div class="sheet-stats-row">
@@ -1291,7 +1337,7 @@
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
             <circle cx="9" cy="7" r="4"/>
           </svg>
-          <span>${r.pax} Pax</span>
+          <span>${i.pax} Pax</span>
         </div>
         <div class="stat-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1300,7 +1346,7 @@
             <line x1="8" x2="8" y1="2" y2="6"/>
             <line x1="3" x2="21" y1="10" y2="10"/>
           </svg>
-          <span>${r.dates}</span>
+          <span>${i.dates}</span>
         </div>
         <div class="stat-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1309,10 +1355,10 @@
             <path d="M2 17h20"/>
             <path d="M6 8v9"/>
           </svg>
-          <span>3N / 4D</span>
+          <span>${i.duration}</span>
         </div>
       </div>
-    `;let i=n.querySelector(`#desktop-guest-count-badge`);if(i&&(i.textContent=r.guests.length),s===`overview`)t.innerHTML=`
+    `,l===`overview`)t.innerHTML=`
         <div class="detail-rows-list">
           <!-- Lead Guest -->
           <div class="detail-row-item">
@@ -1324,11 +1370,11 @@
             </div>
             <div class="detail-content">
               <span class="detail-label">Lead Guest</span>
-              <div class="detail-value">${r.guest.name}</div>
+              <div class="detail-value">${i.guest.name}</div>
             </div>
           </div>
 
-          <!-- Contact -->
+          <!-- Contact with action buttons -->
           <div class="detail-row-item">
             <div class="detail-icon-box">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1337,20 +1383,20 @@
             </div>
             <div class="detail-content">
               <span class="detail-label">Contact</span>
-              <div class="detail-value">${r.guest.phone}</div>
+              <div class="detail-value">${i.guest.phone}</div>
             </div>
             <div class="detail-contact-actions">
-              <button class="circle-action-btn btn-phone" title="Call Guest" onclick="alert('Calling ${r.guest.name} (${r.guest.phone})...')">
+              <button class="circle-action-btn btn-phone" title="Call Guest" id="action-call-guest">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
               </button>
-              <button class="circle-action-btn btn-whatsapp" title="WhatsApp Guest" onclick="alert('Opening WhatsApp for ${r.guest.name}...')">
+              <button class="circle-action-btn btn-whatsapp" title="WhatsApp Guest" id="action-wa-guest">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                 </svg>
               </button>
-              <button class="circle-action-btn btn-email" title="Email Guest" onclick="alert('Sending email to ${r.guest.email||`guest@example.com`}...')">
+              <button class="circle-action-btn btn-email" title="Email Guest" id="action-email-guest">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect width="20" height="16" x="2" y="4" rx="2"/>
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
@@ -1369,9 +1415,9 @@
             </div>
             <div class="detail-content">
               <span class="detail-label">Destination</span>
-              <div class="detail-value">${r.destination}</div>
+              <div class="detail-value">${i.destination}</div>
             </div>
-            <button class="circle-action-btn btn-map" title="View Map" onclick="alert('Viewing map for ${r.destination}')">
+            <button class="circle-action-btn btn-map" title="View Map" id="action-view-map">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
                 <line x1="9" x2="9" y1="3" y2="18"/>
@@ -1390,7 +1436,7 @@
             </div>
             <div class="detail-content">
               <span class="detail-label">Booking Type</span>
-              <div class="detail-value">${r.bookingType}</div>
+              <div class="detail-value">${i.bookingType}</div>
             </div>
           </div>
 
@@ -1406,7 +1452,7 @@
             </div>
             <div class="detail-content">
               <span class="detail-label">Travel Date</span>
-              <div class="detail-value">${r.travelDateFull}</div>
+              <div class="detail-value">${i.travelDateFull||i.dates}</div>
             </div>
           </div>
 
@@ -1420,11 +1466,11 @@
             </div>
             <div class="detail-content">
               <span class="detail-label">Included Services</span>
-              <div class="detail-value">${r.services}</div>
+              <div class="detail-value">${i.services}</div>
             </div>
           </div>
 
-          <!-- Assigned Staff -->
+          <!-- Assigned Coordinator -->
           <div class="detail-row-item">
             <div class="detail-icon-box">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1435,8 +1481,8 @@
             <div class="detail-content">
               <span class="detail-label">Assigned Coordinator</span>
               <div class="assigned-avatar-pill">
-                ${r.assignedTo.avatar?`<img src="${r.assignedTo.avatar}" alt="${r.assignedTo.name}" />`:``}
-                <span class="detail-value">${r.assignedTo.name}</span>
+                ${i.assignedTo.avatar?`<img src="${i.assignedTo.avatar}" alt="${i.assignedTo.name}" />`:``}
+                <span class="detail-value">${i.assignedTo.name} (${i.assignedTo.role||`Coordinator`})</span>
               </div>
             </div>
             <button class="btn-secondary-desktop" style="height: 30px; font-size: 12px; padding: 0 10px;" id="d-change-coordinator-btn">Change</button>
@@ -1452,24 +1498,24 @@
             </div>
             <div class="detail-content">
               <span class="detail-label">Special Notes</span>
-              <div class="detail-value-sub">${r.notes}</div>
+              <div class="detail-value-sub">${i.notes}</div>
             </div>
           </div>
         </div>
-      `;else if(s===`guests`)t.innerHTML=`
+      `;else if(l===`guests`){let e=i.guests.filter(e=>!u||e.name.toLowerCase().includes(u.toLowerCase())||e.phone&&e.phone.includes(u));t.innerHTML=`
         <div class="guests-sub-header">
           <div class="guest-search-box">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"/>
               <path d="m21 21-4.3-4.3"/>
             </svg>
-            <input type="text" placeholder="Search guests in booking..." id="desktop-guest-search-input" />
+            <input type="text" placeholder="Search guests in booking..." id="desktop-guest-search-input" value="${u}" />
           </div>
           <button class="add-guest-pill-btn" id="desktop-add-guest-btn">+ Add Guest</button>
         </div>
 
         <div class="guests-cards-list">
-          ${r.guests.map(e=>`
+          ${e.map(e=>`
             <div class="guest-item-card">
               <div class="guest-left-info">
                 <div class="guest-num-badge">${e.id}</div>
@@ -1479,23 +1525,21 @@
                 </div>
               </div>
               <div class="guest-right-actions">
-                <button class="circle-action-btn btn-phone" title="Call ${e.name}" onclick="alert('Calling ${e.name} (${e.phone})...')">
+                <button class="circle-action-btn btn-phone" title="Call ${e.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${e.name} (${e.phone})...', type: 'info' }}))">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                   </svg>
                 </button>
-                <button class="circle-action-btn btn-email" title="Edit guest" onclick="alert('Editing guest details for ${e.name}')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
+                <button class="circle-action-btn btn-email" title="Message ${e.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${e.name}...', type: 'info' }}))">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                   </svg>
                 </button>
               </div>
             </div>
           `).join(``)}
         </div>
-      `;else if(s===`itinerary`){let e=r.itineraryDays||[],n=e=>e===`bus`||e===`transport`?`<div class="item-icon-box item-icon-bus"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5.3c-.3-1.1-1.3-1.9-2.4-1.9H5c-1.1 0-2.1.8-2.4 1.9L1.2 12.8c-.1.4-.2.8-.2 1.2 0 .4.1.8.2 1.2.3 1.1.8 2.8.8 2.8h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg></div>`:e===`bed`||e===`hotel`?`<div class="item-icon-box item-icon-bed"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg></div>`:e===`camera`||e===`sightseeing`?`<div class="item-icon-box item-icon-camera"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>`:e===`raft`||e===`activity`?`<div class="item-icon-box item-icon-raft"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M20 12v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3"/><line x1="8" y1="12" x2="6" y2="6"/><line x1="16" y1="12" x2="18" y2="6"/></svg></div>`:`<div class="item-icon-box item-icon-restaurant"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 11v11"/><path d="M4 2v20"/><path d="M4 2c2 0 5 1 5 4v2a3 3 0 0 1-3 3H4"/></svg></div>`;t.innerHTML=`
+      `;let r=n.querySelector(`#desktop-guest-search-input`);r&&r.addEventListener(`input`,e=>{u=e.target.value,m()})}else if(l===`itinerary`){let e=i.itineraryDays||[],n=e=>e===`bus`||e===`transport`?`<div class="item-icon-box item-icon-bus"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5.3c-.3-1.1-1.3-1.9-2.4-1.9H5c-1.1 0-2.1.8-2.4 1.9L1.2 12.8c-.1.4-.2.8-.2 1.2 0 .4.1.8.2 1.2.3 1.1.8 2.8.8 2.8h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg></div>`:e===`bed`||e===`hotel`?`<div class="item-icon-box item-icon-bed"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg></div>`:e===`camera`||e===`sightseeing`?`<div class="item-icon-box item-icon-camera"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>`:e===`raft`||e===`activity`?`<div class="item-icon-box item-icon-raft"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M20 12v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3"/><line x1="8" y1="12" x2="6" y2="6"/><line x1="16" y1="12" x2="18" y2="6"/></svg></div>`:`<div class="item-icon-box item-icon-restaurant"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 11v11"/><path d="M4 2v20"/><path d="M4 2c2 0 5 1 5 4v2a3 3 0 0 1-3 3H4"/></svg></div>`;t.innerHTML=`
         <div class="itinerary-v2-container">
           ${e.map(e=>`
             <div class="itinerary-day-section">
@@ -1520,13 +1564,13 @@
                     <div class="item-right-content">
                       ${e.assigned&&e.assigned.isAssigned?`
                         <span class="assigned-pill-badge">Assigned</span>
-                        <img src="${e.assigned.avatar}" class="assigned-avatar-mini" alt="${e.assigned.name}" />
+                        <img src="${e.assigned.avatar}" class="assigned-avatar-mini" alt="${e.assigned.name}" title="Assigned to ${e.assigned.name}" />
                       `:``}
-                      <button class="item-menu-btn" onclick="alert('Item options for: ${e.title}')">
+                      <button class="item-menu-btn" title="Actions" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Item options for: ${e.title}', type: 'info' }}))">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                          <circle cx="12" cy="12" r="1"/>
-                          <circle cx="12" cy="5" r="1"/>
-                          <circle cx="12" cy="19" r="1"/>
+                          <circle cx="12" cy="12" r="1.5"/>
+                          <circle cx="12" cy="5" r="1.5"/>
+                          <circle cx="12" cy="19" r="1.5"/>
                         </svg>
                       </button>
                     </div>
@@ -1536,9 +1580,9 @@
             </div>
           `).join(``)}
         </div>
-      `}else s===`updates`&&(t.innerHTML=`
+      `}else l===`updates`&&(t.innerHTML=`
         <div class="updates-list">
-          ${r.updates.map(e=>`
+          ${i.updates.map(e=>`
             <div class="update-log-card">
               <div class="update-log-header">
                 <span class="update-log-title">${e.title}</span>
@@ -1549,7 +1593,8 @@
             </div>
           `).join(``)}
         </div>
-      `)}function u(){let e=n.querySelector(`#desktop-search-input`);e&&e.addEventListener(`input`,e=>{a=e.target.value,c()}),n.querySelectorAll(`.desktop-tab-btn`).forEach(e=>{e.addEventListener(`click`,()=>{i=e.dataset.dTab,n.querySelectorAll(`.desktop-tab-btn`).forEach(e=>e.classList.remove(`active`)),e.classList.add(`active`),c()})}),n.querySelectorAll(`[data-dt-tab]`).forEach(e=>{e.addEventListener(`click`,()=>{s=e.dataset.dtTab,n.querySelectorAll(`[data-dt-tab]`).forEach(e=>e.classList.remove(`active`)),e.classList.add(`active`),l()})});let t=n.querySelector(`#desktop-select-all-box`);t&&t.addEventListener(`click`,()=>{let e=r.some(e=>!e.selected);r.forEach(t=>t.selected=e),c()}),n.addEventListener(`click`,e=>{let t=e.target.closest(`[data-d-select-id]`);if(t){e.stopPropagation();let n=t.dataset.dSelectId,i=r.find(e=>e.id===n);i&&(i.selected=!i.selected,c());return}let n=e.target.closest(`[data-desktop-row-id]`);if(n){let e=n.dataset.desktopRowId,t=r.find(t=>t.id===e);t&&(o=t,c(),l())}else e.target.closest(`#desktop-add-guest-btn`)?window.dispatchEvent(new CustomEvent(`open-add-guest-modal`,{detail:{bookingId:o.id}})):e.target.closest(`#desktop-confirm-booking-btn`)?window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Booking ${o.id} (${o.title}) confirmed successfully!`,type:`success`}})):e.target.closest(`#desktop-bulk-assign-btn`)?window.dispatchEvent(new CustomEvent(`open-assign-staff-modal`,{detail:{bookingIds:r.filter(e=>e.selected).map(e=>e.id)}})):e.target.closest(`#desktop-bulk-paid-btn`)?(r.filter(e=>e.selected).forEach(e=>{e.status=`Paid`,e.statusClass=`status-paid`}),c(),l(),window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Selected bookings marked as Paid!`,type:`success`}}))):e.target.closest(`#desktop-export-btn`)&&window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Exporting 28 bookings as CSV...`,type:`info`}}))})}return c(),l(),u(),{getBookings:()=>r,updateBooking:e=>{let t=r.findIndex(t=>t.id===e.id);t!==-1&&(r[t]=e,c(),o&&o.id===e.id&&(o=e,l()))}}}document.addEventListener(`DOMContentLoaded`,()=>{let n=document.getElementById(`app`);if(!n)return;window.addEventListener(`show-toast`,e=>{let{message:t,type:n}=e.detail;m(t,n)});let a=`BK-5021`,o=[`BK-5021`],s=document.createElement(`div`);s.innerHTML=`
+      `)}function h(){let e=n.querySelector(`#desktop-search-input`),u=n.querySelector(`#desktop-search-clear`);e&&e.addEventListener(`input`,e=>{a=e.target.value.trim(),u&&(u.style.display=a?`block`:`none`),d()}),u&&u.addEventListener(`click`,()=>{e&&(e.value=``),a=``,u.style.display=`none`,d()});let h=n.querySelector(`#desktop-category-filter`);h&&h.addEventListener(`change`,e=>{o=e.target.value,d()}),n.querySelectorAll(`.desktop-tab-btn`).forEach(e=>{e.addEventListener(`click`,()=>{i=e.dataset.dTab,n.querySelectorAll(`.desktop-tab-btn`).forEach(e=>e.classList.remove(`active`)),e.classList.add(`active`),d()})}),n.querySelectorAll(`[data-dt-tab]`).forEach(e=>{e.addEventListener(`click`,()=>{l=e.dataset.dtTab,n.querySelectorAll(`[data-dt-tab]`).forEach(e=>e.classList.remove(`active`)),e.classList.add(`active`),m()})});let g=n.querySelector(`#close-desktop-detail-btn`);g&&g.addEventListener(`click`,p);let _=n.querySelector(`#desktop-drawer-backdrop`);_&&_.addEventListener(`click`,p),window.addEventListener(`keydown`,e=>{e.key===`Escape`&&c&&p()});let v=n.querySelector(`#desktop-select-all-box`);v&&v.addEventListener(`click`,()=>{let e=r.some(e=>!e.selected);r.forEach(t=>t.selected=e),d()});let y=n.querySelector(`#desktop-bulk-clear-btn`);y&&y.addEventListener(`click`,()=>{r.forEach(e=>e.selected=!1),d()}),n.addEventListener(`click`,c=>{if(c.target.closest(`#btn-reset-filters`)||c.target.closest(`#btn-clear-table-search`)){e&&(e.value=``),a=``,h&&(h.value=`ALL`),o=`ALL`,i=`All Bookings`,n.querySelectorAll(`.desktop-tab-btn`).forEach(e=>{e.classList.toggle(`active`,e.dataset.dTab===`All Bookings`)}),d();return}let l=c.target.closest(`[data-d-select-id]`);if(l){c.stopPropagation();let e=l.dataset.dSelectId,t=r.find(t=>t.id===e);t&&(t.selected=!t.selected,d());return}let u=c.target.closest(`[data-open-detail]`),p=c.target.closest(`[data-desktop-row-id]`);if(u||p){let e=u?u.dataset.openDetail:p.dataset.desktopRowId,t=r.find(t=>t.id===e);t&&f(t);return}if(c.target.closest(`#desktop-add-guest-btn`)){s&&window.dispatchEvent(new CustomEvent(`open-add-guest-modal`,{detail:{bookingId:s.id}}));return}if(c.target.closest(`#d-change-coordinator-btn`)){s&&window.dispatchEvent(new CustomEvent(`open-assign-staff-modal`,{detail:{bookingIds:[s.id]}}));return}if(c.target.closest(`#desktop-confirm-booking-btn`)){s&&window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Booking ${s.id} (${s.title}) confirmed successfully! Vouchers sent.`,type:`success`}}));return}if(c.target.closest(`#action-call-guest`)){window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Dialing Lead Guest ${s.guest.name} (${s.guest.phone})...`,type:`info`}}));return}if(c.target.closest(`#action-wa-guest`)){window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Opening WhatsApp chat with ${s.guest.name}...`,type:`success`}}));return}if(c.target.closest(`#action-email-guest`)){window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Opening email draft for ${s.guest.name}...`,type:`info`}}));return}if(c.target.closest(`#action-view-map`)){window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Opening map view for destination: ${s.destination}...`,type:`info`}}));return}if(c.target.closest(`#desktop-act-call`)){window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Connecting call to ${s?.guest?.name||`Lead Guest`}...`,type:`info`}}));return}if(c.target.closest(`#desktop-act-msg`)){window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Messaging thread opened for ${s?.guest?.name||`Lead Guest`}`,type:`info`}}));return}if(c.target.closest(`#desktop-act-fwd`)){window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Trip voucher forwarded to operations team!`,type:`success`}}));return}if(c.target.closest(`#desktop-act-more`)){window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Opening booking options (Print Voucher, Duplicate, Export Invoice)...`,type:`info`}}));return}let g=c.target.closest(`.staff-member-item`);if(g){let n=g.dataset.staffId,r=t.find(e=>e.id===n);r&&(e&&(e.value=r.name),a=r.name,d(),window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Showing bookings assigned to ${r.name}`,type:`info`}})))}else if(c.target.closest(`#desktop-bulk-assign-btn`)){let e=r.filter(e=>e.selected).map(e=>e.id);e.length>0&&window.dispatchEvent(new CustomEvent(`open-assign-staff-modal`,{detail:{bookingIds:e}}))}else if(c.target.closest(`#desktop-bulk-paid-btn`)){let e=r.filter(e=>e.selected);e.length>0&&(e.forEach(e=>{e.status=`Paid`,e.statusClass=`status-paid`}),d(),s&&m(),window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Marked ${e.length} booking(s) as Paid!`,type:`success`}})))}else if(c.target.closest(`#desktop-export-btn`)){let e=[`Booking ID`,`Title`,`Category`,`Pax`,`Duration`,`Travel Dates`,`Lead Guest`,`Phone`,`Assigned To`,`Status`,`Price`],t=r.map(e=>[`"${e.id}"`,`"${e.title.replace(/"/g,`""`)}"`,`"${e.type}"`,`"${e.pax}"`,`"${e.duration}"`,`"${e.dates}"`,`"${e.guest.name}"`,`"${e.guest.phone}"`,`"${e.assignedTo.name}"`,`"${e.status}"`,`"${e.price}"`]),n=`data:text/csv;charset=utf-8,`+[e.join(`,`),...t.map(e=>e.join(`,`))].join(`
+`),i=encodeURI(n),a=document.createElement(`a`);a.setAttribute(`href`,i),a.setAttribute(`download`,`ruyi_admin_bookings_${new Date().toISOString().slice(0,10)}.csv`),document.body.appendChild(a),a.click(),a.remove(),window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`Exported ${r.length} bookings to CSV!`,type:`success`}}))}else c.target.closest(`#desktop-new-booking-btn`)?window.dispatchEvent(new CustomEvent(`open-new-booking-modal`)):c.target.closest(`#desktop-bell-btn`)&&window.dispatchEvent(new CustomEvent(`show-toast`,{detail:{message:`You have 3 unread operations updates.`,type:`info`}}))})}return d(),h(),{getBookings:()=>r,openBooking:e=>{let t=r.find(t=>t.id===e);t&&f(t)},closeDrawer:p,updateBooking:e=>{let t=r.findIndex(t=>t.id===e.id);t!==-1&&(r[t]=e,d(),s&&s.id===e.id&&(s=e,m()))},addBooking:e=>{r.unshift(e),d(),f(e)}}}document.addEventListener(`DOMContentLoaded`,()=>{let n=document.getElementById(`app`);if(!n)return;window.addEventListener(`show-toast`,e=>{let{message:t,type:n}=e.detail;d(t,n)});let a=`BK-5021`,o=[`BK-5021`],s=document.createElement(`div`);s.innerHTML=`
     <!-- Add Guest Modal -->
     <div class="modal-overlay" id="modal-add-guest">
       <div class="modal-card">
@@ -1613,18 +1658,18 @@
           </button>
         </div>
         <div class="modal-body">
-          <p style="font-size: 13.5px; color: #64748B; margin-bottom: 8px;">Select an operations manager to assign to the booking(s):</p>
+          <p style="font-size: 13.5px; color: #64748B; margin-bottom: 12px;">Select an operations manager to assign to the booking(s):</p>
           <div style="display: flex; flex-direction: column; gap: 10px;">
             ${t.map(e=>`
               <div class="guest-item-card staff-assign-card" data-staff-id="${e.id}" style="cursor: pointer;">
                 <div class="guest-left-info">
-                  <img src="${e.avatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" />
+                  <img src="${e.avatar}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;" />
                   <div class="guest-name-col">
                     <h4>${e.name}</h4>
                     <p>${e.role} • Active in ${e.activeTrips} tours</p>
                   </div>
                 </div>
-                <button class="btn-secondary-desktop" style="height: 32px; font-size: 12px; padding: 0 12px;">Assign</button>
+                <button class="btn-secondary-desktop" style="height: 32px; font-size: 12px; padding: 0 14px;">Assign</button>
               </div>
             `).join(``)}
           </div>
@@ -1632,68 +1677,95 @@
       </div>
     </div>
 
+    <!-- New Booking Modal -->
+    <div class="modal-overlay" id="modal-new-booking">
+      <div class="modal-card" style="width: 540px;">
+        <div class="modal-header">
+          <h3>Create New Booking</h3>
+          <button class="sheet-close-btn" id="close-new-booking-modal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <form id="form-new-booking">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Booking / Trip Title *</label>
+              <input type="text" id="nb-title" placeholder="e.g. Kashmir Great Lakes Trek" required />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>Category *</label>
+                <select id="nb-category">
+                  <option value="TOUR">Tour Package</option>
+                  <option value="VILLA">Villa & Resort</option>
+                  <option value="ACTIVITY">Activity & Sport</option>
+                  <option value="TRANSPORT">Transport</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Total Pax *</label>
+                <input type="number" id="nb-pax" placeholder="e.g. 4" min="1" max="100" required />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>Travel Dates *</label>
+                <input type="text" id="nb-dates" placeholder="e.g. 15 Dec - 20 Dec" required />
+              </div>
+              <div class="form-group">
+                <label>Duration *</label>
+                <input type="text" id="nb-duration" placeholder="e.g. 5D / 4N" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Destination *</label>
+              <input type="text" id="nb-destination" placeholder="e.g. Srinagar, Sonamarg, Gulmarg" required />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>Lead Guest Name *</label>
+                <input type="text" id="nb-guest-name" placeholder="e.g. Suresh Kumar" required />
+              </div>
+              <div class="form-group">
+                <label>Lead Guest Phone *</label>
+                <input type="tel" id="nb-guest-phone" placeholder="e.g. 9811223344" required />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>Package Price (₹) *</label>
+                <input type="text" id="nb-price" placeholder="e.g. ₹45,000" required />
+              </div>
+              <div class="form-group">
+                <label>Assign Coordinator</label>
+                <select id="nb-coordinator">
+                  ${t.map(e=>`<option value="${e.id}">${e.name} (${e.role})</option>`).join(``)}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary-desktop" id="cancel-new-booking-modal">Cancel</button>
+            <button type="submit" class="btn-primary-desktop">+ Create Booking</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toast-container"></div>
   `,document.body.appendChild(s),n.innerHTML=`
-    <!-- Top Global App Bar with Viewport Mode Switcher -->
-    <div class="app-global-bar">
-      <div class="brand-badge">
-        <div class="brand-icon-mini">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/>
-          </svg>
-        </div>
-        <span>Ruyi Admin UI</span>
-      </div>
-
-      <!-- Mode Switcher -->
-      <div class="mode-switcher">
-        <button class="mode-btn active" data-mode="pc">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="20" height="14" x="2" y="3" rx="2"/>
-            <line x1="8" x2="16" y1="21" y2="21"/>
-            <line x1="12" x2="12" y1="17" y2="21"/>
-          </svg>
-          🖥️ PC Admin View
-        </button>
-        <button class="mode-btn" data-mode="mobile">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
-            <line x1="12" x2="12.01" y1="18" y2="18"/>
-          </svg>
-          📱 Phone Simulator
-        </button>
-        <button class="mode-btn" data-mode="dual">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="18" height="18" x="3" y="3" rx="2"/>
-            <line x1="12" x2="12" y1="3" y2="21"/>
-          </svg>
-          ◫ Dual Side-by-Side
-        </button>
-      </div>
-
-      <!-- Quick Screen Jump Shortcuts for testing reference screens -->
-      <div class="global-actions" style="flex-wrap: wrap;">
-        <span style="font-size: 12px; color: #94A3B8;">Jump to Screen:</span>
-        <button class="pill-link" id="btn-jump-screen-1" title="Screen 1: Bookings List">1. Bookings</button>
-        <button class="pill-link" id="btn-jump-screen-2" title="Overview Sheet">2. Overview</button>
-        <button class="pill-link" id="btn-jump-screen-guests" title="Guests Tab">3. Guests (12)</button>
-        <button class="pill-link" id="btn-jump-itinerary" title="Itinerary Timeline">4. Itinerary</button>
-        <button class="pill-link" id="btn-jump-menu" title="Itinerary ⋮ Dropdown Menu">5. Action Menu</button>
-        <button class="pill-link" id="btn-jump-assign" title="Assign to Vendor Modal">6. Assign to</button>
-        <button class="pill-link" id="btn-jump-assigned" title="Itinerary with Assigned Badges">7. Assigned Badges</button>
-      </div>
-    </div>
-
-    <!-- Active Viewport Container -->
-    <div class="app-viewport mode-pc" id="viewport-container">
+    <div class="app-root-container" id="app-root-container">
       <!-- Desktop Area Container -->
-      <div id="desktop-view-slot"></div>
+      <div id="desktop-view-slot" class="view-slot-desktop"></div>
 
-      <!-- Mobile Phone Simulator Container -->
-      <div class="mobile-frame-container" id="mobile-view-slot"></div>
+      <!-- Mobile View Container -->
+      <div id="mobile-view-slot" class="view-slot-mobile"></div>
     </div>
-  `;let c=document.getElementById(`viewport-container`),l=document.getElementById(`desktop-view-slot`),u=r(document.getElementById(`mobile-view-slot`)),d=i(l);p(window.innerWidth<=900?`mobile`:`pc`),document.querySelectorAll(`.mode-btn`).forEach(e=>{e.addEventListener(`click`,()=>{let t=e.dataset.mode;p(t)})}),window.addEventListener(`resize`,()=>{window.innerWidth<=900&&!c.classList.contains(`mode-mobile`)&&p(`mobile`)});let f=e.find(e=>e.id===`BK-5021`);document.getElementById(`btn-jump-screen-1`).addEventListener(`click`,()=>{p(`mobile`),u.closeModal(),m(`Screen 1: Mobile Bookings List`,`info`)}),document.getElementById(`btn-jump-screen-2`).addEventListener(`click`,()=>{p(`mobile`),u.openModal(f,`overview`),m(`Screen 2: Overview Bottom Sheet`,`info`)}),document.getElementById(`btn-jump-screen-guests`).addEventListener(`click`,()=>{p(`mobile`),u.openModal(f,`guests`),m(`Screen 3: Guests (12) Tab inside Bottom Sheet`,`info`)}),document.getElementById(`btn-jump-itinerary`).addEventListener(`click`,()=>{p(`mobile`),u.openModal(f,`itinerary`),m(`New Screen 1: Itinerary Timeline (Haridwar – Kashi Trip)`,`info`)}),document.getElementById(`btn-jump-menu`).addEventListener(`click`,()=>{p(`mobile`),u.openModal(f,`itinerary`),u.setOpenDropdownItemId(`IT-101`),m(`New Screen 2: Itinerary Item Action Menu (Assign, Details, Edit, Remove)`,`info`)}),document.getElementById(`btn-jump-assign`).addEventListener(`click`,()=>{p(`mobile`),u.openModal(f,`itinerary`);let e=f.itineraryDays?.[1]?.items?.[1];u.openAssignSheet(e),m(`New Screen 3: "Assign to" Sheet with Vendors & WhatsApp`,`info`)}),document.getElementById(`btn-jump-assigned`).addEventListener(`click`,()=>{p(`mobile`),f.itineraryDays?.[0]?.items?.[1]&&(f.itineraryDays[0].items[1].assigned={isAssigned:!0,name:`Rahul Mehta`,avatar:`https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80`}),f.itineraryDays?.[1]?.items?.[1]&&(f.itineraryDays[1].items[1].assigned={isAssigned:!0,name:`Adventure World`,avatar:`https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80`}),u.closeAssignSheet(),u.openModal(f,`itinerary`),m(`New Screen 4: Itinerary with "Assigned" badges & coordinator avatars`,`success`)});function p(e){document.querySelectorAll(`.mode-btn`).forEach(t=>{t.classList.toggle(`active`,t.dataset.mode===e)}),c.className=`app-viewport mode-${e}`}window.addEventListener(`open-add-guest-modal`,e=>{a=e.detail.bookingId,document.getElementById(`modal-add-guest`).classList.add(`open`)}),window.addEventListener(`open-assign-staff-modal`,e=>{o=e.detail.bookingIds,document.getElementById(`modal-assign-staff`).classList.add(`open`)}),document.getElementById(`close-add-guest-modal`).addEventListener(`click`,()=>{document.getElementById(`modal-add-guest`).classList.remove(`open`)}),document.getElementById(`cancel-add-guest-modal`).addEventListener(`click`,()=>{document.getElementById(`modal-add-guest`).classList.remove(`open`)}),document.getElementById(`close-assign-staff-modal`).addEventListener(`click`,()=>{document.getElementById(`modal-assign-staff`).classList.remove(`open`)}),document.getElementById(`form-add-guest`).addEventListener(`submit`,t=>{t.preventDefault();let n=document.getElementById(`guest-input-name`).value.trim(),r=parseInt(document.getElementById(`guest-input-age`).value)||25,i=document.getElementById(`guest-input-role`).value,o=document.getElementById(`guest-input-phone`).value.trim()||`9876500000`;if(!n)return;let s=e.find(e=>e.id===a);if(s){let e={id:s.guests.length+1,name:n,age:r,role:i,phone:o};s.guests.push(e),s.pax=s.guests.length,u.updateBooking(s),d.updateBooking(s),m(`Added ${n} to ${s.title}!`,`success`)}document.getElementById(`form-add-guest`).reset(),document.getElementById(`modal-add-guest`).classList.remove(`open`)}),document.querySelectorAll(`.staff-assign-card`).forEach(n=>{n.addEventListener(`click`,()=>{let r=n.dataset.staffId,i=t.find(e=>e.id===r);i&&(o.forEach(t=>{let n=e.find(e=>e.id===t);n&&(n.assignedTo={name:i.name,role:i.role,avatar:i.avatar},n.assignedStatus=`Assigned • Paid`,n.updates.unshift({time:`Just now`,title:`Assigned to ${i.name}`,desc:`Coordinator ${i.name} took ownership of trip operations.`,user:`Karan Sapalia`}),u.updateBooking(n),d.updateBooking(n))}),m(`Assigned ${i.name} to ${o.length} booking(s)!`,`success`)),document.getElementById(`modal-assign-staff`).classList.remove(`open`)})});function m(e,t=`info`){let n=document.getElementById(`toast-container`);if(!n)return;let r=document.createElement(`div`);r.className=`toast toast-${t}`,r.innerHTML=`
+  `;let c=document.getElementById(`desktop-view-slot`),l=r(document.getElementById(`mobile-view-slot`)),u=i(c);window.addEventListener(`open-add-guest-modal`,e=>{a=e.detail.bookingId,document.getElementById(`modal-add-guest`).classList.add(`open`)}),window.addEventListener(`open-assign-staff-modal`,e=>{o=e.detail.bookingIds,document.getElementById(`modal-assign-staff`).classList.add(`open`)}),window.addEventListener(`open-new-booking-modal`,()=>{document.getElementById(`modal-new-booking`).classList.add(`open`)}),document.getElementById(`close-add-guest-modal`).addEventListener(`click`,()=>{document.getElementById(`modal-add-guest`).classList.remove(`open`)}),document.getElementById(`cancel-add-guest-modal`).addEventListener(`click`,()=>{document.getElementById(`modal-add-guest`).classList.remove(`open`)}),document.getElementById(`close-assign-staff-modal`).addEventListener(`click`,()=>{document.getElementById(`modal-assign-staff`).classList.remove(`open`)}),document.getElementById(`close-new-booking-modal`).addEventListener(`click`,()=>{document.getElementById(`modal-new-booking`).classList.remove(`open`)}),document.getElementById(`cancel-new-booking-modal`).addEventListener(`click`,()=>{document.getElementById(`modal-new-booking`).classList.remove(`open`)}),document.getElementById(`form-add-guest`).addEventListener(`submit`,t=>{t.preventDefault();let n=document.getElementById(`guest-input-name`).value.trim(),r=parseInt(document.getElementById(`guest-input-age`).value)||25,i=document.getElementById(`guest-input-role`).value,o=document.getElementById(`guest-input-phone`).value.trim()||`9876500000`;if(!n)return;let s=e.find(e=>e.id===a);if(s){let e={id:s.guests.length+1,name:n,age:r,role:i,phone:o};s.guests.push(e),s.pax=s.guests.length,l.updateBooking(s),u.updateBooking(s),d(`Added ${n} to ${s.title}!`,`success`)}document.getElementById(`form-add-guest`).reset(),document.getElementById(`modal-add-guest`).classList.remove(`open`)}),document.getElementById(`form-new-booking`).addEventListener(`submit`,n=>{n.preventDefault();let r=document.getElementById(`nb-title`).value.trim(),i=document.getElementById(`nb-category`).value,a=parseInt(document.getElementById(`nb-pax`).value)||2,o=document.getElementById(`nb-dates`).value.trim(),s=document.getElementById(`nb-duration`).value.trim(),c=document.getElementById(`nb-destination`).value.trim(),f=document.getElementById(`nb-guest-name`).value.trim(),p=document.getElementById(`nb-guest-phone`).value.trim(),m=document.getElementById(`nb-price`).value.trim();m.startsWith(`₹`)||(m=`₹`+m);let h=document.getElementById(`nb-coordinator`).value,g=t.find(e=>e.id===h)||t[0],_={id:`BK-${5020+e.length+1}`,title:r,type:i,typeClass:{TOUR:`badge-tour`,VILLA:`badge-villa`,ACTIVITY:`badge-activity`,TRANSPORT:`badge-transport`}[i]||`badge-tour`,image:`/images/manali.jpg`,pax:a,duration:s,dates:o,travelDateFull:`${o} (${s})`,status:`Pending`,statusClass:`status-pending`,price:m,rawPrice:parseInt(m.replace(/[^0-9]/g,``))||25e3,category:`New Bookings`,selected:!1,guest:{name:f,phone:p,email:`${f.toLowerCase().replace(/\s+/g,`.`)}@example.com`,age:32,isPrimary:!0},destination:c,bookingType:i===`TOUR`?`Tour Package`:i===`VILLA`?`Villa Stay`:`Activity Booking`,services:`Accommodation, Cab, Guided Sightseeing`,assignedStatus:`Unassigned`,assignedTo:{name:g.name,role:g.role,avatar:g.avatar},notes:`Standard package requested. Confirmation pending.`,guests:[{id:1,name:f,age:32,role:`Primary Contact`,phone:p}],itineraryDays:[{day:`Day 1`,date:o.split(`-`)[0]?.trim()||`Day 1`,items:[{id:`IT-NEW-1`,type:`hotel`,icon:`bed`,title:`Hotel Check-in`,subtitle:`12:00 PM • Welcome drink & rest`,assigned:null},{id:`IT-NEW-2`,type:`sightseeing`,icon:`camera`,title:`Local Sightseeing`,subtitle:`04:00 PM • Explore destination`,assigned:null}]}],updates:[{time:`Just now`,title:`Booking Created`,desc:`Booking entered into operations queue.`,user:`Karan Sapalia`}]};e.unshift(_),u.addBooking(_),l.updateBooking(_),d(`Created new booking ${_.id} (${_.title})!`,`success`),document.getElementById(`form-new-booking`).reset(),document.getElementById(`modal-new-booking`).classList.remove(`open`)}),document.querySelectorAll(`.staff-assign-card`).forEach(n=>{n.addEventListener(`click`,()=>{let r=n.dataset.staffId,i=t.find(e=>e.id===r);i&&(o.forEach(t=>{let n=e.find(e=>e.id===t);n&&(n.assignedTo={name:i.name,role:i.role,avatar:i.avatar},n.assignedStatus=`Assigned • Paid`,n.updates.unshift({time:`Just now`,title:`Assigned to ${i.name}`,desc:`Coordinator ${i.name} took ownership of trip operations.`,user:`Karan Sapalia`}),l.updateBooking(n),u.updateBooking(n))}),d(`Assigned ${i.name} to ${o.length} booking(s)!`,`success`)),document.getElementById(`modal-assign-staff`).classList.remove(`open`)})});function d(e,t=`info`){let n=document.getElementById(`toast-container`);if(!n)return;let r=document.createElement(`div`);r.className=`toast toast-${t}`,r.innerHTML=`
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         ${t===`success`?`<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>`:`<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>`}
       </svg>

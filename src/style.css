@@ -59,209 +59,102 @@
 
 body {
   font-family: var(--font-family);
-  background-color: #0F172A;
+  background-color: var(--bg-app);
   color: var(--text-main);
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ==========================================================================
-   App Shell & Top Navigation Toolbar (Mode Switcher)
+   App Shell & Responsive Viewport Container
    ========================================================================== */
 
-.app-global-bar {
-  background: #1E293B;
-  color: #F8FAFC;
-  padding: 10px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #334155;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  font-size: 14px;
-}
-
-.brand-badge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-}
-
-.brand-icon-mini {
-  width: 28px;
-  height: 28px;
-  background: var(--primary);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #FFF;
-}
-
-.mode-switcher {
-  display: flex;
-  background: #0F172A;
-  padding: 4px;
-  border-radius: var(--radius-full);
-  gap: 4px;
-  border: 1px solid #334155;
-}
-
-.mode-btn {
-  background: transparent;
-  border: none;
-  color: #94A3B8;
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-  font-family: var(--font-family);
-}
-
-.mode-btn:hover {
-  color: #F8FAFC;
-}
-
-.mode-btn.active {
-  background: var(--primary);
-  color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
-}
-
-.global-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.pill-link {
-  color: #94A3B8;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
-  transition: background 0.2s;
-}
-
-.pill-link:hover {
-  background: #334155;
-  color: #FFFFFF;
-}
-
-/* ==========================================================================
-   Main Containers & Modes (PC vs Mobile vs Side-by-Side)
-   ========================================================================== */
-
-.app-viewport {
+.app-root-container {
   width: 100%;
-  min-height: calc(100vh - 53px);
-  background-color: #0F172A;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 24px;
-  overflow-x: hidden;
-}
-
-/* In Desktop Mode */
-.app-viewport.mode-pc {
-  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--bg-app);
-  display: block;
 }
 
-.app-viewport.mode-pc .mobile-frame-container {
-  display: none !important;
+.view-slot-desktop {
+  width: 100%;
+  min-height: 100vh;
 }
 
-.app-viewport.mode-pc .desktop-layout {
-  display: flex !important;
-}
-
-/* In Mobile Simulator Mode */
-.app-viewport.mode-mobile {
-  padding: 30px 20px;
-  background: radial-gradient(circle at 50% 20%, #1E293B 0%, #0F172A 100%);
+.view-slot-mobile {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
+  background: #FFFFFF;
 }
 
-.app-viewport.mode-mobile .desktop-layout {
+@media (min-width: 901px) {
+  .view-slot-desktop {
+    display: block !important;
+  }
+  .view-slot-mobile {
+    display: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .view-slot-desktop {
+    display: none !important;
+  }
+  .view-slot-mobile {
+    display: flex !important;
+  }
+}
+
+/* Hide legacy simulation bar - clean production mode */
+.app-global-bar {
   display: none !important;
-}
-
-.app-viewport.mode-mobile .mobile-frame-container {
-  display: flex !important;
-}
-
-/* In Side-by-Side Dual Mode */
-.app-viewport.mode-dual {
-  padding: 20px;
-  background: #0B1120;
-  display: flex;
-  gap: 28px;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.app-viewport.mode-dual .desktop-layout {
-  display: flex !important;
-  flex: 1;
-  max-width: 1100px;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-.app-viewport.mode-dual .mobile-frame-container {
-  display: flex !important;
-  position: sticky;
-  top: 80px;
 }
 
 /* ==========================================================================
-   MOBILE DEVICE FRAME (Pixel-Perfect iPhone Mockup & Standalone)
+   MOBILE DEVICE VIEW (Clean Native-feeling Responsive Mobile Layout)
    ========================================================================== */
 
 .mobile-frame-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .phone-device {
-  width: 400px;
-  height: 840px;
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: #FFFFFF;
-  border-radius: 46px;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 12px #2A3245, 0 0 0 14px #475569;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  margin: 0 auto;
 }
 
-/* Standalone mobile without outer phone shell */
+/* Standalone mobile */
 body.standalone-mobile {
-  background: #F8FAFC;
+  background: #FFFFFF;
 }
 
 body.standalone-mobile .phone-device {
   width: 100%;
-  max-width: 460px;
+  max-width: 480px;
   margin: 0 auto;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
   border-radius: 0;
-  box-shadow: none;
 }
 
 body.standalone-mobile .app-global-bar {
@@ -1518,7 +1411,8 @@ body.standalone-mobile .app-global-bar {
 .desktop-layout {
   display: flex;
   width: 100%;
-  min-height: calc(100vh - 53px);
+  min-height: 100vh;
+  min-height: 100dvh;
   background: #F8FAFC;
 }
 
@@ -1735,15 +1629,17 @@ body.standalone-mobile .app-global-bar {
 /* Desktop Scrollable Body */
 .desktop-body {
   flex: 1;
-  padding: 28px 32px;
+  padding: 28px 36px;
   overflow-y: auto;
   display: flex;
-  gap: 28px;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .desktop-content-col {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -1765,6 +1661,12 @@ body.standalone-mobile .app-global-bar {
   align-items: center;
   gap: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .metric-icon-box {
@@ -1806,15 +1708,15 @@ body.standalone-mobile .app-global-bar {
 .desktop-table-container {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-radius: 18px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
 .table-toolbar {
-  padding: 16px 20px;
+  padding: 16px 24px;
   border-bottom: 1px solid #E2E8F0;
   display: flex;
   align-items: center;
@@ -1864,7 +1766,7 @@ body.standalone-mobile .app-global-bar {
 .desktop-selection-bar {
   background: #EFF6FF;
   border-bottom: 1px solid #BFDBFE;
-  padding: 10px 20px;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1873,7 +1775,7 @@ body.standalone-mobile .app-global-bar {
   color: #1E40AF;
 }
 
-/* Data Table Styling */
+/* Data Table Styling - Full Width, High-end SaaS */
 .bookings-table {
   width: 100%;
   border-collapse: collapse;
@@ -1882,8 +1784,8 @@ body.standalone-mobile .app-global-bar {
 
 .bookings-table th {
   background: #F8FAFC;
-  padding: 12px 18px;
-  font-size: 12px;
+  padding: 14px 20px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #475569;
   text-transform: uppercase;
@@ -1892,7 +1794,7 @@ body.standalone-mobile .app-global-bar {
 }
 
 .bookings-table td {
-  padding: 14px 18px;
+  padding: 16px 20px;
   border-bottom: 1px solid #F1F5F9;
   font-size: 13.5px;
   color: #1E293B;
@@ -1901,15 +1803,16 @@ body.standalone-mobile .app-global-bar {
 
 .bookings-table tbody tr {
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background-color 0.15s ease;
 }
 
 .bookings-table tbody tr:hover {
   background: #F8FAFC;
 }
 
-.bookings-table tbody tr.row-selected {
-  background: #F0FDF4;
+.bookings-table tbody tr.row-selected,
+.bookings-table tbody tr.row-active {
+  background: #EFF6FF !important;
 }
 
 .table-booking-cell {
@@ -1919,11 +1822,12 @@ body.standalone-mobile .app-global-bar {
 }
 
 .table-thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
+  border: 1px solid #E2E8F0;
 }
 
 .table-thumb img {
@@ -1936,28 +1840,116 @@ body.standalone-mobile .app-global-bar {
   font-size: 14.5px;
   font-weight: 700;
   color: #0F172A;
+  line-height: 1.3;
 }
 
 .table-booking-info p {
   font-size: 12px;
   color: #64748B;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
-/* Desktop Details Drawer (Slide-over panel on right) */
-.desktop-details-panel {
-  width: 420px;
-  background: #FFFFFF;
+/* Row Action "View Details" Button */
+.row-view-details-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: #F1F5F9;
   border: 1px solid #E2E8F0;
-  border-radius: 18px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: all 0.15s ease;
+}
+
+.row-view-details-btn:hover,
+.bookings-table tbody tr:hover .row-view-details-btn {
+  background: #2563EB;
+  border-color: #2563EB;
+  color: #FFFFFF;
+}
+
+/* Slide-Over Drawer Backdrop Overlay */
+.desktop-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.desktop-drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Slide-Over Detail Drawer (Popup on PC) */
+.desktop-details-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 500px;
+  max-width: 94vw;
+  height: 100vh;
+  height: 100dvh;
+  background: #FFFFFF;
+  z-index: 999;
+  box-shadow: -10px 0 35px rgba(15, 23, 42, 0.16);
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  max-height: calc(100vh - 150px);
+  transform: translateX(105%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 1px solid #E2E8F0;
   overflow: hidden;
-  position: sticky;
-  top: 0;
+}
+
+.desktop-details-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  border-bottom: 1px solid #F1F5F9;
+  background: #FFFFFF;
+}
+
+.drawer-top-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.drawer-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748B;
+  transition: all 0.15s ease;
+}
+
+.drawer-close-btn:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+  border-color: #CBD5E1;
 }
 
 /* Modal Popup Dialog (Add Guest, Assign Staff, etc.) */
