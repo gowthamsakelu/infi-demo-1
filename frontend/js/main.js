@@ -1,0 +1,163 @@
+// Main Application Orchestrator
+import { createMobileView } from './mobile.js';
+import { createDesktopView } from './desktop.js';
+import { INITIAL_BOOKINGS, STAFF_MEMBERS } from './data.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const appContainer = document.getElementById('app');
+  if (!appContainer) return;
+
+  // Global Toast Dispatcher
+  window.addEventListener('show-toast', (e) => {
+    const { message, type } = e.detail;
+    showToast(message, type);
+  });
+
+  // Modal State
+  let targetBookingForGuest = 'BK-5021';
+  let targetBookingsForAssign = ['BK-5021'];
+
+  // Global Modals HTML
+  const modalContainer = document.createElement('div');
+  modalContainer.innerHTML = `
+    <!-- Add Guest Modal -->
+    <div class="modal-overlay" id="modal-add-guest">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Add New Guest</h3>
+          <button class="sheet-close-btn" id="close-add-guest-modal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <form id="form-add-guest">
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Full Name *</label>
+              <input type="text" id="guest-input-name" placeholder="e.g. Rahul Sharma" required />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>Age *</label>
+                <input type="number" id="guest-input-age" placeholder="e.g. 35" min="1" max="110" required />
+              </div>
+              <div class="form-group">
+                <label>Category / Role</label>
+                <select id="guest-input-role">
+                  <option value="Adult">Adult</option>
+                  <option value="Child">Child</option>
+                  <option value="Senior">Senior</option>
+                  <option value="Primary Contact">Primary Contact</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="guest-input-phone" placeholder="e.g. 9876543210" />
+            </div>
+            <div class="form-group">
+              <label>ID Proof / Notes</label>
+              <input type="text" id="guest-input-notes" placeholder="Aadhaar / Passport / Special meal request" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary-desktop" id="cancel-add-guest-modal">Cancel</button>
+            <button type="submit" class="btn-primary-desktop">+ Add Guest</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toast-container"></div>
+  `;
+  document.body.appendChild(modalContainer);
+
+  // App Layout Shell Structure - No ugly simulation toolbar! Clean and Production-ready
+  appContainer.innerHTML = `
+    <div class="app-root-container" id="app-root-container">
+      <!-- Desktop Area Container -->
+      <div id="desktop-view-slot" class="view-slot-desktop"></div>
+
+      <!-- Mobile View Container -->
+      <div id="mobile-view-slot" class="view-slot-mobile"></div>
+    </div>
+  `;
+
+  const desktopSlot = document.getElementById('desktop-view-slot');
+  const mobileSlot = document.getElementById('mobile-view-slot');
+
+  // Initialize Views
+  const mobileView = createMobileView(mobileSlot);
+  const desktopView = createDesktopView(desktopSlot);
+
+  // Modal Listeners
+  window.addEventListener('open-add-guest-modal', (e) => {
+    targetBookingForGuest = e.detail.bookingId;
+    document.getElementById('modal-add-guest').classList.add('open');
+  });
+
+  // Close Add Guest Modal
+  document.getElementById('close-add-guest-modal').addEventListener('click', () => {
+    document.getElementById('modal-add-guest').classList.remove('open');
+  });
+  document.getElementById('cancel-add-guest-modal').addEventListener('click', () => {
+    document.getElementById('modal-add-guest').classList.remove('open');
+  });
+
+  // Handle Add Guest Form Submission
+  document.getElementById('form-add-guest').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('guest-input-name').value.trim();
+    const age = parseInt(document.getElementById('guest-input-age').value) || 25;
+    const role = document.getElementById('guest-input-role').value;
+    const phone = document.getElementById('guest-input-phone').value.trim() || '9876500000';
+
+    if (!name) return;
+
+    const booking = INITIAL_BOOKINGS.find(b => b.id === targetBookingForGuest);
+    if (booking) {
+      const newGuest = {
+        id: booking.guests.length + 1,
+        name,
+        age,
+        role,
+        phone
+      };
+      booking.guests.push(newGuest);
+      booking.pax = booking.guests.length;
+
+      // Update both views
+      mobileView.updateBooking(booking);
+      desktopView.updateBooking(booking);
+
+      showToast(`Added ${name} to ${booking.title}!`, 'success');
+    }
+
+    document.getElementById('form-add-guest').reset();
+    document.getElementById('modal-add-guest').classList.remove('open');
+  });
+
+  // Toast Helper
+  function showToast(msg, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        ${type === 'success' ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>' : '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>'}
+      </svg>
+      <span>${msg}</span>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      toast.style.transition = 'all 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 3200);
+  }
+});

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "V-01",
+    "name": "Adventure World",
+    "phone": "+91 98765 43210",
+    "service": "Rafting • Rishikesh",
+    "image": "./images/rishikesh.jpg",
+    "selected": true
+  },
+  {
+    "id": "V-02",
+    "name": "Himalayan Adventures",
+    "phone": "+91 91234 52789",
+    "service": "Rafting & Trekking • Rishikesh",
+    "image": "./images/kedarnath.jpg",
+    "selected": false
+  },
+  {
+    "id": "V-03",
+    "name": "Ganga Adventure Co.",
+    "phone": "+91 98887 66554",
+    "service": "White Water Rafting • Kayaking",
+    "image": "./images/rishikesh.jpg",
+    "selected": false
+  },
+  {
+    "id": "V-04",
+    "name": "Garhwal Luxury Transport",
+    "phone": "+91 98370 11223",
+    "service": "Fleet Services & Tempo Travelers",
+    "image": "./images/manali.jpg",
+    "selected": false
+  }
+]
