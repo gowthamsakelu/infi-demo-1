@@ -64,8 +64,19 @@ COPY backend/ /var/www/html/
 COPY docker/start.sh /var/www/html/docker/start.sh
 RUN chmod +x /var/www/html/docker/start.sh
 
+# Ensure storage, cache, and database directories exist with proper write permissions
+RUN mkdir -p /var/www/html/storage/framework/cache/data \
+             /var/www/html/storage/framework/sessions \
+             /var/www/html/storage/framework/views \
+             /var/www/html/storage/logs \
+             /var/www/html/bootstrap/cache \
+             /var/www/html/database \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
+
 # Ensure autoload dump and package discovery
-RUN composer dump-autoload --optimize --no-dev
+RUN composer dump-autoload --optimize --no-dev \
+    && chown -R www-data:www-data /var/www/html/bootstrap/cache /var/www/html/storage
 
 # Default environment variables
 ENV PORT=80 \
