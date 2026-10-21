@@ -62,6 +62,24 @@ class BookingController extends Controller
     }
 
     /**
+     * Mark a booking Paid or back to Pending.
+     */
+    public function updatePayment(Request $request, string $id): JsonResponse
+    {
+        $booking = Booking::find($id);
+        if (!$booking) {
+            return response()->json(['status' => 'error', 'message' => 'Booking not found'], 404);
+        }
+
+        $data = $request->validate(['status' => 'required|in:Paid,Pending,Part Paid']);
+        $booking->status = $data['status'];
+        $booking->status_class = ['Paid' => 'status-paid', 'Part Paid' => 'status-part-paid', 'Pending' => 'status-pending'][$data['status']];
+        $booking->save();
+
+        return response()->json(['status' => 'success', 'data' => ['id' => $booking->id, 'status' => $booking->status, 'status_class' => $booking->status_class]]);
+    }
+
+    /**
      * Add a guest to a booking.
      */
     public function addGuest(Request $request, string $id): JsonResponse

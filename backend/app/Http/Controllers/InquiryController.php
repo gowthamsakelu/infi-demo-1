@@ -18,6 +18,9 @@ class InquiryController extends Controller
         if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
+        if ($request->filled('category')) {
+            $query->where('category', strtoupper($request->category));
+        }
         if ($request->filled('assigned_to')) {
             $query->where('assigned_to_id', $request->assigned_to);
         }
@@ -63,6 +66,28 @@ class InquiryController extends Controller
             'data' => $this->presentFollowUp($followUp),
             'inquiry' => $this->present($inquiry->fresh('followUps')),
         ], 201);
+    }
+
+    public function storeNote(Request $request, Inquiry $inquiry): JsonResponse
+    {
+        $staff = Staff::find($request->input('created_by', 'ST-05'));
+        abort_if($staff === null, 403);
+
+        $data = $request->validate(['comment' => ['required', 'string', 'max:500']]);
+        $data['comment'] = trim($data['comment']);
+        abort_if($data['comment'] === '', 422, 'Note cannot be empty.');
+
+        $note = $inquiry->followUps()->create([
+            'customer_phone' => FollowUp::normalizePhone($inquiry->customer_phone),
+            'customer_name' => $inquiry->customer_name,
+            'type' => 'note',
+            'scheduled_at' => now(),
+            'comment' => $data['comment'],
+            'created_by' => $staff->id,
+            'created_by_name' => $staff->name,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Note saved', 'data' => $this->presentFollowUp($note)], 201);
     }
 
     public function assign(Request $request): JsonResponse
@@ -113,6 +138,7 @@ class InquiryController extends Controller
             'location' => $i->location,
             'lead_source' => $i->lead_source,
             'trip' => $i->trip,
+            'category' => $i->category,
             'pax' => $i->pax,
             'nights' => $i->nights,
             'travel_date' => $i->travel_date?->format('Y-m-d'),

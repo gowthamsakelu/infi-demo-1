@@ -1,7 +1,18 @@
 import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, getSpecialReqIconSvg } from './data.js';
+import { icon } from './shared/icons.js';
+import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
+import { createCategoryFilter } from './shared/dropdown-filter.js';
+import { searchBox, emptyState, toast, openRowMenu, esc } from './shared/ui.js';
+import { renderTabs, mobileRowCard, rowMenuItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
+import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
+import { openFollowUpModal } from './shared/followup-modal.js';
+import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments, openInquiryAssignModal } from './shared/inquiry-store.js';
+import { matchesCategory } from './shared/booking-filters.js';
 
 export function createMobileView(container, options = {}) {
-  let bookings = [...INITIAL_BOOKINGS];
+  const bookingsData = [...INITIAL_BOOKINGS];
+  let bookings = bookingsData; // swapped for the inquiry list on the Inquiries page
+  let page = 'bookings';
   let vendors = [...VENDORS_LIST];
   let teamMembers = [...STAFF_MEMBERS];
   let contacts = [...CONTACTS_LIST];
@@ -46,7 +57,7 @@ export function createMobileView(container, options = {}) {
             </div>
             <div class="brand-text-col">
               <h2>Ruyi Admin</h2>
-              <p>Bookings • 28 Total</p>
+              <p id="mobile-header-subtitle">Bookings • 28 Total</p>
             </div>
           </div>
           <div class="app-header-right">
@@ -61,79 +72,21 @@ export function createMobileView(container, options = {}) {
           </div>
         </div>
 
-        <!-- Page Title -->
-        <div class="mobile-title-section">
-          <h1>Bookings</h1>
-          <p>Manage and track all types of bookings.</p>
-        </div>
-
+        <div id="mobile-bookings-page">
         <!-- Search & Filter Row -->
         <div class="mobile-search-row">
-          <div class="search-input-wrapper">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
-            <input type="text" id="mobile-search-input" placeholder="Search bookings..." value="${searchQuery}" />
-          </div>
-          <div class="mobile-category-select-wrapper">
-            <svg class="category-filter-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-            </svg>
-            <select id="mobile-category-filter" class="mobile-select-filter">
-              <option value="ALL" ${selectedCategory === 'ALL' ? 'selected' : ''}>All Categories</option>
-              <option value="TOUR" ${selectedCategory === 'TOUR' ? 'selected' : ''}>Tour Packages</option>
-              <option value="VILLA" ${selectedCategory === 'VILLA' ? 'selected' : ''}>Villas & Resorts</option>
-              <option value="ACTIVITY" ${selectedCategory === 'ACTIVITY' ? 'selected' : ''}>Activities & Sports</option>
-              <option value="TRANSPORT" ${selectedCategory === 'TRANSPORT' ? 'selected' : ''}>Transports</option>
-            </select>
-          </div>
+          ${searchBox({ id: 'mobile-search-input', placeholder: 'Search bookings...', value: searchQuery, variant: 'mobile' })}
+          <span id="mobile-filter-slot"></span>
         </div>
 
         <!-- Status Filter Tabs / Pills -->
-        <div class="category-filter-tabs">
-          <button class="tab-pill ${activeCategory === 'All Bookings' ? 'active' : ''}" data-cat="All Bookings">
-            All <span class="pill-badge">${bookings.length}</span>
-          </button>
-          <button class="tab-pill ${activeCategory === 'New Bookings' ? 'active' : ''}" data-cat="New Bookings">
-            New Bookings <span class="pill-badge">${bookings.filter(b => b.category === 'New Bookings').length}</span>
-          </button>
-          <button class="tab-pill ${activeCategory === 'Assigned' ? 'active' : ''}" data-cat="Assigned">
-            Assigned <span class="pill-badge">${bookings.filter(b => b.category === 'Assigned').length}</span>
-          </button>
-          <button class="tab-pill ${activeCategory === 'Ongoing' ? 'active' : ''}" data-cat="Ongoing">
-            Ongoing <span class="pill-badge">${bookings.filter(b => b.category === 'Ongoing').length}</span>
-          </button>
-        </div>
+        <div id="mobile-tabs-host"></div>
 
-        <!-- Selection / Bulk Action Bar (Hidden by default, shown when items selected) -->
-        <div class="mobile-selection-bar" id="mobile-selection-bar" style="display: none;">
-          <div class="selection-left">
-            <div class="custom-checkbox" id="mobile-select-all-box">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            </div>
-            <span id="mobile-selected-count">0 selected</span>
-          </div>
-          <div class="selection-actions-right">
-            <div style="position: relative;">
-              <button class="action-more-btn" id="mobile-bulk-more-btn" title="More options" aria-haspopup="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="1.5"/>
-                  <circle cx="19" cy="12" r="1.5"/>
-                  <circle cx="5" cy="12" r="1.5"/>
-                </svg>
-              </button>
-              <div class="bulk-more-dropdown" id="mobile-bulk-more-dropdown" style="display: none;">
-                <!-- Populated dynamically: Assign, Mark Paid / Mark Unpaid, Clear Selection -->
-              </div>
-            </div>
-          </div>
-        </div>
+        ${bulkBar('mobile')}
 
         <!-- Bookings Cards List -->
         <div class="bookings-cards-list" id="mobile-cards-list"></div>
+        </div>
       </div>
 
       <!-- Bottom Navigation Bar (Fixed) -->
@@ -147,18 +100,18 @@ export function createMobileView(container, options = {}) {
           </svg>
           Dashboard
         </button>
-        <button class="nav-item active">
+        <button class="nav-item active" data-route="bookings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
             <rect width="20" height="14" x="2" y="6" rx="2"/>
           </svg>
           Bookings
         </button>
-        <button class="nav-item">
+        <button class="nav-item" data-route="inquiries">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          Enquiries
+          Inquiries
         </button>
         <button class="nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -208,9 +161,7 @@ export function createMobileView(container, options = {}) {
           <button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
           <div class="sheet-quick-actions-grid">
             <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
+              ${icon('phone', { size: 20, stroke: 2.2 })}
               <span>Call</span>
             </button>
             <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
@@ -227,11 +178,7 @@ export function createMobileView(container, options = {}) {
               <span>Forward</span>
             </button>
             <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="1.5"/>
-                <circle cx="19" cy="12" r="1.5"/>
-                <circle cx="5" cy="12" r="1.5"/>
-              </svg>
+              ${icon('more', { size: 20, stroke: 2.2 })}
               <span>More</span>
             </button>
           </div>
@@ -276,10 +223,7 @@ export function createMobileView(container, options = {}) {
         <!-- Search & Filter Bar -->
         <div class="vendor-search-row">
           <div class="vendor-search-input-box">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
+            ${icon('search', { size: 16 })}
             <input type="text" id="assign-vendor-search" placeholder="Search vendor by name, service or location..." />
           </div>
           <button class="filter-btn-square" style="width: 38px; height: 38px;" title="Filter Vendors">
@@ -325,9 +269,7 @@ export function createMobileView(container, options = {}) {
         <div class="assign-footer-actions">
           <button class="btn-cancel-assign" id="btn-cancel-assign-sheet">Cancel</button>
           <button class="btn-whatsapp-assign" id="btn-submit-assign-whatsapp">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-            </svg>
+            ${icon('whatsapp', { size: 18 })}
             Assign & Send on WhatsApp
           </button>
         </div>
@@ -601,200 +543,45 @@ export function createMobileView(container, options = {}) {
   `;
 
   // Render Functions
+  const BOOKING_TABS = [
+    { key: 'All Bookings', label: 'All' },
+    { key: 'New Bookings', label: 'New Bookings' },
+    { key: 'Assigned', label: 'Assigned' },
+    { key: 'Ongoing', label: 'Ongoing' },
+  ];
+  const tabDefs = () => (page === 'inquiries' ? INQUIRY_TABS : BOOKING_TABS);
+  const allKey = () => tabDefs()[0].key;
+
   function renderCards() {
     const listEl = container.querySelector('#mobile-cards-list');
     if (!listEl) return;
+    const inquiry = page === 'inquiries';
+    const what = inquiry ? 'inquiries' : 'bookings';
+    const q = searchQuery.toLowerCase();
+    const catValue = selectedCategory === 'ALL' ? '' : selectedCategory;
 
-    let filtered = bookings.filter(b => {
-      const matchSearch = !searchQuery || 
-        b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (b.guest.phone && b.guest.phone.includes(searchQuery));
-      
-      const matchCategory = !activeCategory || activeCategory === 'All' || activeCategory === 'All Bookings' || b.category === activeCategory;
-      const matchCat = selectedCategory === 'ALL' ||
-        (selectedCategory === 'VILLA'
-          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
-          : b.type.toUpperCase() === selectedCategory.toUpperCase());
-
-      return matchSearch && matchCategory && matchCat;
+    const base = bookings.filter(b => {
+      const matchSearch = !q || b.title.toLowerCase().includes(q) || b.destination.toLowerCase().includes(q) || b.id.toLowerCase().includes(q) ||
+        b.guest.name.toLowerCase().includes(q) || (b.guest.phone && b.guest.phone.includes(searchQuery));
+      return matchSearch && matchesCategory(b, catValue);
     });
+    const filtered = base.filter(b => activeCategory === allKey() || b.category === activeCategory);
 
-    if (filtered.length === 0) {
-      listEl.innerHTML = `
-        <div style="text-align: center; padding: 48px 20px; color: #64748B;">
-          <div style="width: 48px; height: 48px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; color: #94A3B8;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
-          </div>
-          <h4 style="font-size: 15px; font-weight: 700; color: #0F172A; margin: 0 0 4px 0;">No Bookings Found</h4>
-          <p style="font-size: 13px; margin: 0 0 14px 0; color: #94A3B8;">No results matching your selected filters.</p>
-          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-            <button class="action-pill-btn" id="btn-clear-mobile-empty-filters" style="height: 36px; padding: 0 16px; font-weight: 600; border-radius: 10px; background: #2563EB; color: #FFFFFF; border: none; cursor: pointer;">Reset All Filters</button>
-            ${selectedCategory !== 'ALL' ? `<button class="action-pill-btn" id="btn-view-all-category-filters" style="height: 36px; padding: 0 16px; font-weight: 600; border-radius: 10px; background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; cursor: pointer;">View All in Category</button>` : ''}
-          </div>
-        </div>
-      `;
+    const searchEl = container.querySelector('#mobile-search-input');
+    if (searchEl) { searchEl.placeholder = `Search ${what}...`; searchEl.setAttribute('aria-label', `Search ${what}`); }
+
+    if (inquiry && !inquiryState.loaded) {
+      listEl.innerHTML = '<p style="text-align:center;padding:48px 0;color:#94A3B8;">Loading inquiries...</p>';
+    } else if (filtered.length === 0) {
+      listEl.innerHTML = emptyState({ title: `No ${what} found`, text: 'No results matching your selected filters.', resetId: 'btn-clear-mobile-empty-filters' });
     } else {
-      listEl.innerHTML = filtered.map(b => `
-        <div class="booking-card ${b.selected ? 'card-selected' : ''}" data-booking-id="${b.id}">
-          <div class="custom-checkbox card-select-checkbox ${b.selected ? 'checked' : ''}" data-select-id="${b.id}">
-            ${b.selected ? `
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            ` : ''}
-          </div>
-          <div class="card-thumb-wrapper">
-            <img src="${b.image}" alt="${b.title}" loading="lazy" />
-          </div>
-          <div class="card-info-col">
-            <span class="card-type-badge ${b.typeClass}">${b.type}</span>
-            <h3 class="card-title">${b.title}</h3>
-            <div class="card-meta-row">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-              </svg>
-              <span>${b.pax} Pax • ${b.duration}</span>
-            </div>
-            <div class="card-meta-row">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                <line x1="16" x2="16" y1="2" y2="6"/>
-                <line x1="8" x2="8" y1="2" y2="6"/>
-                <line x1="3" x2="21" y1="10" y2="10"/>
-              </svg>
-              <span>${b.dates}</span>
-            </div>
-          </div>
-          <div class="card-right-col">
-            <div class="card-action-btns-row">
-              <button class="card-circle-action-btn btn-action-call" data-action-call="${b.id}" title="Call ${b.guest.name}" aria-label="Call">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
-              </button>
-              <button class="card-circle-action-btn btn-action-whatsapp" data-action-whatsapp="${b.id}" title="WhatsApp ${b.guest.name}" aria-label="WhatsApp">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
-                </svg>
-              </button>
-            </div>
-            <div class="card-price-status-row">
-              <span class="card-price">${b.price}</span>
-              <span class="status-pill ${b.statusClass}">
-                <span class="dot"></span>
-                ${b.status}
-              </span>
-            </div>
-          </div>
-        </div>
-      `).join('');
+      listEl.innerHTML = filtered.map(mobileRowCard).join('');
     }
 
-    // Dynamic category badge counts reflecting current category filter
-    const catFiltered = bookings.filter(b => {
-      const matchSearch = !searchQuery || 
-        b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (b.guest.phone && b.guest.phone.includes(searchQuery));
-      const matchCat = selectedCategory === 'ALL' ||
-        (selectedCategory === 'VILLA'
-          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
-          : b.type.toUpperCase() === selectedCategory.toUpperCase());
-      return matchSearch && matchCat;
-    });
+    const tabs = tabDefs().map(t => ({ ...t, count: t.key === allKey() ? base.length : base.filter(b => b.category === t.key).length }));
+    renderTabs(container.querySelector('#mobile-tabs-host'), { tabs, active: activeCategory, variant: 'mobile', attr: 'data-cat' });
 
-    const countAll = catFiltered.length;
-    const countNew = catFiltered.filter(b => b.category === 'New Bookings').length;
-    const countAssigned = catFiltered.filter(b => b.category === 'Assigned').length;
-    const countOngoing = catFiltered.filter(b => b.category === 'Ongoing').length;
-
-    const bAll = container.querySelector('.tab-pill[data-cat="All Bookings"] .pill-badge');
-    const bNew = container.querySelector('.tab-pill[data-cat="New Bookings"] .pill-badge');
-    const bAssigned = container.querySelector('.tab-pill[data-cat="Assigned"] .pill-badge');
-    const bOngoing = container.querySelector('.tab-pill[data-cat="Ongoing"] .pill-badge');
-
-    if (bAll) bAll.textContent = countAll;
-    if (bNew) bNew.textContent = countNew;
-    if (bAssigned) bAssigned.textContent = countAssigned;
-    if (bOngoing) bOngoing.textContent = countOngoing;
-
-    const selectedCount = bookings.filter(b => b.selected).length;
-    const countEl = container.querySelector('#mobile-selected-count');
-    if (countEl) countEl.textContent = `${selectedCount} selected`;
-
-    const selBar = container.querySelector('#mobile-selection-bar');
-    if (selBar) {
-      selBar.style.display = selectedCount > 0 ? 'flex' : 'none';
-    }
-
-    const allBox = container.querySelector('#mobile-select-all-box');
-    if (allBox) {
-      allBox.className = selectedCount > 0 ? (selectedCount === bookings.length ? 'custom-checkbox checked' : 'custom-checkbox checked') : 'custom-checkbox';
-    }
-
-    renderMobileBulkDropdown();
-  }
-
-  let isMobileBulkDropdownOpen = false;
-
-  function renderMobileBulkDropdown() {
-    const dropdown = container.querySelector('#mobile-bulk-more-dropdown');
-    if (!dropdown) return;
-    const selectedItems = bookings.filter(b => b.selected);
-    if (selectedItems.length === 0) {
-      dropdown.style.display = 'none';
-      isMobileBulkDropdownOpen = false;
-      return;
-    }
-
-    const isAllPaid = selectedItems.every(b => b.status === 'Paid' || b.status === 'Confirmed');
-
-    dropdown.innerHTML = `
-      <button class="dropdown-item-btn" id="mobile-bulk-assign-action">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <line x1="19" x2="19" y1="8" y2="14"/>
-          <line x1="22" x2="16" y1="11" y2="11"/>
-        </svg>
-        <span>Assign</span>
-      </button>
-      ${isAllPaid ? `
-        <button class="dropdown-item-btn" id="mobile-bulk-mark-unpaid-action">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" x2="12" y1="8" y2="12"/>
-            <line x1="12" x2="12.01" y1="16" y2="16"/>
-          </svg>
-          <span>Mark as Unpaid</span>
-        </button>
-      ` : `
-        <button class="dropdown-item-btn" id="mobile-bulk-mark-paid-action">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          <span>Mark as Paid</span>
-        </button>
-      `}
-      <div class="dropdown-divider"></div>
-      <button class="dropdown-item-btn item-danger" id="mobile-bulk-clear-action">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/>
-          <line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-        <span>Clear Selection</span>
-      </button>
-    `;
-    dropdown.style.display = isMobileBulkDropdownOpen ? 'block' : 'none';
+    updateBulkBar(container, 'mobile', bookings.filter(b => b.selected).length);
   }
 
   function renderSheetHeader() {
@@ -807,9 +594,7 @@ export function createMobileView(container, options = {}) {
 
     // Uniform Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
     headerCard.innerHTML = `
-      <div class="sheet-drag-handle-bar">
-        <div class="sheet-handle"></div>
-      </div>
+      <button class="sheet-back-btn" id="mobile-sheet-back-btn" aria-label="Back to list">${icon('arrowLeft', { size: 20 })}</button>
       <div class="sheet-customer-header">
         <div class="customer-avatar-badge">${initials}</div>
         <div class="customer-header-info">
@@ -993,10 +778,7 @@ export function createMobileView(container, options = {}) {
                 <div class="contact-value-row">
                   <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
                   <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect width="20" height="16" x="2" y="4" rx="2"/>
-                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                    </svg>
+                    ${icon('mail', { size: 12 })}
                   </button>
                 </div>
               </div>
@@ -1008,9 +790,7 @@ export function createMobileView(container, options = {}) {
                   <span class="info-value-bold phone-number-val">${c.phone}</span>
                   <div class="contact-action-btns">
                     <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                      </svg>
+                      ${icon('phone', { size: 12, stroke: 2.5 })}
                     </button>
                     <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
@@ -1102,42 +882,7 @@ export function createMobileView(container, options = {}) {
             </div>
 
             <div class="lead-journey-timeline">
-              ${(c.leadFlow && c.leadFlow.length > 0) ? c.leadFlow.map((step, idx) => `
-                <div class="journey-item">
-                  <div class="journey-time-col">
-                    <span class="journey-date">${step.date}</span>
-                    <span class="journey-time">${step.time}</span>
-                  </div>
-                  <div class="journey-track-col">
-                    <div class="journey-dot-icon ${step.iconBg || 'icon-blue'}">
-                      ${step.type === 'call' ? `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                        </svg>
-                      ` : step.type === 'whatsapp' ? `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                        </svg>
-                      ` : `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <rect width="20" height="16" x="2" y="4" rx="2"/>
-                          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                        </svg>
-                      `}
-                    </div>
-                    ${idx < c.leadFlow.length - 1 ? '<div class="journey-line"></div>' : ''}
-                  </div>
-                  <div class="journey-content-col">
-                    <div class="journey-item-header">
-                      <h4>${step.title}</h4>
-                      <span class="journey-author">${step.author || 'By Ruyi Admin'}</span>
-                    </div>
-                    <p class="journey-desc">${step.desc}</p>
-                  </div>
-                </div>
-              `).join('') : `
-                <p style="font-size: 13px; color: #94A3B8; text-align: center; padding: 16px 0;">No journey follow-ups recorded yet.</p>
-              `}
+              ${renderJourneyItems(journeyFor(c))}
             </div>
           </div>
         </div>
@@ -1187,10 +932,7 @@ export function createMobileView(container, options = {}) {
 
         <div class="guests-sub-header">
           <div class="guest-search-box">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
+            ${icon('search', { size: 16 })}
             <input type="text" id="mobile-guest-search-input" placeholder="Search guest..." />
           </div>
           <button class="add-guest-pill-btn" id="mobile-add-guest-btn">
@@ -1214,9 +956,7 @@ export function createMobileView(container, options = {}) {
               </div>
               <div class="guest-right-actions">
                 <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${g.name} (${g.phone})...', type: 'info' }}))">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                  </svg>
+                  ${icon('phone', { size: 14, stroke: 2.5 })}
                 </button>
                 <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${g.name}" aria-label="More options" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Guest options for ${g.name}: ID verified and travel pass issued.', type: 'info' }}))">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1381,6 +1121,7 @@ export function createMobileView(container, options = {}) {
     else if (activeModalTab === 'updates') {
       bodyEl.innerHTML = `
         <div class="updates-list">
+          ${b.updates.length === 0 ? '<p style="font-size: 13px; color: #94A3B8; text-align: center; padding: 24px 0;">No updates yet.</p>' : ''}
           ${b.updates.map(u => `
             <div class="update-log-card">
               <div class="update-log-header">
@@ -1508,9 +1249,7 @@ export function createMobileView(container, options = {}) {
               </div>
             </div>
             <a href="tel:${c.phone}" class="circle-action-btn btn-phone" style="width: 30px; height: 30px; flex-shrink: 0;" onclick="event.stopPropagation();" title="Call ${c.name}">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
+              ${icon('phone', { size: 14, stroke: 2.2 })}
             </a>
           </div>
         `;
@@ -1894,34 +1633,135 @@ export function createMobileView(container, options = {}) {
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
         searchQuery = e.target.value;
+        setParams({ q: searchQuery.trim() }, { push: false, silent: true });
         renderCards();
       });
     }
 
-    // Mobile Category Filter Select
-    const mobileCatSelect = container.querySelector('#mobile-category-filter');
-    if (mobileCatSelect) {
-      mobileCatSelect.addEventListener('change', (e) => {
-        selectedCategory = e.target.value;
-        // Always reset tab to 'All Bookings' so user sees the category's bookings immediately
-        activeCategory = 'All Bookings';
-        container.querySelectorAll('.tab-pill').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.cat === 'All Bookings');
-        });
-        const allBtn = container.querySelector('.tab-pill[data-cat="All Bookings"]');
-        if (allBtn) {
-          allBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-        }
-        renderCards();
-      });
+    // Category dropdown (shared component), persisted in the query string
+    const categoryFilter = createCategoryFilter({ onChange: (v) => setParams({ category: v || null, tab: null }) });
+    categoryFilter.attach(container.querySelector('#mobile-filter-slot'));
+
+    function applyParams() {
+      const q = getParams();
+      searchQuery = q.q || '';
+      activeCategory = tabDefs().some(t => t.key === q.tab) ? q.tab : allKey();
+      selectedCategory = q.category || 'ALL';
+      categoryFilter.setValue(q.category || '');
+      if (searchInput && document.activeElement !== searchInput) searchInput.value = searchQuery;
+      renderCards();
     }
+
+    // Page routing: Bookings <-> Inquiries share one list, one detail panel
+    const subtitleEl = container.querySelector('#mobile-header-subtitle');
+    function route() {
+      const next = currentPage();
+      const changed = next !== page;
+      page = next;
+      if (changed) {
+        if (isModalOpen) closeModal();
+        bookings = page === 'inquiries' ? inquiryState.list : bookingsData;
+        bookings.forEach(b => { b.selected = false; });
+        activeCategory = allKey();
+        container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0 });
+      }
+      container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
+      if (subtitleEl) subtitleEl.textContent = page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
+      const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
+      if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Convert to Booking' : 'Confirm Booking';
+      applyParams();
+    }
+    subscribePage(route);
+    subscribeInquiries(() => {
+      if (page !== 'inquiries') return;
+      bookings = inquiryState.list;
+      if (activeModalBooking) activeModalBooking = bookings.find(b => b.id === activeModalBooking.id) || activeModalBooking;
+      if (subtitleEl) subtitleEl.textContent = `Inquiries • ${inquiryState.list.length} Total`;
+      renderCards();
+      if (isModalOpen) { renderSheetHeader(); renderSheetBody(); }
+    });
+    subscribeFollowUps(() => {
+      if (isModalOpen && activeModalTab === 'customer-details' && activeModalBooking) renderSheetBody();
+    });
+    window.addEventListener('bookings-changed', () => { renderCards(); if (isModalOpen && activeModalBooking) { renderSheetHeader(); renderSheetBody(); } });
+    loadFollowUps();
+    loadInquiries();
+    syncBookingPayments().then(() => renderCards());
+    container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach((b) => {
+      b.addEventListener('click', () => navigate(b.dataset.route));
+    });
+    route();
+
+    // Bulk bar: select all / clear / search / filter / Assign
+    bindBulkBar(container, 'mobile', {
+      onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); renderCards(); },
+      onClear: () => { bookings.forEach(b => { b.selected = false; }); renderCards(); },
+      onAssign: () => assignSelected(),
+      onSearch: () => { container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0, behavior: 'smooth' }); container.querySelector('#mobile-search-input')?.focus(); },
+      onFilter: () => { container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0, behavior: 'smooth' }); categoryFilter.openVisible(); },
+    });
+
+    function assignSelected() {
+      const sel = bookings.filter(b => b.selected);
+      if (!sel.length) return toast('Select at least 1 item to assign.', 'info');
+      if (page === 'inquiries') return openInquiryAssignModal(sel.map(b => b.id), () => { bookings.forEach(b => { b.selected = false; }); renderCards(); });
+      targetActivityItem = { id: 'BULK-ASSIGN', title: `${sel.length} Bookings Selected`, subtitle: sel.map(b => b.id).join(', '), type: 'activity', isBulk: true };
+      openAssignSheet(targetActivityItem);
+    }
+
+    function setPayment(b, status) {
+      b.status = status;
+      b.statusClass = status === 'Paid' ? 'status-paid' : 'status-pending';
+      window.dispatchEvent(new Event('bookings-changed'));
+      savePayment(b.id, status).then(ok => toast(ok ? `${b.id} marked as ${status === 'Paid' ? 'Paid' : 'Unpaid'}` : 'Updated here, but saving to the server failed.', ok ? 'success' : 'warning'));
+    }
+
+    function runRowMenu(b, key) {
+      if (key === 'view') openModal(b, 'customer-details');
+      else if (key === 'assign') {
+        if (b.kind === 'inquiry') return openInquiryAssignModal([b.id]);
+        bookings.forEach(x => { x.selected = x === b; });
+        renderCards();
+        assignSelected();
+      }
+      else if (key === 'paid') setPayment(b, 'Paid');
+      else if (key === 'unpaid') setPayment(b, 'Pending');
+      else if (key === 'email') {
+        if (!b.guest.email) return toast('No email on file for this customer.', 'warning');
+        window.location.href = `mailto:${b.guest.email}?subject=${encodeURIComponent(`Your inquiry ${b.id}: ${b.title}`)}`;
+        toast(`Drafting email to ${b.guest.email}...`, 'info');
+      }
+      else if (key === 'followup') openFollowUpModal(b.raw);
+    }
+
+    container.addEventListener('submit', async (e) => {
+      const form = e.target.closest('[data-quick-note]');
+      if (!form) return;
+      e.preventDefault();
+      const input = form.querySelector('input');
+      if (await saveQuickNote(form.dataset.quickNote, input.value)) input.value = '';
+    });
+
+    container.addEventListener('click', (e) => {
+      const tab = e.target.closest('.tab-pill[data-cat]');
+      if (tab) { setCategory(tab.dataset.cat); return; }
+      if (e.target.closest('.quick-note')) { e.stopPropagation(); return; }
+      const more = e.target.closest('[data-row-menu]');
+      if (more) {
+        e.stopPropagation();
+        const b = bookings.find(x => x.id === more.dataset.rowMenu);
+        if (b) openRowMenu(more, rowMenuItems(b), (key) => runRowMenu(b, key));
+      }
+    }, true);
 
     // Categories Array for Left/Right Swiping & Filtering
-    const categories = ['All Bookings', 'New Bookings', 'Assigned', 'Ongoing'];
+    const categories = { includes: (k) => tabDefs().some(t => t.key === k), indexOf: (k) => tabDefs().findIndex(t => t.key === k), get length() { return tabDefs().length; }, 0: null };
+    const categoryAt = (i) => tabDefs()[i].key;
 
     function setCategory(cat, slideDir = null) {
       if (!categories.includes(cat)) return;
       activeCategory = cat;
+      setParams({ tab: cat === allKey() ? null : cat }, { silent: true });
 
       // Update active tab buttons
       container.querySelectorAll('.tab-pill').forEach(btn => {
@@ -1966,16 +1806,11 @@ export function createMobileView(container, options = {}) {
       }
 
       if (targetIndex !== currentIndex) {
-        setCategory(categories[targetIndex], direction);
+        setCategory(categoryAt(targetIndex), direction);
       }
     }
 
     // Category Tabs click
-    container.querySelectorAll('.tab-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        setCategory(btn.dataset.cat);
-      });
-    });
 
     // Left and Right Swipe / Scroll Gesture Handling
     let touchStartX = 0;
@@ -1989,7 +1824,7 @@ export function createMobileView(container, options = {}) {
 
     // Touch event listeners (Mobile swipe left/right)
     screenArea.addEventListener('touchstart', (e) => {
-      if (isModalOpen || isAssignSheetOpen) return;
+      if (isModalOpen || isAssignSheetOpen || e.target.closest('.tabs-scroller')) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
       touchEndX = touchStartX;
@@ -2211,22 +2046,12 @@ export function createMobileView(container, options = {}) {
     container.addEventListener('click', (e) => {
       // Reset filters from empty state
       if (e.target.closest('#btn-clear-mobile-empty-filters')) {
-        activeCategory = 'All Bookings';
-        selectedCategory = 'ALL';
-        const sInput = container.querySelector('#mobile-search-input');
-        if (sInput) sInput.value = '';
-        searchQuery = '';
-        const catSelect = container.querySelector('#mobile-category-filter');
-        if (catSelect) catSelect.value = 'ALL';
-        setCategory('All Bookings');
+        setParams({ q: null, tab: null, category: null, payment: null, assigned: null, from: null, to: null });
         return;
       }
 
       if (e.target.closest('#btn-view-all-category-filters')) {
-        const sInput = container.querySelector('#mobile-search-input');
-        if (sInput) sInput.value = '';
-        searchQuery = '';
-        setCategory('All Bookings');
+        setParams({ q: null, tab: null });
         return;
       }
 
@@ -2297,6 +2122,10 @@ export function createMobileView(container, options = {}) {
       }
 
       // Add follow-up button -> Opens app modal
+      if (e.target.closest('#btn-add-followup-action') && activeModalBooking?.kind === 'inquiry') {
+        openFollowUpModal(activeModalBooking.raw);
+        return;
+      }
       if (e.target.closest('#btn-add-followup-action')) {
         openMobileAddFollowupModal();
         return;
@@ -2416,106 +2245,9 @@ export function createMobileView(container, options = {}) {
         return;
       }
 
-      // Mobile Bulk Assign Button
-      if (e.target.closest('#mobile-bulk-assign-btn')) {
-        const sel = bookings.filter(b => b.selected);
-        if (sel.length > 0) {
-          targetActivityItem = {
-            id: 'BULK-ASSIGN',
-            title: `${sel.length} Bookings Selected`,
-            subtitle: sel.map(b => b.id).join(', '),
-            type: 'activity',
-            isBulk: true
-          };
-          openAssignSheet(targetActivityItem);
-        } else {
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: 'Please select at least 1 booking to assign.', type: 'info' }
-          }));
-        }
-        return;
-      }
-
-      // Mobile Bulk More Button (Toggle Dropdown)
-      if (e.target.closest('#mobile-bulk-more-btn')) {
-        isMobileBulkDropdownOpen = !isMobileBulkDropdownOpen;
-        renderMobileBulkDropdown();
-        return;
-      }
-
-      // Mobile Bulk Assign Action Inside Dropdown
-      if (e.target.closest('#mobile-bulk-assign-action')) {
-        isMobileBulkDropdownOpen = false;
-        renderMobileBulkDropdown();
-        const sel = bookings.filter(b => b.selected);
-        if (sel.length > 0) {
-          targetActivityItem = {
-            id: 'BULK-ASSIGN',
-            title: `${sel.length} Bookings Selected`,
-            subtitle: sel.map(b => b.id).join(', '),
-            type: 'activity',
-            isBulk: true
-          };
-          openAssignSheet(targetActivityItem);
-        } else {
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: 'Please select at least 1 booking to assign.', type: 'info' }
-          }));
-        }
-        return;
-      }
-
-      // Mobile Bulk Mark as Paid Inside Dropdown
-      if (e.target.closest('#mobile-bulk-mark-paid-action')) {
-        const sel = bookings.filter(b => b.selected);
-        if (sel.length > 0) {
-          sel.forEach(b => {
-            b.status = 'Paid';
-            b.statusClass = 'status-paid';
-          });
-          isMobileBulkDropdownOpen = false;
-          renderCards();
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Marked ${sel.length} booking(s) as Paid!`, type: 'success' }
-          }));
-        }
-        return;
-      }
-
-      // Mobile Bulk Mark as Unpaid Inside Dropdown
-      if (e.target.closest('#mobile-bulk-mark-unpaid-action')) {
-        const sel = bookings.filter(b => b.selected);
-        if (sel.length > 0) {
-          sel.forEach(b => {
-            b.status = 'Pending';
-            b.statusClass = 'status-pending';
-          });
-          isMobileBulkDropdownOpen = false;
-          renderCards();
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Marked ${sel.length} booking(s) as Unpaid (Pending)!`, type: 'info' }
-          }));
-        }
-        return;
-      }
-
-      // Mobile Bulk Clear Selection Inside Dropdown
-      if (e.target.closest('#mobile-bulk-clear-action')) {
-        bookings.forEach(b => b.selected = false);
-        isMobileBulkDropdownOpen = false;
-        renderCards();
-        return;
-      }
-
-      // Close bulk more dropdown if clicked outside
-      if (!e.target.closest('#mobile-bulk-more-btn') && !e.target.closest('#mobile-bulk-more-dropdown') && isMobileBulkDropdownOpen) {
-        isMobileBulkDropdownOpen = false;
-        renderMobileBulkDropdown();
-      }
-
       // Card click -> Open Modal on Customer Details
       const card = e.target.closest('.booking-card');
-      if (card) {
+      if (card && !e.target.closest('.quick-note') && !e.target.closest('[data-row-menu]')) {
         const id = card.dataset.bookingId;
         const b = bookings.find(item => item.id === id);
         if (b) openModal(b, 'customer-details');
@@ -2523,7 +2255,7 @@ export function createMobileView(container, options = {}) {
       }
 
       // Sheet close button or backdrop
-      if (e.target.closest('#mobile-sheet-close-btn') || e.target.id === 'mobile-sheet-backdrop') {
+      if (e.target.closest('#mobile-sheet-close-btn') || e.target.closest('#mobile-sheet-back-btn') || e.target.id === 'mobile-sheet-backdrop') {
         closeModal();
         return;
       }
@@ -2976,6 +2708,7 @@ export function createMobileView(container, options = {}) {
 
       // Confirm Booking
       if (e.target.closest('#mobile-confirm-booking-btn')) {
+        if (activeModalBooking?.kind === 'inquiry') { toast(`Conversion of ${activeModalBooking.id} to a booking is not connected yet.`, 'info'); return; }
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: `Booking ${activeModalBooking.id} (${activeModalBooking.title}) confirmed successfully!`, type: 'success' }
         }));

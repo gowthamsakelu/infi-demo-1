@@ -83,6 +83,27 @@ class FollowUpTest extends TestCase
         $this->postJson('/api/inquiries/assign', ['ids' => ['nope'], 'staff_id' => 'ST-05'])->assertJsonValidationErrors(['ids.0']);
     }
 
+    public function test_quick_note_is_saved_and_appears_in_the_journey_feed(): void
+    {
+        $inq = $this->inquiry();
+
+        $this->postJson("/api/inquiries/{$inq->id}/notes", ['comment' => ' Prefers morning calls '])
+            ->assertCreated()->assertJsonPath('data.type', 'note')->assertJsonPath('data.comment', 'Prefers morning calls');
+        $this->getJson('/api/follow-ups?phone=9988484884')->assertJsonPath('data.0.type', 'note')->assertJsonPath('data.0.created_by_name', 'Karan Sapalia');
+
+        $this->postJson("/api/inquiries/{$inq->id}/notes", ['comment' => ''])->assertJsonValidationErrors(['comment']);
+        $this->postJson("/api/inquiries/{$inq->id}/notes", ['comment' => str_repeat('a', 501)])->assertJsonValidationErrors(['comment']);
+        $this->postJson("/api/inquiries/{$inq->id}/notes", ['comment' => 'x', 'created_by' => 'ST-999'])->assertForbidden();
+    }
+
+    public function test_inquiries_can_be_filtered_by_category(): void
+    {
+        $this->inquiry();
+        Inquiry::create(['id' => 'INQ-2', 'customer_name' => 'A', 'customer_phone' => '1', 'trip' => 'Villa', 'category' => 'VILLA', 'status' => 'new']);
+
+        $this->getJson('/api/inquiries?category=villa')->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', 'INQ-2');
+    }
+
     public function test_old_enquiries_url_redirects_to_inquiries(): void
     {
         $this->get('/enquiries')->assertRedirect('/inquiries')->assertStatus(301);

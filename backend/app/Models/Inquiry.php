@@ -21,6 +21,7 @@ class Inquiry extends Model
         'location',
         'lead_source',
         'trip',
+        'category',
         'pax',
         'nights',
         'travel_date',

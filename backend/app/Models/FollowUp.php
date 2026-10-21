@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FollowUp extends Model
 {
-    public const TYPES = ['follow_up', 'called', 'cc'];
+    public const TYPES = ['follow_up', 'called', 'cc', 'note'];
     public const CALL_OUTCOMES = ['Connected', 'No answer', 'Busy', 'Call back later', 'Wrong number'];
 
     protected $fillable = [

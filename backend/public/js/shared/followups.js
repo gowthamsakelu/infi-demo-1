@@ -35,6 +35,7 @@ const TYPE_META = {
   follow_up: { type: 'followup', iconBg: 'icon-blue', title: 'Follow-up scheduled' },
   called: { type: 'call', iconBg: 'icon-green', title: 'Called' },
   cc: { type: 'cc', iconBg: 'icon-blue', title: 'CC' },
+  note: { type: 'note', iconBg: 'icon-blue', title: 'Note' },
 };
 
 /** API follow-up -> the journey step shape the timeline already renders. */
@@ -62,7 +63,7 @@ export function journeyFor(customer) {
   return [...saved, ...(customer?.leadFlow || [])];
 }
 
-const STEP_ICON = { call: 'phone', whatsapp: 'whatsapp', email: 'mail', followup: 'calendar', cc: 'message' };
+const STEP_ICON = { call: 'phone', whatsapp: 'whatsapp', email: 'mail', followup: 'calendar', cc: 'message', note: 'note' };
 
 export function renderJourneyItems(steps) {
   if (!steps.length) {
