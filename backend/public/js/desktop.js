@@ -1,4 +1,11 @@
 import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, getSpecialReqIconSvg } from './data.js';
+import { icon } from './shared/icons.js';
+import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
+import { createFilter } from './shared/filter.js';
+import { contactButtons } from './shared/ui.js';
+import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
+import { createInquiriesPage } from './shared/inquiries-page.js';
+import { BOOKING_FILTERS, matchesBookingFilters } from './shared/booking-filters.js';
 
 export function createDesktopView(container) {
   let bookings = [...INITIAL_BOOKINGS];
@@ -8,6 +15,7 @@ export function createDesktopView(container) {
   let activeTab = 'All Bookings';
   let searchQuery = '';
   let selectedCategory = 'ALL';
+  let filters = { payment: '', assigned: '', from: '', to: '' };
   let activeBooking = null; // Default: closed popup, table is full-width!
   let isDetailDrawerOpen = false;
   let activeDetailTab = 'customer-details';
@@ -57,14 +65,14 @@ export function createDesktopView(container) {
             <span class="sidebar-badge" id="sidebar-total-badge">28</span>
           </a>
 
-          <a class="sidebar-nav-item" href="#enquiries" id="nav-enquiries">
+          <a class="sidebar-nav-item" href="#inquiries" id="nav-inquiries">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
-              <span>Enquiries</span>
+              <span>Inquiries</span>
             </div>
-            <span class="sidebar-badge">5</span>
+            <span class="sidebar-badge" id="sidebar-inquiries-badge">8</span>
           </a>
 
           <a class="sidebar-nav-item" href="#calendar" id="nav-calendar">
@@ -118,10 +126,7 @@ export function createDesktopView(container) {
         <!-- Top Header with Search and Notification Bar (Image 3 reference) -->
         <header class="desktop-top-header">
           <div class="desktop-search-wrapper">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
+            ${icon('search', { size: 18 })}
             <input type="text" id="desktop-search-input" placeholder="Search by booking ID, destination, or guest name..." value="${searchQuery}" />
             <button id="desktop-search-clear" style="${searchQuery ? 'display: block;' : 'display: none;'} background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 14px; padding: 0 4px;">✕</button>
           </div>
@@ -201,21 +206,14 @@ export function createDesktopView(container) {
 
                     <div class="toolbar-actions-group">
                       <div class="table-toolbar-search-box">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <circle cx="11" cy="11" r="8"/>
-                          <path d="m21 21-4.3-4.3"/>
-                        </svg>
+                        ${icon('search', { size: 15 })}
                         <input type="text" id="desktop-table-search-input" placeholder="Search bookings..." value="${searchQuery}" />
                       </div>
-                      <select id="desktop-category-filter" class="desktop-select-filter">
-                        <option value="ALL" ${selectedCategory === 'ALL' ? 'selected' : ''}>All Categories</option>
-                        <option value="TOUR" ${selectedCategory === 'TOUR' ? 'selected' : ''}>Tour Packages</option>
-                        <option value="VILLA" ${selectedCategory === 'VILLA' ? 'selected' : ''}>Villas & Resorts</option>
-                        <option value="ACTIVITY" ${selectedCategory === 'ACTIVITY' ? 'selected' : ''}>Activities & Sports</option>
-                        <option value="TRANSPORT" ${selectedCategory === 'TRANSPORT' ? 'selected' : ''}>Transports</option>
-                      </select>
+                      <span id="desktop-filter-slot"></span>
                     </div>
                   </div>
+
+                  <div class="filter-chips" id="desktop-filter-chips" hidden></div>
 
                   <!-- Selection / Action Bar ("1 selected", "+ Assign", "...") Exactly as Mobile -->
                   <div class="mobile-selection-bar desktop-selection-bar" id="desktop-selection-bar" style="display: none;">
@@ -230,11 +228,7 @@ export function createDesktopView(container) {
                     <div class="selection-actions-right">
                       <div style="position: relative;">
                         <button class="action-more-btn" id="desktop-bulk-more-btn" title="More options" aria-haspopup="true">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="1.5"/>
-                            <circle cx="19" cy="12" r="1.5"/>
-                            <circle cx="5" cy="12" r="1.5"/>
-                          </svg>
+                          ${icon('more', { size: 18, stroke: 2.5 })}
                         </button>
                         <div class="bulk-more-dropdown" id="desktop-bulk-more-dropdown" style="display: none;">
                           <!-- Populated dynamically: Assign, Mark Paid / Mark Unpaid, Clear Selection -->
@@ -276,20 +270,15 @@ export function createDesktopView(container) {
                   <div class="compact-list-header">
                     <div class="compact-header-top">
                       <div class="compact-search-bar">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        ${icon('search', { size: 15 })}
                         <input type="text" id="desktop-compact-search-input" placeholder="Search bookings..." value="${searchQuery}" />
                       </div>
-                      <select id="desktop-compact-category-filter" class="desktop-select-filter compact-select-filter">
-                        <option value="ALL" ${selectedCategory === 'ALL' ? 'selected' : ''}>All</option>
-                        <option value="TOUR" ${selectedCategory === 'TOUR' ? 'selected' : ''}>Tours</option>
-                        <option value="VILLA" ${selectedCategory === 'VILLA' ? 'selected' : ''}>Villas</option>
-                        <option value="ACTIVITY" ${selectedCategory === 'ACTIVITY' ? 'selected' : ''}>Activities</option>
-                        <option value="TRANSPORT" ${selectedCategory === 'TRANSPORT' ? 'selected' : ''}>Transports</option>
-                      </select>
+                      <span id="desktop-compact-filter-slot"></span>
                       <button class="btn-expand-full-table" id="desktop-btn-expand-table" title="Expand to Full Table View">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                       </button>
                     </div>
+                    <div class="filter-chips" id="desktop-compact-chips" hidden style="padding: 8px 0 4px; border: none;"></div>
                     <div class="compact-tabs-nav">
                       <button class="compact-tab-btn ${activeTab === 'All Bookings' ? 'active' : ''}" data-d-tab="All Bookings">All (${bookings.length})</button>
                       <button class="compact-tab-btn ${activeTab === 'New Bookings' ? 'active' : ''}" data-d-tab="New Bookings">New (${bookings.filter(b => b.category === 'New Bookings').length})</button>
@@ -328,9 +317,7 @@ export function createDesktopView(container) {
                   <button class="btn-confirm-booking" id="desktop-confirm-booking-btn">Confirm Booking</button>
                   <div class="sheet-quick-actions-grid desktop-quick-actions-grid">
                     <button class="quick-action-col-btn btn-act-call" id="desktop-act-call" title="Call">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                      </svg>
+                      ${icon('phone', { size: 20, stroke: 2.2 })}
                       <span>Call</span>
                     </button>
                     <button class="quick-action-col-btn btn-act-msg" id="desktop-act-msg" title="Message">
@@ -347,11 +334,7 @@ export function createDesktopView(container) {
                       <span>Forward</span>
                     </button>
                     <button class="quick-action-col-btn btn-act-more" id="desktop-act-more" title="More">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="1.5"/>
-                        <circle cx="19" cy="12" r="1.5"/>
-                        <circle cx="5" cy="12" r="1.5"/>
-                      </svg>
+                      ${icon('more', { size: 20, stroke: 2.2 })}
                       <span>More</span>
                     </button>
                   </div>
@@ -656,10 +639,7 @@ export function createDesktopView(container) {
         (b.guest.phone && b.guest.phone.includes(searchQuery));
 
       const matchTab = activeTab === 'All Bookings' || b.category === activeTab;
-      const matchCat = selectedCategory === 'ALL' ||
-        (selectedCategory === 'VILLA'
-          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
-          : b.type.toUpperCase() === selectedCategory.toUpperCase());
+      const matchCat = matchesBookingFilters(b, { category: selectedCategory === 'ALL' ? '' : selectedCategory, ...filters });
 
       return matchSearch && matchTab && matchCat;
     });
@@ -672,10 +652,7 @@ export function createDesktopView(container) {
         b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         b.guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (b.guest.phone && b.guest.phone.includes(searchQuery));
-      const matchCat = selectedCategory === 'ALL' ||
-        (selectedCategory === 'VILLA'
-          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
-          : b.type.toUpperCase() === selectedCategory.toUpperCase());
+      const matchCat = matchesBookingFilters(b, { category: selectedCategory === 'ALL' ? '' : selectedCategory, ...filters });
       return matchSearch && matchCat;
     });
 
@@ -785,16 +762,7 @@ export function createDesktopView(container) {
           </td>
           <td style="text-align: right; padding-right: 20px;">
             <div class="desktop-action-btn-group">
-              <button class="card-circle-action-btn btn-action-call" data-action-call="${b.id}" title="Call ${b.guest.name} (${b.guest.phone || ''})" aria-label="Call">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
-              </button>
-              <button class="card-circle-action-btn btn-action-whatsapp" data-action-whatsapp="${b.id}" title="WhatsApp ${b.guest.name} (${b.guest.phone || ''})" aria-label="WhatsApp">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
-                </svg>
-              </button>
+              ${contactButtons({ id: b.id, name: b.guest.name, phone: b.guest.phone, size: 14 })}
               <button class="row-view-details-btn" data-open-detail="${b.id}" title="View details for ${b.title}">
                 <span>View</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -843,16 +811,7 @@ export function createDesktopView(container) {
                   </span>
                 </div>
                 <div class="card-action-btns-row" style="gap: 5px;">
-                  <button class="card-circle-action-btn btn-action-call" data-action-call="${b.id}" title="Call ${b.guest.name}" aria-label="Call" style="width: 28px; height: 28px;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                    </svg>
-                  </button>
-                  <button class="card-circle-action-btn btn-action-whatsapp" data-action-whatsapp="${b.id}" title="WhatsApp ${b.guest.name}" aria-label="WhatsApp" style="width: 28px; height: 28px;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
-                    </svg>
-                  </button>
+                  ${contactButtons({ id: b.id, name: b.guest.name, phone: b.guest.phone, style: 'width: 28px; height: 28px;', size: 13 })}
                 </div>
               </div>
             </div>
@@ -1097,10 +1056,7 @@ export function createDesktopView(container) {
                 <div class="contact-value-row">
                   <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
                   <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect width="20" height="16" x="2" y="4" rx="2"/>
-                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                    </svg>
+                    ${icon('mail', { size: 12 })}
                   </button>
                 </div>
               </div>
@@ -1112,9 +1068,7 @@ export function createDesktopView(container) {
                   <span class="info-value-bold phone-number-val">${c.phone}</span>
                   <div class="contact-action-btns">
                     <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                      </svg>
+                      ${icon('phone', { size: 12, stroke: 2.5 })}
                     </button>
                     <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
@@ -1206,35 +1160,7 @@ export function createDesktopView(container) {
             </div>
 
             <div class="lead-journey-timeline">
-              ${(c.leadFlow && c.leadFlow.length > 0) ? c.leadFlow.map((step, idx) => `
-                <div class="journey-item">
-                  <div class="journey-time-col">
-                    <span class="journey-date">${step.date}</span>
-                    <span class="journey-time">${step.time}</span>
-                  </div>
-                  <div class="journey-track-col">
-                    <div class="journey-dot-icon ${step.iconBg || 'icon-blue'}">
-                      ${step.type === 'call' ? `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      ` : step.type === 'whatsapp' ? `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
-                      ` : `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                      `}
-                    </div>
-                    ${idx < c.leadFlow.length - 1 ? '<div class="journey-line"></div>' : ''}
-                  </div>
-                  <div class="journey-content-col">
-                    <div class="journey-item-header">
-                      <h4>${step.title}</h4>
-                      <span class="journey-author">${step.author || 'By Ruyi Admin'}</span>
-                    </div>
-                    <p class="journey-desc">${step.desc}</p>
-                  </div>
-                </div>
-              `).join('') : `
-                <p style="font-size: 13px; color: #94A3B8; text-align: center; padding: 16px 0;">No journey follow-ups recorded yet.</p>
-              `}
+              ${renderJourneyItems(journeyFor(c))}
             </div>
           </div>
         </div>
@@ -1287,10 +1213,7 @@ export function createDesktopView(container) {
 
         <div class="guests-sub-header">
           <div class="guest-search-box">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
+            ${icon('search', { size: 16 })}
             <input type="text" placeholder="Search guests in booking..." id="desktop-guest-search-input" value="${guestSearchQuery}" />
           </div>
           <button class="add-guest-pill-btn" id="desktop-add-guest-btn">
@@ -1314,9 +1237,7 @@ export function createDesktopView(container) {
               </div>
               <div class="guest-right-actions">
                 <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${g.name} (${g.phone})...', type: 'info' }}))">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                  </svg>
+                  ${icon('phone', { size: 14, stroke: 2.2 })}
                 </button>
                 <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${g.name}" aria-label="More options">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1774,6 +1695,11 @@ export function createDesktopView(container) {
       if (tableSearch && tableSearch.value !== val) tableSearch.value = val;
       if (compactSearch && compactSearch.value !== val) compactSearch.value = val;
       if (topClear) topClear.style.display = val ? 'block' : 'none';
+      if (currentPage() === 'inquiries') {
+        setParams({ q: val }, { push: false });
+        return;
+      }
+      setParams({ q: val }, { push: false, silent: true });
       renderTable();
     }
 
@@ -1790,45 +1716,74 @@ export function createDesktopView(container) {
       compactSearch.addEventListener('input', (e) => syncSearch(e.target.value.trim()));
     }
 
-    // Category dropdown filter (Full Table View)
-    const catSelect = container.querySelector('#desktop-category-filter');
-    if (catSelect) {
-      catSelect.addEventListener('change', (e) => {
-        selectedCategory = e.target.value;
-        const compactCat = container.querySelector('#desktop-compact-category-filter');
-        if (compactCat) compactCat.value = selectedCategory;
-        activeTab = 'All Bookings';
-        container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.dTab === 'All Bookings');
-        });
-        renderTable();
-      });
+    // Shared filter (button + removable chips), persisted in the query string
+    const bookingFilter = createFilter({
+      config: BOOKING_FILTERS,
+      onApply: (v) => setParams({ category: v.category || null, payment: v.payment || null, assigned: v.assigned || null, from: v.from || null, to: v.to || null, tab: null }),
+    });
+    bookingFilter.attachButton(container.querySelector('#desktop-filter-slot'));
+    bookingFilter.attachButton(container.querySelector('#desktop-compact-filter-slot'));
+    bookingFilter.attachChips(container.querySelector('#desktop-filter-chips'));
+    bookingFilter.attachChips(container.querySelector('#desktop-compact-chips'));
+
+    function applyParams() {
+      const q = getParams();
+      searchQuery = q.q || '';
+      activeTab = ['New Bookings', 'Assigned', 'Ongoing'].includes(q.tab) ? q.tab : 'All Bookings';
+      selectedCategory = q.category || 'ALL';
+      filters = { payment: q.payment || '', assigned: q.assigned || '', from: q.from || '', to: q.to || '' };
+      bookingFilter.setValues({ category: q.category || '', ...filters });
+      [topSearch, tableSearch, compactSearch].forEach((el) => { if (el && document.activeElement !== el) el.value = searchQuery; });
+      if (topClear) topClear.style.display = searchQuery ? 'block' : 'none';
+      container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.dTab === activeTab));
+      renderTable();
     }
 
-    // Category dropdown filter (Compact Master List View)
-    const compactCatSelect = container.querySelector('#desktop-compact-category-filter');
-    if (compactCatSelect) {
-      compactCatSelect.addEventListener('change', (e) => {
-        selectedCategory = e.target.value;
-        const fullCat = container.querySelector('#desktop-category-filter');
-        if (fullCat) fullCat.value = selectedCategory;
-        activeTab = 'All Bookings';
-        container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.dTab === 'All Bookings');
-        });
-        renderTable();
-      });
+    // Page routing: Bookings <-> Inquiries
+    const mainEl = container.querySelector('.desktop-main');
+    const bookingsBody = mainEl.querySelector(':scope > .desktop-body');
+    const inquiriesSlot = document.createElement('div');
+    inquiriesSlot.id = 'desktop-inquiries-page';
+    inquiriesSlot.style.cssText = 'display: none; flex: 1; min-height: 0; flex-direction: column;';
+    mainEl.appendChild(inquiriesSlot);
+    const inquiriesPage = createInquiriesPage(inquiriesSlot, { variant: 'desktop' });
+
+    function route() {
+      const page = currentPage();
+      bookingsBody.style.display = page === 'bookings' ? '' : 'none';
+      inquiriesSlot.style.display = page === 'inquiries' ? 'flex' : 'none';
+      container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
+      container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
+      if (topSearch) topSearch.placeholder = page === 'inquiries' ? 'Search by customer, trip, or phone...' : 'Search by booking ID, destination, or guest name...';
+      if (page === 'inquiries') {
+        isDetailDrawerOpen && closeDrawer();
+        inquiriesPage.show();
+        const q = getParams().q || '';
+        if (topSearch && document.activeElement !== topSearch) topSearch.value = q;
+        if (topClear) topClear.style.display = q ? 'block' : 'none';
+      } else {
+        inquiriesPage.hide();
+        applyParams();
+      }
     }
+    subscribePage(route);
+    subscribeFollowUps(() => {
+      if (isDetailDrawerOpen && activeDetailTab === 'customer-details' && activeBooking) renderDetailPanel();
+    });
+    loadFollowUps();
+
+    container.querySelectorAll('a.sidebar-nav-item[href="#bookings"], a.sidebar-nav-item[href="#inquiries"]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate(a.getAttribute('href').slice(1));
+      });
+    });
+    route();
 
     // Tabs (Both Full Table & Compact List)
     container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        activeTab = btn.dataset.dTab;
-        container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => {
-          if (b.dataset.dTab === activeTab) b.classList.add('active');
-          else b.classList.remove('active');
-        });
-        renderTable();
+        setParams({ tab: btn.dataset.dTab === 'All Bookings' ? null : btn.dataset.dTab });
       });
     });
 
@@ -1859,20 +1814,10 @@ export function createDesktopView(container) {
       }
       // Reset filters button in empty state
       if (e.target.closest('#btn-reset-filters') || e.target.closest('#btn-clear-table-search')) {
-        if (searchInput) searchInput.value = '';
-        const compactSearch = container.querySelector('#desktop-compact-search-input');
-        if (compactSearch) compactSearch.value = '';
-        searchQuery = '';
-        if (catSelect) catSelect.value = 'ALL';
-        const compactCat = container.querySelector('#desktop-compact-category-filter');
-        if (compactCat) compactCat.value = 'ALL';
-        selectedCategory = 'ALL';
-        activeTab = 'All Bookings';
-        container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.dTab === 'All Bookings');
-        });
-        renderTable();
-        return;
+        if (currentPage() === 'bookings') {
+          setParams({ q: null, tab: null, category: null, payment: null, assigned: null, from: null, to: null });
+          return;
+        }
       }
 
       // Close dropdown if clicked outside
@@ -2610,9 +2555,8 @@ export function createDesktopView(container) {
         const staffId = staffNav.dataset.staffId;
         const staff = STAFF_MEMBERS.find(s => s.id === staffId);
         if (staff) {
-          if (searchInput) searchInput.value = staff.name;
-          searchQuery = staff.name;
-          renderTable();
+          if (currentPage() !== 'bookings') navigate('bookings');
+          setParams({ q: staff.name }, { push: false });
           window.dispatchEvent(new CustomEvent('show-toast', {
             detail: { message: `Showing bookings assigned to ${staff.name}`, type: 'info' }
           }));

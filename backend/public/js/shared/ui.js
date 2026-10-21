@@ -1,0 +1,182 @@
+// Shared list-page building blocks used by Bookings and Inquiries (desktop + mobile).
+import { icon } from './icons.js';
+
+export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+export function toast(message, type = 'info') {
+  window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type } }));
+}
+
+export function initials(name) {
+  return (String(name || '').replace(/^(mr|mrs|ms|dr)\.?\s+/i, '').split(/\s+/).filter(Boolean).slice(0, 2).map((n) => n[0]).join('') || 'CU').toUpperCase();
+}
+
+/** Search box. variant: 'mobile' (page search row) | 'desktop' (table toolbar). */
+export function searchBox({ id, placeholder, value = '', variant = 'desktop' }) {
+  const wrap = variant === 'mobile' ? 'search-input-wrapper' : 'table-toolbar-search-box';
+  const size = variant === 'mobile' ? 18 : 15;
+  return `
+    <div class="${wrap}">
+      ${icon('search', { size })}
+      <input type="text" id="${id}" placeholder="${esc(placeholder)}" value="${esc(value)}" aria-label="${esc(placeholder)}" />
+    </div>`;
+}
+
+/**
+ * Status tabs. variant 'mobile' = pills with count badge, 'desktop' = toolbar tabs with "(n)".
+ * tabs: [{ key, label, count }]
+ */
+export function statusTabs({ tabs, active, variant = 'desktop', attr = 'data-tab' }) {
+  if (variant === 'mobile') {
+    return `<div class="category-filter-tabs" role="tablist">${tabs.map((t) => `
+      <button class="tab-pill ${t.key === active ? 'active' : ''}" role="tab" aria-selected="${t.key === active}" ${attr}="${esc(t.key)}">
+        ${esc(t.label)} <span class="pill-badge">${t.count}</span>
+      </button>`).join('')}</div>`;
+  }
+  return `<div class="toolbar-tabs-group" role="tablist">${tabs.map((t) => `
+    <button class="desktop-tab-btn ${t.key === active ? 'active' : ''}" role="tab" aria-selected="${t.key === active}" ${attr}="${esc(t.key)}">
+      ${esc(t.label)} (${t.count})
+    </button>`).join('')}</div>`;
+}
+
+/**
+ * Phone + WhatsApp row actions. Same markup, classes and icons everywhere.
+ * attrs name the data-attributes the page's click handler listens to.
+ */
+export function contactButtons({ id, name, phone, size = 15, callAttr = 'data-action-call', waAttr = 'data-action-whatsapp', style = '' }) {
+  const s = style ? ` style="${style}"` : '';
+  return `
+    <button class="card-circle-action-btn btn-action-call" ${callAttr}="${esc(id)}" title="Call ${esc(name)}${phone ? ` (${esc(phone)})` : ''}" aria-label="Call ${esc(name)}"${s}>${icon('phone', { size, stroke: 2.2 })}</button>
+    <button class="card-circle-action-btn btn-action-whatsapp" ${waAttr}="${esc(id)}" title="WhatsApp ${esc(name)}${phone ? ` (${esc(phone)})` : ''}" aria-label="WhatsApp ${esc(name)}"${s}>${icon('whatsapp', { size })}</button>`;
+}
+
+/** ⋮ trigger for a row menu (neutral variant of the circle action button). */
+export function rowMenuButton({ id, name, size = 15, attr = 'data-row-menu' }) {
+  return `<button class="card-circle-action-btn btn-action-more" ${attr}="${esc(id)}" aria-haspopup="menu" aria-expanded="false" title="More options for ${esc(name)}" aria-label="More options for ${esc(name)}">${icon('more', { size, stroke: 2.4 })}</button>`;
+}
+
+export function openCall(name, phone) {
+  if (!phone) return toast('Phone number not available.', 'warning');
+  window.location.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
+  toast(`Dialing ${name} (${phone})...`, 'info');
+}
+
+export function openWhatsApp(name, phone, text) {
+  if (!phone) return toast('Phone number not available.', 'warning');
+  const digits = phone.replace(/[^0-9]/g, '');
+  const to = digits.startsWith('91') ? digits : digits.length === 10 ? `91${digits}` : digits;
+  window.open(`https://wa.me/${to}?text=${encodeURIComponent(text)}`, '_blank');
+  toast(`Opening WhatsApp chat with ${name}...`, 'success');
+}
+
+export function emptyState({ title, text, resetId = 'btn-reset-filters', colspanRow = 0 }) {
+  const inner = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;color:#64748B;text-align:center;padding:${colspanRow ? '48px 20px' : '48px 20px'};">
+      <div style="width:48px;height:48px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;color:#94A3B8;">${icon('search', { size: 24 })}</div>
+      <h4 style="font-size:15px;color:#0F172A;font-weight:700;margin:0;">${esc(title)}</h4>
+      <p style="font-size:13px;color:#94A3B8;margin:0 0 6px;">${esc(text)}</p>
+      <button class="btn-secondary-desktop" id="${resetId}" style="height:36px;font-size:12.5px;">Reset Filters</button>
+    </div>`;
+  return colspanRow ? `<tr><td colspan="${colspanRow}">${inner}</td></tr>` : inner;
+}
+
+/** Bulk selection bar (same markup as Bookings). */
+export function selectionBar({ prefix, desktop }) {
+  return `
+    <div class="mobile-selection-bar ${desktop ? 'desktop-selection-bar' : ''}" id="${prefix}-selection-bar" style="display:none;">
+      <div class="selection-left">
+        <div class="custom-checkbox" id="${prefix}-select-all-box" role="checkbox" aria-checked="false" aria-label="Select all" tabindex="0">${icon('check', { size: 12, stroke: 3 })}</div>
+        <span id="${prefix}-selected-count">0 selected</span>
+      </div>
+      <div class="selection-actions-right">
+        <div style="position:relative;">
+          <button class="action-more-btn" id="${prefix}-bulk-more-btn" title="More options" aria-label="Bulk actions" aria-haspopup="true" aria-expanded="false">${icon('more', { size: 18, stroke: 2.5 })}</button>
+          <div class="bulk-more-dropdown" id="${prefix}-bulk-more-dropdown" role="menu" style="display:none;"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+export function checkbox({ checked, attr, id, label }) {
+  return `<div class="custom-checkbox card-select-checkbox ${checked ? 'checked' : ''}" ${attr}="${esc(id)}" role="checkbox" aria-checked="${!!checked}" aria-label="${esc(label)}" tabindex="0">${checked ? icon('check', { size: 12, stroke: 3 }) : ''}</div>`;
+}
+
+/** Close `el` on outside click or Esc. Returns a disposer. */
+export function dismissOnOutside(el, onClose, ignore = []) {
+  const down = (e) => {
+    if (el.contains(e.target) || ignore.some((n) => n && n.contains(e.target))) return;
+    onClose();
+  };
+  const key = (e) => { if (e.key === 'Escape') onClose(); };
+  document.addEventListener('mousedown', down, true);
+  document.addEventListener('touchstart', down, true);
+  document.addEventListener('keydown', key);
+  return () => {
+    document.removeEventListener('mousedown', down, true);
+    document.removeEventListener('touchstart', down, true);
+    document.removeEventListener('keydown', key);
+  };
+}
+
+/**
+ * Floating menu anchored to a trigger. Fixed-positioned so scroll containers never clip it.
+ * items: [{ key, label, icon, danger }]
+ */
+let activeMenu = null;
+export function closeRowMenu() { activeMenu?.close(); }
+
+export function openRowMenu(trigger, items, onSelect) {
+  closeRowMenu();
+  const menu = document.createElement('div');
+  menu.className = 'bulk-more-dropdown row-floating-menu';
+  menu.setAttribute('role', 'menu');
+  menu.innerHTML = items.map((it) => `
+    <button class="dropdown-item-btn ${it.danger ? 'item-danger' : ''}" role="menuitem" data-menu-key="${it.key}">
+      ${icon(it.icon, { size: 15 })}<span>${esc(it.label)}</span>
+    </button>`).join('');
+  document.body.appendChild(menu);
+
+  const r = trigger.getBoundingClientRect();
+  const mw = menu.offsetWidth;
+  const mh = menu.offsetHeight;
+  const left = Math.max(8, Math.min(r.right - mw, window.innerWidth - mw - 8));
+  const top = r.bottom + 6 + mh > window.innerHeight - 8 ? Math.max(8, r.top - mh - 6) : r.bottom + 6;
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+
+  trigger.setAttribute('aria-expanded', 'true');
+  menu.querySelector('button')?.focus();
+
+  const dispose = dismissOnOutside(menu, close, [trigger]);
+  // Close when the page scrolls the trigger away from where the menu was placed.
+  const onScroll = () => {
+    const now = trigger.getBoundingClientRect();
+    if (Math.abs(now.top - r.top) > 2 || Math.abs(now.left - r.left) > 2) close();
+  };
+  window.addEventListener('resize', onScroll);
+  window.addEventListener('scroll', onScroll, true);
+
+  menu.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-menu-key]');
+    if (!b) return;
+    close();
+    onSelect(b.dataset.menuKey);
+  });
+  menu.addEventListener('keydown', (e) => {
+    const btns = [...menu.querySelectorAll('button')];
+    const i = btns.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); btns[(i + 1) % btns.length].focus(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); btns[(i - 1 + btns.length) % btns.length].focus(); }
+  });
+
+  function close() {
+    dispose();
+    window.removeEventListener('resize', onScroll);
+    window.removeEventListener('scroll', onScroll, true);
+    trigger.setAttribute('aria-expanded', 'false');
+    menu.remove();
+    if (activeMenu && activeMenu.menu === menu) activeMenu = null;
+    if (document.activeElement === document.body) trigger.focus();
+  }
+  activeMenu = { menu, close };
+}

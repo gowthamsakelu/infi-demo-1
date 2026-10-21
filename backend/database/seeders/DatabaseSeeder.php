@@ -7,6 +7,7 @@ use App\Models\Staff;
 use App\Models\Vendor;
 use App\Models\Contact;
 use App\Models\Booking;
+use App\Models\Inquiry;
 
 class DatabaseSeeder extends Seeder
 {
@@ -99,6 +100,14 @@ class DatabaseSeeder extends Seeder
                         'itinerary_days' => $item['itineraryDays'] ?? [],
                     ]
                 );
+            }
+        }
+
+        // 5. Seed Inquiries (dummy leads; only when the table is empty so re-seeding never resets real data)
+        $inquiriesFile = database_path('data/inquiries.json');
+        if (file_exists($inquiriesFile) && Inquiry::count() === 0) {
+            foreach (json_decode(file_get_contents($inquiriesFile), true) as $item) {
+                Inquiry::create($item);
             }
         }
     }

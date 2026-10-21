@@ -9,3 +9,8 @@ Route::get('/', function () {
 
 Route::get('/livewire', BookingsManager::class)->name('bookings.livewire');
 
+
+// "Enquiries" was renamed to "Inquiries": keep old URLs working.
+Route::redirect('/enquiries', '/inquiries', 301);
+Route::redirect('/enquiries/{any}', '/inquiries', 301)->where('any', '.*');
+Route::get('/inquiries', fn () => redirect('/#inquiries'))->name('inquiries');

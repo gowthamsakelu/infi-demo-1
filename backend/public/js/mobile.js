@@ -1,4 +1,11 @@
 import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, getSpecialReqIconSvg } from './data.js';
+import { icon } from './shared/icons.js';
+import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
+import { createFilter } from './shared/filter.js';
+import { contactButtons } from './shared/ui.js';
+import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
+import { createInquiriesPage } from './shared/inquiries-page.js';
+import { BOOKING_FILTERS, matchesBookingFilters } from './shared/booking-filters.js';
 
 export function createMobileView(container, options = {}) {
   let bookings = [...INITIAL_BOOKINGS];
@@ -7,6 +14,7 @@ export function createMobileView(container, options = {}) {
   let contacts = [...CONTACTS_LIST];
   let activeCategory = 'All Bookings'; // 'All Bookings', 'New Bookings', 'Assigned', 'Ongoing'
   let selectedCategory = 'ALL'; // 'ALL', 'TOUR', 'VILLA', 'ACTIVITY', 'TRANSPORT'
+  let filters = { payment: '', assigned: '', from: '', to: '' };
   let searchQuery = '';
   let activeModalBooking = bookings[0]; // Haridwar - Kashi Trip BK-5021
   let activeModalTab = options.initialTab || 'customer-details'; // 'customer-details', 'guests', 'itinerary', 'updates'
@@ -46,7 +54,7 @@ export function createMobileView(container, options = {}) {
             </div>
             <div class="brand-text-col">
               <h2>Ruyi Admin</h2>
-              <p>Bookings • 28 Total</p>
+              <p id="mobile-header-subtitle">Bookings • 28 Total</p>
             </div>
           </div>
           <div class="app-header-right">
@@ -61,34 +69,17 @@ export function createMobileView(container, options = {}) {
           </div>
         </div>
 
-        <!-- Page Title -->
-        <div class="mobile-title-section">
-          <h1>Bookings</h1>
-          <p>Manage and track all types of bookings.</p>
-        </div>
-
+        <div id="mobile-bookings-page">
         <!-- Search & Filter Row -->
         <div class="mobile-search-row">
           <div class="search-input-wrapper">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
+            ${icon('search', { size: 18 })}
             <input type="text" id="mobile-search-input" placeholder="Search bookings..." value="${searchQuery}" />
           </div>
-          <div class="mobile-category-select-wrapper">
-            <svg class="category-filter-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-            </svg>
-            <select id="mobile-category-filter" class="mobile-select-filter">
-              <option value="ALL" ${selectedCategory === 'ALL' ? 'selected' : ''}>All Categories</option>
-              <option value="TOUR" ${selectedCategory === 'TOUR' ? 'selected' : ''}>Tour Packages</option>
-              <option value="VILLA" ${selectedCategory === 'VILLA' ? 'selected' : ''}>Villas & Resorts</option>
-              <option value="ACTIVITY" ${selectedCategory === 'ACTIVITY' ? 'selected' : ''}>Activities & Sports</option>
-              <option value="TRANSPORT" ${selectedCategory === 'TRANSPORT' ? 'selected' : ''}>Transports</option>
-            </select>
-          </div>
+          <span id="mobile-filter-slot"></span>
         </div>
+
+        <div class="filter-chips" id="mobile-filter-chips" hidden></div>
 
         <!-- Status Filter Tabs / Pills -->
         <div class="category-filter-tabs">
@@ -119,11 +110,7 @@ export function createMobileView(container, options = {}) {
           <div class="selection-actions-right">
             <div style="position: relative;">
               <button class="action-more-btn" id="mobile-bulk-more-btn" title="More options" aria-haspopup="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="1.5"/>
-                  <circle cx="19" cy="12" r="1.5"/>
-                  <circle cx="5" cy="12" r="1.5"/>
-                </svg>
+                ${icon('more', { size: 18, stroke: 2.5 })}
               </button>
               <div class="bulk-more-dropdown" id="mobile-bulk-more-dropdown" style="display: none;">
                 <!-- Populated dynamically: Assign, Mark Paid / Mark Unpaid, Clear Selection -->
@@ -134,6 +121,8 @@ export function createMobileView(container, options = {}) {
 
         <!-- Bookings Cards List -->
         <div class="bookings-cards-list" id="mobile-cards-list"></div>
+        </div>
+        <div id="mobile-inquiries-page" hidden></div>
       </div>
 
       <!-- Bottom Navigation Bar (Fixed) -->
@@ -147,18 +136,18 @@ export function createMobileView(container, options = {}) {
           </svg>
           Dashboard
         </button>
-        <button class="nav-item active">
+        <button class="nav-item active" data-route="bookings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
             <rect width="20" height="14" x="2" y="6" rx="2"/>
           </svg>
           Bookings
         </button>
-        <button class="nav-item">
+        <button class="nav-item" data-route="inquiries">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          Enquiries
+          Inquiries
         </button>
         <button class="nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -208,9 +197,7 @@ export function createMobileView(container, options = {}) {
           <button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
           <div class="sheet-quick-actions-grid">
             <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
+              ${icon('phone', { size: 20, stroke: 2.2 })}
               <span>Call</span>
             </button>
             <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
@@ -227,11 +214,7 @@ export function createMobileView(container, options = {}) {
               <span>Forward</span>
             </button>
             <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="1.5"/>
-                <circle cx="19" cy="12" r="1.5"/>
-                <circle cx="5" cy="12" r="1.5"/>
-              </svg>
+              ${icon('more', { size: 20, stroke: 2.2 })}
               <span>More</span>
             </button>
           </div>
@@ -276,10 +259,7 @@ export function createMobileView(container, options = {}) {
         <!-- Search & Filter Bar -->
         <div class="vendor-search-row">
           <div class="vendor-search-input-box">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
+            ${icon('search', { size: 16 })}
             <input type="text" id="assign-vendor-search" placeholder="Search vendor by name, service or location..." />
           </div>
           <button class="filter-btn-square" style="width: 38px; height: 38px;" title="Filter Vendors">
@@ -325,9 +305,7 @@ export function createMobileView(container, options = {}) {
         <div class="assign-footer-actions">
           <button class="btn-cancel-assign" id="btn-cancel-assign-sheet">Cancel</button>
           <button class="btn-whatsapp-assign" id="btn-submit-assign-whatsapp">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-            </svg>
+            ${icon('whatsapp', { size: 18 })}
             Assign & Send on WhatsApp
           </button>
         </div>
@@ -614,10 +592,7 @@ export function createMobileView(container, options = {}) {
         (b.guest.phone && b.guest.phone.includes(searchQuery));
       
       const matchCategory = !activeCategory || activeCategory === 'All' || activeCategory === 'All Bookings' || b.category === activeCategory;
-      const matchCat = selectedCategory === 'ALL' ||
-        (selectedCategory === 'VILLA'
-          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
-          : b.type.toUpperCase() === selectedCategory.toUpperCase());
+      const matchCat = matchesBookingFilters(b, { category: selectedCategory === 'ALL' ? '' : selectedCategory, ...filters });
 
       return matchSearch && matchCategory && matchCat;
     });
@@ -626,10 +601,7 @@ export function createMobileView(container, options = {}) {
       listEl.innerHTML = `
         <div style="text-align: center; padding: 48px 20px; color: #64748B;">
           <div style="width: 48px; height: 48px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; color: #94A3B8;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
+            ${icon('search', { size: 24 })}
           </div>
           <h4 style="font-size: 15px; font-weight: 700; color: #0F172A; margin: 0 0 4px 0;">No Bookings Found</h4>
           <p style="font-size: 13px; margin: 0 0 14px 0; color: #94A3B8;">No results matching your selected filters.</p>
@@ -674,16 +646,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="card-right-col">
             <div class="card-action-btns-row">
-              <button class="card-circle-action-btn btn-action-call" data-action-call="${b.id}" title="Call ${b.guest.name}" aria-label="Call">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
-              </button>
-              <button class="card-circle-action-btn btn-action-whatsapp" data-action-whatsapp="${b.id}" title="WhatsApp ${b.guest.name}" aria-label="WhatsApp">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
-                </svg>
-              </button>
+              ${contactButtons({ id: b.id, name: b.guest.name, phone: b.guest.phone, size: 15 })}
             </div>
             <div class="card-price-status-row">
               <span class="card-price">${b.price}</span>
@@ -705,10 +668,7 @@ export function createMobileView(container, options = {}) {
         b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         b.guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (b.guest.phone && b.guest.phone.includes(searchQuery));
-      const matchCat = selectedCategory === 'ALL' ||
-        (selectedCategory === 'VILLA'
-          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
-          : b.type.toUpperCase() === selectedCategory.toUpperCase());
+      const matchCat = matchesBookingFilters(b, { category: selectedCategory === 'ALL' ? '' : selectedCategory, ...filters });
       return matchSearch && matchCat;
     });
 
@@ -993,10 +953,7 @@ export function createMobileView(container, options = {}) {
                 <div class="contact-value-row">
                   <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
                   <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect width="20" height="16" x="2" y="4" rx="2"/>
-                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                    </svg>
+                    ${icon('mail', { size: 12 })}
                   </button>
                 </div>
               </div>
@@ -1008,9 +965,7 @@ export function createMobileView(container, options = {}) {
                   <span class="info-value-bold phone-number-val">${c.phone}</span>
                   <div class="contact-action-btns">
                     <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                      </svg>
+                      ${icon('phone', { size: 12, stroke: 2.5 })}
                     </button>
                     <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
@@ -1102,42 +1057,7 @@ export function createMobileView(container, options = {}) {
             </div>
 
             <div class="lead-journey-timeline">
-              ${(c.leadFlow && c.leadFlow.length > 0) ? c.leadFlow.map((step, idx) => `
-                <div class="journey-item">
-                  <div class="journey-time-col">
-                    <span class="journey-date">${step.date}</span>
-                    <span class="journey-time">${step.time}</span>
-                  </div>
-                  <div class="journey-track-col">
-                    <div class="journey-dot-icon ${step.iconBg || 'icon-blue'}">
-                      ${step.type === 'call' ? `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                        </svg>
-                      ` : step.type === 'whatsapp' ? `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                        </svg>
-                      ` : `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <rect width="20" height="16" x="2" y="4" rx="2"/>
-                          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                        </svg>
-                      `}
-                    </div>
-                    ${idx < c.leadFlow.length - 1 ? '<div class="journey-line"></div>' : ''}
-                  </div>
-                  <div class="journey-content-col">
-                    <div class="journey-item-header">
-                      <h4>${step.title}</h4>
-                      <span class="journey-author">${step.author || 'By Ruyi Admin'}</span>
-                    </div>
-                    <p class="journey-desc">${step.desc}</p>
-                  </div>
-                </div>
-              `).join('') : `
-                <p style="font-size: 13px; color: #94A3B8; text-align: center; padding: 16px 0;">No journey follow-ups recorded yet.</p>
-              `}
+              ${renderJourneyItems(journeyFor(c))}
             </div>
           </div>
         </div>
@@ -1187,10 +1107,7 @@ export function createMobileView(container, options = {}) {
 
         <div class="guests-sub-header">
           <div class="guest-search-box">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
+            ${icon('search', { size: 16 })}
             <input type="text" id="mobile-guest-search-input" placeholder="Search guest..." />
           </div>
           <button class="add-guest-pill-btn" id="mobile-add-guest-btn">
@@ -1214,9 +1131,7 @@ export function createMobileView(container, options = {}) {
               </div>
               <div class="guest-right-actions">
                 <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${g.name} (${g.phone})...', type: 'info' }}))">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                  </svg>
+                  ${icon('phone', { size: 14, stroke: 2.5 })}
                 </button>
                 <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${g.name}" aria-label="More options" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Guest options for ${g.name}: ID verified and travel pass issued.', type: 'info' }}))">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1508,9 +1423,7 @@ export function createMobileView(container, options = {}) {
               </div>
             </div>
             <a href="tel:${c.phone}" class="circle-action-btn btn-phone" style="width: 30px; height: 30px; flex-shrink: 0;" onclick="event.stopPropagation();" title="Call ${c.name}">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
+              ${icon('phone', { size: 14, stroke: 2.2 })}
             </a>
           </div>
         `;
@@ -1894,34 +1807,71 @@ export function createMobileView(container, options = {}) {
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
         searchQuery = e.target.value;
+        setParams({ q: searchQuery.trim() }, { push: false, silent: true });
         renderCards();
       });
     }
 
-    // Mobile Category Filter Select
-    const mobileCatSelect = container.querySelector('#mobile-category-filter');
-    if (mobileCatSelect) {
-      mobileCatSelect.addEventListener('change', (e) => {
-        selectedCategory = e.target.value;
-        // Always reset tab to 'All Bookings' so user sees the category's bookings immediately
-        activeCategory = 'All Bookings';
-        container.querySelectorAll('.tab-pill').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.cat === 'All Bookings');
-        });
-        const allBtn = container.querySelector('.tab-pill[data-cat="All Bookings"]');
-        if (allBtn) {
-          allBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-        }
-        renderCards();
-      });
+    // Shared filter (button + removable chips), persisted in the query string
+    const bookingFilter = createFilter({
+      config: BOOKING_FILTERS,
+      onApply: (v) => setParams({ category: v.category || null, payment: v.payment || null, assigned: v.assigned || null, from: v.from || null, to: v.to || null, tab: null }),
+    });
+    bookingFilter.attachButton(container.querySelector('#mobile-filter-slot'));
+    bookingFilter.attachChips(container.querySelector('#mobile-filter-chips'));
+
+    function applyParams() {
+      const q = getParams();
+      searchQuery = q.q || '';
+      activeCategory = ['New Bookings', 'Assigned', 'Ongoing'].includes(q.tab) ? q.tab : 'All Bookings';
+      selectedCategory = q.category || 'ALL';
+      filters = { payment: q.payment || '', assigned: q.assigned || '', from: q.from || '', to: q.to || '' };
+      bookingFilter.setValues({ category: q.category || '', ...filters });
+      if (searchInput && document.activeElement !== searchInput) searchInput.value = searchQuery;
+      container.querySelectorAll('.tab-pill').forEach(btn => btn.classList.toggle('active', btn.dataset.cat === activeCategory));
+      renderCards();
     }
+
+    // Page routing: Bookings <-> Inquiries
+    const bookingsPage = container.querySelector('#mobile-bookings-page');
+    const inquiriesSlot = container.querySelector('#mobile-inquiries-page');
+    const inquiriesPage = createInquiriesPage(inquiriesSlot, { variant: 'mobile' });
+    const subtitleEl = container.querySelector('#mobile-header-subtitle');
+    function route() {
+      const page = currentPage();
+      bookingsPage.hidden = page !== 'bookings';
+      inquiriesSlot.hidden = page !== 'inquiries';
+      container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
+      const scroller = container.querySelector('#mobile-screen-scroll');
+      if (page === 'inquiries') {
+        inquiriesPage.show();
+        if (subtitleEl) subtitleEl.textContent = `Inquiries • ${inquiriesPage.total()} Total`;
+      } else {
+        inquiriesPage.hide();
+        if (subtitleEl) subtitleEl.textContent = 'Bookings • 28 Total';
+        applyParams();
+      }
+    }
+    subscribePage(route);
+    subscribeFollowUps(() => {
+      if (isModalOpen && activeModalTab === 'customer-details' && activeModalBooking) renderSheetBody();
+    });
+    loadFollowUps();
+    container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach((b) => {
+      b.addEventListener('click', () => {
+        container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0 });
+        navigate(b.dataset.route);
+      });
+    });
+    route();
 
     // Categories Array for Left/Right Swiping & Filtering
     const categories = ['All Bookings', 'New Bookings', 'Assigned', 'Ongoing'];
 
     function setCategory(cat, slideDir = null) {
-      if (!categories.includes(cat)) return;
+      if (!categories.includes(cat) || currentPage() !== 'bookings') return;
       activeCategory = cat;
+      setParams({ tab: cat === 'All Bookings' ? null : cat }, { silent: true });
 
       // Update active tab buttons
       container.querySelectorAll('.tab-pill').forEach(btn => {
@@ -2211,22 +2161,12 @@ export function createMobileView(container, options = {}) {
     container.addEventListener('click', (e) => {
       // Reset filters from empty state
       if (e.target.closest('#btn-clear-mobile-empty-filters')) {
-        activeCategory = 'All Bookings';
-        selectedCategory = 'ALL';
-        const sInput = container.querySelector('#mobile-search-input');
-        if (sInput) sInput.value = '';
-        searchQuery = '';
-        const catSelect = container.querySelector('#mobile-category-filter');
-        if (catSelect) catSelect.value = 'ALL';
-        setCategory('All Bookings');
+        setParams({ q: null, tab: null, category: null, payment: null, assigned: null, from: null, to: null });
         return;
       }
 
       if (e.target.closest('#btn-view-all-category-filters')) {
-        const sInput = container.querySelector('#mobile-search-input');
-        if (sInput) sInput.value = '';
-        searchQuery = '';
-        setCategory('All Bookings');
+        setParams({ q: null, tab: null });
         return;
       }
 
