@@ -101,7 +101,7 @@
 
             <!-- Main Desktop Area -->
             <main class="desktop-main">
-                <!-- Top Header -->
+                <!-- Top Header with Search and Notification Bar (Image 3 reference) -->
                 <header class="desktop-top-header">
                     <div class="desktop-search-wrapper">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -110,89 +110,33 @@
                         </svg>
                         <input type="text" wire:model.live.debounce.200ms="search" placeholder="Search by booking ID, destination, or guest name..." />
                         @if(!empty($search))
-                        <button wire:click="clearSearch" style="background: transparent; border: none; cursor: pointer; color: #94A3B8;">✕</button>
+                        <button wire:click="clearSearch" style="background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 14px; padding: 0 4px;">✕</button>
                         @endif
                     </div>
 
                     <div class="desktop-header-actions">
-                        <button class="icon-bell-btn" title="Notifications" wire:click="showToast('No new notifications', 'info')">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                            </svg>
-                            <span class="bell-dot"></span>
-                        </button>
+                        <div class="desktop-notification-wrapper" style="position: relative;">
+                            <button class="icon-bell-btn" title="Notifications" wire:click="showToast('You have 3 new travel updates and notifications', 'info')">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                                </svg>
+                                <span class="bell-dot"></span>
+                            </button>
+                        </div>
                     </div>
                 </header>
 
-                <!-- Body with Metrics and Full-Width Table -->
+                <!-- Body with Table and Inline Details (Clean, Spacious & Outlook Split View) -->
                 <div class="desktop-body">
                     <div class="desktop-content-col">
-                        <!-- Metrics Row -->
-                        <div class="metrics-row">
-                            <div class="metric-card">
-                                <div class="metric-icon-box metric-icon-blue">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                                        <rect width="20" height="14" x="2" y="6" rx="2"/>
-                                    </svg>
-                                </div>
-                                <div class="metric-info">
-                                    <h5>Total Bookings</h5>
-                                    <h3>{{ $stats['total'] }}</h3>
-                                    <div class="metric-trend">↑ +14.2% this month</div>
-                                </div>
-                            </div>
 
-                            <div class="metric-card">
-                                <div class="metric-icon-box metric-icon-green">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="9" cy="7" r="4"/>
-                                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                    </svg>
-                                </div>
-                                <div class="metric-info">
-                                    <h5>Total Travelers</h5>
-                                    <h3>{{ $stats['pax'] }} Pax</h3>
-                                    <div class="metric-trend">Active across {{ $stats['total'] }} tours</div>
-                                </div>
-                            </div>
-
-                            <div class="metric-card">
-                                <div class="metric-icon-box metric-icon-purple">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect width="20" height="14" x="2" y="5" rx="2"/>
-                                        <line x1="2" x2="22" y1="10" y2="10"/>
-                                    </svg>
-                                </div>
-                                <div class="metric-info">
-                                    <h5>Collected Revenue</h5>
-                                    <h3>{{ $stats['revenue'] }}</h3>
-                                    <div class="metric-trend">86% Settlement rate</div>
-                                </div>
-                            </div>
-
-                            <div class="metric-card">
-                                <div class="metric-icon-box metric-icon-orange">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <line x1="12" x2="12" y1="8" y2="12"/>
-                                        <line x1="12" x2="12.01" y1="16" y2="16"/>
-                                    </svg>
-                                </div>
-                                <div class="metric-info">
-                                    <h5>Pending Due</h5>
-                                    <h3>{{ $stats['pending'] }}</h3>
-                                    <div class="metric-trend" style="color: #EA580C;">Awaiting settlement</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Table Container with Toolbar -->
-                        <div class="desktop-table-container">
-                            <div class="table-toolbar">
+                        <!-- Workspace Split: Table + Inline Details Pane (Outlook Style) -->
+                        <div class="desktop-workspace-split {{ $activeBooking ? 'has-open-detail' : '' }}" id="desktop-workspace-split">
+                            <!-- Left Column: Master View (Full Table or Slim Master List) -->
+                            <div class="desktop-table-container">
+                                <div class="desktop-full-table-view" style="{{ $activeBooking ? 'display: none;' : '' }}">
+                                <div class="table-toolbar">
                                 <div class="toolbar-tabs-group">
                                     <button class="desktop-tab-btn {{ $tab === 'All Bookings' ? 'active' : '' }}" wire:click="setTab('All Bookings')">
                                         All Bookings ({{ $stats['total'] }})
@@ -209,13 +153,21 @@
                                 </div>
 
                                 <div class="toolbar-actions-group">
-                                    <select wire:model.live="category" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #CBD5E1; font-size: 13.5px; font-family: inherit; font-weight: 500; background: #FFFFFF; color: #1E293B; cursor: pointer;">
+                                    <div class="table-toolbar-search-box">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"/>
+                                            <path d="m21 21-4.3-4.3"/>
+                                        </svg>
+                                        <input type="text" wire:model.live.debounce.200ms="search" placeholder="Search bookings..." />
+                                    </div>
+                                    <select wire:model.live="category" class="desktop-select-filter">
                                         <option value="ALL">All Categories</option>
                                         <option value="TOUR">Tour Packages</option>
                                         <option value="VILLA">Villas & Resorts</option>
                                         <option value="ACTIVITY">Activities & Sports</option>
                                         <option value="TRANSPORT">Transports</option>
                                     </select>
+
                                 </div>
                             </div>
 
@@ -231,32 +183,49 @@
                                     <span>{{ count($selectedBookings) }} selected</span>
                                 </div>
                                 <div class="selection-actions-right">
-                                    <button class="action-pill-btn" wire:click="bulkAssign">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                            <circle cx="9" cy="7" r="4"/>
-                                            <line x1="19" x2="19" y1="8" y2="14"/>
-                                            <line x1="22" x2="16" y1="11" y2="11"/>
-                                        </svg>
-                                        + Assign
-                                    </button>
                                     <div style="position: relative;">
-                                        <button class="action-more-btn" wire:click="toggleBulkMore" title="More options">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <circle cx="12" cy="12" r="1"/>
-                                                <circle cx="19" cy="12" r="1"/>
-                                                <circle cx="5" cy="12" r="1"/>
+                                        <button class="action-more-btn" wire:click="toggleBulkMore" title="More options" aria-haspopup="true">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="1.5"/>
+                                                <circle cx="19" cy="12" r="1.5"/>
+                                                <circle cx="5" cy="12" r="1.5"/>
                                             </svg>
                                         </button>
                                         @if($isBulkMoreOpen)
-                                        <div class="bulk-more-dropdown" style="display: block; position: absolute; right: 0; top: 40px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 6px; width: 160px; z-index: 100;">
-                                            <button class="dropdown-item-btn" wire:click="bulkMarkPaid" style="padding: 8px 10px; font-size: 13px; width: 100%; text-align: left; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                                Mark as Paid
+                                        <div class="bulk-more-dropdown" style="display: block;">
+                                            <button class="dropdown-item-btn" wire:click="bulkAssign">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                                    <circle cx="9" cy="7" r="4"/>
+                                                    <line x1="19" x2="19" y1="8" y2="14"/>
+                                                    <line x1="22" x2="16" y1="11" y2="11"/>
+                                                </svg>
+                                                <span>Assign</span>
                                             </button>
-                                            <button class="dropdown-item-btn" wire:click="clearSelection" style="padding: 8px 10px; font-size: 13px; color: #64748B; width: 100%; text-align: left; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                                Clear Selection
+                                            @if($this->isAllSelectedPaid)
+                                            <button class="dropdown-item-btn" wire:click="bulkMarkUnpaid">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <line x1="12" x2="12" y1="8" y2="12"/>
+                                                    <line x1="12" x2="12.01" y1="16" y2="16"/>
+                                                </svg>
+                                                <span>Mark as Unpaid</span>
+                                            </button>
+                                            @else
+                                            <button class="dropdown-item-btn" wire:click="bulkMarkPaid">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="20 6 9 17 4 12"/>
+                                                </svg>
+                                                <span>Mark as Paid</span>
+                                            </button>
+                                            @endif
+                                            <div class="dropdown-divider"></div>
+                                            <button class="dropdown-item-btn item-danger" wire:click="clearSelection">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                                </svg>
+                                                <span>Clear Selection</span>
                                             </button>
                                         </div>
                                         @endif
@@ -284,7 +253,7 @@
                                         <th>Assigned To</th>
                                         <th>Status</th>
                                         <th>Amount</th>
-                                        <th style="text-align: right; padding-right: 24px;">Action</th>
+                                        <th style="text-align: right; padding-right: 24px; min-width: 160px;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -345,11 +314,32 @@
                                         <td>
                                             <span class="table-price-badge">{{ $b->price }}</span>
                                         </td>
-                                        <td style="text-align: right; padding-right: 24px;">
-                                            <button class="action-pill-btn" style="padding: 6px 12px; font-size: 12px;" wire:click.stop="openDrawer('{{ $b->id }}')">
-                                                View
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                                            </button>
+                                        <td style="text-align: right; padding-right: 20px;">
+                                            <div class="desktop-action-btn-group" wire:click.stop>
+                                                @php
+                                                    $leadPhone = $leadGuest['phone'] ?? '';
+                                                    $cleanPhone = preg_replace('/[^0-9+]/', '', $leadPhone);
+                                                    $digitsWa = preg_replace('/[^0-9]/', '', $leadPhone);
+                                                    if (strlen($digitsWa) === 10) { $digitsWa = '91' . $digitsWa; }
+                                                    $waMsg = urlencode("Hi " . ($leadGuest['name'] ?? 'Guest') . ", this is Ruyi Travel Operations regarding your booking {$b->id} ({$b->title}).");
+                                                @endphp
+                                                @if(!empty($cleanPhone))
+                                                <a href="tel:{{ $cleanPhone }}" class="card-circle-action-btn btn-action-call" title="Call {{ $leadGuest['name'] ?? 'Guest' }} ({{ $leadPhone }})" aria-label="Call" wire:click.stop>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                                    </svg>
+                                                </a>
+                                                <a href="https://wa.me/{{ $digitsWa }}?text={{ $waMsg }}" target="_blank" rel="noopener noreferrer" class="card-circle-action-btn btn-action-whatsapp" title="WhatsApp {{ $leadGuest['name'] ?? 'Guest' }} ({{ $leadPhone }})" aria-label="WhatsApp" wire:click.stop>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+                                                    </svg>
+                                                </a>
+                                                @endif
+                                                <button class="row-view-details-btn" wire:click.stop="openDrawer('{{ $b->id }}')" title="View details for {{ $b->title }}">
+                                                    <span>View</span>
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                     @empty
@@ -361,41 +351,129 @@
                                     @endforelse
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                </div>
-            </main>
+                                </div>
 
-            <!-- Slide-Over Drawer Backdrop Overlay -->
-            <div class="desktop-drawer-backdrop {{ $activeBooking ? 'open' : '' }}" wire:click="closeDrawer"></div>
+                                <!-- 2. Compact Outlook Master List (Shown when details open) -->
+                                <div class="desktop-compact-list-view" style="{{ $activeBooking ? 'display: flex;' : 'display: none;' }}">
+                                    <div class="compact-list-header">
+                                        <div class="compact-header-top">
+                                            <div class="compact-search-bar">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                                <input type="text" wire:model.live.debounce.200ms="search" placeholder="Search..." />
+                                            </div>
+                                            <button class="btn-expand-full-table" wire:click="closeDrawer" title="Expand to Full Table View">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                                            </button>
+                                        </div>
+                                        <div class="compact-tabs-nav">
+                                            <button class="compact-tab-btn {{ $tab === 'All Bookings' ? 'active' : '' }}" wire:click="setTab('All Bookings')">All ({{ $stats['total'] }})</button>
+                                            <button class="compact-tab-btn {{ $tab === 'New Bookings' ? 'active' : '' }}" wire:click="setTab('New Bookings')">New ({{ $stats['countNew'] }})</button>
+                                            <button class="compact-tab-btn {{ $tab === 'Assigned' ? 'active' : '' }}" wire:click="setTab('Assigned')">Assigned ({{ $stats['countAssigned'] }})</button>
+                                            <button class="compact-tab-btn {{ $tab === 'Ongoing' ? 'active' : '' }}" wire:click="setTab('Ongoing')">Ongoing ({{ $stats['countOngoing'] }})</button>
+                                        </div>
+                                    </div>
+                                    <div class="compact-list-items">
+                                        @forelse($bookings as $cb)
+                                        <div class="compact-booking-card {{ $activeBookingId === $cb->id ? 'active' : '' }}" wire:click="openDrawer('{{ $cb->id }}')" style="cursor: pointer;">
+                                            <div class="compact-card-top">
+                                                <img src="{{ $cb->image }}" class="compact-thumb" alt="{{ $cb->title }}" />
+                                                <div class="compact-info-col">
+                                                    <h4 class="compact-trip-title">{{ $cb->title }}</h4>
+                                                    <p class="compact-guest-sub">{{ $cb->customer['name'] ?? 'Guest' }} • {{ $cb->pax }} Pax</p>
+                                                </div>
+                                            </div>
+                                            <div class="compact-card-bottom">
+                                                <div style="display: flex; align-items: center; gap: 6px;">
+                                                    <span class="compact-price">{{ $cb->price }}</span>
+                                                    <span class="compact-status-badge {{ $cb->status_class }}">{{ $cb->status }}</span>
+                                                </div>
+                                                @php
+                                                    $cbLead = ($cb->guests && count($cb->guests) > 0) ? $cb->guests[0] : ['name' => $cb->customer['name'] ?? 'Guest', 'phone' => $cb->customer['phone'] ?? ''];
+                                                    $cbPhone = preg_replace('/[^0-9+]/', '', $cbLead['phone'] ?? '');
+                                                    $cbWa = preg_replace('/[^0-9]/', '', $cbLead['phone'] ?? '');
+                                                    if (strlen($cbWa) === 10) { $cbWa = '91' . $cbWa; }
+                                                    $cbWaMsg = urlencode("Hi " . ($cbLead['name'] ?? 'Guest') . ", regarding booking {$cb->id} ({$cb->title})...");
+                                                @endphp
+                                                @if(!empty($cbPhone))
+                                                <div class="card-action-btns-row" wire:click.stop style="gap: 5px;">
+                                                    <a href="tel:{{ $cbPhone }}" class="card-circle-action-btn btn-action-call" style="width: 28px; height: 28px;" title="Call {{ $cbLead['name'] ?? 'Guest' }}" aria-label="Call" wire:click.stop>
+                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                                        </svg>
+                                                    </a>
+                                                    <a href="https://wa.me/{{ $cbWa }}?text={{ $cbWaMsg }}" target="_blank" rel="noopener noreferrer" class="card-circle-action-btn btn-action-whatsapp" style="width: 28px; height: 28px;" title="WhatsApp {{ $cbLead['name'] ?? 'Guest' }}" aria-label="WhatsApp" wire:click.stop>
+                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @empty
+                                        <div style="text-align: center; padding: 24px; color: #94A3B8; font-size: 13px;">No bookings found</div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
 
-            <!-- Slide-Over Detail Drawer (580px wide SaaS layout on PC) -->
-            <aside class="desktop-details-drawer {{ $activeBooking ? 'open' : '' }}" id="desktop-details-drawer">
+                        <!-- Inline Detail Drawer (Popup on PC eliminated -> Inline Outlook split view!) -->
+                        <aside class="desktop-details-drawer {{ $activeBooking ? 'open' : '' }}" id="desktop-details-drawer">
                 @if($activeBooking)
-                <!-- Unified Header -->
+                <!-- Unified Header (Matching Mobile exactly) -->
                 <div class="desktop-drawer-header-box">
-                    <button class="sheet-close-btn" wire:click="closeDrawer" title="Close Drawer">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                    <div class="desktop-header-top-row">
-                        <div class="desktop-header-tags">
-                            <span class="tag-pill {{ $activeBooking->type_class }}">{{ $activeBooking->type }}</span>
-                            <span class="tag-booking-id">{{ $activeBooking->id }}</span>
-                            <span class="status-badge {{ $activeBooking->status_class }}">{{ $activeBooking->status }}</span>
-                        </div>
-                        <div class="desktop-header-price">{{ $activeBooking->price }}</div>
+                    <div class="sheet-drag-handle-bar desktop-sheet-top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px 0 18px; background: #FFFFFF;">
+                        <button class="sheet-close-btn" wire:click="closeDrawer" title="Close Drawer (Esc)" aria-label="Close">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
                     </div>
-                    <h3 class="desktop-header-title">{{ $activeBooking->title }}</h3>
-                    <div class="desktop-header-meta">
-                        <span class="meta-item">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                            {{ $activeBooking->pax }} Travelers ({{ $activeBooking->customer['customerType'] ?? 'Family' }})
-                        </span>
-                        <span class="meta-sep">•</span>
-                        <span class="meta-item">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                            {{ $activeBooking->dates }}
-                        </span>
+                    @php
+                        $c = $activeBooking->customer ?? [];
+                        $custName = $c['name'] ?? ($activeBooking->guest['name'] ?? 'Customer');
+                        $initials = $c['initials'] ?? (collect(explode(' ', $custName))->map(fn($n) => $n[0] ?? '')->join('') ?: 'CU');
+                    @endphp
+                    <div class="sheet-customer-header">
+                        <div class="customer-avatar-badge">{{ $initials }}</div>
+                        <div class="customer-header-info">
+                            <div class="customer-title-row">
+                                <h2 class="customer-name-title">{{ $custName }}</h2>
+                                <span class="status-pill {{ $activeBooking->status_class }}">
+                                    <span class="dot"></span>
+                                    {{ $activeBooking->status }}
+                                </span>
+                            </div>
+                            <p class="customer-trip-subtitle">{{ $activeBooking->title }}</p>
+                            <div class="customer-meta-chips">
+                                <span class="meta-chip">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                    </svg>
+                                    {{ $activeBooking->pax }} Pax
+                                </span>
+                                <span class="meta-dot">•</span>
+                                <span class="meta-chip">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                    {{ $activeBooking->duration }}
+                                </span>
+                                <span class="meta-dot">•</span>
+                                <span class="meta-chip">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                                        <line x1="16" x2="16" y1="2" y2="6"/>
+                                        <line x1="8" x2="8" y1="2" y2="6"/>
+                                        <line x1="3" x2="21" y1="10" y2="10"/>
+                                    </svg>
+                                    {{ $activeBooking->dates }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -411,81 +489,178 @@
                 <div class="sheet-body-scroll desktop-body-scroll">
                     @if($activeDrawerTab === 'customer-details')
                     @php $c = $activeBooking->customer ?? []; @endphp
-                    <!-- Customer Profile Card -->
-                    <div class="customer-profile-card">
-                        <div class="customer-profile-avatar">{{ $c['initials'] ?? 'RM' }}</div>
-                        <div class="customer-profile-info">
-                            <div class="customer-profile-header-row">
-                                <h4 class="customer-profile-name">{{ $c['name'] ?? 'Primary Guest' }}</h4>
-                                <span class="badge-vip-pill">VIP Traveler</span>
-                            </div>
-                            <div class="customer-profile-grid">
-                                <div class="profile-info-item">
-                                    <span class="profile-item-label">Phone</span>
-                                    <span class="profile-item-val">{{ $c['phone'] ?? '+91 99884 84884' }}</span>
-                                </div>
-                                <div class="profile-info-item">
-                                    <span class="profile-item-label">Email</span>
-                                    <span class="profile-item-val" style="word-break: break-all;">{{ $c['email'] ?? 'rohan.malhotra@gmail.com' }}</span>
-                                </div>
-                                <div class="profile-info-item">
-                                    <span class="profile-item-label">Location</span>
-                                    <span class="profile-item-val">{{ $c['location'] ?? 'Chandigarh, Punjab' }}</span>
-                                </div>
-                                <div class="profile-info-item">
-                                    <span class="profile-item-label">Source</span>
-                                    <span class="profile-item-val">{{ $c['leadSource'] ?? 'Google Search' }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Special Requirements Card -->
-                    <div class="section-card">
-                        <div class="section-header-row">
-                            <span class="section-title">Special Requirements</span>
-                            <button class="action-pill-btn" wire:click="openSpecialReqModal" style="padding: 4px 10px; font-size: 11.5px;">+ Quick Edit</button>
-                        </div>
-                        <div class="special-req-tags-grid">
-                            @forelse($activeBooking->special_requirements ?? [] as $sr)
-                            <div class="special-req-pill" style="border-left: 3px solid {{ $sr['color'] ?? '#2563EB' }}; display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #F8FAFC; border-radius: 8px;">
-                                <span style="font-size: 12.5px; font-weight: 600; color: #1E293B;">{{ $sr['text'] }}</span>
-                            </div>
-                            @empty
-                            <p style="font-size: 12.5px; color: #94A3B8; margin: 4px 0;">No special requirements recorded.</p>
-                            @endforelse
-                        </div>
-                    </div>
-
-                    <!-- Short Details -->
-                    <div class="section-card">
-                        <span class="section-title">Trip Overview</span>
-                        <p style="font-size: 13px; line-height: 1.5; color: #475569; margin: 8px 0 0 0;">
-                            {{ $c['shortDetails'] ?? $activeBooking->notes }}
-                        </p>
-                    </div>
-
-                    <!-- Lead Flow Timeline -->
-                    <div class="section-card">
-                        <span class="section-title">Lead Activity & Timeline</span>
-                        <div class="lead-timeline" style="margin-top: 14px; display: flex; flex-direction: column; gap: 14px;">
-                            @forelse($c['leadFlow'] ?? [] as $lf)
-                            <div style="display: flex; gap: 12px; position: relative;">
-                                <div style="width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; font-weight: 700;">
-                                    ✓
-                                </div>
-                                <div style="flex: 1;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <h5 style="margin: 0; font-size: 13px; font-weight: 700; color: #0F172A;">{{ $lf['title'] }}</h5>
-                                        <span style="font-size: 11.5px; color: #94A3B8;">{{ $lf['date'] ?? '' }} • {{ $lf['time'] ?? '' }}</span>
+                    <div class="customer-details-tab-content">
+                        <!-- Card 1: Customer Information -->
+                        <div class="details-section-card">
+                            <div class="details-section-header">
+                                <div class="section-header-left">
+                                    <div class="section-icon-circle blue-circle">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                                            <circle cx="12" cy="7" r="4"/>
+                                        </svg>
                                     </div>
-                                    <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748B;">{{ $lf['desc'] ?? '' }}</p>
-                                    <span style="font-size: 11px; color: #3B82F6; font-weight: 500;">{{ $lf['author'] ?? '' }}</span>
+                                    <h3>Customer Information</h3>
+                                </div>
+                                <button class="btn-edit-action" wire:click="openCustomerEditModal" title="Edit Customer Details">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                    </svg>
+                                    Edit
+                                </button>
+                            </div>
+
+                            <div class="customer-info-grid">
+                                <!-- Left Column: Row 1 -->
+                                <div class="info-cell">
+                                    <span class="info-label">Customer Name</span>
+                                    <span class="info-value-bold">{{ $c['name'] ?? ($activeBooking->guest['name'] ?? 'Customer') }}</span>
+                                </div>
+                                <!-- Right Column: Row 1 -->
+                                <div class="info-cell info-cell-email">
+                                    <span class="info-label">Email</span>
+                                    <div class="contact-value-row">
+                                        <span class="info-value-text email-text-val" title="{{ $c['email'] ?? '' }}">{{ $c['email'] ?? 'rohan.malhotra@gmail.com' }}</span>
+                                        <button class="mini-icon-btn btn-mail-blue" wire:click="showToast('Drafting email...', 'info')" title="Send Email">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Left Column: Row 2 -->
+                                <div class="info-cell info-cell-contact">
+                                    <span class="info-label">Primary Contact</span>
+                                    <div class="contact-value-row">
+                                        <span class="info-value-bold phone-number-val">{{ $c['phone'] ?? '+91 99884 84884' }}</span>
+                                        <div class="contact-action-btns">
+                                            <button class="mini-icon-btn btn-call-green" wire:click="triggerAction('call')" title="Call">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                                </svg>
+                                            </button>
+                                            <button class="mini-icon-btn btn-wa-green" wire:click="triggerAction('whatsapp')" title="WhatsApp">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.892.524 3.662 1.435 5.176L2.05 21.95a.6.6 0 0 0 .736.736l4.774-1.385A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Zm3.906 14.153c-.225.63-1.127 1.196-1.55 1.258-.42.062-.958.088-1.55-.102-.38-.122-.87-.282-1.49-.55-2.617-1.13-4.326-3.79-4.457-3.963-.13-.174-1.065-1.417-1.065-2.702 0-1.286.674-1.92.913-2.18.239-.261.52-.326.695-.326.174 0 .348.002.5.01.16.007.375-.06.587.447.218.522.74 1.804.805 1.935.066.13.11.283.022.457-.087.174-.13.283-.26.435-.13.152-.273.34-.39.456-.13.13-.265.272-.114.533.152.261.674 1.11 1.447 1.8 1 .892 1.84 1.168 2.1 1.3.26.13.413.11.565-.065.152-.174.652-.761.826-1.022.174-.26.348-.217.587-.13.239.087 1.522.717 1.783.848.26.13.435.195.5.304.065.109.065.63-.16 1.26Z" fill="#16A34A"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Right Column: Row 2 -->
+                                <div class="info-cell">
+                                    <span class="info-label">Lead Source</span>
+                                    <span class="info-value-text">{{ $c['leadSource'] ?? 'Website' }}</span>
+                                </div>
+
+                                <!-- Left Column: Row 3 -->
+                                <div class="info-cell">
+                                    <span class="info-label">Travel Dates</span>
+                                    <span class="info-value-text">{{ $c['travelDates'] ?? $activeBooking->dates }}</span>
+                                </div>
+                                <!-- Right Column: Row 3 -->
+                                <div class="info-cell">
+                                    <span class="info-label">Location</span>
+                                    <span class="info-value-text">{{ $c['location'] ?? 'New Delhi, Delhi' }}</span>
+                                </div>
+
+                                <!-- Left Column: Row 4 -->
+                                <div class="info-cell">
+                                    <span class="info-label">Preferred Destination</span>
+                                    <span class="info-value-text">{{ $c['preferredDestination'] ?? $activeBooking->destination }}</span>
+                                </div>
+                                <!-- Right Column: Row 4 -->
+                                <div class="info-cell">
+                                    <span class="info-label">Budget (Est.)</span>
+                                    <span class="info-value-bold" style="color: #0F172A;">{{ $c['budgetEst'] ?? $activeBooking->price }}</span>
+                                </div>
+
+                                <!-- Left Column: Row 5 -->
+                                <div class="info-cell">
+                                    <span class="info-label">Customer Type</span>
+                                    <span class="info-value-text">{{ $c['customerType'] ?? ('Family (' . $activeBooking->pax . ' Pax)') }}</span>
+                                </div>
+                                <!-- Right Column: Row 5 -->
+                                <div class="info-cell">
+                                    <span class="info-label">Status</span>
+                                    <div>
+                                        <span class="status-pill {{ $activeBooking->status_class }}" style="display: inline-flex;">
+                                            <span class="dot"></span>
+                                            {{ $c['status'] ?? $activeBooking->status }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            @empty
-                            <p style="font-size: 12px; color: #94A3B8;">No timeline events recorded yet.</p>
-                            @endforelse
+
+                            <!-- Short Details Card -->
+                            <div class="short-details-card">
+                                <div class="short-details-header">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" x2="8" y1="13" y2="13"/>
+                                        <line x1="16" x2="8" y1="17" y2="17"/>
+                                        <line x1="10" x2="8" y1="9" y2="9"/>
+                                    </svg>
+                                    <span>Short Details</span>
+                                </div>
+                                <p class="short-details-text">{{ $c['shortDetails'] ?? ($activeBooking->notes ?? 'Trip details logged into operations queue.') }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Lead Flow / Journey -->
+                        <div class="details-section-card">
+                            <div class="details-section-header">
+                                <div class="section-header-left">
+                                    <div class="section-icon-circle blue-circle">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                                        </svg>
+                                    </div>
+                                    <h3>Lead Flow / Journey</h3>
+                                </div>
+                                <button class="btn-add-followup" wire:click="openAddFollowupModal">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <line x1="12" x2="12" y1="5" y2="19"/>
+                                        <line x1="5" x2="19" y1="12" y2="12"/>
+                                    </svg>
+                                    Add Follow-up
+                                </button>
+                            </div>
+
+                            <div class="lead-journey-timeline">
+                                @forelse($c['leadFlow'] ?? [] as $step)
+                                <div class="journey-item">
+                                    <div class="journey-time-col">
+                                        <span class="journey-date">{{ $step['date'] ?? '' }}</span>
+                                        <span class="journey-time">{{ $step['time'] ?? '' }}</span>
+                                    </div>
+                                    <div class="journey-track-col">
+                                        <div class="journey-dot-icon {{ $step['iconBg'] ?? 'icon-blue' }}">
+                                            @if(($step['type'] ?? '') === 'call')
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                            @elseif(($step['type'] ?? '') === 'whatsapp')
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                                            @else
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="journey-content-col">
+                                        <div class="journey-item-header">
+                                            <h4>{{ $step['title'] }}</h4>
+                                            <span class="journey-author">{{ $step['author'] ?? 'By Admin' }}</span>
+                                        </div>
+                                        <p class="journey-desc">{{ $step['desc'] }}</p>
+                                    </div>
+                                </div>
+                                @empty
+                                <p style="font-size: 13px; color: #94A3B8; text-align: center; padding: 16px 0;">No journey follow-ups recorded yet.</p>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
 
@@ -493,29 +668,43 @@
                     <!-- Guests Tab Content -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
                         <span class="section-title" style="margin: 0;">Registered Travelers ({{ count($activeBooking->guests ?? []) }})</span>
-                        <button class="btn-primary-desktop" wire:click="openAddGuestModal" style="padding: 6px 14px; font-size: 12.5px; border-radius: 8px;">+ Add Guest</button>
+                        <button class="add-guest-pill-btn" wire:click="openAddGuestModal">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <line x1="12" x2="12" y1="5" y2="19"/>
+                                <line x1="5" x2="19" y1="12" y2="12"/>
+                            </svg>
+                            Add Guest
+                        </button>
                     </div>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         @forelse($activeBooking->guests ?? [] as $g)
                         <div class="guest-card" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 38px; height: 38px; border-radius: 50%; background: #EFF6FF; color: #2563EB; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center;">
-                                    {{ substr($g['name'] ?? 'G', 0, 1) }}
+                                <div class="guest-num-badge" style="width: 28px; height: 28px; border-radius: 8px; background: #F1F5F9; color: #475569; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center;">
+                                    {{ $loop->iteration }}
                                 </div>
                                 <div>
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <h4 style="margin: 0; font-size: 13.5px; font-weight: 700; color: #0F172A;">{{ $g['name'] }}</h4>
-                                        <span class="tag-pill" style="font-size: 11px; padding: 2px 7px; background: #F1F5F9; color: #475569;">{{ $g['role'] ?? 'Adult' }}</span>
-                                    </div>
+                                    <h4 style="margin: 0; font-size: 13.5px; font-weight: 700; color: #0F172A;">{{ $g['name'] }}</h4>
                                     <div style="font-size: 12px; color: #64748B; margin-top: 2px;">
-                                        Age: {{ $g['age'] }} • Phone: {{ $g['phone'] }}
+                                        Age {{ $g['age'] }} • {{ $g['role'] ?? 'Adult' }}
                                     </div>
                                 </div>
                             </div>
-                            <button wire:click="removeGuest({{ $g['id'] }})" style="background: none; border: none; cursor: pointer; color: #EF4444; padding: 4px;" title="Remove Guest">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                            </button>
+                            <div class="guest-right-actions" style="display: flex; align-items: center; gap: 8px;">
+                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $g['phone'] ?? '') }}" class="circle-action-btn btn-phone" title="Call {{ $g['name'] }}">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                    </svg>
+                                </a>
+                                <button class="circle-action-btn btn-more" wire:click="showToast('Guest options for {{ $g['name'] }}: ID verified', 'info')" title="More options" aria-label="More options">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="1.5"/>
+                                        <circle cx="12" cy="5" r="1.5"/>
+                                        <circle cx="12" cy="19" r="1.5"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         @empty
                         <p style="text-align: center; color: #94A3B8; padding: 24px;">No guests registered. Click "+ Add Guest" above.</p>
@@ -523,13 +712,30 @@
                     </div>
 
                     @elseif($activeDrawerTab === 'itinerary')
-                    <!-- Itinerary Tab Content -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                        <span class="section-title" style="margin: 0;">Day-Wise Schedule</span>
-                        <button class="btn-primary-desktop" wire:click="openAddEvent('Day 1')" style="padding: 6px 14px; font-size: 12.5px; border-radius: 8px;">+ Add Event</button>
-                    </div>
+                    <!-- Itinerary Tab Content (Uniform Pattern with Customer Details and Guests) -->
+                    <div class="itinerary-tab-content" style="padding: 0;">
+                        <div class="itinerary-section-header-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                            <div class="section-header-left" style="display: flex; align-items: center; gap: 8px;">
+                                <div class="section-icon-circle blue-circle" style="width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; color: #2563EB;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                                        <line x1="16" x2="16" y1="2" y2="6"/>
+                                        <line x1="8" x2="8" y1="2" y2="6"/>
+                                        <line x1="3" x2="21" y1="10" y2="10"/>
+                                    </svg>
+                                </div>
+                                <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
+                            </div>
+                            <button class="btn-add-event-pill" wire:click="openAddEvent('Day 1')">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <line x1="12" x2="12" y1="5" y2="19"/>
+                                    <line x1="5" x2="19" y1="12" y2="12"/>
+                                </svg>
+                                + Add Event
+                            </button>
+                        </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
                         @forelse($activeBooking->itinerary_days ?? [] as $dayGroup)
                         <div class="day-schedule-box" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
@@ -581,6 +787,7 @@
                         <p style="text-align: center; color: #94A3B8; padding: 24px;">No itinerary days scheduled yet.</p>
                         @endforelse
                     </div>
+                </div>
 
                     @elseif($activeDrawerTab === 'updates')
                     <!-- Updates Tab Content -->
@@ -616,40 +823,49 @@
                     @endif
                 </div>
 
-                <!-- Sleek Sticky Footer Action Bar -->
-                <div class="desktop-drawer-footer">
-                    <button class="btn-primary-desktop desktop-confirm-booking-btn" wire:click="confirmBooking('{{ $activeBooking->id }}')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        <span>Confirm Booking</span>
+                <!-- Exact Match to Mobile Footer (Image 1) -->
+                <div class="sheet-sticky-footer desktop-drawer-footer">
+                    <button class="btn-confirm-booking" wire:click="confirmBooking('{{ $activeBooking->id }}')">
+                        Confirm Booking
                     </button>
-                    <div class="desktop-footer-actions-group">
-                        <button class="desktop-action-icon-btn btn-action-call" wire:click="triggerAction('call')" title="Call Customer">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <div class="sheet-quick-actions-grid desktop-quick-actions-grid">
+                        <button class="quick-action-col-btn btn-act-call" wire:click="triggerAction('call')" title="Call">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                             </svg>
                             <span>Call</span>
                         </button>
-                        <button class="desktop-action-icon-btn btn-action-msg" wire:click="triggerAction('whatsapp')" title="WhatsApp Message">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                        <button class="quick-action-col-btn btn-act-msg" wire:click="triggerAction('whatsapp')" title="Message">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                             </svg>
-                            <span>WhatsApp</span>
+                            <span>Message</span>
                         </button>
-                        <button class="desktop-action-icon-btn btn-action-fwd" wire:click="triggerAction('share')" title="Forward Voucher">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <button class="quick-action-col-btn btn-act-fwd" wire:click="triggerAction('share')" title="Forward">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m22 2-7 20-4-9-9-4Z"/>
                                 <path d="M22 2 11 13"/>
                             </svg>
-                            <span>Share</span>
+                            <span>Forward</span>
+                        </button>
+                        <button class="quick-action-col-btn btn-act-more" wire:click="triggerAction('more')" title="More">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="1.5"/>
+                                <circle cx="19" cy="12" r="1.5"/>
+                                <circle cx="5" cy="12" r="1.5"/>
+                            </svg>
+                            <span>More</span>
                         </button>
                     </div>
                 </div>
                 @endif
-            </aside>
-        </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
+</div>
 
     <!-- ========================================== -->
     <!-- MOBILE AREA CONTAINER                      -->
@@ -671,12 +887,26 @@
                         <span class="bell-dot"></span>
                     </button>
                 </div>
-                <div class="desktop-search-wrapper" style="margin-top: 10px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.3-4.3"/>
-                    </svg>
-                    <input type="text" wire:model.live.debounce.200ms="search" placeholder="Search bookings..." />
+                <div class="mobile-search-row" style="margin-top: 10px; display: flex; gap: 8px; align-items: center;">
+                    <div class="search-input-wrapper" style="flex: 1;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.3-4.3"/>
+                        </svg>
+                        <input type="text" wire:model.live.debounce.200ms="search" placeholder="Search bookings..." />
+                    </div>
+                    <div class="mobile-category-select-wrapper">
+                        <svg class="category-filter-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                        </svg>
+                        <select wire:model.live="category" class="mobile-select-filter">
+                            <option value="ALL">All Categories</option>
+                            <option value="TOUR">Tour Packages</option>
+                            <option value="VILLA">Villas & Resorts</option>
+                            <option value="ACTIVITY">Activities & Sports</option>
+                            <option value="TRANSPORT">Transports</option>
+                        </select>
+                    </div>
                 </div>
             </header>
 
@@ -698,8 +928,53 @@
                     <span>{{ count($selectedBookings) }} selected</span>
                 </div>
                 <div class="selection-actions-right">
-                    <button class="action-pill-btn" wire:click="bulkAssign">+ Assign</button>
-                    <button class="action-pill-btn" wire:click="clearSelection" style="color: #64748B;">Clear</button>
+                    <div style="position: relative;">
+                        <button class="action-more-btn" wire:click="toggleBulkMore" title="More options" aria-haspopup="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="1.5"/>
+                                <circle cx="19" cy="12" r="1.5"/>
+                                <circle cx="5" cy="12" r="1.5"/>
+                            </svg>
+                        </button>
+                        @if($isBulkMoreOpen)
+                        <div class="bulk-more-dropdown" style="display: block;">
+                            <button class="dropdown-item-btn" wire:click="bulkAssign">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <line x1="19" x2="19" y1="8" y2="14"/>
+                                    <line x1="22" x2="16" y1="11" y2="11"/>
+                                </svg>
+                                <span>Assign</span>
+                            </button>
+                            @if($this->isAllSelectedPaid)
+                            <button class="dropdown-item-btn" wire:click="bulkMarkUnpaid">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" x2="12" y1="8" y2="12"/>
+                                    <line x1="12" x2="12.01" y1="16" y2="16"/>
+                                </svg>
+                                <span>Mark as Unpaid</span>
+                            </button>
+                            @else
+                            <button class="dropdown-item-btn" wire:click="bulkMarkPaid">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span>Mark as Paid</span>
+                            </button>
+                            @endif
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item-btn item-danger" wire:click="clearSelection">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                                <span>Clear Selection</span>
+                            </button>
+                        </div>
+                        @endif
+                    </div>
                 </div>
             </div>
             @endif
@@ -708,30 +983,70 @@
             <div class="mobile-cards-container" style="padding: 12px 16px; display: flex; flex-direction: column; gap: 12px;">
                 @forelse($bookings as $b)
                 @php $isSelected = in_array($b->id, $selectedBookings); @endphp
-                <div class="mobile-booking-card" wire:click="openDrawer('{{ $b->id }}')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; position: relative;">
-                    <div style="display: flex; gap: 12px;">
-                        <div wire:click.stop="toggleSelectBooking('{{ $b->id }}')" style="padding-top: 2px;">
-                            <div class="custom-checkbox {{ $isSelected ? 'checked' : '' }}">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                            </div>
+                <div class="mobile-booking-card" wire:click="openDrawer('{{ $b->id }}')" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; position: relative;">
+                    <div wire:click.stop="toggleSelectBooking('{{ $b->id }}')" style="flex-shrink: 0;">
+                        <div class="custom-checkbox {{ $isSelected ? 'checked' : '' }}">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                         </div>
-                        <img src="{{ $b->image }}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;" alt="" />
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <span class="tag-pill {{ $b->type_class }}" style="font-size: 10px; padding: 2px 6px;">{{ $b->type }}</span>
-                                <span class="status-badge {{ $b->status_class }}" style="font-size: 11px;">{{ $b->status }}</span>
-                            </div>
-                            <h4 style="margin: 4px 0 2px 0; font-size: 14px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $b->title }}</h4>
-                            <div style="font-size: 12px; color: #64748B;">{{ $b->id }} • {{ $b->dates }}</div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-                                <span style="font-size: 12px; color: #475569; font-weight: 600;">{{ $b->pax }} Travelers</span>
-                                <span style="font-size: 14px; font-weight: 800; color: #2563EB;">{{ $b->price }}</span>
-                            </div>
+                    </div>
+                    <div class="card-thumb-wrapper" style="width: 56px; height: 56px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: #E2E8F0;">
+                        <img src="{{ $b->image }}" style="width: 100%; height: 100%; object-fit: cover;" alt="" />
+                    </div>
+                    <div class="card-info-col" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                        <span class="card-type-badge {{ $b->type_class }}" style="font-size: 10px; padding: 2px 6px;">{{ $b->type }}</span>
+                        <h4 style="margin: 0; font-size: 13.5px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $b->title }}</h4>
+                        <div style="font-size: 11.5px; color: #64748B; display: flex; align-items: center; gap: 4px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                            <span>{{ $b->pax }} Pax • {{ $b->duration }}</span>
+                        </div>
+                        <div style="font-size: 11.5px; color: #64748B; display: flex; align-items: center; gap: 4px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                            <span>{{ $b->dates }}</span>
+                        </div>
+                    </div>
+                    <div class="card-right-col" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 8px; flex-shrink: 0;">
+                        @php
+                            $mLead = ($b->guests && count($b->guests) > 0) ? $b->guests[0] : ['name' => $b->customer['name'] ?? 'Guest', 'phone' => $b->customer['phone'] ?? ''];
+                            $mPhone = preg_replace('/[^0-9+]/', '', $mLead['phone'] ?? '');
+                            $mWa = preg_replace('/[^0-9]/', '', $mLead['phone'] ?? '');
+                            if (strlen($mWa) === 10) { $mWa = '91' . $mWa; }
+                            $mWaMsg = urlencode("Hi " . ($mLead['name'] ?? 'Guest') . ", regarding your booking {$b->id} ({$b->title})...");
+                        @endphp
+                        <div class="card-action-btns-row" wire:click.stop>
+                            @if(!empty($mPhone))
+                            <a href="tel:{{ $mPhone }}" class="card-circle-action-btn btn-action-call" title="Call {{ $mLead['name'] ?? 'Guest' }}" aria-label="Call" wire:click.stop>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                </svg>
+                            </a>
+                            <a href="https://wa.me/{{ $mWa }}?text={{ $mWaMsg }}" target="_blank" rel="noopener noreferrer" class="card-circle-action-btn btn-action-whatsapp" title="WhatsApp {{ $mLead['name'] ?? 'Guest' }}" aria-label="WhatsApp" wire:click.stop>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+                                </svg>
+                            </a>
+                            @endif
+                        </div>
+                        <div class="card-price-status-row" style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 14px; font-weight: 700; color: #0F172A;">{{ $b->price }}</span>
+                            <span class="status-pill {{ $b->status_class }}" style="font-size: 11px; padding: 2px 7px;">
+                                <span class="dot"></span>
+                                {{ $b->status }}
+                            </span>
                         </div>
                     </div>
                 </div>
                 @empty
-                <p style="text-align: center; color: #94A3B8; padding: 24px;">No bookings found.</p>
+                <div style="text-align: center; padding: 48px 20px; color: #64748B;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; color: #94A3B8;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.3-4.3"/>
+                        </svg>
+                    </div>
+                    <h4 style="font-size: 15px; font-weight: 700; color: #0F172A; margin: 0 0 4px 0;">No Bookings Found</h4>
+                    <p style="font-size: 13px; margin: 0 0 14px 0; color: #94A3B8;">No results matching your selected filters.</p>
+                    <button class="action-pill-btn" wire:click="$set('search', ''); $set('category', 'ALL'); $set('tab', 'All Bookings');" style="height: 36px; padding: 0 16px; font-weight: 600; border-radius: 10px; background: #2563EB; color: #FFFFFF; border: none; cursor: pointer; margin: 0 auto;">Reset Filters</button>
+                </div>
                 @endforelse
             </div>
         </div>

@@ -231,7 +231,7 @@
     "statusClass": "status-paid",
     "price": "₹36,000",
     "rawPrice": 36000,
-    "category": "New Bookings",
+    "category": "Assigned",
     "selected": false,
     "guest": {
       "name": "Amit Verma",
@@ -1580,6 +1580,647 @@
         "title": "Trip Completed",
         "desc": "All 60 students and staff returned safely. Final payment settled.",
         "user": "Rahul Mehta"
+      }
+    ]
+  },
+  {
+    "id": "BK-5028",
+    "title": "Kerala Backwaters & Munnar Hills",
+    "type": "TOUR",
+    "typeClass": "badge-tour",
+    "image": "./images/kashmir.jpg",
+    "pax": 4,
+    "duration": "5D / 4N",
+    "dates": "22 Nov - 26 Nov",
+    "travelDateFull": "22 Nov - 26 Nov 2024 (5D / 4N)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹48,000",
+    "rawPrice": 48000,
+    "category": "Ongoing",
+    "selected": false,
+    "guest": {
+      "name": "Rajesh Nambiar",
+      "phone": "+91 98450 11223",
+      "email": "rajesh.nambiar@gmail.com",
+      "age": 40,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Rajesh Nambiar",
+      "initials": "RN",
+      "phone": "+91 98450 11223",
+      "email": "rajesh.nambiar@gmail.com",
+      "location": "Bengaluru, India",
+      "leadSource": "Website Direct",
+      "preferredDestination": "Kerala, Munnar & Alleppey",
+      "travelDates": "22 Nov - 26 Nov 2024",
+      "customerType": "Family Vacationer",
+      "budgetEst": "₹50,000",
+      "status": "Active Trip",
+      "shortDetails": "Luxury houseboat cruise and tea estate cottage stay.",
+      "leadFlow": [
+        {
+          "type": "call",
+          "iconBg": "icon-green",
+          "title": "Houseboat Check-in Done",
+          "desc": "Guests checked in at Alleppey jetty on time.",
+          "author": "By Priya Sharma"
+        }
+      ]
+    },
+    "destination": "Alleppey, Munnar, Kochi",
+    "bookingType": "Tour Package",
+    "services": "Premium Houseboat (1N), Munnar Resort (3N), Private Innova",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Priya Sharma",
+      "role": "Trip Coordinator",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Provide local South Indian vegetarian meals during houseboat cruise.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Rajesh Nambiar",
+        "age": 40,
+        "role": "Primary Contact",
+        "phone": "9845011223"
+      },
+      {
+        "id": 2,
+        "name": "Divya Nambiar",
+        "age": 36,
+        "role": "Adult",
+        "phone": "9845011224"
+      },
+      {
+        "id": 3,
+        "name": "Aarav Nambiar",
+        "age": 10,
+        "role": "Child",
+        "phone": "9845011225"
+      },
+      {
+        "id": 4,
+        "name": "Meera Nambiar",
+        "age": 8,
+        "role": "Child",
+        "phone": "9845011226"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-71",
+        "icon": "leaf",
+        "text": "Vegetarian Food",
+        "color": "#2563EB"
+      },
+      {
+        "id": "SR-72",
+        "icon": "smile",
+        "text": "Kid Friendly Activities",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "22 Nov",
+        "items": [
+          {
+            "id": "IT-KER-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Cochin Airport Pickup",
+            "subtitle": "09:00 AM • Private AC Innova transfer",
+            "assigned": null
+          },
+          {
+            "id": "IT-KER-2",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Alleppey Luxury Houseboat Boarding",
+            "subtitle": "12:30 PM • Welcome drink & backwaters cruise",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "date": "23 Nov",
+        "items": [
+          {
+            "id": "IT-KER-3",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Scenic Drive to Munnar",
+            "subtitle": "10:00 AM • Cheeyappara waterfalls viewpoint",
+            "assigned": null
+          },
+          {
+            "id": "IT-KER-4",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Tea Valley Resort Check-in",
+            "subtitle": "02:00 PM • Valley view family cottage",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "12:30 PM, 22 Nov",
+        "title": "Houseboat Cruising",
+        "desc": "Houseboat cruise underway across Vembanad lake.",
+        "user": "Priya Sharma"
+      }
+    ]
+  },
+  {
+    "id": "BK-5029",
+    "title": "Udaipur Royal Lake Villa",
+    "type": "VILLA",
+    "typeClass": "badge-villa",
+    "image": "./images/goa.jpg",
+    "pax": 6,
+    "duration": "3D / 2N",
+    "dates": "28 Nov - 30 Nov",
+    "travelDateFull": "28 Nov - 30 Nov 2024 (3D / 2N)",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "₹52,000",
+    "rawPrice": 52000,
+    "category": "New Bookings",
+    "selected": false,
+    "guest": {
+      "name": "Vikram Singhania",
+      "phone": "+91 98200 44556",
+      "email": "vikram.singhania@yahoo.com",
+      "age": 41,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Vikram Singhania",
+      "initials": "VS",
+      "phone": "+91 98200 44556",
+      "email": "vikram.singhania@yahoo.com",
+      "location": "Mumbai, India",
+      "leadSource": "WhatsApp Business",
+      "preferredDestination": "Udaipur, Rajasthan",
+      "travelDates": "28 Nov - 30 Nov 2024",
+      "customerType": "Luxury Traveler",
+      "budgetEst": "₹60,000",
+      "status": "Inquiry",
+      "shortDetails": "Lakefront royal villa with private courtyard and heritage dinner.",
+      "leadFlow": [
+        {
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Inquiry Received",
+          "desc": "Guest requested quotation for 6 adults lakefront villa.",
+          "author": "By System"
+        }
+      ]
+    },
+    "destination": "Lake Pichola, Udaipur",
+    "bookingType": "Heritage Villa Stay",
+    "services": "Private Courtyard, Butler Service, Airport Pickup",
+    "assignedStatus": "Unassigned • Pending",
+    "assignedTo": {
+      "name": "Unassigned",
+      "role": "Staff",
+      "avatar": ""
+    },
+    "notes": "Requested candlelight terrace dinner on night 2.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Vikram Singhania",
+        "age": 41,
+        "role": "Primary Contact",
+        "phone": "9820044556"
+      },
+      {
+        "id": 2,
+        "name": "Radhika Singhania",
+        "age": 38,
+        "role": "Adult",
+        "phone": "9820044557"
+      },
+      {
+        "id": 3,
+        "name": "Siddharth Singhania",
+        "age": 35,
+        "role": "Adult",
+        "phone": "9820044558"
+      },
+      {
+        "id": 4,
+        "name": "Anushka Singhania",
+        "age": 33,
+        "role": "Adult",
+        "phone": "9820044559"
+      },
+      {
+        "id": 5,
+        "name": "Manish Agarwal",
+        "age": 40,
+        "role": "Adult",
+        "phone": "9820044560"
+      },
+      {
+        "id": 6,
+        "name": "Shalini Agarwal",
+        "age": 37,
+        "role": "Adult",
+        "phone": "9820044561"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-81",
+        "icon": "clock",
+        "text": "Late Check-out (2 PM)",
+        "color": "#2563EB"
+      },
+      {
+        "id": "SR-82",
+        "icon": "utensils",
+        "text": "Barbecue Setup",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "28 Nov",
+        "items": [
+          {
+            "id": "IT-UDA-1",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Royal Villa Check-in",
+            "subtitle": "02:00 PM • Welcome garlands & royal welcome drinks",
+            "assigned": null
+          },
+          {
+            "id": "IT-UDA-2",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Sunset Boat Ride on Lake Pichola",
+            "subtitle": "05:30 PM • Private solar boat cruise",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "11:00 AM, 18 Oct",
+        "title": "Quote Dispatched",
+        "desc": "Quotation sent to Vikram via WhatsApp.",
+        "user": "Admin"
+      }
+    ]
+  },
+  {
+    "id": "BK-5030",
+    "title": "Scuba Diving & Coral Safari",
+    "type": "ACTIVITY",
+    "typeClass": "badge-activity",
+    "image": "./images/rishikesh.jpg",
+    "pax": 2,
+    "duration": "1 Day",
+    "dates": "18 Nov",
+    "travelDateFull": "18 Nov 2024 (Full Day)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹14,500",
+    "rawPrice": 14500,
+    "category": "Assigned",
+    "selected": false,
+    "guest": {
+      "name": "Aditya Roy",
+      "phone": "+91 97110 88990",
+      "email": "aditya.roy@hotmail.com",
+      "age": 27,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Aditya Roy",
+      "initials": "AR",
+      "phone": "+91 97110 88990",
+      "email": "aditya.roy@hotmail.com",
+      "location": "Pune, India",
+      "leadSource": "Instagram Ad",
+      "preferredDestination": "Netrani Island, Murudeshwar",
+      "travelDates": "18 Nov 2024",
+      "customerType": "Adventure Enthusiast",
+      "budgetEst": "₹15,000",
+      "status": "Confirmed",
+      "shortDetails": "Certified boat scuba diving package with underwater GoPro photos.",
+      "leadFlow": [
+        {
+          "type": "call",
+          "iconBg": "icon-green",
+          "title": "Dive Master Assigned",
+          "desc": "Instructor Rahul confirmed for 18 Nov dive session.",
+          "author": "By Rahul Mehta"
+        }
+      ]
+    },
+    "destination": "Netrani Island, Karnataka",
+    "bookingType": "Adventure Activity",
+    "services": "PADI Certified Dive Master, Boat Ride, Full Diving Kit",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Rahul Mehta",
+      "role": "Adventure Lead",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Medical fitness self-declaration received and approved.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Aditya Roy",
+        "age": 27,
+        "role": "Primary Contact",
+        "phone": "9711088990"
+      },
+      {
+        "id": 2,
+        "name": "Kavya Sen",
+        "age": 25,
+        "role": "Adult",
+        "phone": "9711088991"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-91",
+        "icon": "shield",
+        "text": "First Aid & Medical Kit",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "18 Nov",
+        "items": [
+          {
+            "id": "IT-DIV-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Harbor Speedboat Departure",
+            "subtitle": "07:30 AM • 45-min ride to Netrani Island dive site",
+            "assigned": null
+          },
+          {
+            "id": "IT-DIV-2",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Tandem Scuba Dive (12m Depth)",
+            "subtitle": "09:30 AM • PADI Master guided coral dive & photos",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "03:00 PM, 17 Oct",
+        "title": "Kit Prepared",
+        "desc": "Oxygen cylinders and wet suits reserved for 2 pax.",
+        "user": "Rahul Mehta"
+      }
+    ]
+  },
+  {
+    "id": "BK-5031",
+    "title": "Mumbai – Pune Luxury Traveler",
+    "type": "TRANSPORT",
+    "typeClass": "badge-transport",
+    "image": "./images/manali.jpg",
+    "pax": 15,
+    "duration": "2 Days",
+    "dates": "25 Nov - 26 Nov",
+    "travelDateFull": "25 Nov - 26 Nov 2024 (2 Days)",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "₹18,500",
+    "rawPrice": 18500,
+    "category": "New Bookings",
+    "selected": false,
+    "guest": {
+      "name": "Sunita Deshmukh",
+      "phone": "+91 98220 77889",
+      "email": "sunita.deshmukh@gmail.com",
+      "age": 46,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Sunita Deshmukh",
+      "initials": "SD",
+      "phone": "+91 98220 77889",
+      "email": "sunita.deshmukh@gmail.com",
+      "location": "Pune, India",
+      "leadSource": "Phone Referral",
+      "preferredDestination": "Mumbai - Lonavala - Pune",
+      "travelDates": "25 Nov - 26 Nov 2024",
+      "customerType": "Corporate Group",
+      "budgetEst": "₹20,000",
+      "status": "Pending Approval",
+      "shortDetails": "17-seater Force Urbania luxury transfer for corporate offsite.",
+      "leadFlow": [
+        {
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Vehicle Availability Checked",
+          "desc": "Force Urbania AC traveler available with Mohan Rawat.",
+          "author": "By Admin"
+        }
+      ]
+    },
+    "destination": "Mumbai to Pune Expressway",
+    "bookingType": "Fleet Transfer",
+    "services": "17-Seater AC Luxury Tempo Traveler, Tolls & Permits Included",
+    "assignedStatus": "Unassigned • Pending",
+    "assignedTo": {
+      "name": "Unassigned",
+      "role": "Staff",
+      "avatar": ""
+    },
+    "notes": "Overnight parking at Lonavala resort arranged by client.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Sunita Deshmukh",
+        "age": 46,
+        "role": "Primary Contact",
+        "phone": "9822077889"
+      },
+      {
+        "id": 2,
+        "name": "Pramod Deshmukh",
+        "age": 49,
+        "role": "Adult",
+        "phone": "9822077890"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-101",
+        "icon": "shield",
+        "text": "First Aid & Medical Kit",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "25 Nov",
+        "items": [
+          {
+            "id": "IT-TR-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "BKC Mumbai Corporate Pickup",
+            "subtitle": "07:00 AM • Luxury Tempo Traveler boarding",
+            "assigned": null
+          },
+          {
+            "id": "IT-TR-2",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Lonavala Offsite Venue Arrival",
+            "subtitle": "10:30 AM • Expressway drive & safe arrival",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "04:00 PM, 16 Oct",
+        "title": "Inquiry Logged",
+        "desc": "Corporate transfer route verified.",
+        "user": "Admin"
+      }
+    ]
+  },
+  {
+    "id": "BK-5032",
+    "title": "Goa Airport Express Shuttle",
+    "type": "TRANSPORT",
+    "typeClass": "badge-transport",
+    "image": "./images/goa.jpg",
+    "pax": 8,
+    "duration": "1 Day",
+    "dates": "14 Nov",
+    "travelDateFull": "14 Nov 2024 (Single Day)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹8,500",
+    "rawPrice": 8500,
+    "category": "Ongoing",
+    "selected": false,
+    "guest": {
+      "name": "Devendra Joshi",
+      "phone": "+91 98900 11447",
+      "email": "devendra.joshi@gmail.com",
+      "age": 36,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Devendra Joshi",
+      "initials": "DJ",
+      "phone": "+91 98900 11447",
+      "email": "devendra.joshi@gmail.com",
+      "location": "Goa, India",
+      "leadSource": "Hotel Partner",
+      "preferredDestination": "Mopa Airport to Candolim",
+      "travelDates": "14 Nov 2024",
+      "customerType": "VIP Family Group",
+      "budgetEst": "₹9,000",
+      "status": "Active Trip",
+      "shortDetails": "Airport meet & greet with luxury 9-seater luggage carrier van.",
+      "leadFlow": [
+        {
+          "type": "call",
+          "iconBg": "icon-green",
+          "title": "Flight Landed on Time",
+          "desc": "IndiGo 6E-204 landed at Manohar International Airport.",
+          "author": "By Amit Patel"
+        }
+      ]
+    },
+    "destination": "Mopa Airport to North Goa",
+    "bookingType": "Airport Shuttle",
+    "services": "Urbania Luxury Van, Meet & Greet at Arrivals Gate",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Amit Patel",
+      "role": "Fleet Manager",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Flight tracking active. Placard with name Devendra Joshi ready.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Devendra Joshi",
+        "age": 36,
+        "role": "Primary Contact",
+        "phone": "9890011447"
+      },
+      {
+        "id": 2,
+        "name": "Pallavi Joshi",
+        "age": 33,
+        "role": "Adult",
+        "phone": "9890011448"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-111",
+        "icon": "shield",
+        "text": "First Aid & Medical Kit",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "14 Nov",
+        "items": [
+          {
+            "id": "IT-AIR-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Airport Gate Meet & Greet",
+            "subtitle": "11:15 AM • Mopa Terminal 1 VIP pickup",
+            "assigned": null
+          },
+          {
+            "id": "IT-AIR-2",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Resort Drop-off Candolim",
+            "subtitle": "12:45 PM • Direct non-stop transfer",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "11:20 AM, 14 Nov",
+        "title": "Guests Boarded",
+        "desc": "Guests seated in van, departure towards Candolim.",
+        "user": "Amit Patel"
       }
     ]
   }

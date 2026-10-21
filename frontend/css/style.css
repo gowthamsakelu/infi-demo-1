@@ -79,7 +79,9 @@ body {
 
 .view-slot-desktop {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .view-slot-mobile {
@@ -91,16 +93,29 @@ body {
   background: #FFFFFF;
 }
 
-@media (min-width: 901px) {
+@media (min-width: 740px) {
+  html, body {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden !important;
+  }
+  .app-root-container {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden !important;
+  }
   .view-slot-desktop {
     display: block !important;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden !important;
   }
   .view-slot-mobile {
     display: none !important;
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 739px) {
   .view-slot-desktop {
     display: none !important;
   }
@@ -356,23 +371,54 @@ body.standalone-mobile .app-global-bar {
   font-size: 13.5px;
 }
 
-.filter-btn-square {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+/* Mobile Category Select Filter - Perfectly Uniform with Desktop */
+.mobile-category-select-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #475569;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
 }
 
-.filter-btn-square:hover {
-  background: #F1F5F9;
+.mobile-category-select-wrapper .category-filter-icon {
+  position: absolute;
+  left: 12px;
+  pointer-events: none;
+  color: #64748B;
+  transition: color 0.15s ease;
+  z-index: 2;
+}
+
+.mobile-category-select-wrapper:focus-within .category-filter-icon {
+  color: #2563EB;
+}
+
+.mobile-select-filter {
+  height: 44px;
+  padding-left: 36px !important;
+  padding-right: 32px !important;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
+  background-color: #F8FAFC;
   color: #1E293B;
+  font-size: 13.5px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  min-width: 145px;
+  max-width: 185px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+}
+
+.mobile-select-filter:focus {
+  border-color: #3B82F6;
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
 /* Category Filter Tabs / Pills */
@@ -496,11 +542,11 @@ body.standalone-mobile .app-global-bar {
 }
 
 .action-more-btn {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-full);
   background: #F1F5F9;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #CBD5E1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -511,6 +557,60 @@ body.standalone-mobile .app-global-bar {
 
 .action-more-btn:hover {
   background: #E2E8F0;
+  color: #0F172A;
+  border-color: #94A3B8;
+}
+
+/* Bulk Actions Dropdown (Uniform for Mobile & PC) */
+.bulk-more-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  padding: 6px;
+  min-width: 175px;
+  z-index: 200;
+}
+
+.bulk-more-dropdown .dropdown-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  color: #1E293B;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.bulk-more-dropdown .dropdown-item-btn:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+.bulk-more-dropdown .dropdown-item-btn.item-danger {
+  color: #EF4444;
+}
+
+.bulk-more-dropdown .dropdown-item-btn.item-danger:hover {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.bulk-more-dropdown .dropdown-divider {
+  height: 1px;
+  background: #E2E8F0;
+  margin: 4px 0;
 }
 
 /* ==========================================================================
@@ -637,8 +737,72 @@ body.standalone-mobile .app-global-bar {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+/* Quick Communication Action Buttons (Call & WhatsApp) from Image 2 */
+.card-action-btns-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.card-circle-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: #E8F8F0;
+  color: #16A34A;
+  border: 1px solid rgba(22, 163, 74, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.card-circle-action-btn:hover {
+  background: #DCFCE7;
+  color: #15803D;
+  border-color: rgba(22, 163, 74, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.22);
+}
+
+.card-circle-action-btn:active {
+  transform: scale(0.94);
+}
+
+.card-circle-action-btn svg {
+  display: block;
+}
+
+.card-price-status-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+/* PC Desktop Action Column Optimization */
+.desktop-action-btn-group {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.desktop-action-btn-group .card-circle-action-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
 }
 
 .status-pill {
@@ -905,18 +1069,18 @@ body.standalone-mobile .app-global-bar {
 
 /* Customer Details Body */
 .customer-details-tab-content {
-  padding: 12px 14px 24px 14px;
+  padding: 12px 4px 24px 4px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
 .details-section-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  background: transparent;
+  border: none !important;
+  border-radius: 0;
+  padding: 0 4px 10px 4px;
+  box-shadow: none !important;
 }
 
 .details-section-header {
@@ -977,7 +1141,7 @@ body.standalone-mobile .app-global-bar {
 /* 2-Column Key-Value Grid */
 .customer-info-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 12px 14px;
 }
 
@@ -1006,11 +1170,11 @@ body.standalone-mobile .app-global-bar {
 }
 
 .phone-number-val {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #0F172A;
   white-space: nowrap !important;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
 }
 
 .email-text-val {
@@ -1033,21 +1197,21 @@ body.standalone-mobile .app-global-bar {
 .contact-value-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: nowrap;
+  gap: 5px;
+  flex-wrap: wrap;
   min-width: 0;
 }
 
 .contact-action-btns {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   flex-shrink: 0;
 }
 
 .mini-icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: none;
   display: inline-flex;
@@ -1081,7 +1245,7 @@ body.standalone-mobile .app-global-bar {
 /* Short Details Card */
 .short-details-card {
   background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  border: none !important;
   border-radius: 12px;
   padding: 14px 16px;
   margin-top: 16px;
@@ -1112,20 +1276,32 @@ body.standalone-mobile .app-global-bar {
 .btn-add-followup {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: #EFF6FF;
-  border: 1px solid #BFDBFE;
-  color: #2563EB;
+  gap: 6px;
+  padding: 6px 14px;
+  height: 34px;
+  border-radius: 10px;
+  background: #2563EB;
+  color: #FFFFFF;
   font-size: 12.5px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 8px;
+  font-weight: 700;
+  border: none;
   cursor: pointer;
-  transition: all 0.15s;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  font-family: var(--font-family);
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .btn-add-followup:hover {
-  background: #DBEAFE;
+  background: #1D4ED8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+}
+
+.btn-add-followup svg {
+  stroke: #FFFFFF;
+  width: 13px;
+  height: 13px;
 }
 
 .lead-journey-timeline {
@@ -1276,6 +1452,42 @@ body.standalone-mobile .app-global-bar {
   color: #0F172A;
 }
 
+.mobile-sheet-close-pill {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 50% !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #334155 !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  position: static !important;
+  margin-left: auto !important;
+  margin-top: 2px !important;
+  transition: all 0.15s ease !important;
+  z-index: 10 !important;
+  padding: 0 !important;
+}
+
+.mobile-sheet-close-pill:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+  transform: scale(1.05) !important;
+}
+
+.mobile-sheet-close-pill svg {
+  width: 14px !important;
+  height: 14px !important;
+  stroke: #334155 !important;
+  stroke-width: 2.5 !important;
+  display: block !important;
+}
+
 /* Sheet Booking Card Header */
 .sheet-header-card {
   padding: 4px 20px 14px 20px;
@@ -1358,6 +1570,14 @@ body.standalone-mobile .app-global-bar {
   padding: 0 16px;
   flex-shrink: 0;
   background: #FFFFFF;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sheet-tabs-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .sheet-tab-btn {
@@ -1371,6 +1591,7 @@ body.standalone-mobile .app-global-bar {
   position: relative;
   font-family: var(--font-family);
   transition: color 0.15s ease;
+  flex-shrink: 0;
 }
 
 .sheet-tab-btn:hover {
@@ -1398,6 +1619,7 @@ body.standalone-mobile .app-global-bar {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 14px 20px 48px 20px;
 }
 
@@ -1494,9 +1716,16 @@ body.standalone-mobile .app-global-bar {
   color: #22C55E;
 }
 
-.btn-email {
+.btn-email,
+.btn-more {
   background: #F1F5F9;
   color: #475569;
+  border: 1px solid #E2E8F0;
+}
+
+.btn-more:hover {
+  background: #E2E8F0;
+  color: #0F172A;
 }
 
 .btn-map {
@@ -1552,24 +1781,34 @@ body.standalone-mobile .app-global-bar {
 }
 
 .add-guest-pill-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 14px;
-  height: 38px;
-  border-radius: 12px;
-  background: #EFF6FF;
-  border: 1px solid #BFDBFE;
-  color: #2563EB;
-  font-size: 13px;
+  padding: 6px 14px;
+  height: 34px;
+  border-radius: 10px;
+  background: #2563EB;
+  color: #FFFFFF;
+  font-size: 12.5px;
   font-weight: 700;
+  border: none;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   font-family: var(--font-family);
-  transition: background 0.15s;
+  transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .add-guest-pill-btn:hover {
-  background: #DBEAFE;
+  background: #1D4ED8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+}
+
+.add-guest-pill-btn svg {
+  stroke: #FFFFFF;
+  width: 13px;
+  height: 13px;
 }
 
 .guests-cards-list {
@@ -1857,19 +2096,23 @@ body.standalone-mobile .app-global-bar {
 .desktop-layout {
   display: flex;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   background: #F8FAFC;
 }
 
 /* Left Sidebar (Desktop) */
 .desktop-sidebar {
   width: 260px;
+  height: 100vh;
+  height: 100dvh;
   background: #FFFFFF;
   border-right: 1px solid #E2E8F0;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  overflow-y: auto;
 }
 
 .sidebar-brand {
@@ -1984,25 +2227,31 @@ body.standalone-mobile .app-global-bar {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
   min-width: 0;
+  overflow: hidden;
   background: #F8FAFC;
 }
 
 /* Desktop Top Header */
 .desktop-top-header {
-  height: 72px;
+  height: 64px;
   background: #FFFFFF;
   border-bottom: 1px solid #E2E8F0;
-  padding: 0 32px;
+  padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 25;
 }
 
 .desktop-search-wrapper {
-  width: 420px;
-  height: 42px;
+  width: 440px;
+  height: 40px;
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
@@ -2011,13 +2260,20 @@ body.standalone-mobile .app-global-bar {
   padding: 0 14px;
   gap: 10px;
   color: #64748B;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.desktop-search-wrapper:focus-within {
+  border-color: #2563EB;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .desktop-search-wrapper input {
   border: none;
   background: transparent;
   width: 100%;
-  font-size: 14px;
+  font-size: 13.5px;
   outline: none;
   font-family: var(--font-family);
   color: #111827;
@@ -2026,7 +2282,134 @@ body.standalone-mobile .app-global-bar {
 .desktop-header-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
+}
+
+.desktop-header-actions .icon-bell-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #334155;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.desktop-header-actions .icon-bell-btn:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  color: #0F172A;
+  transform: translateY(-1px);
+}
+
+.desktop-notifications-dropdown {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 340px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.notifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #F1F5F9;
+  background: #F8FAFC;
+}
+
+.notifications-header h4 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.notifications-mark-read-btn {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  color: #2563EB;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.notifications-mark-read-btn:hover {
+  text-decoration: underline;
+}
+
+.notifications-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #F8FAFC;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.notification-item:hover {
+  background: #F8FAFC;
+}
+
+.notification-item.unread {
+  background: #F0FDF4;
+}
+
+.notif-icon-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-icon-circle.blue {
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.notif-icon-circle.green {
+  background: #DCFCE7;
+  color: #16A34A;
+}
+
+.notif-icon-circle.purple {
+  background: #F3E8FF;
+  color: #9333EA;
+}
+
+.notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-text {
+  margin: 0 0 2px 0;
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.notif-time {
+  font-size: 11px;
+  color: #94A3B8;
+  font-weight: 500;
 }
 
 .btn-primary-desktop {
@@ -2075,20 +2458,25 @@ body.standalone-mobile .app-global-bar {
 /* Desktop Scrollable Body */
 .desktop-body {
   flex: 1;
-  padding: 28px 36px;
-  overflow-y: auto;
+  min-height: 0;
+  height: calc(100vh - 64px);
+  padding: 14px 18px;
+  overflow: hidden !important;
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1600px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
 .desktop-content-col {
   width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  overflow: hidden;
 }
 
 /* Metric Cards Row (Desktop) */
@@ -2162,13 +2550,14 @@ body.standalone-mobile .app-global-bar {
 }
 
 .table-toolbar {
-  padding: 16px 24px;
+  padding: 14px 20px;
   border-bottom: 1px solid #E2E8F0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  background: #FFFFFF;
 }
 
 .toolbar-tabs-group {
@@ -2206,6 +2595,68 @@ body.standalone-mobile .app-global-bar {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.table-toolbar-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 0 12px;
+  height: 38px;
+  width: 220px;
+  color: #64748B;
+  transition: all 0.15s ease;
+}
+
+.table-toolbar-search-box:focus-within {
+  background: #FFFFFF;
+  border-color: #93C5FD;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.table-toolbar-search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #0F172A;
+}
+
+.desktop-select-filter {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #CBD5E1;
+  background-color: #FFFFFF;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1E293B;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.desktop-select-filter:hover {
+  border-color: #94A3B8;
+}
+
+.desktop-select-filter:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.compact-select-filter {
+  height: 34px;
+  padding: 0 8px;
+  font-size: 12.5px;
+  border-radius: 9px;
+  max-width: 105px;
 }
 
 /* Desktop Selection Banner - Replicates Mobile Screen Buttons & Box */
@@ -2379,56 +2830,747 @@ body.standalone-mobile .app-global-bar {
   color: #FFFFFF;
 }
 
-/* Slide-Over Drawer Backdrop Overlay */
+/* Slide-Over Drawer Backdrop Overlay - Disabled for Outlook Split View */
 .desktop-drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(4px);
-  z-index: 998;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: none !important;
 }
 
-.desktop-drawer-backdrop.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Slide-Over Detail Drawer (Popup on PC) */
-.desktop-details-drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 580px;
-  max-width: 95vw;
-  height: 100vh;
-  height: 100dvh;
-  background: #FFFFFF;
-  z-index: 999;
-  box-shadow: -14px 0 45px rgba(15, 23, 42, 0.16);
+/* Inline Split Workspace (Outlook / Productivity SaaS Style) */
+.desktop-workspace-split {
   display: flex;
-  flex-direction: column;
-  transform: translateX(105%);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  border-left: 1px solid #E2E8F0;
+  gap: 16px;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  position: relative;
   overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.desktop-table-container {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  transition: all 0.25s ease;
+}
+
+.desktop-workspace-split.has-open-detail .desktop-table-container {
+  flex: 0 0 340px !important;
+  width: 340px !important;
+  min-width: 320px !important;
+  max-width: 350px !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* Detail Drawer (Spacious, Gorgeous Master-Detail Pane - Takes all remaining screen!) */
+.desktop-details-drawer {
+  display: none !important;
 }
 
 .desktop-details-drawer.open {
-  transform: translateX(0);
+  display: flex !important;
+  position: relative !important;
+  top: 0 !important;
+  right: auto !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.07) !important;
+  flex-direction: column !important;
+  transform: none !important;
+  overflow: hidden !important;
+  z-index: 10 !important;
+  transition: none !important;
+}
+
+/* Compact Master List View (Outlook Style) */
+.desktop-compact-list-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+}
+
+.compact-list-header {
+  padding: 14px 14px 10px 14px;
+  border-bottom: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.compact-header-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.compact-search-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+}
+
+.compact-search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  color: #0F172A;
+  font-family: inherit;
+}
+
+.btn-expand-full-table {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-expand-full-table:hover {
+  background: #EFF6FF;
+  color: #2563EB;
+  border-color: #BFDBFE;
+}
+
+.compact-tabs-nav {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.compact-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.compact-tab-btn {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: none;
+  background: #F1F5F9;
+  color: #64748B;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.compact-tab-btn.active {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+.compact-list-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compact-booking-card {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #F1F5F9;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.compact-booking-card:hover {
+  background: #F8FAFC;
+  border-color: #E2E8F0;
+}
+
+.compact-booking-card.active {
+  background: #EFF6FF !important;
+  border-color: #BFDBFE !important;
+  border-left: 3.5px solid #2563EB !important;
+}
+
+.compact-card-top {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.compact-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.compact-info-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.compact-trip-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compact-guest-sub {
+  font-size: 12px;
+  color: #64748B;
+  margin: 2px 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compact-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+}
+
+.compact-dates {
+  color: #64748B;
+  font-weight: 500;
+}
+
+.compact-bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compact-price {
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.compact-status-badge {
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+/* Executive CRM Customer Card (Unified & High-end) */
+.hero-customer-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hero-customer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-customer-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-customer-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  flex-shrink: 0;
+}
+
+.hero-customer-name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hero-name-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero-name-badge-row h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.lead-badge {
+  background: #EFF6FF;
+  color: #2563EB;
+  border: 1px solid #BFDBFE;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.vip-badge {
+  background: #F0FDF4;
+  color: #16A34A;
+  border: 1px solid #BBF7D0;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.hero-customer-caption {
+  font-size: 13px;
+  color: #64748B;
+  margin: 0;
+}
+
+.hero-customer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.pill-btn-call {
+  background: #F0FDF4;
+  color: #16A34A;
+  border-color: #DCFCE7;
+}
+
+.pill-btn-call:hover {
+  background: #DCFCE7;
+}
+
+.pill-btn-whatsapp {
+  background: #ECFDF5;
+  color: #059669;
+  border-color: #A7F3D0;
+}
+
+.pill-btn-whatsapp:hover {
+  background: #D1FAE5;
+}
+
+.pill-btn-email {
+  background: #EFF6FF;
+  color: #2563EB;
+  border-color: #DBEAFE;
+}
+
+.pill-btn-email:hover {
+  background: #DBEAFE;
+}
+
+.btn-edit-customer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: #F8FAFC;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.btn-edit-customer-pill:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+  border-color: #94A3B8;
+}
+
+/* Key-Value Spec Tiles Grid */
+.hero-customer-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid #F1F5F9;
+}
+
+@media (max-width: 1200px) {
+  .hero-customer-specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.spec-tile {
+  background: #F8FAFC;
+  border: 1px solid #F1F5F9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.spec-tile-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.spec-tile-value {
+  font-size: 13.5px;
+  color: #1E293B;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spec-tile-value.bold {
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.spec-tile-value.price-accent {
+  color: #2563EB;
+}
+
+/* Section Cards for Notes & Timeline */
+.details-section-card {
+  background: transparent;
+  border: none !important;
+  border-radius: 0;
+  padding: 0 4px 12px 4px;
+  box-shadow: none !important;
+  margin-bottom: 20px;
+}
+
+.section-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.section-title-icon-box {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #FEF3C7;
+  color: #D97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.section-title-icon-box.blue {
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.section-card-title-row h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+
+.notes-body-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #334155;
+  background: #FFFBEB;
+  border: 1px solid #FEF3C7;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 0;
+}
+
+.drawer-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.drawer-meta-chip svg {
+  color: #2563EB;
+}
+
+.drawer-assigned-chip {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border-color: #DBEAFE;
+}
+
+.drawer-assigned-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Tablet & iPad Specific Optimizations (iPad Mini 744px/768px to iPad 13" 1024px/1140px) */
+@media (min-width: 740px) and (max-width: 1140px) {
+  .desktop-sidebar {
+    width: 64px !important;
+    min-width: 64px !important;
+    padding: 14px 6px !important;
+    align-items: center !important;
+  }
+
+  .desktop-sidebar .sidebar-brand {
+    justify-content: center !important;
+    padding: 0 0 14px 0 !important;
+  }
+
+  .desktop-sidebar .sidebar-brand .brand-text-col {
+    display: none !important;
+  }
+
+  .desktop-sidebar .sidebar-nav {
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .desktop-sidebar .sidebar-nav .nav-section-title {
+    display: none !important;
+  }
+
+  .desktop-sidebar .sidebar-nav-item {
+    justify-content: center !important;
+    padding: 10px 0 !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    margin: 2px 0 !important;
+  }
+
+  .desktop-sidebar .sidebar-nav-item .nav-left span {
+    display: none !important;
+  }
+
+  .desktop-sidebar .sidebar-nav-item .sidebar-badge {
+    display: none !important;
+  }
+
+  .desktop-sidebar .sidebar-profile-box {
+    padding: 10px 0 !important;
+    justify-content: center !important;
+  }
+
+  .desktop-sidebar .sidebar-profile-box .profile-user-left div:last-child {
+    display: none !important;
+  }
+
+  .desktop-sidebar .ks-avatar-badge {
+    margin: 0 !important;
+  }
+
+  .desktop-body {
+    padding: 12px 14px !important;
+  }
+
+  .desktop-workspace-split {
+    gap: 12px !important;
+  }
+
+  /* 2x2 Grid for Metrics Cards on iPad */
+  .metrics-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  /* Table horizontal scrolling on tablet */
+  .desktop-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .bookings-table {
+    min-width: 820px !important;
+  }
+
+  .toolbar-tabs-group {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    max-width: 100% !important;
+  }
+  .toolbar-tabs-group::-webkit-scrollbar {
+    display: none !important;
+  }
+  .desktop-tab-btn {
+    flex-shrink: 0 !important;
+  }
+
+  /* Split view on iPad 13" (1024px) down to iPad Air (820px-834px) */
+  .desktop-workspace-split.has-open-detail .desktop-table-container {
+    flex: 0 0 280px !important;
+    width: 280px !important;
+    min-width: 260px !important;
+    max-width: 290px !important;
+  }
+
+  .desktop-details-drawer.open {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    top: 0 !important;
+  }
+
+  .desktop-compact-list-view {
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .desktop-details-drawer .customer-info-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 14px !important;
+  }
+
+  .desktop-details-drawer .customer-meta-chips {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  .desktop-drawer-footer {
+    padding: 12px 16px 16px 16px !important;
+  }
+}
+
+/* iPad Mini specific (740px - 850px) */
+@media (min-width: 740px) and (max-width: 850px) {
+  .desktop-workspace-split.has-open-detail .desktop-table-container {
+    flex: 0 0 230px !important;
+    width: 230px !important;
+    min-width: 210px !important;
+    max-width: 240px !important;
+  }
+
+  .desktop-details-drawer .customer-info-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .desktop-drawer-footer .quick-action-col-btn {
+    min-height: 52px !important;
+    font-size: 11px !important;
+    padding: 6px 2px !important;
+  }
 }
 
 /* Unified Desktop Drawer Header */
 .desktop-drawer-header-box {
   background: #FFFFFF;
   border-bottom: 1px solid #E2E8F0;
-  padding: 20px 24px 16px 24px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
   flex-shrink: 0;
+}
+
+.desktop-details-drawer .sheet-customer-header {
+  border-bottom: none;
+  padding: 4px 22px 16px 22px;
 }
 
 .desktop-drawer-top-row {
@@ -2659,70 +3801,96 @@ body.standalone-mobile .app-global-bar {
   transform: scale(1.06);
 }
 
-/* Desktop Drawer Footer Bar */
+/* Desktop Drawer Footer Bar - Exact Match to Mobile Screen (Image 1) */
 .desktop-drawer-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 24px;
-  border-top: 1px solid #E2E8F0;
-  background: #FFFFFF;
-  flex-shrink: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  padding: 14px 20px 18px 20px !important;
+  border-top: 1px solid #E2E8F0 !important;
+  background: #FFFFFF !important;
+  flex-shrink: 0 !important;
 }
 
+.desktop-drawer-footer .btn-confirm-booking,
 .desktop-confirm-booking-btn {
-  flex: 1;
-  height: 42px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  width: 100% !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+  background: #2563EB !important;
+  color: #FFFFFF !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.32) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transition: all 0.15s ease !important;
+  font-family: var(--font-family) !important;
 }
 
-.desktop-footer-actions-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.desktop-drawer-footer .btn-confirm-booking:hover,
+.desktop-confirm-booking-btn:hover {
+  background: #1D4ED8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.42) !important;
 }
 
-.desktop-action-icon-btn {
-  height: 42px;
-  padding: 0 12px;
-  border-radius: 12px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  color: #334155;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-family: var(--font-family);
-  transition: all 0.15s ease;
+.desktop-drawer-footer .sheet-quick-actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 10px !important;
+  width: 100% !important;
 }
 
-.desktop-action-icon-btn:hover {
-  background: #F1F5F9;
-  border-color: #CBD5E1;
-  color: #0F172A;
+.desktop-drawer-footer .quick-action-col-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 10px 4px !important;
+  min-height: 58px !important;
+  border-radius: 12px !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #334155 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  font-family: var(--font-family) !important;
+  transition: all 0.15s ease !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 
-.desktop-action-icon-btn.btn-action-call:hover {
-  background: #DCFCE7;
-  border-color: #86EFAC;
-  color: #15803D;
+.desktop-drawer-footer .quick-action-col-btn:hover {
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06) !important;
 }
 
-.desktop-action-icon-btn.btn-action-msg:hover {
-  background: #DCFCE7;
-  border-color: #86EFAC;
-  color: #16A34A;
+.desktop-drawer-footer .quick-action-col-btn.btn-act-call svg {
+  color: #16A34A !important;
+  stroke: #16A34A !important;
+}
+
+.desktop-drawer-footer .quick-action-col-btn.btn-act-msg svg {
+  color: #7C3AED !important;
+  stroke: #7C3AED !important;
+}
+
+.desktop-drawer-footer .quick-action-col-btn.btn-act-fwd svg {
+  color: #2563EB !important;
+  stroke: #2563EB !important;
+}
+
+.desktop-drawer-footer .quick-action-col-btn.btn-act-more svg {
+  color: #475569 !important;
+  stroke: #475569 !important;
 }
 
 /* Drawer Body & Grid Overrides for Spacious SaaS Feel */
@@ -3116,6 +4284,17 @@ body.standalone-mobile .app-global-bar {
   color: #166534;
 }
 
+/* Itinerary Tab Content Container - Uniform with Customer Details */
+.itinerary-tab-content {
+  padding: 12px 14px 24px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-body-scroll .itinerary-tab-content {
+  padding: 14px 18px 24px 18px;
+}
+
 /* Itinerary Header Bar with + Add Event */
 .itinerary-section-header-bar {
   display: flex;
@@ -3140,6 +4319,7 @@ body.standalone-mobile .app-global-bar {
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
+  height: 34px;
   border-radius: 10px;
   background: #2563EB;
   color: #FFFFFF;
@@ -3150,12 +4330,63 @@ body.standalone-mobile .app-global-bar {
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   font-family: var(--font-family);
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .btn-add-event-pill:hover {
   background: #1D4ED8;
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+}
+
+.btn-add-event-pill svg {
+  stroke: #FFFFFF;
+  width: 13px;
+  height: 13px;
+}
+
+/* Master Uniformity for Primary Action Buttons (+ Add Event, + Add Follow-up, + Add Guest) */
+.btn-add-event-pill,
+.btn-add-followup,
+.add-guest-pill-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+  background: #2563EB !important;
+  color: #FFFFFF !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
+  font-family: var(--font-family) !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+}
+
+.btn-add-event-pill:hover,
+.btn-add-followup:hover,
+.add-guest-pill-btn:hover {
+  background: #1D4ED8 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35) !important;
+}
+
+.btn-add-event-pill svg,
+.btn-add-followup svg,
+.add-guest-pill-btn svg {
+  stroke: #FFFFFF !important;
+  color: #FFFFFF !important;
+  width: 13px !important;
+  height: 13px !important;
+  flex-shrink: 0 !important;
 }
 
 /* Special Requirements Card (Exact match to Image reference) */
@@ -3245,6 +4476,15 @@ body.standalone-mobile .app-global-bar {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: #2563EB;
+}
+
+.special-req-chip .req-chip-icon svg {
+  stroke: #2563EB !important;
+  color: #2563EB !important;
+  width: 15px;
+  height: 15px;
+  display: block;
 }
 
 .special-req-chip .req-chip-text {
@@ -3285,6 +4525,24 @@ body.standalone-mobile .app-global-bar {
   border-color: #2563EB;
   color: #2563EB;
   font-weight: 700;
+}
+
+.preset-chip-btn svg {
+  stroke: #2563EB !important;
+  color: #2563EB !important;
+  width: 15px;
+  height: 15px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.editable-req-item-left svg {
+  stroke: #2563EB !important;
+  color: #2563EB !important;
+  width: 15px;
+  height: 15px;
+  display: block;
+  flex-shrink: 0;
 }
 
 .editable-req-item {
@@ -3840,7 +5098,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 /* ==========================================================================
    Responsive Adaptability (Automatic switch on mobile devices)
    ========================================================================== */
-@media (max-width: 900px) {
+@media (max-width: 739px) {
   body {
     background-color: #FFFFFF !important;
   }
@@ -4003,3 +5261,410 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 }
 
 
+
+/* Desktop Full Table View Container */
+.desktop-full-table-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+
+/* ==========================================================================
+   COMPREHENSIVE MULTI-DEVICE OPTIMIZATIONS
+   Targeting:
+   - Mobile: iPhone SE (375x667), iPhone 16 (393x852), Pixel 9/9Pro/10 (412x924),
+             Galaxy A55 (412x915), iPhone 16 Pro Max (440x956)
+   - Foldables: Galaxy Z Fold 6 (375x960 folded, 768x960 unfolded),
+                Pixel 9 Pro Fold (412x924 folded, 840x840 unfolded)
+   - Tablets & 2-in-1s: iPad Mini (768x1024 / 1024x768), Surface Pro 10 (912x1368 / 1368x912),
+                        iPad Pro 13 (1024x1366 / 1366x1024)
+   - Smart Displays: Nest Hub Max (1280x800)
+   ========================================================================== */
+
+/* 1. Ultra-Compact Mobile: iPhone SE (375px) & Galaxy Z Fold 6 folded (375px) */
+@media (max-width: 380px) {
+  .mobile-screen-content {
+    padding: 10px 12px 85px 12px !important;
+  }
+
+  .mobile-app-header {
+    margin-bottom: 14px !important;
+  }
+
+  .mobile-title-section h1 {
+    font-size: 23px !important;
+  }
+
+  .mobile-title-section p {
+    font-size: 12.5px !important;
+  }
+
+  .mobile-search-row {
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .search-input-wrapper {
+    height: 40px !important;
+    padding: 0 10px !important;
+    border-radius: 11px !important;
+  }
+
+  .search-input-wrapper input {
+    font-size: 12.5px !important;
+  }
+
+  .mobile-select-filter {
+    min-width: 122px !important;
+    max-width: 138px !important;
+    font-size: 12px !important;
+    height: 40px !important;
+    padding-left: 28px !important;
+    padding-right: 22px !important;
+    border-radius: 11px !important;
+  }
+
+  .mobile-category-select-wrapper .category-filter-icon {
+    left: 8px !important;
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .category-filter-tabs {
+    gap: 6px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .tab-pill {
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+    gap: 6px !important;
+  }
+
+  .tab-pill .pill-badge {
+    min-width: 18px !important;
+    height: 18px !important;
+    font-size: 10.5px !important;
+    padding: 0 4px !important;
+  }
+
+  .booking-card {
+    padding: 10px !important;
+    gap: 8px !important;
+    border-radius: 14px !important;
+  }
+
+  .card-thumb-wrapper {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 10px !important;
+  }
+
+  .card-title {
+    font-size: 13px !important;
+  }
+
+  .card-meta-row {
+    font-size: 11.5px !important;
+  }
+
+  .card-type-badge {
+    font-size: 9.5px !important;
+    padding: 1px 6px !important;
+  }
+
+  .card-circle-action-btn {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 8px !important;
+  }
+
+  .card-circle-action-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .card-action-btns-row {
+    gap: 5px !important;
+  }
+
+  .card-price {
+    font-size: 13px !important;
+  }
+
+  .status-pill {
+    font-size: 10.5px !important;
+    padding: 2px 7px !important;
+  }
+}
+
+/* 2. Short Mobile Heights: iPhone SE (667px height) */
+@media (max-width: 739px) and (max-height: 700px) {
+  .bottom-sheet,
+  .assign-to-sheet {
+    height: 94vh !important;
+    height: 94dvh !important;
+    max-height: 94vh !important;
+  }
+
+  .sheet-customer-header {
+    padding: 12px 16px 10px 16px !important;
+  }
+
+  .sheet-header-top .sheet-avatar-circle {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 15px !important;
+  }
+
+  .sheet-title-info h3 {
+    font-size: 15px !important;
+  }
+
+  .sheet-tab-btn {
+    padding: 9px 11px !important;
+    font-size: 12.5px !important;
+  }
+
+  .sheet-sticky-footer {
+    padding: 8px 14px 12px 14px !important;
+    gap: 8px !important;
+  }
+
+  .btn-confirm-booking {
+    height: 42px !important;
+    font-size: 13.5px !important;
+    border-radius: 11px !important;
+  }
+
+  .quick-action-col-btn {
+    min-height: 46px !important;
+    font-size: 10.5px !important;
+    padding: 5px 2px !important;
+    gap: 4px !important;
+    border-radius: 10px !important;
+  }
+}
+
+/* 3. Small Tablets & Foldables Unfolded (740px - 850px):
+      Galaxy Z Fold 6 unfolded (768px), iPad Mini portrait (768px), Pixel 9 Pro Fold unfolded (840px) */
+@media (min-width: 740px) and (max-width: 850px) {
+  .desktop-sidebar {
+    width: 60px !important;
+    min-width: 60px !important;
+  }
+
+  .desktop-top-header {
+    height: 58px !important;
+    padding: 0 16px !important;
+    gap: 12px !important;
+  }
+
+  .desktop-search-wrapper {
+    width: 220px !important;
+    max-width: 100% !important;
+    height: 38px !important;
+  }
+
+  .desktop-body {
+    height: calc(100vh - 58px) !important;
+    padding: 10px 12px !important;
+  }
+
+  .desktop-workspace-split {
+    gap: 10px !important;
+  }
+
+  .desktop-workspace-split.has-open-detail .desktop-table-container {
+    flex: 0 0 230px !important;
+    width: 230px !important;
+    min-width: 215px !important;
+    max-width: 240px !important;
+  }
+
+  .compact-list-header {
+    padding: 10px 10px 8px 10px !important;
+    gap: 8px !important;
+  }
+
+  .compact-search-bar {
+    padding: 5px 8px !important;
+  }
+
+  .compact-search-bar input {
+    font-size: 12px !important;
+  }
+
+  .compact-select-filter {
+    max-width: 90px !important;
+    font-size: 11.5px !important;
+    padding: 0 6px !important;
+    height: 32px !important;
+  }
+
+  .compact-tab-btn {
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+  }
+
+  .desktop-drawer-header-box {
+    padding: 10px 14px !important;
+  }
+
+  .desktop-drawer-header-box .drawer-avatar-lg {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 15px !important;
+  }
+
+  .drawer-title-col h2 {
+    font-size: 16px !important;
+  }
+
+  .drawer-title-col p {
+    font-size: 11.5px !important;
+  }
+
+  .sheet-tab-btn {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .desktop-details-drawer .customer-info-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  .desktop-drawer-footer {
+    padding: 8px 12px 12px 12px !important;
+    gap: 8px !important;
+  }
+
+  .desktop-drawer-footer .btn-confirm-booking,
+  .desktop-confirm-booking-btn {
+    height: 42px !important;
+    font-size: 13.5px !important;
+  }
+
+  .desktop-drawer-footer .quick-action-col-btn {
+    min-height: 46px !important;
+    font-size: 10px !important;
+    padding: 5px 2px !important;
+  }
+}
+
+/* 4. Medium Tablets & 2-in-1s (851px - 1140px):
+      Surface Pro 10 portrait (912px), iPad Pro 13 portrait (1024px), iPad Mini landscape (1024px) */
+@media (min-width: 851px) and (max-width: 1140px) {
+  .desktop-sidebar {
+    width: 64px !important;
+    min-width: 64px !important;
+  }
+
+  .desktop-top-header {
+    height: 60px !important;
+    padding: 0 20px !important;
+  }
+
+  .desktop-search-wrapper {
+    width: 300px !important;
+    max-width: 100% !important;
+  }
+
+  .desktop-body {
+    height: calc(100vh - 60px) !important;
+    padding: 12px 16px !important;
+  }
+
+  .desktop-workspace-split.has-open-detail .desktop-table-container {
+    flex: 0 0 290px !important;
+    width: 290px !important;
+    min-width: 270px !important;
+    max-width: 300px !important;
+  }
+
+  .desktop-drawer-header-box {
+    padding: 12px 20px !important;
+  }
+
+  .desktop-details-drawer .customer-info-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px 16px !important;
+  }
+
+  .desktop-drawer-footer {
+    padding: 10px 16px 14px 16px !important;
+    gap: 8px !important;
+  }
+
+  .desktop-drawer-footer .btn-confirm-booking,
+  .desktop-confirm-booking-btn {
+    height: 44px !important;
+    font-size: 14px !important;
+  }
+
+  .desktop-drawer-footer .quick-action-col-btn {
+    min-height: 52px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* 5. Short Landscape Displays: Nest Hub Max (1280x800), iPad Mini landscape (1024x768), Laptops (1366x768) */
+@media (min-width: 740px) and (max-height: 820px) {
+  .desktop-top-header {
+    height: 54px !important;
+    padding: 0 20px !important;
+  }
+
+  .desktop-body {
+    height: calc(100vh - 54px) !important;
+    padding: 10px 16px !important;
+  }
+
+  .compact-list-header {
+    padding: 10px 12px 8px 12px !important;
+    gap: 8px !important;
+  }
+
+  .desktop-drawer-header-box {
+    padding: 10px 18px !important;
+  }
+
+  .desktop-drawer-header-box .drawer-avatar-lg {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 16px !important;
+  }
+
+  .sheet-tab-btn {
+    padding: 8px 12px !important;
+    font-size: 12.5px !important;
+  }
+
+  .desktop-body-scroll {
+    padding: 12px 18px 20px 18px !important;
+  }
+
+  .desktop-drawer-footer {
+    padding: 8px 16px 10px 16px !important;
+    gap: 6px !important;
+  }
+
+  .desktop-drawer-footer .btn-confirm-booking,
+  .desktop-confirm-booking-btn {
+    height: 40px !important;
+    font-size: 13.5px !important;
+    border-radius: 11px !important;
+  }
+
+  .desktop-drawer-footer .quick-action-col-btn {
+    min-height: 46px !important;
+    padding: 5px 2px !important;
+    font-size: 10.5px !important;
+    border-radius: 10px !important;
+  }
+}

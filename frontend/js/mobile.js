@@ -5,10 +5,12 @@ export function createMobileView(container, options = {}) {
   let vendors = [...VENDORS_LIST];
   let teamMembers = [...STAFF_MEMBERS];
   let contacts = [...CONTACTS_LIST];
-  let activeCategory = 'New Bookings'; // 'New Bookings', 'Assigned', 'Ongoing'
+  let activeCategory = 'All Bookings'; // 'All Bookings', 'New Bookings', 'Assigned', 'Ongoing'
+  let selectedCategory = 'ALL'; // 'ALL', 'TOUR', 'VILLA', 'ACTIVITY', 'TRANSPORT'
   let searchQuery = '';
   let activeModalBooking = bookings[0]; // Haridwar - Kashi Trip BK-5021
   let activeModalTab = options.initialTab || 'customer-details'; // 'customer-details', 'guests', 'itinerary', 'updates'
+  const modalTabs = ['customer-details', 'guests', 'itinerary', 'updates'];
   let isModalOpen = options.autoOpenModal !== undefined ? options.autoOpenModal : false;
   let showAllGuests = false;
   let modalActiveItem = null;
@@ -72,33 +74,35 @@ export function createMobileView(container, options = {}) {
               <circle cx="11" cy="11" r="8"/>
               <path d="m21 21-4.3-4.3"/>
             </svg>
-            <input type="text" id="mobile-search-input" placeholder="Search by guest, destination or ID..." />
+            <input type="text" id="mobile-search-input" placeholder="Search bookings..." value="${searchQuery}" />
           </div>
-          <button class="filter-btn-square" id="mobile-filter-btn" title="Filter Bookings">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="21" x2="14" y1="4" y2="4"/>
-              <line x1="10" x2="3" y1="4" y2="4"/>
-              <line x1="21" x2="12" y1="12" y2="12"/>
-              <line x1="8" x2="3" y1="12" y2="12"/>
-              <line x1="21" x2="16" y1="20" y2="20"/>
-              <line x1="12" x2="3" y1="20" y2="20"/>
-              <line x1="14" x2="14" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="10" y2="14"/>
-              <line x1="16" x2="16" y1="18" y2="22"/>
+          <div class="mobile-category-select-wrapper">
+            <svg class="category-filter-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
             </svg>
-          </button>
+            <select id="mobile-category-filter" class="mobile-select-filter">
+              <option value="ALL" ${selectedCategory === 'ALL' ? 'selected' : ''}>All Categories</option>
+              <option value="TOUR" ${selectedCategory === 'TOUR' ? 'selected' : ''}>Tour Packages</option>
+              <option value="VILLA" ${selectedCategory === 'VILLA' ? 'selected' : ''}>Villas & Resorts</option>
+              <option value="ACTIVITY" ${selectedCategory === 'ACTIVITY' ? 'selected' : ''}>Activities & Sports</option>
+              <option value="TRANSPORT" ${selectedCategory === 'TRANSPORT' ? 'selected' : ''}>Transports</option>
+            </select>
+          </div>
         </div>
 
         <!-- Status Filter Tabs / Pills -->
         <div class="category-filter-tabs">
+          <button class="tab-pill ${activeCategory === 'All Bookings' ? 'active' : ''}" data-cat="All Bookings">
+            All <span class="pill-badge">${bookings.length}</span>
+          </button>
           <button class="tab-pill ${activeCategory === 'New Bookings' ? 'active' : ''}" data-cat="New Bookings">
-            New Bookings <span class="pill-badge">8</span>
+            New Bookings <span class="pill-badge">${bookings.filter(b => b.category === 'New Bookings').length}</span>
           </button>
           <button class="tab-pill ${activeCategory === 'Assigned' ? 'active' : ''}" data-cat="Assigned">
-            Assigned <span class="pill-badge">12</span>
+            Assigned <span class="pill-badge">${bookings.filter(b => b.category === 'Assigned').length}</span>
           </button>
           <button class="tab-pill ${activeCategory === 'Ongoing' ? 'active' : ''}" data-cat="Ongoing">
-            Ongoing <span class="pill-badge">6</span>
+            Ongoing <span class="pill-badge">${bookings.filter(b => b.category === 'Ongoing').length}</span>
           </button>
         </div>
 
@@ -113,22 +117,18 @@ export function createMobileView(container, options = {}) {
             <span id="mobile-selected-count">0 selected</span>
           </div>
           <div class="selection-actions-right">
-            <button class="action-pill-btn" id="mobile-bulk-assign-btn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <line x1="19" x2="19" y1="8" y2="14"/>
-                <line x1="22" x2="16" y1="11" y2="11"/>
-              </svg>
-              + Assign
-            </button>
-            <button class="action-more-btn" id="mobile-bulk-more-btn" title="More options">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="1"/>
-                <circle cx="19" cy="12" r="1"/>
-                <circle cx="5" cy="12" r="1"/>
-              </svg>
-            </button>
+            <div style="position: relative;">
+              <button class="action-more-btn" id="mobile-bulk-more-btn" title="More options" aria-haspopup="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="1.5"/>
+                  <circle cx="19" cy="12" r="1.5"/>
+                  <circle cx="5" cy="12" r="1.5"/>
+                </svg>
+              </button>
+              <div class="bulk-more-dropdown" id="mobile-bulk-more-dropdown" style="display: none;">
+                <!-- Populated dynamically: Assign, Mark Paid / Mark Unpaid, Clear Selection -->
+              </div>
+            </div>
           </div>
         </div>
 
@@ -464,6 +464,139 @@ export function createMobileView(container, options = {}) {
           </div>
         </div>
       </div>
+
+      <!-- Mobile Modal 5: Edit Customer Details (App-based modal) -->
+      <div class="modal-overlay" id="mobile-edit-customer-modal">
+        <div class="modal-card" style="width: 92%; max-width: 480px; max-height: 85vh; overflow-y: auto;">
+          <div class="modal-header">
+            <h3>Edit Customer Details</h3>
+            <button class="sheet-close-btn" id="close-mobile-modal-edit-customer-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="mobile-modal-edit-cust-name" placeholder="Full Name" />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="text" id="mobile-modal-edit-cust-phone" placeholder="+91 99884 84884" />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="mobile-modal-edit-cust-email" placeholder="guest@example.com" />
+            </div>
+            <div class="form-group">
+              <label>Location / City</label>
+              <input type="text" id="mobile-modal-edit-cust-location" placeholder="Chandigarh, Punjab" />
+            </div>
+            <div class="form-group">
+              <label>Lead Source</label>
+              <select id="mobile-modal-edit-cust-source">
+                <option value="Google Search">Google Search</option>
+                <option value="Website">Website</option>
+                <option value="Referral">Referral</option>
+                <option value="Instagram">Instagram</option>
+                <option value="Direct Call">Direct Call</option>
+                <option value="WhatsApp Inquiry">WhatsApp Inquiry</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Traveler Type / Pax</label>
+              <input type="text" id="mobile-modal-edit-cust-type" placeholder="e.g. Family (3 Pax)" />
+            </div>
+            <div class="form-group">
+              <label>Preferred Destination</label>
+              <input type="text" id="mobile-modal-edit-cust-destination" placeholder="Kashmir / Manali" />
+            </div>
+            <div class="form-group">
+              <label>Travel Dates</label>
+              <input type="text" id="mobile-modal-edit-cust-dates" placeholder="12 Oct - 17 Oct" />
+            </div>
+            <div class="form-group">
+              <label>Estimated Budget / Price</label>
+              <input type="text" id="mobile-modal-edit-cust-budget" placeholder="₹45,000" />
+            </div>
+            <div class="form-group">
+              <label>Customer Notes / Requirements</label>
+              <textarea id="mobile-modal-edit-cust-notes" rows="3" placeholder="Special requirements, preferences..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="btn-cancel-edit-customer">Cancel</button>
+            <button class="btn-primary-desktop" id="btn-save-edit-customer" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Customer Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Modal 6: Add Follow-up Activity (App-based modal) -->
+      <div class="modal-overlay" id="mobile-add-followup-modal">
+        <div class="modal-card" style="width: 92%; max-width: 440px;">
+          <div class="modal-header">
+            <h3>Add Follow-up Activity</h3>
+            <button class="sheet-close-btn" id="close-mobile-modal-add-followup-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Follow-up Channel</label>
+              <select id="mobile-modal-add-followup-type">
+                <option value="call">Phone Call</option>
+                <option value="whatsapp">WhatsApp Message</option>
+                <option value="email">Email</option>
+                <option value="meeting">In-Person Meeting</option>
+                <option value="note">Internal Note / Status</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Activity Title / Subject</label>
+              <input type="text" id="mobile-modal-add-followup-title" placeholder="e.g. Follow-up Call, WhatsApp Quote Sent" />
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="text" id="mobile-modal-add-followup-date" placeholder="e.g. 20 Oct" />
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <input type="text" id="mobile-modal-add-followup-time" placeholder="e.g. 02:30 PM" />
+            </div>
+            <div class="form-group">
+              <label>Follow-up Notes / Discussion</label>
+              <textarea id="mobile-modal-add-followup-desc" rows="3" placeholder="Enter notes from the conversation, quote details, or action items..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="btn-cancel-add-followup">Cancel</button>
+            <button class="btn-primary-desktop" id="btn-submit-add-followup" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Save Follow-up</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Modal 7: Add Assignee (Team/Vendor/Contact) App-based modal -->
+      <div class="modal-overlay" id="mobile-add-assignee-modal">
+        <div class="modal-card" style="width: 92%; max-width: 440px;">
+          <div class="modal-header">
+            <h3 id="mobile-modal-add-assignee-heading">Add New Member</h3>
+            <button class="sheet-close-btn" id="close-mobile-modal-add-assignee-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label id="mobile-modal-add-assignee-name-lbl">Full Name</label>
+              <input type="text" id="mobile-modal-add-assignee-name" placeholder="Enter name or company" />
+            </div>
+            <div class="form-group">
+              <label id="mobile-modal-add-assignee-role-lbl">Role / Service</label>
+              <input type="text" id="mobile-modal-add-assignee-role" placeholder="e.g. Tour Guide, Rafting Coordinator" />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="text" id="mobile-modal-add-assignee-phone" placeholder="+91 98765 43210" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="btn-cancel-add-assignee">Cancel</button>
+            <button class="btn-primary-desktop" id="btn-submit-add-assignee" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save & Assign</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -477,51 +610,122 @@ export function createMobileView(container, options = {}) {
         b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         b.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
         b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        b.guest.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchSearch;
+        b.guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (b.guest.phone && b.guest.phone.includes(searchQuery));
+      
+      const matchCategory = !activeCategory || activeCategory === 'All' || activeCategory === 'All Bookings' || b.category === activeCategory;
+      const matchCat = selectedCategory === 'ALL' ||
+        (selectedCategory === 'VILLA'
+          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
+          : b.type.toUpperCase() === selectedCategory.toUpperCase());
+
+      return matchSearch && matchCategory && matchCat;
     });
 
-    listEl.innerHTML = filtered.map(b => `
-      <div class="booking-card ${b.selected ? 'card-selected' : ''}" data-booking-id="${b.id}">
-        <div class="custom-checkbox card-select-checkbox ${b.selected ? 'checked' : ''}" data-select-id="${b.id}">
-          ${b.selected ? `
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align: center; padding: 48px 20px; color: #64748B;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; color: #94A3B8;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
             </svg>
-          ` : ''}
-        </div>
-        <div class="card-thumb-wrapper">
-          <img src="${b.image}" alt="${b.title}" loading="lazy" />
-        </div>
-        <div class="card-info-col">
-          <span class="card-type-badge ${b.typeClass}">${b.type}</span>
-          <h3 class="card-title">${b.title}</h3>
-          <div class="card-meta-row">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-            </svg>
-            <span>${b.pax} Pax • ${b.duration}</span>
           </div>
-          <div class="card-meta-row">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
-            </svg>
-            <span>${b.dates}</span>
+          <h4 style="font-size: 15px; font-weight: 700; color: #0F172A; margin: 0 0 4px 0;">No Bookings Found</h4>
+          <p style="font-size: 13px; margin: 0 0 14px 0; color: #94A3B8;">No results matching your selected filters.</p>
+          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+            <button class="action-pill-btn" id="btn-clear-mobile-empty-filters" style="height: 36px; padding: 0 16px; font-weight: 600; border-radius: 10px; background: #2563EB; color: #FFFFFF; border: none; cursor: pointer;">Reset All Filters</button>
+            ${selectedCategory !== 'ALL' ? `<button class="action-pill-btn" id="btn-view-all-category-filters" style="height: 36px; padding: 0 16px; font-weight: 600; border-radius: 10px; background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; cursor: pointer;">View All in Category</button>` : ''}
           </div>
         </div>
-        <div class="card-right-col">
-          <span class="status-pill ${b.statusClass}">
-            <span class="dot"></span>
-            ${b.status}
-          </span>
-          <span class="card-price">${b.price}</span>
+      `;
+    } else {
+      listEl.innerHTML = filtered.map(b => `
+        <div class="booking-card ${b.selected ? 'card-selected' : ''}" data-booking-id="${b.id}">
+          <div class="custom-checkbox card-select-checkbox ${b.selected ? 'checked' : ''}" data-select-id="${b.id}">
+            ${b.selected ? `
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            ` : ''}
+          </div>
+          <div class="card-thumb-wrapper">
+            <img src="${b.image}" alt="${b.title}" loading="lazy" />
+          </div>
+          <div class="card-info-col">
+            <span class="card-type-badge ${b.typeClass}">${b.type}</span>
+            <h3 class="card-title">${b.title}</h3>
+            <div class="card-meta-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+              <span>${b.pax} Pax • ${b.duration}</span>
+            </div>
+            <div class="card-meta-row">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                <line x1="16" x2="16" y1="2" y2="6"/>
+                <line x1="8" x2="8" y1="2" y2="6"/>
+                <line x1="3" x2="21" y1="10" y2="10"/>
+              </svg>
+              <span>${b.dates}</span>
+            </div>
+          </div>
+          <div class="card-right-col">
+            <div class="card-action-btns-row">
+              <button class="card-circle-action-btn btn-action-call" data-action-call="${b.id}" title="Call ${b.guest.name}" aria-label="Call">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </button>
+              <button class="card-circle-action-btn btn-action-whatsapp" data-action-whatsapp="${b.id}" title="WhatsApp ${b.guest.name}" aria-label="WhatsApp">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="card-price-status-row">
+              <span class="card-price">${b.price}</span>
+              <span class="status-pill ${b.statusClass}">
+                <span class="dot"></span>
+                ${b.status}
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `).join('');
+    }
+
+    // Dynamic category badge counts reflecting current category filter
+    const catFiltered = bookings.filter(b => {
+      const matchSearch = !searchQuery || 
+        b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (b.guest.phone && b.guest.phone.includes(searchQuery));
+      const matchCat = selectedCategory === 'ALL' ||
+        (selectedCategory === 'VILLA'
+          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
+          : b.type.toUpperCase() === selectedCategory.toUpperCase());
+      return matchSearch && matchCat;
+    });
+
+    const countAll = catFiltered.length;
+    const countNew = catFiltered.filter(b => b.category === 'New Bookings').length;
+    const countAssigned = catFiltered.filter(b => b.category === 'Assigned').length;
+    const countOngoing = catFiltered.filter(b => b.category === 'Ongoing').length;
+
+    const bAll = container.querySelector('.tab-pill[data-cat="All Bookings"] .pill-badge');
+    const bNew = container.querySelector('.tab-pill[data-cat="New Bookings"] .pill-badge');
+    const bAssigned = container.querySelector('.tab-pill[data-cat="Assigned"] .pill-badge');
+    const bOngoing = container.querySelector('.tab-pill[data-cat="Ongoing"] .pill-badge');
+
+    if (bAll) bAll.textContent = countAll;
+    if (bNew) bNew.textContent = countNew;
+    if (bAssigned) bAssigned.textContent = countAssigned;
+    if (bOngoing) bOngoing.textContent = countOngoing;
 
     const selectedCount = bookings.filter(b => b.selected).length;
     const countEl = container.querySelector('#mobile-selected-count');
@@ -536,6 +740,61 @@ export function createMobileView(container, options = {}) {
     if (allBox) {
       allBox.className = selectedCount > 0 ? (selectedCount === bookings.length ? 'custom-checkbox checked' : 'custom-checkbox checked') : 'custom-checkbox';
     }
+
+    renderMobileBulkDropdown();
+  }
+
+  let isMobileBulkDropdownOpen = false;
+
+  function renderMobileBulkDropdown() {
+    const dropdown = container.querySelector('#mobile-bulk-more-dropdown');
+    if (!dropdown) return;
+    const selectedItems = bookings.filter(b => b.selected);
+    if (selectedItems.length === 0) {
+      dropdown.style.display = 'none';
+      isMobileBulkDropdownOpen = false;
+      return;
+    }
+
+    const isAllPaid = selectedItems.every(b => b.status === 'Paid' || b.status === 'Confirmed');
+
+    dropdown.innerHTML = `
+      <button class="dropdown-item-btn" id="mobile-bulk-assign-action">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" x2="19" y1="8" y2="14"/>
+          <line x1="22" x2="16" y1="11" y2="11"/>
+        </svg>
+        <span>Assign</span>
+      </button>
+      ${isAllPaid ? `
+        <button class="dropdown-item-btn" id="mobile-bulk-mark-unpaid-action">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" x2="12" y1="8" y2="12"/>
+            <line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
+          <span>Mark as Unpaid</span>
+        </button>
+      ` : `
+        <button class="dropdown-item-btn" id="mobile-bulk-mark-paid-action">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Mark as Paid</span>
+        </button>
+      `}
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item-btn item-danger" id="mobile-bulk-clear-action">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        <span>Clear Selection</span>
+      </button>
+    `;
+    dropdown.style.display = isMobileBulkDropdownOpen ? 'block' : 'none';
   }
 
   function renderSheetHeader() {
@@ -543,119 +802,61 @@ export function createMobileView(container, options = {}) {
     if (!headerCard || !activeModalBooking) return;
 
     const b = activeModalBooking;
+    const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
+    const custName = b.customer?.name || b.guest?.name || 'Customer';
 
-    // When on Itinerary tab, render the exact header from Screen 1, 2, 4!
-    if (activeModalTab === 'itinerary') {
-      headerCard.innerHTML = `
-        <div class="sheet-drag-handle-bar" style="padding-bottom: 0;">
-          <div class="sheet-handle"></div>
-        </div>
-        <div class="sheet-header-bar-v2">
-          <button class="back-title-btn" id="itinerary-back-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-            <span>Booking Details</span>
-          </button>
-          <button class="sheet-close-btn" id="mobile-sheet-close-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="sheet-title-price-row">
-          <h2 class="sheet-title-large">${b.title}</h2>
-          <div class="sheet-price-col">
-            <div class="price-main">${b.price}</div>
-            <div class="booking-id-sub">${b.id}</div>
+    // Uniform Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
+    headerCard.innerHTML = `
+      <div class="sheet-drag-handle-bar">
+        <div class="sheet-handle"></div>
+      </div>
+      <div class="sheet-customer-header">
+        <div class="customer-avatar-badge">${initials}</div>
+        <div class="customer-header-info">
+          <div class="customer-title-row">
+            <h2 class="customer-name-title">${custName}</h2>
+            <span class="status-pill ${b.statusClass}">
+              <span class="dot"></span>
+              ${b.status}
+            </span>
+          </div>
+          <p class="customer-trip-subtitle">${b.title}</p>
+          <div class="customer-meta-chips">
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+              ${b.pax} Pax
+            </span>
+            <span class="meta-dot">•</span>
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              ${b.duration}
+            </span>
+            <span class="meta-dot">•</span>
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                <line x1="16" x2="16" y1="2" y2="6"/>
+                <line x1="8" x2="8" y1="2" y2="6"/>
+                <line x1="3" x2="21" y1="10" y2="10"/>
+              </svg>
+              ${b.dates}
+            </span>
           </div>
         </div>
-        <div class="sheet-stats-row" style="padding: 2px 18px 12px 18px;">
-          <div class="stat-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-            </svg>
-            <span>${b.pax} Pax</span>
-          </div>
-          <div class="stat-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
-            </svg>
-            <span>${b.dates}</span>
-          </div>
-          <div class="stat-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M2 4v16"/>
-              <path d="M2 8h18a2 2 0 0 1 2 2v10"/>
-              <path d="M2 17h20"/>
-              <path d="M6 8v9"/>
-            </svg>
-            <span>${b.duration}</span>
-          </div>
-        </div>
-      `;
-    } else {
-      // Customer Details Header (Exact match to Image 3 reference)
-      const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
-      const custName = b.customer?.name || b.guest?.name || 'Customer';
-
-      headerCard.innerHTML = `
-        <div class="sheet-drag-handle-bar">
-          <div class="sheet-handle"></div>
-          <button class="sheet-close-btn" id="mobile-sheet-close-btn" title="Close">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-        <div class="sheet-customer-header">
-          <div class="customer-avatar-badge">${initials}</div>
-          <div class="customer-header-info">
-            <div class="customer-title-row">
-              <h2 class="customer-name-title">${custName}</h2>
-              <span class="status-pill ${b.statusClass}">
-                <span class="dot"></span>
-                ${b.status}
-              </span>
-            </div>
-            <p class="customer-trip-subtitle">${b.title}</p>
-            <div class="customer-meta-chips">
-              <span class="meta-chip">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                </svg>
-                ${b.pax} Pax
-              </span>
-              <span class="meta-dot">•</span>
-              <span class="meta-chip">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                ${b.duration}
-              </span>
-              <span class="meta-dot">•</span>
-              <span class="meta-chip">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                  <line x1="16" x2="16" y1="2" y2="6"/>
-                  <line x1="8" x2="8" y1="2" y2="6"/>
-                  <line x1="3" x2="21" y1="10" y2="10"/>
-                </svg>
-                ${b.dates}
-              </span>
-            </div>
-          </div>
-        </div>
-      `;
-    }
+        <button class="sheet-close-btn mobile-sheet-close-pill" id="mobile-sheet-close-btn" title="Close" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    `;
 
     const guestBadge = container.querySelector('#sheet-guest-count-badge');
     if (guestBadge) guestBadge.textContent = b.guests.length;
@@ -791,7 +992,7 @@ export function createMobileView(container, options = {}) {
                 <span class="info-label">Email</span>
                 <div class="contact-value-row">
                   <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
-                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="alert('Sending email to ${c.email}...')">
+                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <rect width="20" height="16" x="2" y="4" rx="2"/>
                       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
@@ -806,14 +1007,14 @@ export function createMobileView(container, options = {}) {
                 <div class="contact-value-row">
                   <span class="info-value-bold phone-number-val">${c.phone}</span>
                   <div class="contact-action-btns">
-                    <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="alert('Calling ${c.name} (${c.phone})...')">
+                    <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                       </svg>
                     </button>
-                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="alert('Opening WhatsApp for ${c.name} (${c.phone})...')">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.892.524 3.662 1.435 5.176L2.05 21.95a.6.6 0 0 0 .736.736l4.774-1.385A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Zm3.906 14.153c-.225.63-1.127 1.196-1.55 1.258-.42.062-.958.088-1.55-.102-.38-.122-.87-.282-1.49-.55-2.617-1.13-4.326-3.79-4.457-3.963-.13-.174-1.065-1.417-1.065-2.702 0-1.286.674-1.92.913-2.18.239-.261.52-.326.695-.326.174 0 .348.002.5.01.16.007.375-.06.587.447.218.522.74 1.804.805 1.935.066.13.11.283.022.457-.087.174-.13.283-.26.435-.13.152-.273.34-.39.456-.13.13-.265.272-.114.533.152.261.674 1.11 1.447 1.8 1 .892 1.84 1.168 2.1 1.3.26.13.413.11.565-.065.152-.174.652-.761.826-1.022.174-.26.348-.217.587-.13.239.087 1.522.717 1.783.848.26.13.435.195.5.304.065.109.065.63-.16 1.26Z" fill="#16A34A"/>
                       </svg>
                     </button>
                   </div>
@@ -993,7 +1194,11 @@ export function createMobileView(container, options = {}) {
             <input type="text" id="mobile-guest-search-input" placeholder="Search guest..." />
           </div>
           <button class="add-guest-pill-btn" id="mobile-add-guest-btn">
-            + Add Guest
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" x2="12" y1="5" y2="19"/>
+              <line x1="5" x2="19" y1="12" y2="12"/>
+            </svg>
+            Add Guest
           </button>
         </div>
 
@@ -1008,16 +1213,16 @@ export function createMobileView(container, options = {}) {
                 </div>
               </div>
               <div class="guest-right-actions">
-                <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="alert('Calling ${g.name} (${g.phone})...')">
+                <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${g.name} (${g.phone})...', type: 'info' }}))">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                   </svg>
                 </button>
-                <button class="circle-action-btn btn-email" title="More options" onclick="alert('Guest options: Edit details, download ID, or remove guest.')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <circle cx="12" cy="12" r="1"/>
-                    <circle cx="12" cy="5" r="1"/>
-                    <circle cx="12" cy="19" r="1"/>
+                <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${g.name}" aria-label="More options" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Guest options for ${g.name}: ID verified and travel pass issued.', type: 'info' }}))">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="1.5"/>
+                    <circle cx="12" cy="5" r="1.5"/>
+                    <circle cx="12" cy="19" r="1.5"/>
                   </svg>
                 </button>
               </div>
@@ -1040,26 +1245,29 @@ export function createMobileView(container, options = {}) {
       const days = b.itineraryDays || [];
 
       bodyEl.innerHTML = `
-        <div class="itinerary-section-header-bar">
-          <h3>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
-            </svg>
-            Day-wise Schedule
-          </h3>
-          <button class="btn-add-event-pill" id="mobile-add-event-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="12" x2="12" y1="5" y2="19"/>
-              <line x1="5" x2="19" y1="12" y2="12"/>
-            </svg>
-            + Add Event
-          </button>
-        </div>
+        <div class="itinerary-tab-content">
+          <div class="itinerary-section-header-bar">
+            <div class="section-header-left" style="display: flex; align-items: center; gap: 8px;">
+              <div class="section-icon-circle blue-circle" style="width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; color: #2563EB;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                  <line x1="16" x2="16" y1="2" y2="6"/>
+                  <line x1="8" x2="8" y1="2" y2="6"/>
+                  <line x1="3" x2="21" y1="10" y2="10"/>
+                </svg>
+              </div>
+              <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
+            </div>
+            <button class="btn-add-event-pill" id="mobile-add-event-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" x2="12" y1="5" y2="19"/>
+                <line x1="5" x2="19" y1="12" y2="12"/>
+              </svg>
+              + Add Event
+            </button>
+          </div>
 
-        <div class="itinerary-v2-container">
+          <div class="itinerary-v2-container">
           ${days.map(dayGroup => `
             <div class="itinerary-day-section">
               <!-- Left Day & Date Label -->
@@ -1165,6 +1373,7 @@ export function createMobileView(container, options = {}) {
               </div>
             </div>
           `).join('')}
+          </div>
         </div>
       `;
     }
@@ -1257,7 +1466,7 @@ export function createMobileView(container, options = {}) {
                 <p>${v.service ? `${v.service} • ` : ''}${v.phone}</p>
               </div>
             </div>
-            <button class="item-menu-btn" onclick="event.stopPropagation(); alert('Options for ${v.name}')" title="Vendor options">
+            <button class="item-menu-btn" onclick="event.stopPropagation(); window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Vendor options for ${v.name}: Active provider on record.', type: 'info' }}))" title="Vendor options">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <circle cx="12" cy="12" r="1"/>
                 <circle cx="12" cy="5" r="1"/>
@@ -1320,7 +1529,11 @@ export function createMobileView(container, options = {}) {
     renderSheetBody();
 
     container.querySelectorAll('.sheet-tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.sheetTab === activeModalTab);
+      const isActive = btn.dataset.sheetTab === activeModalTab;
+      btn.classList.toggle('active', isActive);
+      if (isActive) {
+        btn.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+      }
     });
 
     const backdrop = container.querySelector('#mobile-sheet-backdrop');
@@ -1584,6 +1797,97 @@ export function createMobileView(container, options = {}) {
     if (modal) modal.classList.remove('open');
   }
 
+  function openMobileEditCustomerModal() {
+    if (!activeModalBooking) return;
+    const c = activeModalBooking.customer || {
+      name: activeModalBooking.guest?.name || 'Customer',
+      phone: activeModalBooking.guest?.phone || '+91 99884 84884',
+      email: activeModalBooking.guest?.email || 'guest@example.com',
+      location: 'Chandigarh, Punjab',
+      leadSource: 'Website',
+      preferredDestination: activeModalBooking.destination || '',
+      travelDates: activeModalBooking.dates || '',
+      customerType: `Family (${activeModalBooking.pax || 3} Pax)`,
+      budgetEst: activeModalBooking.price || '',
+      shortDetails: activeModalBooking.notes || ''
+    };
+
+    const modal = container.querySelector('#mobile-edit-customer-modal');
+    if (!modal) return;
+    const setVal = (sel, val) => { const el = modal.querySelector(sel); if (el) el.value = val || ''; };
+    setVal('#mobile-modal-edit-cust-name', c.name);
+    setVal('#mobile-modal-edit-cust-phone', c.phone);
+    setVal('#mobile-modal-edit-cust-email', c.email);
+    setVal('#mobile-modal-edit-cust-location', c.location);
+    setVal('#mobile-modal-edit-cust-source', c.leadSource || 'Website');
+    setVal('#mobile-modal-edit-cust-type', c.customerType || `Family (${activeModalBooking.pax || 3} Pax)`);
+    setVal('#mobile-modal-edit-cust-destination', c.preferredDestination || activeModalBooking.destination);
+    setVal('#mobile-modal-edit-cust-dates', c.travelDates || activeModalBooking.dates);
+    setVal('#mobile-modal-edit-cust-budget', c.budgetEst || activeModalBooking.price);
+    setVal('#mobile-modal-edit-cust-notes', c.shortDetails || activeModalBooking.notes || '');
+
+    modal.classList.add('open');
+  }
+
+  function closeMobileEditCustomerModal() {
+    const modal = container.querySelector('#mobile-edit-customer-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function openMobileAddFollowupModal() {
+    if (!activeModalBooking) return;
+    const modal = container.querySelector('#mobile-add-followup-modal');
+    if (!modal) return;
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const dateStr = `${now.getDate()} ${months[now.getMonth()]}`;
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const typeEl = modal.querySelector('#mobile-modal-add-followup-type');
+    const titleEl = modal.querySelector('#mobile-modal-add-followup-title');
+    const dateEl = modal.querySelector('#mobile-modal-add-followup-date');
+    const timeEl = modal.querySelector('#mobile-modal-add-followup-time');
+    const descEl = modal.querySelector('#mobile-modal-add-followup-desc');
+
+    if (typeEl) typeEl.value = 'call';
+    if (titleEl) titleEl.value = 'Follow-up Call';
+    if (dateEl) dateEl.value = dateStr;
+    if (timeEl) timeEl.value = timeStr;
+    if (descEl) descEl.value = '';
+
+    modal.classList.add('open');
+  }
+
+  function closeMobileAddFollowupModal() {
+    const modal = container.querySelector('#mobile-add-followup-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function openMobileAddAssigneeModal(type) {
+    const modal = container.querySelector('#mobile-add-assignee-modal');
+    if (!modal) return;
+    const heading = modal.querySelector('#mobile-modal-add-assignee-heading');
+    const nameLbl = modal.querySelector('#mobile-modal-add-assignee-name-lbl');
+    const roleLbl = modal.querySelector('#mobile-modal-add-assignee-role-lbl');
+    const nameInput = modal.querySelector('#mobile-modal-add-assignee-name');
+    const roleInput = modal.querySelector('#mobile-modal-add-assignee-role');
+    const phoneInput = modal.querySelector('#mobile-modal-add-assignee-phone');
+
+    if (heading) heading.textContent = `Add New ${type === 'Vendors' ? 'Vendor' : type === 'Contacts' ? 'Contact' : 'Team Member'}`;
+    if (nameLbl) nameLbl.textContent = type === 'Vendors' ? 'Company Name' : 'Full Name';
+    if (roleLbl) roleLbl.textContent = type === 'Vendors' ? 'Service Provided' : 'Role / Title';
+    if (nameInput) { nameInput.value = ''; nameInput.placeholder = type === 'Vendors' ? 'e.g. Mountain Peaks Trekking' : 'e.g. Ramesh Kumar'; }
+    if (roleInput) { roleInput.value = ''; roleInput.placeholder = type === 'Vendors' ? 'e.g. Adventure Guides' : 'e.g. Tour Escort'; }
+    if (phoneInput) { phoneInput.value = ''; phoneInput.placeholder = '+91 98765 00000'; }
+
+    modal.classList.add('open');
+  }
+
+  function closeMobileAddAssigneeModal() {
+    const modal = container.querySelector('#mobile-add-assignee-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
   function bindEvents() {
     // Search input
     const searchInput = container.querySelector('#mobile-search-input');
@@ -1594,25 +1898,295 @@ export function createMobileView(container, options = {}) {
       });
     }
 
-    // Filter button
-    const filterBtn = container.querySelector('#mobile-filter-btn');
-    if (filterBtn) {
-      filterBtn.addEventListener('click', () => {
-        window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { message: 'Filter dialog: All categories active', type: 'info' }
-        }));
+    // Mobile Category Filter Select
+    const mobileCatSelect = container.querySelector('#mobile-category-filter');
+    if (mobileCatSelect) {
+      mobileCatSelect.addEventListener('change', (e) => {
+        selectedCategory = e.target.value;
+        // Always reset tab to 'All Bookings' so user sees the category's bookings immediately
+        activeCategory = 'All Bookings';
+        container.querySelectorAll('.tab-pill').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.cat === 'All Bookings');
+        });
+        const allBtn = container.querySelector('.tab-pill[data-cat="All Bookings"]');
+        if (allBtn) {
+          allBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        }
+        renderCards();
       });
     }
 
-    // Category Tabs
+    // Categories Array for Left/Right Swiping & Filtering
+    const categories = ['All Bookings', 'New Bookings', 'Assigned', 'Ongoing'];
+
+    function setCategory(cat, slideDir = null) {
+      if (!categories.includes(cat)) return;
+      activeCategory = cat;
+
+      // Update active tab buttons
+      container.querySelectorAll('.tab-pill').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.classList.add('active');
+          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      const listEl = container.querySelector('#mobile-cards-list');
+      if (listEl) {
+        const offset = slideDir === 'left' ? '-14px' : slideDir === 'right' ? '14px' : '0px';
+        listEl.style.transition = 'opacity 0.1s ease, transform 0.1s ease';
+        listEl.style.opacity = '0';
+        listEl.style.transform = `translateX(${offset})`;
+
+        setTimeout(() => {
+          renderCards();
+          listEl.style.transform = slideDir === 'left' ? 'translateX(14px)' : slideDir === 'right' ? 'translateX(-14px)' : 'translateX(0)';
+          void listEl.offsetHeight; // trigger reflow
+          listEl.style.transition = 'opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)';
+          listEl.style.opacity = '1';
+          listEl.style.transform = 'translateX(0)';
+        }, 60);
+      } else {
+        renderCards();
+      }
+    }
+
+    function switchCategoryByDirection(direction) {
+      const currentIndex = categories.indexOf(activeCategory);
+      let targetIndex = currentIndex;
+
+      if (direction === 'left') {
+        // Swiping left moves towards left tab ('New Bookings')
+        targetIndex = Math.max(0, currentIndex - 1);
+      } else if (direction === 'right') {
+        // Swiping right moves towards right tab ('Assigned', 'Ongoing')
+        targetIndex = Math.min(categories.length - 1, currentIndex + 1);
+      }
+
+      if (targetIndex !== currentIndex) {
+        setCategory(categories[targetIndex], direction);
+      }
+    }
+
+    // Category Tabs click
     container.querySelectorAll('.tab-pill').forEach(btn => {
       btn.addEventListener('click', () => {
-        activeCategory = btn.dataset.cat;
-        container.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderCards();
+        setCategory(btn.dataset.cat);
       });
     });
+
+    // Left and Right Swipe / Scroll Gesture Handling
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    let isTouchSwiping = false;
+
+    const cardsArea = container.querySelector('#mobile-cards-list');
+    const screenArea = container.querySelector('.bookings-screen') || container;
+
+    // Touch event listeners (Mobile swipe left/right)
+    screenArea.addEventListener('touchstart', (e) => {
+      if (isModalOpen || isAssignSheetOpen) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchEndX = touchStartX;
+      touchEndY = touchStartY;
+      isTouchSwiping = true;
+    }, { passive: true });
+
+    screenArea.addEventListener('touchmove', (e) => {
+      if (!isTouchSwiping || isModalOpen || isAssignSheetOpen) return;
+      touchEndX = e.touches[0].clientX;
+      touchEndY = e.touches[0].clientY;
+    }, { passive: true });
+
+    screenArea.addEventListener('touchend', (e) => {
+      if (!isTouchSwiping || isModalOpen || isAssignSheetOpen) return;
+      isTouchSwiping = false;
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      const minDistance = 35; // threshold in pixels
+
+      if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX < 0) {
+          // Swiped left -> Filters New Bookings (or moves left)
+          switchCategoryByDirection('left');
+        } else {
+          // Swiped right -> Filters Assigned / Ongoing (moves right)
+          switchCategoryByDirection('right');
+        }
+      }
+    });
+
+    // Mouse drag gesture listeners (for testing on desktop browser / mobile simulator)
+    let isMouseDownDrag = false;
+    let mouseStartX = 0;
+    let mouseStartY = 0;
+    let mouseEndX = 0;
+    let mouseEndY = 0;
+
+    screenArea.addEventListener('mousedown', (e) => {
+      if (isModalOpen || isAssignSheetOpen || e.button !== 0) return;
+      if (e.target.closest('button, input, select, textarea, .custom-checkbox, .card-select-checkbox')) return;
+      isMouseDownDrag = true;
+      mouseStartX = e.clientX;
+      mouseStartY = e.clientY;
+      mouseEndX = mouseStartX;
+      mouseEndY = mouseStartY;
+    });
+
+    screenArea.addEventListener('mousemove', (e) => {
+      if (!isMouseDownDrag) return;
+      mouseEndX = e.clientX;
+      mouseEndY = e.clientY;
+    });
+
+    const endMouseDrag = () => {
+      if (!isMouseDownDrag) return;
+      isMouseDownDrag = false;
+      const diffX = mouseEndX - mouseStartX;
+      const diffY = mouseEndY - mouseStartY;
+      const minDistance = 35;
+
+      if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX < 0) {
+          switchCategoryByDirection('left');
+        } else {
+          switchCategoryByDirection('right');
+        }
+      }
+    };
+
+    screenArea.addEventListener('mouseup', endMouseDrag);
+
+    // Trackpad / Horizontal wheel scroll (left and right)
+    screenArea.addEventListener('wheel', (e) => {
+      if (isModalOpen || isAssignSheetOpen) return;
+      if (Math.abs(e.deltaX) > 25 && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        if (e.deltaX < 0) {
+          switchCategoryByDirection('left');
+        } else {
+          switchCategoryByDirection('right');
+        }
+      }
+    }, { passive: true });
+
+    // Modal Sheet Left and Right Swipe / Scroll Gesture Handling (Customer Details <-> Guests <-> Itinerary <-> Updates)
+    const sheetEl = container.querySelector('#mobile-bottom-sheet');
+    const modalTabs = ['customer-details', 'guests', 'itinerary', 'updates'];
+
+    function switchModalTabByDirection(direction) {
+      const currentIndex = modalTabs.indexOf(activeModalTab);
+      let targetIndex = currentIndex;
+
+      if (direction === 'left') {
+        // Swiping left moves towards left tab (e.g. Guests -> Customer Details, Itinerary -> Guests)
+        targetIndex = Math.max(0, currentIndex - 1);
+      } else if (direction === 'right') {
+        // Swiping right moves towards right tab (e.g. Guests -> Itinerary, Itinerary -> Updates)
+        targetIndex = Math.min(modalTabs.length - 1, currentIndex + 1);
+      }
+
+      if (targetIndex !== currentIndex) {
+        switchTab(modalTabs[targetIndex], direction);
+      }
+    }
+
+    if (sheetEl) {
+      let sheetTouchStartX = 0;
+      let sheetTouchStartY = 0;
+      let sheetTouchEndX = 0;
+      let sheetTouchEndY = 0;
+      let isSheetTouchSwiping = false;
+
+      sheetEl.addEventListener('touchstart', (e) => {
+        if (!isModalOpen || isAssignSheetOpen) return;
+        sheetTouchStartX = e.touches[0].clientX;
+        sheetTouchStartY = e.touches[0].clientY;
+        sheetTouchEndX = sheetTouchStartX;
+        sheetTouchEndY = sheetTouchStartY;
+        isSheetTouchSwiping = true;
+      }, { passive: true });
+
+      sheetEl.addEventListener('touchmove', (e) => {
+        if (!isSheetTouchSwiping || !isModalOpen || isAssignSheetOpen) return;
+        sheetTouchEndX = e.touches[0].clientX;
+        sheetTouchEndY = e.touches[0].clientY;
+      }, { passive: true });
+
+      sheetEl.addEventListener('touchend', (e) => {
+        if (!isSheetTouchSwiping || !isModalOpen || isAssignSheetOpen) return;
+        isSheetTouchSwiping = false;
+        const diffX = sheetTouchEndX - sheetTouchStartX;
+        const diffY = sheetTouchEndY - sheetTouchStartY;
+        const minDistance = 35;
+
+        // Ensure horizontal swipe was intended rather than vertical scrolling
+        if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY) * 1.1) {
+          if (diffX < 0) {
+            switchModalTabByDirection('left');
+          } else {
+            switchModalTabByDirection('right');
+          }
+        }
+      });
+
+      // Mouse drag gesture on bottom sheet (for testing on desktop / mobile simulator)
+      let isSheetMouseDragging = false;
+      let sheetMouseStartX = 0;
+      let sheetMouseStartY = 0;
+      let sheetMouseEndX = 0;
+      let sheetMouseEndY = 0;
+
+      sheetEl.addEventListener('mousedown', (e) => {
+        if (!isModalOpen || isAssignSheetOpen || e.button !== 0) return;
+        if (e.target.closest('button, input, select, textarea, .custom-checkbox, .mini-icon-btn, .btn-confirm-booking')) return;
+        isSheetMouseDragging = true;
+        sheetMouseStartX = e.clientX;
+        sheetMouseStartY = e.clientY;
+        sheetMouseEndX = sheetMouseStartX;
+        sheetMouseEndY = sheetMouseStartY;
+      });
+
+      sheetEl.addEventListener('mousemove', (e) => {
+        if (!isSheetMouseDragging) return;
+        sheetMouseEndX = e.clientX;
+        sheetMouseEndY = e.clientY;
+      });
+
+      const endSheetMouseDrag = () => {
+        if (!isSheetMouseDragging) return;
+        isSheetMouseDragging = false;
+        const diffX = sheetMouseEndX - sheetMouseStartX;
+        const diffY = sheetMouseEndY - sheetMouseStartY;
+        const minDistance = 35;
+
+        if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY) * 1.1) {
+          if (diffX < 0) {
+            switchModalTabByDirection('left');
+          } else {
+            switchModalTabByDirection('right');
+          }
+        }
+      };
+
+      sheetEl.addEventListener('mouseup', endSheetMouseDrag);
+
+      // Trackpad / Horizontal wheel scroll on bottom sheet
+      sheetEl.addEventListener('wheel', (e) => {
+        if (!isModalOpen || isAssignSheetOpen) return;
+        if (Math.abs(e.deltaX) > 28 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.5) {
+          if (e.deltaX < 0) {
+            switchModalTabByDirection('left');
+          } else {
+            switchModalTabByDirection('right');
+          }
+        }
+      }, { passive: true });
+    }
 
     // Select All
     const selectAllBox = container.querySelector('#mobile-select-all-box');
@@ -1635,34 +2209,145 @@ export function createMobileView(container, options = {}) {
 
     // Global Click Handler
     container.addEventListener('click', (e) => {
-      // Edit customer button
+      // Reset filters from empty state
+      if (e.target.closest('#btn-clear-mobile-empty-filters')) {
+        activeCategory = 'All Bookings';
+        selectedCategory = 'ALL';
+        const sInput = container.querySelector('#mobile-search-input');
+        if (sInput) sInput.value = '';
+        searchQuery = '';
+        const catSelect = container.querySelector('#mobile-category-filter');
+        if (catSelect) catSelect.value = 'ALL';
+        setCategory('All Bookings');
+        return;
+      }
+
+      if (e.target.closest('#btn-view-all-category-filters')) {
+        const sInput = container.querySelector('#mobile-search-input');
+        if (sInput) sInput.value = '';
+        searchQuery = '';
+        setCategory('All Bookings');
+        return;
+      }
+
+      // Edit customer button -> Opens app modal
       if (e.target.closest('#btn-edit-customer')) {
-        const name = activeModalBooking?.customer?.name || activeModalBooking?.guest?.name || 'Customer';
+        openMobileEditCustomerModal();
+        return;
+      }
+
+      // Edit Customer Modal Actions
+      if (e.target.closest('#btn-cancel-edit-customer') || e.target.closest('#close-mobile-modal-edit-customer-btn')) {
+        closeMobileEditCustomerModal();
+        return;
+      }
+
+      if (e.target.closest('#btn-save-edit-customer')) {
+        if (!activeModalBooking) return;
+        const nameVal = container.querySelector('#mobile-modal-edit-cust-name')?.value?.trim();
+        const phoneVal = container.querySelector('#mobile-modal-edit-cust-phone')?.value?.trim();
+        const emailVal = container.querySelector('#mobile-modal-edit-cust-email')?.value?.trim();
+        const locVal = container.querySelector('#mobile-modal-edit-cust-location')?.value?.trim();
+        const srcVal = container.querySelector('#mobile-modal-edit-cust-source')?.value;
+        const typeVal = container.querySelector('#mobile-modal-edit-cust-type')?.value?.trim();
+        const destVal = container.querySelector('#mobile-modal-edit-cust-destination')?.value?.trim();
+        const datesVal = container.querySelector('#mobile-modal-edit-cust-dates')?.value?.trim();
+        const budgetVal = container.querySelector('#mobile-modal-edit-cust-budget')?.value?.trim();
+        const notesVal = container.querySelector('#mobile-modal-edit-cust-notes')?.value?.trim();
+
+        if (!nameVal || !phoneVal) {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Customer name and phone number are required.', type: 'warning' }
+          }));
+          return;
+        }
+
+        const nameParts = nameVal.split(' ');
+        const initials = (nameParts[0]?.[0] || 'C') + (nameParts[1]?.[0] || '');
+
+        activeModalBooking.customer = activeModalBooking.customer || {};
+        activeModalBooking.customer.name = nameVal;
+        activeModalBooking.customer.initials = initials.toUpperCase();
+        activeModalBooking.customer.phone = phoneVal;
+        activeModalBooking.customer.email = emailVal || activeModalBooking.customer.email;
+        activeModalBooking.customer.location = locVal || activeModalBooking.customer.location;
+        activeModalBooking.customer.leadSource = srcVal || activeModalBooking.customer.leadSource;
+        activeModalBooking.customer.customerType = typeVal || activeModalBooking.customer.customerType;
+        activeModalBooking.customer.preferredDestination = destVal || activeModalBooking.destination;
+        activeModalBooking.customer.travelDates = datesVal || activeModalBooking.dates;
+        activeModalBooking.customer.budgetEst = budgetVal || activeModalBooking.price;
+        activeModalBooking.customer.shortDetails = notesVal;
+
+        if (activeModalBooking.guest) {
+          activeModalBooking.guest.name = nameVal;
+          activeModalBooking.guest.phone = phoneVal;
+          if (emailVal) activeModalBooking.guest.email = emailVal;
+        }
+        if (destVal) {
+          activeModalBooking.destination = destVal;
+        }
+
+        closeMobileEditCustomerModal();
+        renderCards();
+        renderSheetBody();
         window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { message: `Editing customer details for ${name}...`, type: 'info' }
+          detail: { message: 'Customer details updated successfully!', type: 'success' }
         }));
         return;
       }
 
-      // Add follow-up button
+      // Add follow-up button -> Opens app modal
       if (e.target.closest('#btn-add-followup-action')) {
-        const note = prompt('Enter follow-up note (e.g. Call with customer regarding dates):');
-        if (note && activeModalBooking?.customer) {
-          activeModalBooking.customer.leadFlow = activeModalBooking.customer.leadFlow || [];
-          activeModalBooking.customer.leadFlow.unshift({
-            date: 'Today',
-            time: 'Just now',
-            type: 'call',
-            iconBg: 'icon-blue',
-            title: 'Follow-up Call (Logged)',
-            desc: note,
-            author: 'By Ruyi Admin'
-          });
-          renderSheetBody();
+        openMobileAddFollowupModal();
+        return;
+      }
+
+      // Add Follow-up Modal Actions
+      if (e.target.closest('#btn-cancel-add-followup') || e.target.closest('#close-mobile-modal-add-followup-btn')) {
+        closeMobileAddFollowupModal();
+        return;
+      }
+
+      if (e.target.closest('#btn-submit-add-followup')) {
+        if (!activeModalBooking) return;
+        const typeVal = container.querySelector('#mobile-modal-add-followup-type')?.value || 'call';
+        const titleVal = container.querySelector('#mobile-modal-add-followup-title')?.value?.trim();
+        const dateVal = container.querySelector('#mobile-modal-add-followup-date')?.value?.trim();
+        const timeVal = container.querySelector('#mobile-modal-add-followup-time')?.value?.trim();
+        const descVal = container.querySelector('#mobile-modal-add-followup-desc')?.value?.trim();
+
+        if (!titleVal) {
           window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: 'New follow-up added to journey!', type: 'success' }
+            detail: { message: 'Please enter an activity title / subject.', type: 'warning' }
           }));
+          return;
         }
+
+        const typeMap = {
+          call: { bg: 'icon-blue', title: 'Follow-up Call (Logged)' },
+          whatsapp: { bg: 'icon-green', title: 'WhatsApp Chat (Logged)' },
+          email: { bg: 'icon-blue', title: 'Email Sent (Logged)' },
+          meeting: { bg: 'icon-purple', title: 'In-Person Meeting (Logged)' },
+          note: { bg: 'icon-orange', title: 'Status Note (Logged)' }
+        };
+
+        activeModalBooking.customer = activeModalBooking.customer || {};
+        activeModalBooking.customer.leadFlow = activeModalBooking.customer.leadFlow || [];
+        activeModalBooking.customer.leadFlow.unshift({
+          date: dateVal || 'Today',
+          time: timeVal || 'Just now',
+          type: typeVal,
+          iconBg: typeMap[typeVal]?.bg || 'icon-blue',
+          title: titleVal,
+          desc: descVal,
+          author: 'By Ruyi Admin'
+        });
+
+        closeMobileAddFollowupModal();
+        renderSheetBody();
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: 'New follow-up added to journey!', type: 'success' }
+        }));
         return;
       }
 
@@ -1681,6 +2366,52 @@ export function createMobileView(container, options = {}) {
         if (b) {
           b.selected = !b.selected;
           renderCards();
+        }
+        return;
+      }
+
+      // Quick Call Action on Mobile Booking Card
+      const callBtn = e.target.closest('[data-action-call]');
+      if (callBtn) {
+        e.stopPropagation();
+        e.preventDefault();
+        const id = callBtn.dataset.actionCall;
+        const b = bookings.find(item => item.id === id);
+        if (b && b.guest && b.guest.phone) {
+          const rawPhone = b.guest.phone;
+          const cleanPhone = rawPhone.replace(/[^0-9+]/g, '');
+          window.location.href = `tel:${cleanPhone}`;
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Calling ${b.guest.name} (${rawPhone})...`, type: 'info' }
+          }));
+        } else {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Phone number not available for this guest.', type: 'warning' }
+          }));
+        }
+        return;
+      }
+
+      // Quick WhatsApp Action on Mobile Booking Card
+      const waBtn = e.target.closest('[data-action-whatsapp]');
+      if (waBtn) {
+        e.stopPropagation();
+        e.preventDefault();
+        const id = waBtn.dataset.actionWhatsapp;
+        const b = bookings.find(item => item.id === id);
+        if (b && b.guest && b.guest.phone) {
+          const rawPhone = b.guest.phone;
+          const digits = rawPhone.replace(/[^0-9]/g, '');
+          const phoneForWa = digits.startsWith('91') ? digits : (digits.length === 10 ? '91' + digits : digits);
+          const msg = encodeURIComponent(`Hi ${b.guest.name}, this is Ruyi Travel Operations regarding your booking ${b.id} (${b.title}).`);
+          window.open(`https://wa.me/${phoneForWa}?text=${msg}`, '_blank');
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Opening WhatsApp chat with ${b.guest.name}...`, type: 'success' }
+          }));
+        } else {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Phone number not available for this guest.', type: 'warning' }
+          }));
         }
         return;
       }
@@ -1705,27 +2436,81 @@ export function createMobileView(container, options = {}) {
         return;
       }
 
-      // Mobile Bulk More Button (Options)
+      // Mobile Bulk More Button (Toggle Dropdown)
       if (e.target.closest('#mobile-bulk-more-btn')) {
+        isMobileBulkDropdownOpen = !isMobileBulkDropdownOpen;
+        renderMobileBulkDropdown();
+        return;
+      }
+
+      // Mobile Bulk Assign Action Inside Dropdown
+      if (e.target.closest('#mobile-bulk-assign-action')) {
+        isMobileBulkDropdownOpen = false;
+        renderMobileBulkDropdown();
         const sel = bookings.filter(b => b.selected);
         if (sel.length > 0) {
-          const action = confirm(`Bulk Actions for ${sel.length} selected bookings:\n\nClick OK to Mark as Paid.\nClick Cancel to Clear Selection.`);
-          if (action) {
-            sel.forEach(b => {
-              b.status = 'Paid';
-              b.statusClass = 'status-paid';
-              b.selected = false;
-            });
-            renderCards();
-            window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { message: `Marked ${sel.length} booking(s) as Paid!`, type: 'success' }
-            }));
-          } else {
-            sel.forEach(b => b.selected = false);
-            renderCards();
-          }
+          targetActivityItem = {
+            id: 'BULK-ASSIGN',
+            title: `${sel.length} Bookings Selected`,
+            subtitle: sel.map(b => b.id).join(', '),
+            type: 'activity',
+            isBulk: true
+          };
+          openAssignSheet(targetActivityItem);
+        } else {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Please select at least 1 booking to assign.', type: 'info' }
+          }));
         }
         return;
+      }
+
+      // Mobile Bulk Mark as Paid Inside Dropdown
+      if (e.target.closest('#mobile-bulk-mark-paid-action')) {
+        const sel = bookings.filter(b => b.selected);
+        if (sel.length > 0) {
+          sel.forEach(b => {
+            b.status = 'Paid';
+            b.statusClass = 'status-paid';
+          });
+          isMobileBulkDropdownOpen = false;
+          renderCards();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Marked ${sel.length} booking(s) as Paid!`, type: 'success' }
+          }));
+        }
+        return;
+      }
+
+      // Mobile Bulk Mark as Unpaid Inside Dropdown
+      if (e.target.closest('#mobile-bulk-mark-unpaid-action')) {
+        const sel = bookings.filter(b => b.selected);
+        if (sel.length > 0) {
+          sel.forEach(b => {
+            b.status = 'Pending';
+            b.statusClass = 'status-pending';
+          });
+          isMobileBulkDropdownOpen = false;
+          renderCards();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Marked ${sel.length} booking(s) as Unpaid (Pending)!`, type: 'info' }
+          }));
+        }
+        return;
+      }
+
+      // Mobile Bulk Clear Selection Inside Dropdown
+      if (e.target.closest('#mobile-bulk-clear-action')) {
+        bookings.forEach(b => b.selected = false);
+        isMobileBulkDropdownOpen = false;
+        renderCards();
+        return;
+      }
+
+      // Close bulk more dropdown if clicked outside
+      if (!e.target.closest('#mobile-bulk-more-btn') && !e.target.closest('#mobile-bulk-more-dropdown') && isMobileBulkDropdownOpen) {
+        isMobileBulkDropdownOpen = false;
+        renderMobileBulkDropdown();
       }
 
       // Card click -> Open Modal on Customer Details
@@ -1745,7 +2530,7 @@ export function createMobileView(container, options = {}) {
 
       // Itinerary Back Button `< Booking Details`
       if (e.target.closest('#itinerary-back-btn')) {
-        switchTab('customer-details');
+        switchTab('customer-details', 'left');
         return;
       }
 
@@ -1753,7 +2538,10 @@ export function createMobileView(container, options = {}) {
       const sheetTabBtn = e.target.closest('.sheet-tab-btn');
       if (sheetTabBtn) {
         const targetTab = sheetTabBtn.dataset.sheetTab;
-        switchTab(targetTab);
+        const currentIdx = modalTabs.indexOf(activeModalTab);
+        const targetIdx = modalTabs.indexOf(targetTab);
+        const dir = targetIdx > currentIdx ? 'right' : (targetIdx < currentIdx ? 'left' : null);
+        switchTab(targetTab, dir);
         return;
       }
 
@@ -1889,7 +2677,9 @@ export function createMobileView(container, options = {}) {
         const type = container.querySelector('#modal-add-event-type')?.value || 'sightseeing';
 
         if (!title) {
-          alert('Please enter an event title.');
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Please enter an event title.', type: 'warning' }
+          }));
           return;
         }
 
@@ -2031,66 +2821,76 @@ export function createMobileView(container, options = {}) {
         return;
       }
 
-      // Add New Item Trigger (Team Member, Vendor, or Contact)
+      // Add New Item Trigger (Team Member, Vendor, or Contact) -> Opens app-based modal
       if (e.target.closest('#btn-add-new-vendor-trigger')) {
-        if (assignVendorTab === 'Team Members') {
-          const name = prompt('Enter New Team Member Full Name:');
-          if (name) {
-            const role = prompt('Enter Member Role (e.g. Operations Coordinator):') || 'Operations Coordinator';
-            const newM = {
-              id: `ST-0${teamMembers.length + 1}`,
-              name,
-              role,
-              phone: '+91 98765 00999',
-              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-              activeTrips: 1
-            };
-            teamMembers.unshift(newM);
-            selectedAssignee = { type: 'Team Members', id: newM.id, name: newM.name, avatar: newM.avatar, roleOrService: newM.role, phone: newM.phone };
-            renderAssignVendorsList();
-            window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { message: `Added team member "${name}"!`, type: 'success' }
-            }));
-          }
-        } else if (assignVendorTab === 'Vendors') {
-          const vendorName = prompt('Enter New Vendor Company Name:');
-          if (vendorName) {
-            const service = prompt('Enter Service (e.g. River Rafting & Camping):') || 'Rishikesh Rafting & Safari';
-            const newV = {
-              id: `V-0${vendors.length + 1}`,
-              name: vendorName,
-              phone: '+91 99887 76655',
-              service,
-              image: './images/rishikesh.jpg',
-              selected: false
-            };
-            vendors.unshift(newV);
-            selectedAssignee = { type: 'Vendors', id: newV.id, name: newV.name, avatar: newV.image, roleOrService: newV.service, phone: newV.phone };
-            renderAssignVendorsList();
-            window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { message: `Added vendor "${vendorName}"!`, type: 'success' }
-            }));
-          }
-        } else if (assignVendorTab === 'Contacts') {
-          const contactName = prompt('Enter New Contact Full Name:');
-          if (contactName) {
-            const role = prompt('Enter Role / Specialty (e.g. Driver, Guide, Resort Contact):') || 'Tour Contact';
-            const newC = {
-              id: `CT-0${contacts.length + 1}`,
-              name: contactName,
-              phone: '+91 98777 88990',
-              role,
-              details: 'On-ground operations contact',
-              avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80'
-            };
-            contacts.unshift(newC);
-            selectedAssignee = { type: 'Contacts', id: newC.id, name: newC.name, avatar: newC.avatar, roleOrService: newC.role, phone: newC.phone };
-            renderAssignVendorsList();
-            window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { message: `Added contact "${contactName}"!`, type: 'success' }
-            }));
-          }
+        openMobileAddAssigneeModal(assignVendorTab);
+        return;
+      }
+
+      // Add Assignee Modal Actions
+      if (e.target.closest('#btn-cancel-add-assignee') || e.target.closest('#close-mobile-modal-add-assignee-btn')) {
+        closeMobileAddAssigneeModal();
+        return;
+      }
+
+      if (e.target.closest('#btn-submit-add-assignee')) {
+        const nameVal = container.querySelector('#mobile-modal-add-assignee-name')?.value?.trim();
+        const roleVal = container.querySelector('#mobile-modal-add-assignee-role')?.value?.trim();
+        const phoneVal = container.querySelector('#mobile-modal-add-assignee-phone')?.value?.trim() || '+91 98765 00000';
+
+        if (!nameVal) {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Please enter a name or company title.', type: 'warning' }
+          }));
+          return;
         }
+
+        if (assignVendorTab === 'Team Members') {
+          const newM = {
+            id: `ST-0${teamMembers.length + 1}`,
+            name: nameVal,
+            role: roleVal || 'Operations Coordinator',
+            phone: phoneVal,
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+            activeTrips: 1
+          };
+          teamMembers.unshift(newM);
+          selectedAssignee = { type: 'Team Members', id: newM.id, name: newM.name, avatar: newM.avatar, roleOrService: newM.role, phone: newM.phone };
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Added team member "${nameVal}"!`, type: 'success' }
+          }));
+        } else if (assignVendorTab === 'Vendors') {
+          const newV = {
+            id: `V-0${vendors.length + 1}`,
+            name: nameVal,
+            phone: phoneVal,
+            service: roleVal || 'Rishikesh Rafting & Safari',
+            image: './images/rishikesh.jpg',
+            selected: false
+          };
+          vendors.unshift(newV);
+          selectedAssignee = { type: 'Vendors', id: newV.id, name: newV.name, avatar: newV.image, roleOrService: newV.service, phone: newV.phone };
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Added vendor "${nameVal}"!`, type: 'success' }
+          }));
+        } else if (assignVendorTab === 'Contacts') {
+          const newC = {
+            id: `CT-0${contacts.length + 1}`,
+            name: nameVal,
+            phone: phoneVal,
+            role: roleVal || 'Tour Contact',
+            details: 'On-ground operations contact',
+            avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80'
+          };
+          contacts.unshift(newC);
+          selectedAssignee = { type: 'Contacts', id: newC.id, name: newC.name, avatar: newC.avatar, roleOrService: newC.role, phone: newC.phone };
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Added contact "${nameVal}"!`, type: 'success' }
+          }));
+        }
+
+        closeMobileAddAssigneeModal();
+        renderAssignVendorsList();
         return;
       }
 
@@ -2155,7 +2955,7 @@ export function createMobileView(container, options = {}) {
 
       // Guest row click in overview -> switches to guests tab
       if (e.target.closest('#row-click-guest')) {
-        switchTab('guests');
+        switchTab('guests', 'right');
         return;
       }
 
@@ -2184,16 +2984,50 @@ export function createMobileView(container, options = {}) {
     });
   }
 
-  function switchTab(tab) {
+  function switchTab(tab, slideDir = null) {
+    if (activeModalTab === tab && !slideDir) return;
+    if (!slideDir && activeModalTab !== tab) {
+      const currentIdx = modalTabs.indexOf(activeModalTab);
+      const targetIdx = modalTabs.indexOf(tab);
+      if (currentIdx !== -1 && targetIdx !== -1) {
+        slideDir = targetIdx > currentIdx ? 'right' : 'left';
+      }
+    }
+
     activeModalTab = tab;
     openDropdownItemId = null;
     closeAssignSheet();
 
     renderSheetHeader();
     container.querySelectorAll('.sheet-tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.sheetTab === activeModalTab);
+      const isActive = btn.dataset.sheetTab === activeModalTab;
+      btn.classList.toggle('active', isActive);
+      if (isActive) {
+        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
     });
-    renderSheetBody();
+
+    const bodyEl = container.querySelector('#sheet-body-content');
+    if (bodyEl && slideDir) {
+      const exitOffset = slideDir === 'left' ? '18px' : '-18px';
+      const enterOffset = slideDir === 'left' ? '-18px' : '18px';
+      bodyEl.style.transition = 'opacity 0.12s ease-out, transform 0.12s ease-out';
+      bodyEl.style.opacity = '0.3';
+      bodyEl.style.transform = `translateX(${exitOffset})`;
+
+      setTimeout(() => {
+        renderSheetBody();
+        bodyEl.scrollTop = 0;
+        bodyEl.style.transition = 'none';
+        bodyEl.style.transform = `translateX(${enterOffset})`;
+        void bodyEl.offsetHeight; // Force reflow
+        bodyEl.style.transition = 'opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+        bodyEl.style.opacity = '1';
+        bodyEl.style.transform = 'translateX(0)';
+      }, 70);
+    } else {
+      renderSheetBody();
+    }
   }
 
   // Initial renders

@@ -73,6 +73,20 @@ class BookingsManager extends Component
     public function setCategory(string $cat): void
     {
         $this->category = $cat;
+        $query = Booking::query();
+        if ($cat !== 'ALL') {
+            if ($cat === 'VILLA') {
+                $query->whereIn('type', ['VILLA', 'RESORT']);
+            } else {
+                $query->where('type', $cat);
+            }
+        }
+        if ($this->tab !== 'All Bookings') {
+            $query->where('category', $this->tab);
+        }
+        if ($query->count() === 0) {
+            $this->tab = 'All Bookings';
+        }
     }
 
     public function clearSearch(): void
@@ -148,8 +162,31 @@ class BookingsManager extends Component
             }
         }
         $this->showToast("Marked {$count} booking(s) as Confirmed & Paid!", 'success');
-        $this->selectedBookings = [];
         $this->isBulkMoreOpen = false;
+    }
+
+    public function bulkMarkUnpaid(): void
+    {
+        if (empty($this->selectedBookings)) return;
+        $count = count($this->selectedBookings);
+
+        foreach ($this->selectedBookings as $id) {
+            $b = Booking::find($id);
+            if ($b) {
+                $b->status = 'Pending';
+                $b->status_class = 'status-pending';
+                $b->save();
+            }
+        }
+        $this->showToast("Marked {$count} booking(s) as Unpaid (Pending)!", 'info');
+        $this->isBulkMoreOpen = false;
+    }
+
+    public function getIsAllSelectedPaidProperty(): bool
+    {
+        if (empty($this->selectedBookings)) return false;
+        $items = Booking::whereIn('id', $this->selectedBookings)->get();
+        return $items->isNotEmpty() && $items->every(fn($b) => in_array($b->status, ['Paid', 'Confirmed']));
     }
 
     public function openDrawer(string $id): void
@@ -626,7 +663,11 @@ class BookingsManager extends Component
         }
 
         if ($this->category !== 'ALL') {
-            $query->where('type', $this->category);
+            if ($this->category === 'VILLA') {
+                $query->whereIn('type', ['VILLA', 'RESORT']);
+            } else {
+                $query->where('type', $this->category);
+            }
         }
 
         if (!empty(trim($this->search))) {
@@ -649,7 +690,15 @@ class BookingsManager extends Component
 
     public function getStatsProperty(): array
     {
-        $all = Booking::all();
+        $query = Booking::query();
+        if ($this->category !== 'ALL') {
+            if ($this->category === 'VILLA') {
+                $query->whereIn('type', ['VILLA', 'RESORT']);
+            } else {
+                $query->where('type', $this->category);
+            }
+        }
+        $all = $query->get();
         $totalBookings = $all->count();
         $totalPax = $all->sum('pax');
         $totalRev = $all->sum('raw_price');

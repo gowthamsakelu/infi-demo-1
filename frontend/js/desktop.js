@@ -12,6 +12,7 @@ export function createDesktopView(container) {
   let isDetailDrawerOpen = false;
   let activeDetailTab = 'customer-details';
   let guestSearchQuery = '';
+  let showAllGuests = false;
   let openDropdownItemId = null;
   let modalActiveItem = null;
 
@@ -114,256 +115,252 @@ export function createDesktopView(container) {
 
       <!-- Main Desktop Area -->
       <main class="desktop-main">
-        <!-- Top Header -->
+        <!-- Top Header with Search and Notification Bar (Image 3 reference) -->
         <header class="desktop-top-header">
           <div class="desktop-search-wrapper">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"/>
               <path d="m21 21-4.3-4.3"/>
             </svg>
-            <input type="text" id="desktop-search-input" placeholder="Search by booking ID, destination, or guest name..." />
-            <button id="desktop-search-clear" style="display: none; background: transparent; border: none; cursor: pointer; color: #94A3B8;">✕</button>
+            <input type="text" id="desktop-search-input" placeholder="Search by booking ID, destination, or guest name..." value="${searchQuery}" />
+            <button id="desktop-search-clear" style="${searchQuery ? 'display: block;' : 'display: none;'} background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 14px; padding: 0 4px;">✕</button>
           </div>
 
           <div class="desktop-header-actions">
-            <button class="icon-bell-btn" id="desktop-bell-btn" title="Notifications">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-              </svg>
-              <span class="bell-dot"></span>
-            </button>
-          </div>
-        </header>
-
-        <!-- Body with Metrics and Full-Width Table (Spacious & Clean) -->
-        <div class="desktop-body">
-          <div class="desktop-content-col">
-            <!-- Metrics Row -->
-            <div class="metrics-row">
-              <div class="metric-card">
-                <div class="metric-icon-box metric-icon-blue">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                    <rect width="20" height="14" x="2" y="6" rx="2"/>
-                  </svg>
+            <div class="desktop-notification-wrapper" style="position: relative;">
+              <button class="icon-bell-btn" id="desktop-bell-btn" title="Notifications" aria-label="Notifications">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+                <span class="bell-dot" id="desktop-bell-dot"></span>
+              </button>
+              <div class="desktop-notifications-dropdown" id="desktop-notifications-dropdown" style="display: none;">
+                <div class="notifications-header">
+                  <h4>Notifications</h4>
+                  <button class="notifications-mark-read-btn" id="btn-mark-all-notifications-read">Mark all as read</button>
                 </div>
-                <div class="metric-info">
-                  <h5>Total Bookings</h5>
-                  <h3 id="stat-total-bookings">28</h3>
-                  <div class="metric-trend">↑ +14.2% this month</div>
-                </div>
-              </div>
-
-              <div class="metric-card">
-                <div class="metric-icon-box metric-icon-green">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
-                </div>
-                <div class="metric-info">
-                  <h5>Total Travelers</h5>
-                  <h3 id="stat-total-pax">142 Pax</h3>
-                  <div class="metric-trend">Active across 6 tours</div>
-                </div>
-              </div>
-
-              <div class="metric-card">
-                <div class="metric-icon-box metric-icon-purple">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect width="20" height="14" x="2" y="5" rx="2"/>
-                    <line x1="2" x2="22" y1="10" y2="10"/>
-                  </svg>
-                </div>
-                <div class="metric-info">
-                  <h5>Collected Revenue</h5>
-                  <h3 id="stat-revenue">₹2,19,500</h3>
-                  <div class="metric-trend">86% Settlement rate</div>
-                </div>
-              </div>
-
-              <div class="metric-card">
-                <div class="metric-icon-box metric-icon-orange">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" x2="12" y1="8" y2="12"/>
-                    <line x1="12" x2="12.01" y1="16" y2="16"/>
-                  </svg>
-                </div>
-                <div class="metric-info">
-                  <h5>Pending Due</h5>
-                  <h3 id="stat-pending">₹32,500</h3>
-                  <div class="metric-trend" style="color: #EA580C;">2 Bookings awaiting</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Table Container with Toolbar -->
-            <div class="desktop-table-container">
-              <div class="table-toolbar">
-                <div class="toolbar-tabs-group">
-                  <button class="desktop-tab-btn ${activeTab === 'All Bookings' ? 'active' : ''}" data-d-tab="All Bookings">
-                    All Bookings (28)
-                  </button>
-                  <button class="desktop-tab-btn ${activeTab === 'New Bookings' ? 'active' : ''}" data-d-tab="New Bookings">
-                    New Bookings (8)
-                  </button>
-                  <button class="desktop-tab-btn ${activeTab === 'Assigned' ? 'active' : ''}" data-d-tab="Assigned">
-                    Assigned (12)
-                  </button>
-                  <button class="desktop-tab-btn ${activeTab === 'Ongoing' ? 'active' : ''}" data-d-tab="Ongoing">
-                    Ongoing (6)
-                  </button>
-                </div>
-
-                <div class="toolbar-actions-group">
-                  <select id="desktop-category-filter" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #CBD5E1; font-size: 13.5px; font-family: inherit; font-weight: 500; background: #FFFFFF; color: #1E293B; cursor: pointer;">
-                    <option value="ALL">All Categories</option>
-                    <option value="TOUR">Tour Packages</option>
-                    <option value="VILLA">Villas & Resorts</option>
-                    <option value="ACTIVITY">Activities & Sports</option>
-                    <option value="TRANSPORT">Transports</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Selection / Action Bar ("1 selected", "+ Assign", "...") Exactly as Mobile -->
-              <div class="mobile-selection-bar desktop-selection-bar" id="desktop-selection-bar" style="display: none;">
-                <div class="selection-left">
-                  <div class="custom-checkbox" id="desktop-select-all-box">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
+                <div class="notifications-list">
+                  <div class="notification-item unread">
+                    <div class="notif-icon-circle blue">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="notif-content">
+                      <p class="notif-text"><strong>New Booking:</strong> Haridwar - Kashi Trip (BK-5021) • 12 Pax</p>
+                      <span class="notif-time">10m ago</span>
+                    </div>
                   </div>
-                  <span id="desktop-selected-count">0 selected</span>
-                </div>
-                <div class="selection-actions-right">
-                  <button class="action-pill-btn" id="desktop-bulk-assign-btn">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                      <circle cx="9" cy="7" r="4"/>
-                      <line x1="19" x2="19" y1="8" y2="14"/>
-                      <line x1="22" x2="16" y1="11" y2="11"/>
-                    </svg>
-                    + Assign
-                  </button>
-                  <div style="position: relative;">
-                    <button class="action-more-btn" id="desktop-bulk-more-btn" title="More options">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="1"/>
-                        <circle cx="19" cy="12" r="1"/>
-                        <circle cx="5" cy="12" r="1"/>
-                      </svg>
-                    </button>
-                    <div class="bulk-more-dropdown" id="desktop-bulk-more-dropdown" style="display: none; position: absolute; right: 0; top: 40px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 6px; width: 160px; z-index: 100;">
-                      <button class="dropdown-item-btn" id="desktop-bulk-mark-paid-btn" style="padding: 8px 10px; font-size: 13px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        Mark as Paid
-                      </button>
-                      <button class="dropdown-item-btn" id="desktop-bulk-clear-btn" style="padding: 8px 10px; font-size: 13px; color: #64748B;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                        Clear Selection
-                      </button>
+                  <div class="notification-item unread">
+                    <div class="notif-icon-circle green">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="notif-content">
+                      <p class="notif-text"><strong>Payment Confirmed:</strong> ₹36,000 received from Amit Verma</p>
+                      <span class="notif-time">25m ago</span>
+                    </div>
+                  </div>
+                  <div class="notification-item unread">
+                    <div class="notif-icon-circle purple">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <div class="notif-content">
+                      <p class="notif-text"><strong>Special Requirement:</strong> Room Heating requested for BK-5027</p>
+                      <span class="notif-time">1h ago</span>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </header>
 
-              <!-- Table Element -->
-              <table class="bookings-table">
-                <thead>
-                  <tr>
-                    <th style="width: 44px; padding-left: 20px; padding-right: 0;">
-                      <div class="custom-checkbox" id="desktop-th-select-all">
+        <!-- Body with Table and Inline Details (Clean, Spacious & Outlook Split View) -->
+        <div class="desktop-body">
+          <div class="desktop-content-col">
+            <!-- Workspace Split: Table + Inline Details Pane (Outlook Style) -->
+            <div class="desktop-workspace-split" id="desktop-workspace-split">
+              <!-- Left Column: Master View (Full Table when closed, Slim Outlook Master List when open) -->
+              <div class="desktop-table-container" id="desktop-table-container">
+                <!-- 1. Full 10-Column Spacious Table View (Displayed when details are closed) -->
+                <div class="desktop-full-table-view" id="desktop-full-table-view">
+                  <div class="table-toolbar">
+                    <div class="toolbar-tabs-group">
+                      <button class="desktop-tab-btn ${activeTab === 'All Bookings' ? 'active' : ''}" data-d-tab="All Bookings">
+                        All Bookings (28)
+                      </button>
+                      <button class="desktop-tab-btn ${activeTab === 'New Bookings' ? 'active' : ''}" data-d-tab="New Bookings">
+                        New Bookings (8)
+                      </button>
+                      <button class="desktop-tab-btn ${activeTab === 'Assigned' ? 'active' : ''}" data-d-tab="Assigned">
+                        Assigned (12)
+                      </button>
+                      <button class="desktop-tab-btn ${activeTab === 'Ongoing' ? 'active' : ''}" data-d-tab="Ongoing">
+                        Ongoing (6)
+                      </button>
+                    </div>
+
+                    <div class="toolbar-actions-group">
+                      <div class="table-toolbar-search-box">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="11" cy="11" r="8"/>
+                          <path d="m21 21-4.3-4.3"/>
+                        </svg>
+                        <input type="text" id="desktop-table-search-input" placeholder="Search bookings..." value="${searchQuery}" />
+                      </div>
+                      <select id="desktop-category-filter" class="desktop-select-filter">
+                        <option value="ALL" ${selectedCategory === 'ALL' ? 'selected' : ''}>All Categories</option>
+                        <option value="TOUR" ${selectedCategory === 'TOUR' ? 'selected' : ''}>Tour Packages</option>
+                        <option value="VILLA" ${selectedCategory === 'VILLA' ? 'selected' : ''}>Villas & Resorts</option>
+                        <option value="ACTIVITY" ${selectedCategory === 'ACTIVITY' ? 'selected' : ''}>Activities & Sports</option>
+                        <option value="TRANSPORT" ${selectedCategory === 'TRANSPORT' ? 'selected' : ''}>Transports</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Selection / Action Bar ("1 selected", "+ Assign", "...") Exactly as Mobile -->
+                  <div class="mobile-selection-bar desktop-selection-bar" id="desktop-selection-bar" style="display: none;">
+                    <div class="selection-left">
+                      <div class="custom-checkbox" id="desktop-select-all-box">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                           <polyline points="20 6 9 17 4 12"/>
                         </svg>
                       </div>
-                    </th>
-                    <th style="min-width: 240px; padding-left: 14px;">Booking / Trip</th>
-                    <th>Category</th>
-                    <th>Pax & Duration</th>
-                    <th>Travel Dates</th>
-                    <th>Lead Guest</th>
-                    <th>Assigned To</th>
-                    <th>Status</th>
-                    <th>Amount</th>
-                    <th style="text-align: right; padding-right: 24px;">Action</th>
-                  </tr>
-                </thead>
-                <tbody id="desktop-table-body">
-                  <!-- Rows populated dynamically -->
-                </tbody>
-              </table>
+                      <span id="desktop-selected-count">0 selected</span>
+                    </div>
+                    <div class="selection-actions-right">
+                      <div style="position: relative;">
+                        <button class="action-more-btn" id="desktop-bulk-more-btn" title="More options" aria-haspopup="true">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="1.5"/>
+                            <circle cx="19" cy="12" r="1.5"/>
+                            <circle cx="5" cy="12" r="1.5"/>
+                          </svg>
+                        </button>
+                        <div class="bulk-more-dropdown" id="desktop-bulk-more-dropdown" style="display: none;">
+                          <!-- Populated dynamically: Assign, Mark Paid / Mark Unpaid, Clear Selection -->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Table Element -->
+                  <table class="bookings-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 44px; padding-left: 20px; padding-right: 0;">
+                          <div class="custom-checkbox" id="desktop-th-select-all">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                              <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                          </div>
+                        </th>
+                        <th style="min-width: 240px; padding-left: 14px;">Booking / Trip</th>
+                        <th>Category</th>
+                        <th>Pax & Duration</th>
+                        <th>Travel Dates</th>
+                        <th>Lead Guest</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th style="text-align: right; padding-right: 24px; min-width: 160px;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="desktop-table-body">
+                      <!-- Rows populated dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- 2. Compact Outlook Master List (Shown when details pane is open) -->
+                <div class="desktop-compact-list-view" id="desktop-compact-list-view" style="display: none;">
+                  <div class="compact-list-header">
+                    <div class="compact-header-top">
+                      <div class="compact-search-bar">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" id="desktop-compact-search-input" placeholder="Search bookings..." value="${searchQuery}" />
+                      </div>
+                      <select id="desktop-compact-category-filter" class="desktop-select-filter compact-select-filter">
+                        <option value="ALL" ${selectedCategory === 'ALL' ? 'selected' : ''}>All</option>
+                        <option value="TOUR" ${selectedCategory === 'TOUR' ? 'selected' : ''}>Tours</option>
+                        <option value="VILLA" ${selectedCategory === 'VILLA' ? 'selected' : ''}>Villas</option>
+                        <option value="ACTIVITY" ${selectedCategory === 'ACTIVITY' ? 'selected' : ''}>Activities</option>
+                        <option value="TRANSPORT" ${selectedCategory === 'TRANSPORT' ? 'selected' : ''}>Transports</option>
+                      </select>
+                      <button class="btn-expand-full-table" id="desktop-btn-expand-table" title="Expand to Full Table View">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                      </button>
+                    </div>
+                    <div class="compact-tabs-nav">
+                      <button class="compact-tab-btn ${activeTab === 'All Bookings' ? 'active' : ''}" data-d-tab="All Bookings">All (${bookings.length})</button>
+                      <button class="compact-tab-btn ${activeTab === 'New Bookings' ? 'active' : ''}" data-d-tab="New Bookings">New (${bookings.filter(b => b.category === 'New Bookings').length})</button>
+                      <button class="compact-tab-btn ${activeTab === 'Assigned' ? 'active' : ''}" data-d-tab="Assigned">Assigned (${bookings.filter(b => b.category === 'Assigned').length})</button>
+                      <button class="compact-tab-btn ${activeTab === 'Ongoing' ? 'active' : ''}" data-d-tab="Ongoing">Ongoing (${bookings.filter(b => b.category === 'Ongoing').length})</button>
+                    </div>
+                  </div>
+                  <div class="compact-list-items" id="desktop-compact-list-items">
+                    <!-- Populated dynamically in renderTable() -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Inline Detail Pane (Outlook Style - NO dark popup backdrop!) -->
+              <aside class="desktop-details-drawer" id="desktop-details-drawer">
+                <!-- Unified Header: Rendered dynamically in renderDetailPanel() -->
+                <div class="desktop-drawer-header-box" id="desktop-sheet-header">
+                  <!-- Populated dynamically with trip title, price, ID, status & metadata -->
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="sheet-tabs-nav desktop-tabs-nav">
+                  <button class="sheet-tab-btn ${activeDetailTab === 'customer-details' ? 'active' : ''}" data-dt-tab="customer-details">Customer Details</button>
+                  <button class="sheet-tab-btn ${activeDetailTab === 'guests' ? 'active' : ''}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">0</span>)</button>
+                  <button class="sheet-tab-btn ${activeDetailTab === 'itinerary' ? 'active' : ''}" data-dt-tab="itinerary">Itinerary</button>
+                  <button class="sheet-tab-btn ${activeDetailTab === 'updates' ? 'active' : ''}" data-dt-tab="updates">Updates</button>
+                </div>
+
+                <!-- Scrollable Detail Body -->
+                <div class="sheet-body-scroll desktop-body-scroll" id="desktop-sheet-body">
+                  <!-- Rendered dynamically -->
+                </div>
+
+                <!-- Exact Match to Mobile Footer (Image 1) -->
+                <div class="sheet-sticky-footer desktop-drawer-footer" id="desktop-drawer-footer">
+                  <button class="btn-confirm-booking" id="desktop-confirm-booking-btn">Confirm Booking</button>
+                  <div class="sheet-quick-actions-grid desktop-quick-actions-grid">
+                    <button class="quick-action-col-btn btn-act-call" id="desktop-act-call" title="Call">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                      </svg>
+                      <span>Call</span>
+                    </button>
+                    <button class="quick-action-col-btn btn-act-msg" id="desktop-act-msg" title="Message">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                      </svg>
+                      <span>Message</span>
+                    </button>
+                    <button class="quick-action-col-btn btn-act-fwd" id="desktop-act-fwd" title="Forward">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m22 2-7 20-4-9-9-4Z"/>
+                        <path d="M22 2 11 13"/>
+                      </svg>
+                      <span>Forward</span>
+                    </button>
+                    <button class="quick-action-col-btn btn-act-more" id="desktop-act-more" title="More">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1.5"/>
+                        <circle cx="19" cy="12" r="1.5"/>
+                        <circle cx="5" cy="12" r="1.5"/>
+                      </svg>
+                      <span>More</span>
+                    </button>
+                  </div>
+                </div>
+              </aside>
             </div>
           </div>
         </div>
       </main>
-
-      <!-- Slide-Over Drawer Backdrop Overlay -->
-      <div class="desktop-drawer-backdrop" id="desktop-drawer-backdrop"></div>
-
-      <!-- Slide-Over Detail Drawer (Popup on PC) -->
-      <aside class="desktop-details-drawer" id="desktop-details-drawer">
-        <!-- Unified Header: Rendered dynamically in renderDetailPanel() -->
-        <div class="desktop-drawer-header-box" id="desktop-sheet-header">
-          <!-- Populated dynamically with trip title, price, ID, status & metadata -->
-        </div>
-
-        <!-- Navigation Tabs -->
-        <div class="sheet-tabs-nav desktop-tabs-nav">
-          <button class="sheet-tab-btn ${activeDetailTab === 'customer-details' ? 'active' : ''}" data-dt-tab="customer-details">Customer Details</button>
-          <button class="sheet-tab-btn ${activeDetailTab === 'guests' ? 'active' : ''}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">0</span>)</button>
-          <button class="sheet-tab-btn ${activeDetailTab === 'itinerary' ? 'active' : ''}" data-dt-tab="itinerary">Itinerary</button>
-          <button class="sheet-tab-btn ${activeDetailTab === 'updates' ? 'active' : ''}" data-dt-tab="updates">Updates</button>
-        </div>
-
-        <!-- Scrollable Detail Body -->
-        <div class="sheet-body-scroll desktop-body-scroll" id="desktop-sheet-body">
-          <!-- Rendered dynamically -->
-        </div>
-
-        <!-- Sleek Sticky Footer Action Bar -->
-        <div class="desktop-drawer-footer" id="desktop-drawer-footer">
-          <button class="btn-primary-desktop desktop-confirm-booking-btn" id="desktop-confirm-booking-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            <span>Confirm Booking</span>
-          </button>
-          <div class="desktop-footer-actions-group">
-            <button class="desktop-action-icon-btn btn-action-call" id="desktop-act-call" title="Call Customer">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-              <span>Call</span>
-            </button>
-            <button class="desktop-action-icon-btn btn-action-msg" id="desktop-act-msg" title="WhatsApp Message">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-              </svg>
-              <span>WhatsApp</span>
-            </button>
-            <button class="desktop-action-icon-btn btn-action-fwd" id="desktop-act-fwd" title="Forward Voucher">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="m22 2-7 20-4-9-9-4Z"/>
-                <path d="M22 2 11 13"/>
-              </svg>
-              <span>Share</span>
-            </button>
-            <button class="desktop-action-icon-btn btn-action-more" id="desktop-act-more" title="More Options">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <circle cx="12" cy="12" r="1.5"/>
-                <circle cx="19" cy="12" r="1.5"/>
-                <circle cx="5" cy="12" r="1.5"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </aside>
 
       <!-- Desktop Modal 1: Edit Special Requirements -->
       <div class="modal-overlay" id="desktop-special-req-modal">
@@ -536,6 +533,112 @@ export function createDesktopView(container) {
           </div>
         </div>
       </div>
+      <!-- Desktop Modal 6: Edit Customer Details (App-based Modal) -->
+      <div class="modal-overlay" id="desktop-edit-customer-modal">
+        <div class="modal-card" style="width: 520px; max-width: 95vw;">
+          <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              <h3>Edit Customer Details</h3>
+            </div>
+            <button class="sheet-close-btn" id="close-desktop-edit-cust-modal-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="desktop-edit-cust-name" placeholder="Full Name" />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>Primary Phone</label>
+                <input type="text" id="desktop-edit-cust-phone" placeholder="+91 98765 43210" />
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="desktop-edit-cust-email" placeholder="customer@gmail.com" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>Location / City</label>
+                <input type="text" id="desktop-edit-cust-location" placeholder="City, State" />
+              </div>
+              <div class="form-group">
+                <label>Travel Dates</label>
+                <input type="text" id="desktop-edit-cust-dates" placeholder="e.g. 15-20 Nov 2024" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>Budget (Est.)</label>
+                <input type="text" id="desktop-edit-cust-budget" placeholder="₹24,500" />
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <select id="desktop-edit-cust-status">
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Special Notes / Short Details</label>
+              <textarea id="desktop-edit-cust-notes" rows="3" placeholder="Enter notes or preferences..." style="width: 100%; border: 1px solid #CBD5E1; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 13px; resize: vertical;"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer" style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button class="action-pill-btn" id="desktop-btn-cancel-edit-cust">Cancel</button>
+            <button class="btn-primary-desktop" id="desktop-btn-save-edit-cust" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Modal 7: Add Follow-up Entry (App-based Modal) -->
+      <div class="modal-overlay" id="desktop-add-followup-modal">
+        <div class="modal-card" style="width: 500px; max-width: 95vw;">
+          <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+              </svg>
+              <h3>Add Follow-up Entry</h3>
+            </div>
+            <button class="sheet-close-btn" id="close-desktop-add-followup-modal-btn" style="position: static;">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Channel / Type</label>
+              <select id="desktop-modal-followup-type">
+                <option value="call">Phone Call (Inbound/Outbound)</option>
+                <option value="whatsapp">WhatsApp Message</option>
+                <option value="email">Email Sent</option>
+                <option value="note">Internal Team Note</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Follow-up Title</label>
+              <input type="text" id="desktop-modal-followup-title" placeholder="e.g. Call regarding dates & meal preference" />
+            </div>
+            <div class="form-group">
+              <label>Discussion Summary / Details</label>
+              <textarea id="desktop-modal-followup-desc" rows="3" placeholder="Enter follow-up details..." style="width: 100%; border: 1px solid #CBD5E1; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 13px; resize: vertical;"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Logged By</label>
+              <input type="text" id="desktop-modal-followup-author" value="By Ruyi Admin" />
+            </div>
+          </div>
+          <div class="modal-footer" style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button class="action-pill-btn" id="desktop-btn-cancel-add-followup">Cancel</button>
+            <button class="btn-primary-desktop" id="desktop-btn-save-add-followup" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Log Follow-up</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
@@ -553,10 +656,51 @@ export function createDesktopView(container) {
         (b.guest.phone && b.guest.phone.includes(searchQuery));
 
       const matchTab = activeTab === 'All Bookings' || b.category === activeTab;
-      const matchCat = selectedCategory === 'ALL' || b.type === selectedCategory;
+      const matchCat = selectedCategory === 'ALL' ||
+        (selectedCategory === 'VILLA'
+          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
+          : b.type.toUpperCase() === selectedCategory.toUpperCase());
 
       return matchSearch && matchTab && matchCat;
     });
+
+    // Update dynamic tab counts for active category filter
+    const catFiltered = bookings.filter(b => {
+      const matchSearch = !searchQuery || 
+        b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (b.guest.phone && b.guest.phone.includes(searchQuery));
+      const matchCat = selectedCategory === 'ALL' ||
+        (selectedCategory === 'VILLA'
+          ? (b.type.toUpperCase() === 'VILLA' || b.type.toUpperCase() === 'RESORT')
+          : b.type.toUpperCase() === selectedCategory.toUpperCase());
+      return matchSearch && matchCat;
+    });
+
+    const countAll = catFiltered.length;
+    const countNew = catFiltered.filter(b => b.category === 'New Bookings').length;
+    const countAssigned = catFiltered.filter(b => b.category === 'Assigned').length;
+    const countOngoing = catFiltered.filter(b => b.category === 'Ongoing').length;
+
+    const btnAll = container.querySelector('.desktop-tab-btn[data-d-tab="All Bookings"]');
+    if (btnAll) btnAll.textContent = `All Bookings (${countAll})`;
+    const btnNew = container.querySelector('.desktop-tab-btn[data-d-tab="New Bookings"]');
+    if (btnNew) btnNew.textContent = `New Bookings (${countNew})`;
+    const btnAssigned = container.querySelector('.desktop-tab-btn[data-d-tab="Assigned"]');
+    if (btnAssigned) btnAssigned.textContent = `Assigned (${countAssigned})`;
+    const btnOngoing = container.querySelector('.desktop-tab-btn[data-d-tab="Ongoing"]');
+    if (btnOngoing) btnOngoing.textContent = `Ongoing (${countOngoing})`;
+
+    const cmpAll = container.querySelector('.compact-tab-btn[data-d-tab="All Bookings"]');
+    if (cmpAll) cmpAll.textContent = `All (${countAll})`;
+    const cmpNew = container.querySelector('.compact-tab-btn[data-d-tab="New Bookings"]');
+    if (cmpNew) cmpNew.textContent = `New (${countNew})`;
+    const cmpAssigned = container.querySelector('.compact-tab-btn[data-d-tab="Assigned"]');
+    if (cmpAssigned) cmpAssigned.textContent = `Assigned (${countAssigned})`;
+    const cmpOngoing = container.querySelector('.compact-tab-btn[data-d-tab="Ongoing"]');
+    if (cmpOngoing) cmpOngoing.textContent = `Ongoing (${countOngoing})`;
 
     if (filtered.length === 0) {
       tbody.innerHTML = `
@@ -574,6 +718,15 @@ export function createDesktopView(container) {
           </td>
         </tr>
       `;
+      const compactList = container.querySelector('#desktop-compact-list-items');
+      if (compactList) {
+        compactList.innerHTML = `
+          <div style="text-align: center; padding: 32px 16px; color: #64748B;">
+            <p style="font-size: 13px; margin: 0 0 10px 0;">No bookings found</p>
+            <button class="btn-secondary-desktop" id="btn-reset-filters" style="height: 30px; font-size: 12px; padding: 0 12px;">Reset Filters</button>
+          </div>
+        `;
+      }
       return;
     }
 
@@ -630,17 +783,83 @@ export function createDesktopView(container) {
           <td>
             <span style="font-size: 15px; font-weight: 700; color: #0F172A;">${b.price}</span>
           </td>
-          <td style="text-align: right; padding-right: 24px;">
-            <button class="row-view-details-btn" data-open-detail="${b.id}" title="View details for ${b.title}">
-              <span>View</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
-            </button>
+          <td style="text-align: right; padding-right: 20px;">
+            <div class="desktop-action-btn-group">
+              <button class="card-circle-action-btn btn-action-call" data-action-call="${b.id}" title="Call ${b.guest.name} (${b.guest.phone || ''})" aria-label="Call">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </button>
+              <button class="card-circle-action-btn btn-action-whatsapp" data-action-whatsapp="${b.id}" title="WhatsApp ${b.guest.name} (${b.guest.phone || ''})" aria-label="WhatsApp">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+                </svg>
+              </button>
+              <button class="row-view-details-btn" data-open-detail="${b.id}" title="View details for ${b.title}">
+                <span>View</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            </div>
           </td>
         </tr>
       `;
     }).join('');
+
+    // Render Compact Outlook-Style Master List for Split View
+    const compactContainer = container.querySelector('#desktop-compact-list-items');
+    if (compactContainer) {
+      if (filtered.length === 0) {
+        compactContainer.innerHTML = `<div style="text-align: center; padding: 24px 10px; color: #94A3B8; font-size: 13px;">No bookings found</div>`;
+      } else {
+        compactContainer.innerHTML = filtered.map(b => {
+          const isCardActive = activeBooking && activeBooking.id === b.id;
+          const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
+          return `
+            <div class="compact-booking-card ${isCardActive ? 'active' : ''}" data-compact-booking-id="${b.id}" style="cursor: pointer;">
+              <div class="compact-card-top">
+                <img src="${b.image}" class="compact-thumb" alt="${b.title}" />
+                <div class="compact-info-col">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                    <span class="card-type-badge ${b.typeClass}" style="font-size: 10px; padding: 2px 6px;">${b.type}</span>
+                    <span class="compact-dates" style="font-size: 11px; color: #64748B;">${b.dates}</span>
+                  </div>
+                  <h4 class="compact-trip-title" title="${b.title}">${b.title}</h4>
+                  <p class="compact-guest-sub" style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #EFF6FF; color: #2563EB; font-size: 9px; font-weight: 700;">${initials}</span>
+                    <span>${b.guest.name}</span>
+                    <span style="color: #94A3B8;">•</span>
+                    <span>${b.pax} Pax</span>
+                  </p>
+                </div>
+              </div>
+              <div class="compact-card-bottom">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span class="compact-price">${b.price}</span>
+                  <span class="compact-status-badge ${b.statusClass}">
+                    <span class="dot"></span>
+                    ${b.status}
+                  </span>
+                </div>
+                <div class="card-action-btns-row" style="gap: 5px;">
+                  <button class="card-circle-action-btn btn-action-call" data-action-call="${b.id}" title="Call ${b.guest.name}" aria-label="Call" style="width: 28px; height: 28px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                  </button>
+                  <button class="card-circle-action-btn btn-action-whatsapp" data-action-whatsapp="${b.id}" title="WhatsApp ${b.guest.name}" aria-label="WhatsApp" style="width: 28px; height: 28px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.004c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 00-3.48-8.413Z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
 
     // Update Selection Bar State Exactly as Mobile
     const selectedCount = bookings.filter(b => b.selected).length;
@@ -660,19 +879,79 @@ export function createDesktopView(container) {
     if (thAllBox) {
       thAllBox.className = selectedCount > 0 ? (selectedCount === bookings.length ? 'custom-checkbox checked' : 'custom-checkbox checked') : 'custom-checkbox';
     }
+
+    renderDesktopBulkDropdown();
   }
 
-  // Open & Close Detail Popup Drawer
+  let isDesktopBulkDropdownOpen = false;
+
+  function renderDesktopBulkDropdown() {
+    const dropdown = container.querySelector('#desktop-bulk-more-dropdown');
+    if (!dropdown) return;
+    const selectedItems = bookings.filter(b => b.selected);
+    if (selectedItems.length === 0) {
+      dropdown.style.display = 'none';
+      isDesktopBulkDropdownOpen = false;
+      return;
+    }
+
+    const isAllPaid = selectedItems.every(b => b.status === 'Paid' || b.status === 'Confirmed');
+
+    dropdown.innerHTML = `
+      <button class="dropdown-item-btn" id="desktop-bulk-assign-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" x2="19" y1="8" y2="14"/>
+          <line x1="22" x2="16" y1="11" y2="11"/>
+        </svg>
+        <span>Assign</span>
+      </button>
+      ${isAllPaid ? `
+        <button class="dropdown-item-btn" id="desktop-bulk-mark-unpaid-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" x2="12" y1="8" y2="12"/>
+            <line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
+          <span>Mark as Unpaid</span>
+        </button>
+      ` : `
+        <button class="dropdown-item-btn" id="desktop-bulk-mark-paid-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Mark as Paid</span>
+        </button>
+      `}
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item-btn item-danger" id="desktop-bulk-clear-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        <span>Clear Selection</span>
+      </button>
+    `;
+    dropdown.style.display = isDesktopBulkDropdownOpen ? 'block' : 'none';
+  }
+
+  // Open & Close Detail Pane (Outlook Inline Split View)
   function openDrawer(booking) {
     activeBooking = booking;
     isDetailDrawerOpen = true;
     renderDetailPanel();
     renderTable();
 
+    const split = container.querySelector('#desktop-workspace-split');
     const drawer = container.querySelector('#desktop-details-drawer');
-    const backdrop = container.querySelector('#desktop-drawer-backdrop');
+    const fullTable = container.querySelector('#desktop-full-table-view');
+    const compactList = container.querySelector('#desktop-compact-list-view');
+
+    if (split) split.classList.add('has-open-detail');
     if (drawer) drawer.classList.add('open');
-    if (backdrop) backdrop.classList.add('open');
+    if (fullTable) fullTable.style.display = 'none';
+    if (compactList) compactList.style.display = 'flex';
   }
 
   function closeDrawer() {
@@ -680,10 +959,15 @@ export function createDesktopView(container) {
     isDetailDrawerOpen = false;
     renderTable();
 
+    const split = container.querySelector('#desktop-workspace-split');
     const drawer = container.querySelector('#desktop-details-drawer');
-    const backdrop = container.querySelector('#desktop-drawer-backdrop');
+    const fullTable = container.querySelector('#desktop-full-table-view');
+    const compactList = container.querySelector('#desktop-compact-list-view');
+
+    if (split) split.classList.remove('has-open-detail');
     if (drawer) drawer.classList.remove('open');
-    if (backdrop) backdrop.classList.remove('open');
+    if (fullTable) fullTable.style.display = 'block';
+    if (compactList) compactList.style.display = 'none';
   }
 
   // Render Details inside Drawer
@@ -700,74 +984,55 @@ export function createDesktopView(container) {
     const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
     const custName = b.customer?.name || b.guest?.name || 'Customer';
 
+    // Header: Unified Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
     headerEl.innerHTML = `
-      <div class="desktop-drawer-top-row">
-        <div class="drawer-top-left-badges">
-          <span class="drawer-booking-id-tag">${b.id}</span>
-          <span class="card-type-badge ${b.typeClass}">${b.type}</span>
-          <span class="status-pill ${b.statusClass}">
-            <span class="dot"></span>
-            ${b.status}
-          </span>
-        </div>
-        <button class="drawer-close-btn" id="close-desktop-detail-btn" title="Close Drawer (Esc)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="sheet-drag-handle-bar desktop-sheet-top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px 0 18px; background: #FFFFFF;">
+        <button class="sheet-close-btn" id="close-desktop-detail-btn" title="Close Drawer (Esc)" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
       </div>
-
-      <div class="desktop-drawer-title-price-row">
-        <div class="drawer-title-block">
-          <h2 class="drawer-trip-title">${b.title}</h2>
-          <div class="drawer-dest-subtitle">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-            <span>${b.destination}</span>
+      <div class="sheet-customer-header">
+        <div class="customer-avatar-badge">${initials}</div>
+        <div class="customer-header-info">
+          <div class="customer-title-row">
+            <h2 class="customer-name-title">${custName}</h2>
+            <span class="status-pill ${b.statusClass}">
+              <span class="dot"></span>
+              ${b.status}
+            </span>
+          </div>
+          <p class="customer-trip-subtitle">${b.title}</p>
+          <div class="customer-meta-chips">
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+              ${b.pax} Pax
+            </span>
+            <span class="meta-dot">•</span>
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              ${b.duration}
+            </span>
+            <span class="meta-dot">•</span>
+            <span class="meta-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                <line x1="16" x2="16" y1="2" y2="6"/>
+                <line x1="8" x2="8" y1="2" y2="6"/>
+                <line x1="3" x2="21" y1="10" y2="10"/>
+              </svg>
+              ${b.dates}
+            </span>
           </div>
         </div>
-        <div class="drawer-price-block">
-          <div class="drawer-price-value">${b.price}</div>
-          <div class="drawer-price-caption">Total Package</div>
-        </div>
-      </div>
-
-      <div class="desktop-drawer-meta-bar">
-        <div class="drawer-meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-          </svg>
-          <span>${b.pax} Travelers</span>
-        </div>
-        <span class="drawer-meta-separator">•</span>
-        <div class="drawer-meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-            <line x1="16" x2="16" y1="2" y2="6"/>
-            <line x1="8" x2="8" y1="2" y2="6"/>
-            <line x1="3" x2="21" y1="10" y2="10"/>
-          </svg>
-          <span>${b.dates}</span>
-        </div>
-        <span class="drawer-meta-separator">•</span>
-        <div class="drawer-meta-item">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-          <span>${b.duration}</span>
-        </div>
-        ${b.assignedTo?.name ? `
-          <span class="drawer-meta-separator">•</span>
-          <div class="drawer-meta-item drawer-assigned-item">
-            ${b.assignedTo.avatar ? `<img src="${b.assignedTo.avatar}" alt="${b.assignedTo.name}" class="drawer-assigned-avatar" />` : ''}
-            <span>${b.assignedTo.name}</span>
-          </div>
-        ` : ''}
       </div>
     `;
 
@@ -799,28 +1064,6 @@ export function createDesktopView(container) {
 
       bodyEl.innerHTML = `
         <div class="customer-details-tab-content">
-          <!-- Lead Customer Profile Card -->
-          <div class="customer-profile-card">
-            <div class="customer-profile-avatar">${initials}</div>
-            <div class="customer-profile-info">
-              <div class="customer-profile-name-row">
-                <h4>${c.name}</h4>
-                <span class="lead-badge">Lead Guest</span>
-              </div>
-              <p class="customer-profile-contact-sub">${c.phone} • ${c.email}</p>
-            </div>
-            <div class="customer-profile-actions">
-              <button class="mini-circle-btn btn-call-green" title="Call ${c.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              </button>
-              <button class="mini-circle-btn btn-wa-green" title="WhatsApp ${c.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
-              </button>
-              <button class="mini-circle-btn btn-mail-blue" title="Email ${c.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-              </button>
-            </div>
-          </div>
           <!-- Card 1: Customer Information -->
           <div class="details-section-card">
             <div class="details-section-header">
@@ -833,7 +1076,7 @@ export function createDesktopView(container) {
                 </div>
                 <h3>Customer Information</h3>
               </div>
-              <button class="btn-edit-action" id="desktop-edit-customer-btn" title="Edit Customer Details">
+              <button class="btn-edit-action" id="btn-edit-customer" title="Edit Customer Details">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -868,14 +1111,14 @@ export function createDesktopView(container) {
                 <div class="contact-value-row">
                   <span class="info-value-bold phone-number-val">${c.phone}</span>
                   <div class="contact-action-btns">
-                    <button class="mini-icon-btn btn-call-green" title="Call" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
+                    <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                       </svg>
                     </button>
-                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp for ${c.name}...', type: 'success' }}))">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.892.524 3.662 1.435 5.176L2.05 21.95a.6.6 0 0 0 .736.736l4.774-1.385A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Zm3.906 14.153c-.225.63-1.127 1.196-1.55 1.258-.42.062-.958.088-1.55-.102-.38-.122-.87-.282-1.49-.55-2.617-1.13-4.326-3.79-4.457-3.963-.13-.174-1.065-1.417-1.065-2.702 0-1.286.674-1.92.913-2.18.239-.261.52-.326.695-.326.174 0 .348.002.5.01.16.007.375-.06.587.447.218.522.74 1.804.805 1.935.066.13.11.283.022.457-.087.174-.13.283-.26.435-.13.152-.273.34-.39.456-.13.13-.265.272-.114.533.152.261.674 1.11 1.447 1.8 1 .892 1.84 1.168 2.1 1.3.26.13.413.11.565-.065.152-.174.652-.761.826-1.022.174-.26.348-.217.587-.13.239.087 1.522.717 1.783.848.26.13.435.195.5.304.065.109.065.63-.16 1.26Z" fill="#16A34A"/>
                       </svg>
                     </button>
                   </div>
@@ -912,7 +1155,7 @@ export function createDesktopView(container) {
               <!-- Left Column: Row 5 -->
               <div class="info-cell">
                 <span class="info-label">Customer Type</span>
-                <span class="info-value-text">${c.customerType || 'Family (12 Pax)'}</span>
+                <span class="info-value-text">${c.customerType || 'Family (' + b.pax + ' Pax)'}</span>
               </div>
               <!-- Right Column: Row 5 -->
               <div class="info-cell">
@@ -953,7 +1196,7 @@ export function createDesktopView(container) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              <button class="btn-add-followup" id="desktop-add-followup-btn">
+              <button class="btn-add-followup" id="btn-add-followup-action">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="12" x2="12" y1="5" y2="19"/>
                   <line x1="5" x2="19" y1="12" y2="12"/>
@@ -972,18 +1215,11 @@ export function createDesktopView(container) {
                   <div class="journey-track-col">
                     <div class="journey-dot-icon ${step.iconBg || 'icon-blue'}">
                       ${step.type === 'call' ? `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                        </svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                       ` : step.type === 'whatsapp' ? `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                        </svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
                       ` : `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <rect width="20" height="16" x="2" y="4" rx="2"/>
-                          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                        </svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                       `}
                     </div>
                     ${idx < c.leadFlow.length - 1 ? '<div class="journey-line"></div>' : ''}
@@ -1009,6 +1245,8 @@ export function createDesktopView(container) {
         g.name.toLowerCase().includes(guestSearchQuery.toLowerCase()) ||
         (g.phone && g.phone.includes(guestSearchQuery))
       );
+      const visibleGuests = showAllGuests ? filteredGuests : filteredGuests.slice(0, 4);
+      const remainingCount = filteredGuests.length - 4;
       const reqs = b.specialRequirements || [];
 
       bodyEl.innerHTML = `
@@ -1055,11 +1293,17 @@ export function createDesktopView(container) {
             </svg>
             <input type="text" placeholder="Search guests in booking..." id="desktop-guest-search-input" value="${guestSearchQuery}" />
           </div>
-          <button class="add-guest-pill-btn" id="desktop-add-guest-btn">+ Add Guest</button>
+          <button class="add-guest-pill-btn" id="desktop-add-guest-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" x2="12" y1="5" y2="19"/>
+              <line x1="5" x2="19" y1="12" y2="12"/>
+            </svg>
+            Add Guest
+          </button>
         </div>
 
         <div class="guests-cards-list">
-          ${filteredGuests.map(g => `
+          ${visibleGuests.map(g => `
             <div class="guest-item-card">
               <div class="guest-left-info">
                 <div class="guest-num-badge">${g.id}</div>
@@ -1070,26 +1314,45 @@ export function createDesktopView(container) {
               </div>
               <div class="guest-right-actions">
                 <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${g.name} (${g.phone})...', type: 'info' }}))">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                   </svg>
                 </button>
-                <button class="circle-action-btn btn-email" title="Message ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${g.name}...', type: 'info' }}))">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${g.name}" aria-label="More options">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="1.5"/>
+                    <circle cx="12" cy="5" r="1.5"/>
+                    <circle cx="12" cy="19" r="1.5"/>
                   </svg>
                 </button>
               </div>
             </div>
           `).join('')}
+
+          ${remainingCount > 0 ? `
+            <button class="more-guests-toggle-btn" id="desktop-toggle-more-guests-btn">
+              <span>${showAllGuests ? 'Hide additional guests' : `+${remainingCount} more guests`}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="${showAllGuests ? '18 15 12 9 6 15' : '9 18 15 12 9 6'}"/>
+              </svg>
+            </button>
+          ` : ''}
         </div>
       `;
 
-      // Bind guest search
+      // Bind guest search & toggle
       const gInput = container.querySelector('#desktop-guest-search-input');
       if (gInput) {
         gInput.addEventListener('input', (e) => {
           guestSearchQuery = e.target.value;
+          renderDetailPanel();
+        });
+      }
+
+      const moreBtn = container.querySelector('#desktop-toggle-more-guests-btn');
+      if (moreBtn) {
+        moreBtn.addEventListener('click', () => {
+          showAllGuests = !showAllGuests;
           renderDetailPanel();
         });
       }
@@ -1104,26 +1367,29 @@ export function createDesktopView(container) {
       };
 
       bodyEl.innerHTML = `
-        <div class="itinerary-section-header-bar">
-          <h3>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
-            </svg>
-            Day-wise Schedule
-          </h3>
-          <button class="btn-add-event-pill" id="desktop-add-event-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="12" x2="12" y1="5" y2="19"/>
-              <line x1="5" x2="19" y1="12" y2="12"/>
-            </svg>
-            + Add Event
-          </button>
-        </div>
+        <div class="itinerary-tab-content">
+          <div class="itinerary-section-header-bar">
+            <div class="section-header-left" style="display: flex; align-items: center; gap: 8px;">
+              <div class="section-icon-circle blue-circle" style="width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; color: #2563EB;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                  <line x1="16" x2="16" y1="2" y2="6"/>
+                  <line x1="8" x2="8" y1="2" y2="6"/>
+                  <line x1="3" x2="21" y1="10" y2="10"/>
+                </svg>
+              </div>
+              <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
+            </div>
+            <button class="btn-add-event-pill" id="desktop-add-event-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" x2="12" y1="5" y2="19"/>
+                <line x1="5" x2="19" y1="12" y2="12"/>
+              </svg>
+              + Add Event
+            </button>
+          </div>
 
-        <div class="itinerary-v2-container">
+          <div class="itinerary-v2-container">
           ${days.map(d => `
             <div class="itinerary-day-section">
               <div class="timeline-day-col">
@@ -1217,6 +1483,7 @@ export function createDesktopView(container) {
               </div>
             </div>
           `).join('')}
+          </div>
         </div>
       `;
     } else if (activeDetailTab === 'updates') {
@@ -1235,6 +1502,14 @@ export function createDesktopView(container) {
         </div>
       `;
     }
+  }
+
+  function switchDetailTab(tab) {
+    activeDetailTab = tab;
+    container.querySelectorAll('[data-dt-tab]').forEach(b => {
+      b.classList.toggle('active', b.dataset.dtTab === activeDetailTab);
+    });
+    renderDetailPanel();
   }
 
   // Desktop Modal Helpers
@@ -1487,40 +1762,72 @@ export function createDesktopView(container) {
 
   // Bind All Event Listeners
   function bindEvents() {
-    // Search input
-    const searchInput = container.querySelector('#desktop-search-input');
-    const searchClear = container.querySelector('#desktop-search-clear');
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value.trim();
-        if (searchClear) searchClear.style.display = searchQuery ? 'block' : 'none';
-        renderTable();
-      });
-    }
-    if (searchClear) {
-      searchClear.addEventListener('click', () => {
-        if (searchInput) searchInput.value = '';
-        searchQuery = '';
-        searchClear.style.display = 'none';
-        renderTable();
-      });
+    // Search inputs in top header, table toolbar, and compact list
+    const topSearch = container.querySelector('#desktop-search-input');
+    const topClear = container.querySelector('#desktop-search-clear');
+    const tableSearch = container.querySelector('#desktop-table-search-input');
+    const compactSearch = container.querySelector('#desktop-compact-search-input');
+
+    function syncSearch(val) {
+      searchQuery = val;
+      if (topSearch && topSearch.value !== val) topSearch.value = val;
+      if (tableSearch && tableSearch.value !== val) tableSearch.value = val;
+      if (compactSearch && compactSearch.value !== val) compactSearch.value = val;
+      if (topClear) topClear.style.display = val ? 'block' : 'none';
+      renderTable();
     }
 
-    // Category dropdown filter
+    if (topSearch) {
+      topSearch.addEventListener('input', (e) => syncSearch(e.target.value.trim()));
+    }
+    if (topClear) {
+      topClear.addEventListener('click', () => syncSearch(''));
+    }
+    if (tableSearch) {
+      tableSearch.addEventListener('input', (e) => syncSearch(e.target.value.trim()));
+    }
+    if (compactSearch) {
+      compactSearch.addEventListener('input', (e) => syncSearch(e.target.value.trim()));
+    }
+
+    // Category dropdown filter (Full Table View)
     const catSelect = container.querySelector('#desktop-category-filter');
     if (catSelect) {
       catSelect.addEventListener('change', (e) => {
         selectedCategory = e.target.value;
+        const compactCat = container.querySelector('#desktop-compact-category-filter');
+        if (compactCat) compactCat.value = selectedCategory;
+        activeTab = 'All Bookings';
+        container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.dTab === 'All Bookings');
+        });
         renderTable();
       });
     }
 
-    // Tabs
-    container.querySelectorAll('.desktop-tab-btn').forEach(btn => {
+    // Category dropdown filter (Compact Master List View)
+    const compactCatSelect = container.querySelector('#desktop-compact-category-filter');
+    if (compactCatSelect) {
+      compactCatSelect.addEventListener('change', (e) => {
+        selectedCategory = e.target.value;
+        const fullCat = container.querySelector('#desktop-category-filter');
+        if (fullCat) fullCat.value = selectedCategory;
+        activeTab = 'All Bookings';
+        container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.dTab === 'All Bookings');
+        });
+        renderTable();
+      });
+    }
+
+    // Tabs (Both Full Table & Compact List)
+    container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         activeTab = btn.dataset.dTab;
-        container.querySelectorAll('.desktop-tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => {
+          if (b.dataset.dTab === activeTab) b.classList.add('active');
+          else b.classList.remove('active');
+        });
         renderTable();
       });
     });
@@ -1528,10 +1835,7 @@ export function createDesktopView(container) {
     // Detail Panel Tabs
     container.querySelectorAll('[data-dt-tab]').forEach(btn => {
       btn.addEventListener('click', () => {
-        activeDetailTab = btn.dataset.dtTab;
-        container.querySelectorAll('[data-dt-tab]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderDetailPanel();
+        switchDetailTab(btn.dataset.dtTab);
       });
     });
 
@@ -1556,11 +1860,15 @@ export function createDesktopView(container) {
       // Reset filters button in empty state
       if (e.target.closest('#btn-reset-filters') || e.target.closest('#btn-clear-table-search')) {
         if (searchInput) searchInput.value = '';
+        const compactSearch = container.querySelector('#desktop-compact-search-input');
+        if (compactSearch) compactSearch.value = '';
         searchQuery = '';
         if (catSelect) catSelect.value = 'ALL';
+        const compactCat = container.querySelector('#desktop-compact-category-filter');
+        if (compactCat) compactCat.value = 'ALL';
         selectedCategory = 'ALL';
         activeTab = 'All Bookings';
-        container.querySelectorAll('.desktop-tab-btn').forEach(b => {
+        container.querySelectorAll('.desktop-tab-btn, .compact-tab-btn').forEach(b => {
           b.classList.toggle('active', b.dataset.dTab === 'All Bookings');
         });
         renderTable();
@@ -1715,7 +2023,9 @@ export function createDesktopView(container) {
         const type = container.querySelector('#desktop-modal-add-event-type')?.value || 'sightseeing';
 
         if (!title) {
-          alert('Please enter an event title.');
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Please enter an event title.', type: 'warning' }
+          }));
           return;
         }
 
@@ -1932,17 +2242,17 @@ export function createDesktopView(container) {
       // Desktop Bulk "..." More Button Dropdown
       if (e.target.closest('#desktop-bulk-more-btn')) {
         e.stopPropagation();
-        const dd = container.querySelector('#desktop-bulk-more-dropdown');
-        if (dd) {
-          dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
-        }
+        isDesktopBulkDropdownOpen = !isDesktopBulkDropdownOpen;
+        renderDesktopBulkDropdown();
         return;
       }
 
       // Close bulk more dropdown if clicked elsewhere
       if (!e.target.closest('#desktop-bulk-more-btn') && !e.target.closest('#desktop-bulk-more-dropdown')) {
-        const dd = container.querySelector('#desktop-bulk-more-dropdown');
-        if (dd) dd.style.display = 'none';
+        if (isDesktopBulkDropdownOpen) {
+          isDesktopBulkDropdownOpen = false;
+          renderDesktopBulkDropdown();
+        }
       }
 
       // Bulk Mark as Paid Action
@@ -1952,10 +2262,8 @@ export function createDesktopView(container) {
           sel.forEach(b => {
             b.status = 'Paid';
             b.statusClass = 'status-paid';
-            b.selected = false;
           });
-          const dd = container.querySelector('#desktop-bulk-more-dropdown');
-          if (dd) dd.style.display = 'none';
+          isDesktopBulkDropdownOpen = false;
           renderTable();
           window.dispatchEvent(new CustomEvent('show-toast', {
             detail: { message: `Marked ${sel.length} booking(s) as Paid!`, type: 'success' }
@@ -1964,12 +2272,91 @@ export function createDesktopView(container) {
         return;
       }
 
+      // Bulk Mark as Unpaid Action
+      if (e.target.closest('#desktop-bulk-mark-unpaid-btn')) {
+        const sel = bookings.filter(b => b.selected);
+        if (sel.length > 0) {
+          sel.forEach(b => {
+            b.status = 'Pending';
+            b.statusClass = 'status-pending';
+          });
+          isDesktopBulkDropdownOpen = false;
+          renderTable();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Marked ${sel.length} booking(s) as Unpaid (Pending)!`, type: 'info' }
+          }));
+        }
+        return;
+      }
+
       // Bulk Clear Selection Action
       if (e.target.closest('#desktop-bulk-clear-btn')) {
         bookings.forEach(b => b.selected = false);
-        const dd = container.querySelector('#desktop-bulk-more-dropdown');
-        if (dd) dd.style.display = 'none';
+        isDesktopBulkDropdownOpen = false;
         renderTable();
+        return;
+      }
+
+      // Quick Call Action on Desktop (Table row or Compact card)
+      const callBtn = e.target.closest('[data-action-call]');
+      if (callBtn) {
+        e.stopPropagation();
+        e.preventDefault();
+        const id = callBtn.dataset.actionCall;
+        const b = bookings.find(item => item.id === id);
+        if (b && b.guest && b.guest.phone) {
+          const rawPhone = b.guest.phone;
+          const cleanPhone = rawPhone.replace(/[^0-9+]/g, '');
+          window.location.href = `tel:${cleanPhone}`;
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Dialing ${b.guest.name} (${rawPhone})...`, type: 'info' }
+          }));
+        } else {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Phone number not available for this guest.', type: 'warning' }
+          }));
+        }
+        return;
+      }
+
+      // Quick WhatsApp Action on Desktop (Table row or Compact card)
+      const waBtn = e.target.closest('[data-action-whatsapp]');
+      if (waBtn) {
+        e.stopPropagation();
+        e.preventDefault();
+        const id = waBtn.dataset.actionWhatsapp;
+        const b = bookings.find(item => item.id === id);
+        if (b && b.guest && b.guest.phone) {
+          const rawPhone = b.guest.phone;
+          const digits = rawPhone.replace(/[^0-9]/g, '');
+          const phoneForWa = digits.startsWith('91') ? digits : (digits.length === 10 ? '91' + digits : digits);
+          const msg = encodeURIComponent(`Hi ${b.guest.name}, this is Ruyi Travel Operations regarding your booking ${b.id} (${b.title}).`);
+          window.open(`https://wa.me/${phoneForWa}?text=${msg}`, '_blank');
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Opening WhatsApp chat with ${b.guest.name}...`, type: 'success' }
+          }));
+        } else {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Phone number not available for this guest.', type: 'warning' }
+          }));
+        }
+        return;
+      }
+
+      // Click on Compact Master List Card (Outlook Split View)
+      const compactCard = e.target.closest('[data-compact-booking-id]');
+      if (compactCard) {
+        const id = compactCard.dataset.compactBookingId;
+        const b = bookings.find(item => item.id === id);
+        if (b) {
+          openDrawer(b);
+        }
+        return;
+      }
+
+      // Expand to Full Table View Button
+      if (e.target.closest('#desktop-btn-expand-table')) {
+        closeDrawer();
         return;
       }
 
@@ -1977,8 +2364,8 @@ export function createDesktopView(container) {
       const openBtn = e.target.closest('[data-open-detail]');
       const row = e.target.closest('[data-desktop-row-id]');
       if (openBtn || row) {
-        // If clicking checkbox cell, do not open drawer
-        if (e.target.closest('.td-checkbox-cell') || e.target.closest('[data-desktop-select-id]')) {
+        // If clicking checkbox cell or action buttons, do not open drawer
+        if (e.target.closest('.td-checkbox-cell') || e.target.closest('[data-desktop-select-id]') || e.target.closest('[data-action-call]') || e.target.closest('[data-action-whatsapp]')) {
           return;
         }
 
@@ -1990,29 +2377,143 @@ export function createDesktopView(container) {
         return;
       }
 
-      // Edit Customer Button inside Drawer
-      if (e.target.closest('#desktop-edit-customer-btn')) {
-        const name = activeBooking?.customer?.name || activeBooking?.guest?.name || 'Customer';
+      // Open Edit Customer Modal (App-based modal, no browser popups)
+      if (e.target.closest('#desktop-edit-customer-btn') || e.target.closest('#btn-edit-customer')) {
+        if (!activeBooking) return;
+        const c = activeBooking.customer || {
+          name: activeBooking.guest.name,
+          phone: activeBooking.guest.phone,
+          email: activeBooking.guest.email,
+          location: 'New Delhi, Delhi',
+          travelDates: `${activeBooking.dates} 2024`,
+          budgetEst: activeBooking.price,
+          status: activeBooking.status,
+          shortDetails: activeBooking.notes || ''
+        };
+        const modal = container.querySelector('#desktop-edit-customer-modal');
+        if (modal) {
+          container.querySelector('#desktop-edit-cust-name').value = c.name || '';
+          container.querySelector('#desktop-edit-cust-phone').value = c.phone || '';
+          container.querySelector('#desktop-edit-cust-email').value = c.email || '';
+          container.querySelector('#desktop-edit-cust-location').value = c.location || '';
+          container.querySelector('#desktop-edit-cust-dates').value = c.travelDates || activeBooking.dates;
+          container.querySelector('#desktop-edit-cust-budget').value = c.budgetEst || activeBooking.price;
+          container.querySelector('#desktop-edit-cust-status').value = activeBooking.status || 'Confirmed';
+          container.querySelector('#desktop-edit-cust-notes').value = c.shortDetails || activeBooking.notes || '';
+          modal.classList.add('open');
+        }
+        return;
+      }
+
+      // Close Edit Customer Modal
+      if (e.target.closest('#desktop-btn-cancel-edit-cust') || e.target.closest('#close-desktop-edit-cust-modal-btn')) {
+        container.querySelector('#desktop-edit-customer-modal')?.classList.remove('open');
+        return;
+      }
+
+      // Save Customer Details
+      if (e.target.closest('#desktop-btn-save-edit-cust')) {
+        if (!activeBooking) return;
+        const name = container.querySelector('#desktop-edit-cust-name')?.value?.trim();
+        const phone = container.querySelector('#desktop-edit-cust-phone')?.value?.trim();
+        const email = container.querySelector('#desktop-edit-cust-email')?.value?.trim();
+        const location = container.querySelector('#desktop-edit-cust-location')?.value?.trim();
+        const dates = container.querySelector('#desktop-edit-cust-dates')?.value?.trim();
+        const budget = container.querySelector('#desktop-edit-cust-budget')?.value?.trim();
+        const status = container.querySelector('#desktop-edit-cust-status')?.value;
+        const notes = container.querySelector('#desktop-edit-cust-notes')?.value?.trim();
+
+        if (!name) {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Customer name is required.', type: 'warning' }
+          }));
+          return;
+        }
+
+        activeBooking.customer = activeBooking.customer || {};
+        activeBooking.customer.name = name;
+        activeBooking.guest.name = name;
+        activeBooking.customer.initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0, 2);
+
+        if (phone) {
+          activeBooking.customer.phone = phone;
+          activeBooking.guest.phone = phone;
+        }
+        if (email) {
+          activeBooking.customer.email = email;
+          activeBooking.guest.email = email;
+        }
+        if (location) activeBooking.customer.location = location;
+        if (dates) {
+          activeBooking.customer.travelDates = dates;
+          activeBooking.dates = dates;
+        }
+        if (budget) {
+          activeBooking.customer.budgetEst = budget;
+          activeBooking.price = budget;
+        }
+        if (status) {
+          activeBooking.status = status;
+          activeBooking.statusClass = status === 'Confirmed' ? 'status-confirmed' : status === 'Ongoing' ? 'status-ongoing' : 'status-pending';
+        }
+        if (notes !== undefined) {
+          activeBooking.customer.shortDetails = notes;
+          activeBooking.notes = notes;
+        }
+
+        container.querySelector('#desktop-edit-customer-modal')?.classList.remove('open');
+        renderDetailPanel();
+        renderTable();
         window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { message: `Editing customer details for ${name}...`, type: 'info' }
+          detail: { message: 'Customer details updated successfully!', type: 'success' }
         }));
         return;
       }
 
-      // Add Follow-up Button inside Drawer
-      if (e.target.closest('#desktop-add-followup-btn')) {
-        const note = prompt('Enter follow-up note (e.g. Call with customer regarding dates):');
-        if (note && activeBooking?.customer) {
+      // Open Add Follow-up Modal (App-based modal, no browser popups)
+      if (e.target.closest('#desktop-add-followup-btn') || e.target.closest('#btn-add-followup-action')) {
+        const modal = container.querySelector('#desktop-add-followup-modal');
+        if (modal) {
+          container.querySelector('#desktop-modal-followup-title').value = '';
+          container.querySelector('#desktop-modal-followup-desc').value = '';
+          modal.classList.add('open');
+        }
+        return;
+      }
+
+      // Close Add Follow-up Modal
+      if (e.target.closest('#desktop-btn-cancel-add-followup') || e.target.closest('#close-desktop-add-followup-modal-btn')) {
+        container.querySelector('#desktop-add-followup-modal')?.classList.remove('open');
+        return;
+      }
+
+      // Save Follow-up
+      if (e.target.closest('#desktop-btn-save-add-followup')) {
+        const type = container.querySelector('#desktop-modal-followup-type')?.value || 'call';
+        const title = container.querySelector('#desktop-modal-followup-title')?.value?.trim();
+        const desc = container.querySelector('#desktop-modal-followup-desc')?.value?.trim();
+        const author = container.querySelector('#desktop-modal-followup-author')?.value?.trim() || 'By Ruyi Admin';
+
+        if (!title) {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: 'Please enter a follow-up title.', type: 'warning' }
+          }));
+          return;
+        }
+
+        if (activeBooking) {
+          activeBooking.customer = activeBooking.customer || {};
           activeBooking.customer.leadFlow = activeBooking.customer.leadFlow || [];
           activeBooking.customer.leadFlow.unshift({
             date: 'Today',
-            time: 'Just now',
-            type: 'call',
-            iconBg: 'icon-blue',
-            title: 'Follow-up Call (Logged)',
-            desc: note,
-            author: 'By Ruyi Admin'
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            type,
+            iconBg: type === 'whatsapp' ? 'icon-green' : 'icon-blue',
+            title,
+            desc: desc || 'Follow-up logged into customer timeline.',
+            author
           });
+          container.querySelector('#desktop-add-followup-modal')?.classList.remove('open');
           renderDetailPanel();
           window.dispatchEvent(new CustomEvent('show-toast', {
             detail: { message: 'New follow-up added to journey!', type: 'success' }
@@ -2182,10 +2683,44 @@ export function createDesktopView(container) {
         return;
       }
 
-      // Notification Bell
+      // Notification Bell on Desktop Top Header
       if (e.target.closest('#desktop-bell-btn')) {
+        const dropdown = container.querySelector('#desktop-notifications-dropdown');
+        if (dropdown) {
+          const isOpen = dropdown.style.display === 'block';
+          dropdown.style.display = isOpen ? 'none' : 'block';
+          const dot = container.querySelector('#desktop-bell-dot');
+          if (dot) dot.style.display = 'none';
+        }
+        return;
+      }
+
+      // Mark All Notifications as Read
+      if (e.target.closest('#btn-mark-all-notifications-read')) {
+        container.querySelectorAll('.notification-item.unread').forEach(el => el.classList.remove('unread'));
+        const dot = container.querySelector('#desktop-bell-dot');
+        if (dot) dot.style.display = 'none';
         window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { message: 'You have 3 unread operations updates.', type: 'info' }
+          detail: { message: 'All notifications marked as read.', type: 'success' }
+        }));
+        return;
+      }
+
+      // Close notifications if clicked outside
+      if (!e.target.closest('#desktop-bell-btn') && !e.target.closest('#desktop-notifications-dropdown')) {
+        const dropdown = container.querySelector('#desktop-notifications-dropdown');
+        if (dropdown) dropdown.style.display = 'none';
+      }
+
+      // Guest Three Dots Menu Click
+      const guestMenuBtn = e.target.closest('[data-guest-menu]');
+      if (guestMenuBtn) {
+        e.stopPropagation();
+        const gId = guestMenuBtn.dataset.guestMenu;
+        const guestObj = activeBooking?.guests?.find(g => String(g.id) === String(gId));
+        const guestName = guestObj ? guestObj.name : 'Guest';
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: `Guest options for ${guestName}: ID verified, travel pass issued.`, type: 'info' }
         }));
         return;
       }
