@@ -274,13 +274,13 @@
                                             </div>
                                         </td>
                                         <td style="padding-left: 14px;">
-                                            <div class="table-trip-cell">
-                                                <img src="{{ $b->image }}" class="table-trip-thumb" alt="{{ $b->title }}" />
-                                                <div class="table-trip-meta">
-                                                    <div class="table-trip-title">{{ $b->title }}</div>
-                                                    <div class="table-trip-dest">
-                                                        <span>{{ $b->id }}</span> • {{ $b->destination }}
-                                                    </div>
+                                            <div class="table-booking-cell">
+                                                <div class="table-thumb">
+                                                    <img src="{{ $b->image }}" alt="{{ $b->title }}" />
+                                                </div>
+                                                <div class="table-booking-info">
+                                                    <h4>{{ $b->title }}</h4>
+                                                    <p><span>{{ $b->id }}</span> • {{ $b->destination }}</p>
                                                 </div>
                                             </div>
                                         </td>

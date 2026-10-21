@@ -26,13 +26,13 @@ if [ "${DB_CONNECTION:-sqlite}" = "sqlite" ]; then
         echo "==> Created empty SQLite database file: ${DB_PATH}"
     fi
     chown www-data:www-data "$DB_PATH" 2>/dev/null || true
-    chmod 664 "$DB_PATH" 2>/dev/null || true
+    chmod 666 "$DB_PATH" 2>/dev/null || true
 fi
 
 # 4. Set directory ownership and write permissions for Apache (www-data)
 echo "==> Setting directory permissions for storage, cache, and database..."
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database 2>/dev/null || true
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database 2>/dev/null || true
+chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database 2>/dev/null || true
 
 # 5. Check APP_KEY; generate one automatically if missing
 if [ -z "$APP_KEY" ]; then

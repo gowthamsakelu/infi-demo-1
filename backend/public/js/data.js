@@ -1,0 +1,2392 @@
+// Ruyi Admin Booking Data Store
+export const INITIAL_BOOKINGS = [
+  {
+    "id": "BK-5027",
+    "title": "Kashmir Valley & Gulmarg Tour",
+    "type": "TOUR",
+    "typeClass": "badge-tour",
+    "image": "./images/manali.jpg",
+    "pax": 3,
+    "duration": "5D / 4N",
+    "dates": "15 Jan - 20 Jan",
+    "travelDateFull": "15 Jan - 20 Jan 2025 (5D / 4N)",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "₹45,000",
+    "rawPrice": 45000,
+    "category": "New Bookings",
+    "selected": false,
+    "guest": {
+      "name": "Rohan Malhotra",
+      "phone": "+91 99884 84884",
+      "email": "rohan.malhotra@gmail.com",
+      "age": 34,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Rohan Malhotra",
+      "initials": "RM",
+      "phone": "+91 99884 84884",
+      "email": "rohan.malhotra@gmail.com",
+      "location": "Chandigarh, Punjab",
+      "leadSource": "Google Search",
+      "preferredDestination": "Srinagar, Gulmarg, Pahalgam",
+      "travelDates": "15 Jan – 20 Jan 2025",
+      "customerType": "Family (3 Pax)",
+      "budgetEst": "₹ 45,000 – 50,000",
+      "status": "Pending",
+      "shortDetails": "Winter snow trip to Srinagar, Gulmarg, and Pahalgam. Requested luxury heated houseboat stay on Dal Lake, Gondola Phase 1 & 2 tickets, and heated private 4x4 cab.",
+      "leadFlow": [
+        {
+          "date": "12 Jan",
+          "time": "11:00 AM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Initial Inquiry (Call)",
+          "desc": "Discussed snow season dates, Gulmarg gondola availability, and Dal Lake houseboat stay.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "12 Jan",
+          "time": "03:30 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Shared Itinerary (WhatsApp)",
+          "desc": "Sent 5D/4N Kashmir winter itinerary with hotel options and private 4x4 cab inclusions.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "13 Jan",
+          "time": "02:00 PM",
+          "type": "email",
+          "iconBg": "icon-blue",
+          "title": "Sent Quote & Package Breakdown (Email)",
+          "desc": "Dispatched detailed quote for 3 pax with Gondola pass booking process.",
+          "author": "By Ruyi Admin"
+        }
+      ]
+    },
+    "destination": "Srinagar, Gulmarg, Pahalgam",
+    "bookingType": "Tour Package",
+    "services": "Houseboat Stay, 4x4 Cab, Gondola Pass, Sightseeing",
+    "assignedStatus": "Assigned",
+    "assignedTo": {
+      "name": "Rahul Mehta",
+      "role": "Operations Lead",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Winter package requested. Needs snow boots & phase 2 gondola passes pre-booked.",
+    "specialRequirements": [
+      {
+        "id": "sr-kash-1",
+        "icon": "flame",
+        "text": "Room Heating / Bukhari Needed",
+        "color": "#EF4444"
+      },
+      {
+        "id": "sr-kash-2",
+        "icon": "coffee",
+        "text": "Daily Breakfast & Kahwa Included",
+        "color": "#F59E0B"
+      },
+      {
+        "id": "sr-kash-3",
+        "icon": "shield",
+        "text": "Child Snow Safety Gear",
+        "color": "#2563EB"
+      }
+    ],
+    "guests": [
+      {
+        "id": 1,
+        "name": "Rohan Malhotra",
+        "age": 34,
+        "role": "Primary Contact",
+        "phone": "+91 99884 84884"
+      },
+      {
+        "id": 2,
+        "name": "Pooja Malhotra",
+        "age": 32,
+        "role": "Adult",
+        "phone": "+91 99884 84885"
+      },
+      {
+        "id": 3,
+        "name": "Aarav Malhotra",
+        "age": 7,
+        "role": "Child",
+        "phone": "+91 99884 84884"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "15 Jan",
+        "items": [
+          {
+            "id": "IT-KASH-101",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Srinagar Airport Pickup",
+            "subtitle": "11:30 AM • Private 4x4 Scorpio to Dal Lake",
+            "assigned": {
+              "isAssigned": true,
+              "name": "Garhwal Luxury Transport",
+              "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+            }
+          },
+          {
+            "id": "IT-KASH-102",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Check-in: Royal Heritage Houseboat",
+            "subtitle": "01:00 PM • Dal Lake, Srinagar (Heated rooms)",
+            "assigned": null
+          },
+          {
+            "id": "IT-KASH-103",
+            "type": "sightseeing",
+            "icon": "camera",
+            "title": "Shikara Sunset Ride & Floating Market",
+            "subtitle": "04:30 PM • 2-hour Shikara ride with Kahwa tea",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "date": "16 Jan",
+        "items": [
+          {
+            "id": "IT-KASH-201",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Srinagar to Gulmarg Drive",
+            "subtitle": "08:30 AM • Scenic snow drive via Tangmarg (2 hrs)",
+            "assigned": null
+          },
+          {
+            "id": "IT-KASH-202",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Gulmarg Gondola Ride (Phase 1 & 2)",
+            "subtitle": "11:00 AM • Kongdoori & Apharwat Peak skiing",
+            "assigned": {
+              "isAssigned": true,
+              "name": "Adventure World",
+              "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+            }
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "date": "17 Jan",
+        "items": [
+          {
+            "id": "IT-KASH-301",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Gulmarg to Pahalgam Valley Drive",
+            "subtitle": "08:00 AM • Travel via saffron fields & Awantipora",
+            "assigned": null
+          },
+          {
+            "id": "IT-KASH-302",
+            "type": "sightseeing",
+            "icon": "camera",
+            "title": "Betaab Valley & Aru Sightseeing",
+            "subtitle": "02:00 PM • Pony ride & photography session",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "12 Jan • 03:30 PM",
+        "title": "Booking Request Received",
+        "desc": "Inquiry received for 3 pax winter tour.",
+        "user": "Ruyi Admin"
+      },
+      {
+        "time": "13 Jan • 10:15 AM",
+        "title": "Assigned to Rahul Mehta",
+        "desc": "Rahul assigned as tour coordinator.",
+        "user": "Karan Sapalia"
+      }
+    ]
+  },
+  {
+    "id": "BK-5021",
+    "title": "Haridwar – Kashi Trip",
+    "type": "TOUR",
+    "typeClass": "badge-tour",
+    "image": "./images/kedarnath.jpg",
+    "pax": 12,
+    "duration": "4D / 3N",
+    "dates": "12 Nov - 15 Nov",
+    "travelDateFull": "12 Nov - 15 Nov 2024 (4D / 3N)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹36,000",
+    "rawPrice": 36000,
+    "category": "Assigned",
+    "selected": false,
+    "guest": {
+      "name": "Amit Verma",
+      "phone": "+91 98765 43210",
+      "email": "amit.verma@gmail.com",
+      "age": 42,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Amit Verma",
+      "initials": "AV",
+      "phone": "+91 98765 43210",
+      "email": "amit.verma@gmail.com",
+      "location": "New Delhi, Delhi",
+      "leadSource": "Website",
+      "preferredDestination": "Haridwar, Rishikesh, Kashi",
+      "travelDates": "12 Nov – 15 Nov 2024",
+      "customerType": "Family (12 Pax)",
+      "budgetEst": "₹ 35,000 – 40,000",
+      "status": "Paid",
+      "shortDetails": "Planning a family pilgrimage tour to Haridwar, Rishikesh & Kashi. Senior citizens in group requiring comfortable AC tempo traveler, riverfront hotel stay, and priority Aarti access.",
+      "leadFlow": [
+        {
+          "date": "08 Nov",
+          "time": "10:30 AM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Initial Inquiry (Call)",
+          "desc": "Discussed Haridwar & Kashi circuit options. Inquired about senior citizen comfort and hotel heating.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "08 Nov",
+          "time": "04:15 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Shared Itinerary (WhatsApp)",
+          "desc": "Sent customized day-wise itinerary options, tempo traveler details, and hotel pricing.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "10 Nov",
+          "time": "11:20 AM",
+          "type": "email",
+          "iconBg": "icon-blue",
+          "title": "Sent Quote & Voucher (Email)",
+          "desc": "Dispatched booking voucher #BK-5021, payment receipt, and coordinator contact details.",
+          "author": "By Ruyi Admin"
+        }
+      ]
+    },
+    "destination": "Haridwar, Rishikesh, Kashi",
+    "bookingType": "Tour Package",
+    "services": "Hotel (3N), Cab, Sightseeing, Guide",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Rahul Mehta",
+      "role": "Tour Manager",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Senior citizens, need comfortable vehicle.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Amit Verma",
+        "age": 42,
+        "role": "Primary Contact",
+        "phone": "9876543210"
+      },
+      {
+        "id": 2,
+        "name": "Neha Verma",
+        "age": 38,
+        "role": "Adult",
+        "phone": "9876543211"
+      },
+      {
+        "id": 3,
+        "name": "Rohan Verma",
+        "age": 16,
+        "role": "Teen",
+        "phone": "9876543212"
+      },
+      {
+        "id": 4,
+        "name": "Pooja Verma",
+        "age": 14,
+        "role": "Child",
+        "phone": "9876543213"
+      },
+      {
+        "id": 5,
+        "name": "Rajesh Verma",
+        "age": 68,
+        "role": "Senior",
+        "phone": "9876543214"
+      },
+      {
+        "id": 6,
+        "name": "Sunita Verma",
+        "age": 64,
+        "role": "Senior",
+        "phone": "9876543215"
+      },
+      {
+        "id": 7,
+        "name": "Aarav Verma",
+        "age": 10,
+        "role": "Child",
+        "phone": "9876543216"
+      },
+      {
+        "id": 8,
+        "name": "Ananya Verma",
+        "age": 8,
+        "role": "Child",
+        "phone": "9876543217"
+      },
+      {
+        "id": 9,
+        "name": "Vikram Singh",
+        "age": 45,
+        "role": "Family Friend",
+        "phone": "9876543218"
+      },
+      {
+        "id": 10,
+        "name": "Meera Singh",
+        "age": 41,
+        "role": "Family Friend",
+        "phone": "9876543219"
+      },
+      {
+        "id": 11,
+        "name": "Kabir Singh",
+        "age": 15,
+        "role": "Teen",
+        "phone": "9876543220"
+      },
+      {
+        "id": 12,
+        "name": "Priya Singh",
+        "age": 12,
+        "role": "Child",
+        "phone": "9876543221"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-1",
+        "icon": "leaf",
+        "text": "Vegetarian Food",
+        "color": "#16A34A"
+      },
+      {
+        "id": "SR-2",
+        "icon": "bed",
+        "text": "2 Connecting Rooms",
+        "color": "#2563EB"
+      },
+      {
+        "id": "SR-3",
+        "icon": "accessibility",
+        "text": "Wheelchair Assistance",
+        "color": "#2563EB"
+      },
+      {
+        "id": "SR-4",
+        "icon": "waves",
+        "text": "Near Beach",
+        "color": "#0284C7"
+      },
+      {
+        "id": "SR-5",
+        "icon": "smile",
+        "text": "Kid Friendly Activities",
+        "color": "#EA580C"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "12 Nov",
+        "items": [
+          {
+            "id": "IT-101",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Delhi → Haridwar",
+            "subtitle": "06:00 AM • Pickup from Delhi",
+            "assigned": null
+          },
+          {
+            "id": "IT-102",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Hotel Ganga View",
+            "subtitle": "12:00 PM • Check-in",
+            "assigned": {
+              "isAssigned": true,
+              "name": "Rahul Mehta",
+              "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+            }
+          },
+          {
+            "id": "IT-103",
+            "type": "sightseeing",
+            "icon": "camera",
+            "title": "Evening Aarti",
+            "subtitle": "06:00 PM • Har Ki Pauri",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "date": "13 Nov",
+        "items": [
+          {
+            "id": "IT-201",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Haridwar → Rishikesh",
+            "subtitle": "08:00 AM • Travel (3 hrs)",
+            "assigned": null
+          },
+          {
+            "id": "IT-202",
+            "type": "activity",
+            "icon": "raft",
+            "title": "River Rafting (16 km)",
+            "subtitle": "10:00 AM • Rishikesh",
+            "tag": "Activity",
+            "image": "./images/rishikesh.jpg",
+            "assigned": {
+              "isAssigned": true,
+              "name": "Adventure World",
+              "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+            }
+          },
+          {
+            "id": "IT-203",
+            "type": "food",
+            "icon": "restaurant",
+            "title": "Lunch at Local Restaurant",
+            "subtitle": "01:00 PM • Rishikesh",
+            "assigned": null
+          },
+          {
+            "id": "IT-204",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Hotel Ganges Retreat",
+            "subtitle": "Check-in",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "date": "14 Nov",
+        "items": [
+          {
+            "id": "IT-301",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Rishikesh → Kashi",
+            "subtitle": "07:00 AM • Travel (8 hrs)",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "itinerary": [
+      {
+        "day": "Day 1",
+        "date": "12 Nov",
+        "title": "Delhi to Haridwar & Ganga Aarti",
+        "desc": "06:00 AM pickup from Delhi. Check-in at Hotel Ganga View at 12:00 PM. Evening divine Aarti at Har Ki Pauri."
+      },
+      {
+        "day": "Day 2",
+        "date": "13 Nov",
+        "title": "Rishikesh River Rafting (16 km) & Retreat",
+        "desc": "08:00 AM travel to Rishikesh (3 hrs). 10:00 AM 16 km White water river rafting. 01:00 PM local lunch & check-in at Hotel Ganges Retreat."
+      },
+      {
+        "day": "Day 3",
+        "date": "14 Nov",
+        "title": "Rishikesh to Kashi Heritage Drive",
+        "desc": "07:00 AM morning departure towards Varanasi / Kashi (8 hrs scenic drive)."
+      }
+    ],
+    "updates": [
+      {
+        "time": "10:45 AM, Today",
+        "title": "Payment Confirmed",
+        "desc": "Received ₹36,000 via Razorpay (UPI - HDFC). Invoice generated #INV-9921.",
+        "user": "System"
+      },
+      {
+        "time": "11:15 AM, Today",
+        "title": "Assigned to Rahul Mehta",
+        "desc": "Rahul Mehta confirmed trip coordinator role and initiated supplier booking.",
+        "user": "KS Admin"
+      },
+      {
+        "time": "12:30 PM, Today",
+        "title": "Hotel Grand Kedarnath Booked",
+        "desc": "Confirmed 3 Luxury Family Suites with heating amenities.",
+        "user": "Rahul Mehta"
+      },
+      {
+        "time": "01:00 PM, Today",
+        "title": "Welcome WhatsApp Sent",
+        "desc": "Itinerary and packing list sent to Amit Verma (+91 98765 43210).",
+        "user": "System"
+      }
+    ]
+  },
+  {
+    "id": "BK-5022",
+    "title": "Goa Beach Villa",
+    "type": "VILLA",
+    "typeClass": "badge-villa",
+    "image": "./images/goa.jpg",
+    "pax": 8,
+    "duration": "2N/3D",
+    "dates": "18 Nov - 20 Nov",
+    "travelDateFull": "18 Nov - 20 Nov 2024 (2N/3D)",
+    "status": "Part Paid",
+    "statusClass": "status-part-paid",
+    "price": "₹22,000",
+    "rawPrice": 22000,
+    "category": "Assigned",
+    "selected": false,
+    "guest": {
+      "name": "Kavita Roy",
+      "phone": "+91 98112 23344",
+      "email": "kavita.roy@gmail.com",
+      "age": 32,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Kavita Roy",
+      "initials": "KR",
+      "phone": "+91 98112 23344",
+      "email": "kavita.roy@gmail.com",
+      "location": "Mumbai, Maharashtra",
+      "leadSource": "Instagram",
+      "preferredDestination": "Candolim Beach, North Goa",
+      "travelDates": "18 Nov – 20 Nov 2024",
+      "customerType": "Friends Group (8 Pax)",
+      "budgetEst": "₹ 22,000 – 26,000",
+      "status": "Part Paid",
+      "shortDetails": "Planning a private villa weekend getaway in Candolim North Goa with friends. Interested in private pool, private chef barbecue, and river cruise.",
+      "leadFlow": [
+        {
+          "date": "14 Nov",
+          "time": "11:00 AM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Initial Inquiry (Call)",
+          "desc": "Customer called inquiring about luxury 4BHK villas with private pool near Candolim.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "14 Nov",
+          "time": "02:30 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Shared Itinerary (WhatsApp)",
+          "desc": "Shared Villa Sol Candolim photos, chef menu options, and weekend package rates.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "15 Nov",
+          "time": "05:00 PM",
+          "type": "email",
+          "iconBg": "icon-blue",
+          "title": "Sent Quote (Email)",
+          "desc": "Sent deposit payment link of ₹10,000 and reservation confirmation agreement.",
+          "author": "By Ruyi Admin"
+        }
+      ]
+    },
+    "destination": "Candolim Beach, North Goa",
+    "bookingType": "Luxury Villa Stay",
+    "services": "Private Pool, Chef on Call, Airport Transfer",
+    "assignedStatus": "Assigned • Part Paid",
+    "assignedTo": {
+      "name": "Priya Sharma",
+      "role": "Villa Concierge",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Barbecue setup needed for Saturday evening party.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Kavita Roy",
+        "age": 32,
+        "role": "Primary Contact",
+        "phone": "9811223344"
+      },
+      {
+        "id": 2,
+        "name": "Sameer Roy",
+        "age": 34,
+        "role": "Adult",
+        "phone": "9811223345"
+      },
+      {
+        "id": 3,
+        "name": "Nikhil Roy",
+        "age": 29,
+        "role": "Adult",
+        "phone": "9811223346"
+      },
+      {
+        "id": 4,
+        "name": "Ananya Sen",
+        "age": 28,
+        "role": "Adult",
+        "phone": "9811223347"
+      },
+      {
+        "id": 5,
+        "name": "Tanvi Shah",
+        "age": 31,
+        "role": "Adult",
+        "phone": "9811223348"
+      },
+      {
+        "id": 6,
+        "name": "Kunal Shah",
+        "age": 33,
+        "role": "Adult",
+        "phone": "9811223349"
+      },
+      {
+        "id": 7,
+        "name": "Arjun Das",
+        "age": 30,
+        "role": "Adult",
+        "phone": "9811223350"
+      },
+      {
+        "id": 8,
+        "name": "Sneha Das",
+        "age": 29,
+        "role": "Adult",
+        "phone": "9811223351"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-21",
+        "icon": "waves",
+        "text": "Near Beach",
+        "color": "#0284C7"
+      },
+      {
+        "id": "SR-22",
+        "icon": "utensils",
+        "text": "Barbecue Setup",
+        "color": "#EA580C"
+      },
+      {
+        "id": "SR-23",
+        "icon": "clock",
+        "text": "Late Check-out (2 PM)",
+        "color": "#D97706"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "18 Nov",
+        "items": [
+          {
+            "id": "IT-GOA-1",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Villa Check-in & Pool Drinks",
+            "subtitle": "01:00 PM • Candolim Luxury Villa",
+            "assigned": null
+          },
+          {
+            "id": "IT-GOA-2",
+            "type": "food",
+            "icon": "restaurant",
+            "title": "Sundowner Barbecue Dinner",
+            "subtitle": "07:30 PM • Chef on call setup",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "date": "19 Nov",
+        "items": [
+          {
+            "id": "IT-GOA-3",
+            "type": "transport",
+            "icon": "bus",
+            "title": "North Goa Beach Drive",
+            "subtitle": "11:00 AM • Anjuna & Vagator cafes",
+            "assigned": null
+          },
+          {
+            "id": "IT-GOA-4",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Private Sunset Yacht Cruise",
+            "subtitle": "05:00 PM • Mandovi River",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "itinerary": [
+      {
+        "day": "Day 1",
+        "date": "18 Nov",
+        "title": "Check-in & Sundowner Party",
+        "desc": "Welcome drinks at Candolim Villa, private pool leisure and barbecue dinner."
+      },
+      {
+        "day": "Day 2",
+        "date": "19 Nov",
+        "title": "Catamaran Cruise & Beach Club",
+        "desc": "Private yacht cruise in Mandovi river, evening at Thalassa club."
+      },
+      {
+        "day": "Day 3",
+        "date": "20 Nov",
+        "title": "Brunch & Airport Drop",
+        "desc": "Leisurely brunch prepared by in-house chef, check-out and drop off."
+      }
+    ],
+    "updates": [
+      {
+        "time": "09:00 AM, Yesterday",
+        "title": "Deposit Received",
+        "desc": "Advance deposit of ₹10,000 received. Balance ₹12,000 due at check-in.",
+        "user": "System"
+      },
+      {
+        "time": "11:20 AM, Yesterday",
+        "title": "Villa Blocked",
+        "desc": "Villa Sol Candolim locked for 18-20 Nov.",
+        "user": "Priya Sharma"
+      }
+    ]
+  },
+  {
+    "id": "BK-5023",
+    "title": "Rishikesh Rafting",
+    "type": "ACTIVITY",
+    "typeClass": "badge-activity",
+    "image": "./images/rishikesh.jpg",
+    "pax": 6,
+    "duration": "1 Day",
+    "dates": "10 Nov - 15 Nov",
+    "travelDateFull": "10 Nov - 15 Nov 2024 (1 Day Activity)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹9,000",
+    "rawPrice": 9000,
+    "category": "New Bookings",
+    "selected": false,
+    "guest": {
+      "name": "Deepak Chopra",
+      "phone": "+91 97115 54433",
+      "email": "deepak.c@gmail.com",
+      "age": 27,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Deepak Chopra",
+      "initials": "DC",
+      "phone": "+91 97115 54433",
+      "email": "deepak.c@gmail.com",
+      "location": "Gurugram, Haryana",
+      "leadSource": "Google Search",
+      "preferredDestination": "Shivpuri to NIM Beach, Rishikesh",
+      "travelDates": "10 Nov – 15 Nov 2024",
+      "customerType": "Adventure Group (6 Pax)",
+      "budgetEst": "₹ 9,000 – 12,000",
+      "status": "Paid",
+      "shortDetails": "Group of college friends looking for high-adrenaline 24 km white water rafting, cliff jumping, and GoPro video coverage.",
+      "leadFlow": [
+        {
+          "date": "07 Nov",
+          "time": "09:30 AM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Initial Inquiry (Call)",
+          "desc": "Group lead checked rapid conditions and safety gear certification.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "07 Nov",
+          "time": "01:00 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Shared Itinerary (WhatsApp)",
+          "desc": "Sent 24 KM Marine Drive to NIM beach slot details and waiver documents.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "08 Nov",
+          "time": "10:15 AM",
+          "type": "email",
+          "iconBg": "icon-blue",
+          "title": "Sent Quote & Voucher (Email)",
+          "desc": "Payment of ₹9,000 verified. Guide and transport coordinator assigned.",
+          "author": "By Ruyi Admin"
+        }
+      ]
+    },
+    "destination": "Shivpuri to NIM Beach, Rishikesh",
+    "bookingType": "Adventure Sport",
+    "services": "24 KM Grade 3-4 Rafting, Cliff Jumping, GoPro Video",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Rahul Mehta",
+      "role": "Adventure Lead",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "All participants signed liability waiver; GoPro video included.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Deepak Chopra",
+        "age": 27,
+        "role": "Primary Contact",
+        "phone": "9711554433"
+      },
+      {
+        "id": 2,
+        "name": "Varun Grover",
+        "age": 28,
+        "role": "Participant",
+        "phone": "9711554434"
+      },
+      {
+        "id": 3,
+        "name": "Harshit Saxena",
+        "age": 26,
+        "role": "Participant",
+        "phone": "9711554435"
+      },
+      {
+        "id": 4,
+        "name": "Manish Tyagi",
+        "age": 27,
+        "role": "Participant",
+        "phone": "9711554436"
+      },
+      {
+        "id": 5,
+        "name": "Gaurav Bisht",
+        "age": 29,
+        "role": "Participant",
+        "phone": "9711554437"
+      },
+      {
+        "id": 6,
+        "name": "Siddharth Sen",
+        "age": 26,
+        "role": "Participant",
+        "phone": "9711554438"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-31",
+        "icon": "shield",
+        "text": "First Aid & Medical Kit",
+        "color": "#DC2626"
+      },
+      {
+        "id": "SR-32",
+        "icon": "camera",
+        "text": "GoPro 4K Recording",
+        "color": "#2563EB"
+      },
+      {
+        "id": "SR-33",
+        "icon": "leaf",
+        "text": "Vegetarian Food",
+        "color": "#16A34A"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "11 Nov",
+        "items": [
+          {
+            "id": "IT-RFT-1",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Marine Drive Briefing",
+            "subtitle": "09:00 AM • Safety instructions & gear fitment",
+            "assigned": null
+          },
+          {
+            "id": "IT-RFT-2",
+            "type": "activity",
+            "icon": "raft",
+            "title": "24 KM Grade 4 Rapids & Cliff Jump",
+            "subtitle": "10:00 AM • Shivpuri to NIM Beach",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "itinerary": [
+      {
+        "day": "Day 1",
+        "date": "11 Nov",
+        "title": "Marine Drive to NIM Beach Rafting",
+        "desc": "Safety briefing at base camp, 24 km thrilling rapids, body surfing and cliff jumping."
+      }
+    ],
+    "updates": [
+      {
+        "time": "02:15 PM, 2 days ago",
+        "title": "Paid in Full",
+        "desc": "₹9,000 paid via NetBanking.",
+        "user": "System"
+      }
+    ]
+  },
+  {
+    "id": "BK-5024",
+    "title": "Manali Resort Stay",
+    "type": "RESORT",
+    "typeClass": "badge-resort",
+    "image": "./images/manali.jpg",
+    "pax": 4,
+    "duration": "3N/4D",
+    "dates": "25 Nov - 28 Nov",
+    "travelDateFull": "25 Nov - 28 Nov 2024 (3N/4D)",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "₹26,500",
+    "rawPrice": 26500,
+    "category": "Ongoing",
+    "selected": false,
+    "guest": {
+      "name": "Rohit Joshi",
+      "phone": "+91 98991 12233",
+      "email": "rohit.j@gmail.com",
+      "age": 35,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Rohit Joshi",
+      "initials": "RJ",
+      "phone": "+91 98991 12233",
+      "email": "rohit.j@gmail.com",
+      "location": "Ahmedabad, Gujarat",
+      "leadSource": "Referral",
+      "preferredDestination": "Old Manali, Himachal Pradesh",
+      "travelDates": "25 Nov – 28 Nov 2024",
+      "customerType": "Family (4 Pax)",
+      "budgetEst": "₹ 26,500 – 30,000",
+      "status": "Pending",
+      "shortDetails": "Celebrating 5th wedding anniversary with spouse and two young kids. Looking for luxury pine chalet, Solang snow excursion, and evening bonfire.",
+      "leadFlow": [
+        {
+          "date": "18 Nov",
+          "time": "12:15 PM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Initial Inquiry (Call)",
+          "desc": "Client requested cottage options with fireplace and snow view in Old Manali.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "18 Nov",
+          "time": "03:45 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Shared Itinerary (WhatsApp)",
+          "desc": "Sent pine chalet photos, anniversary cake arrangement details, and cab options.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "19 Nov",
+          "time": "11:00 AM",
+          "type": "email",
+          "iconBg": "icon-blue",
+          "title": "Sent Quote (Email)",
+          "desc": "Sent comprehensive quote for 3N/4D with MAP meal plan and sightseeing.",
+          "author": "By Ruyi Admin"
+        }
+      ]
+    },
+    "destination": "Old Manali, Himachal Pradesh",
+    "bookingType": "Resort Holiday",
+    "services": "Cottage Suite, Breakfast & Dinner, Bonfire Night",
+    "assignedStatus": "Unassigned • Pending",
+    "assignedTo": {
+      "name": "Unassigned",
+      "role": "Support Pool",
+      "avatar": ""
+    },
+    "notes": "Couple celebrating 5th wedding anniversary.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Rohit Joshi",
+        "age": 35,
+        "role": "Primary Contact",
+        "phone": "9899112233"
+      },
+      {
+        "id": 2,
+        "name": "Aditi Joshi",
+        "age": 33,
+        "role": "Spouse",
+        "phone": "9899112234"
+      },
+      {
+        "id": 3,
+        "name": "Vihaan Joshi",
+        "age": 7,
+        "role": "Child",
+        "phone": "9899112235"
+      },
+      {
+        "id": 4,
+        "name": "Isha Joshi",
+        "age": 4,
+        "role": "Child",
+        "phone": "9899112236"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-41",
+        "icon": "smile",
+        "text": "Kid Friendly Activities",
+        "color": "#EA580C"
+      },
+      {
+        "id": "SR-42",
+        "icon": "baby",
+        "text": "Baby Crib / Cot",
+        "color": "#8B5CF6"
+      },
+      {
+        "id": "SR-43",
+        "icon": "bed",
+        "text": "2 Connecting Rooms",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "25 Nov",
+        "items": [
+          {
+            "id": "IT-MAN-1",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Check-in at Pine Chalet",
+            "subtitle": "12:00 PM • Welcome tea & cedar walk",
+            "assigned": null
+          },
+          {
+            "id": "IT-MAN-2",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Evening Cedar Bonfire",
+            "subtitle": "07:00 PM • Private pine courtyard",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "date": "26 Nov",
+        "items": [
+          {
+            "id": "IT-MAN-3",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Solang Valley Snow Excursion",
+            "subtitle": "09:30 AM • Cable car & snow activities",
+            "assigned": null
+          },
+          {
+            "id": "IT-MAN-4",
+            "type": "food",
+            "icon": "restaurant",
+            "title": "Riverside Trout Dinner",
+            "subtitle": "08:00 PM • Old Manali Cafe setup",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 3",
+        "date": "27 Nov",
+        "items": [
+          {
+            "id": "IT-MAN-5",
+            "type": "activity",
+            "icon": "camera",
+            "title": "Naggar Castle & Heritage Walk",
+            "subtitle": "10:30 AM • Art gallery & historic fort",
+            "assigned": null
+          },
+          {
+            "id": "IT-MAN-6",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Vashisht Sulphur Springs",
+            "subtitle": "03:30 PM • Natural hot springs bath",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 4",
+        "date": "28 Nov",
+        "items": [
+          {
+            "id": "IT-MAN-7",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Check-out & Mall Road Transfer",
+            "subtitle": "10:00 AM • Luggage assistance & departure",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "itinerary": [
+      {
+        "day": "Day 1",
+        "date": "25 Nov",
+        "title": "Check-in at Pine Chalet",
+        "desc": "Warm cider welcome, leisure walk through cedar woods."
+      },
+      {
+        "day": "Day 2",
+        "date": "26 Nov",
+        "title": "Solang Valley Snow Trip",
+        "desc": "Cable car ride and snow sports at Solang."
+      },
+      {
+        "day": "Day 3",
+        "date": "27 Nov",
+        "title": "Naggar Castle & Cafe Crawl",
+        "desc": "Art gallery and ancient heritage castle visit."
+      },
+      {
+        "day": "Day 4",
+        "date": "28 Nov",
+        "title": "Check-out",
+        "desc": "Departure after breakfast."
+      }
+    ],
+    "updates": [
+      {
+        "time": "04:00 PM, 3 days ago",
+        "title": "Booking Request Received",
+        "desc": "Guest requested quotation for cottage upgrade.",
+        "user": "System"
+      }
+    ]
+  },
+  {
+    "id": "BK-5025",
+    "title": "Paragliding - Bir",
+    "type": "ACTIVITY",
+    "typeClass": "badge-activity",
+    "image": "./images/paragliding.jpg",
+    "pax": 2,
+    "duration": "1 Day",
+    "dates": "5 Nov - 7 Nov",
+    "travelDateFull": "5 Nov - 7 Nov 2024 (1 Day Activity)",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "₹6,000",
+    "rawPrice": 6000,
+    "category": "Ongoing",
+    "selected": false,
+    "guest": {
+      "name": "Akash Goel",
+      "phone": "+91 98224 46688",
+      "email": "akash.goel@gmail.com",
+      "age": 24,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Akash Goel",
+      "initials": "AG",
+      "phone": "+91 98224 46688",
+      "email": "akash.goel@gmail.com",
+      "location": "Chandigarh, Punjab",
+      "leadSource": "Instagram",
+      "preferredDestination": "Bir Billing, Himachal Pradesh",
+      "travelDates": "5 Nov – 7 Nov 2024",
+      "customerType": "Couple (2 Pax)",
+      "budgetEst": "₹ 6,000 – 8,000",
+      "status": "Pending",
+      "shortDetails": "Weekend tandem paragliding from Billing takeoff site to Bir landing ground with 4K GoPro recording.",
+      "leadFlow": [
+        {
+          "date": "02 Nov",
+          "time": "03:00 PM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Initial Inquiry (Call)",
+          "desc": "Client inquired about morning wind conditions and pilot flight certifications.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "02 Nov",
+          "time": "05:30 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Shared Itinerary (WhatsApp)",
+          "desc": "Shared takeoff timings, safety guidelines, and 4K video recording details.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "03 Nov",
+          "time": "10:00 AM",
+          "type": "email",
+          "iconBg": "icon-blue",
+          "title": "Sent Quote (Email)",
+          "desc": "Confirmed 2 flight slots with certified pilots pending final weather clearance.",
+          "author": "By Ruyi Admin"
+        }
+      ]
+    },
+    "destination": "Bir Billing, Himachal Pradesh",
+    "bookingType": "Tandem Paragliding",
+    "services": "30 Min Tandem Flight, GoPro 4K Recording, Takeoff transfer",
+    "assignedStatus": "Unassigned • Pending",
+    "assignedTo": {
+      "name": "Unassigned",
+      "role": "Support Pool",
+      "avatar": ""
+    },
+    "notes": "Requires early morning slot for optimal wind conditions.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Akash Goel",
+        "age": 24,
+        "role": "Primary Contact",
+        "phone": "9822446688"
+      },
+      {
+        "id": 2,
+        "name": "Riya Bansal",
+        "age": 23,
+        "role": "Participant",
+        "phone": "9822446689"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-51",
+        "icon": "camera",
+        "text": "GoPro 4K Recording",
+        "color": "#2563EB"
+      },
+      {
+        "id": "SR-52",
+        "icon": "clock",
+        "text": "Early Morning Slot (7 AM)",
+        "color": "#D97706"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "5 Nov",
+        "items": [
+          {
+            "id": "IT-BIR-1",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Billing 2400m Takeoff",
+            "subtitle": "07:30 AM • Tandem flight over pine forests",
+            "assigned": null
+          },
+          {
+            "id": "IT-BIR-2",
+            "type": "food",
+            "icon": "restaurant",
+            "title": "Landing Site & Tibetan Cafe Lunch",
+            "subtitle": "12:30 PM • Organic garden cafe",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "date": "6 Nov",
+        "items": [
+          {
+            "id": "IT-BIR-3",
+            "type": "activity",
+            "icon": "camera",
+            "title": "Chokling Monastery & Stupa Tour",
+            "subtitle": "09:30 AM • Tibetan cultural heritage walk",
+            "assigned": null
+          },
+          {
+            "id": "IT-BIR-4",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Return Drop to Pathankot",
+            "subtitle": "04:00 PM • Private cab departure",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "itinerary": [
+      {
+        "day": "Day 1",
+        "date": "5 Nov",
+        "title": "Billing Takeoff & Landing at Bir",
+        "desc": "Transfer up to 2400m Billing launchpad, 30 min tandem flight gliding over tea gardens."
+      }
+    ],
+    "updates": [
+      {
+        "time": "11:00 AM, 4 days ago",
+        "title": "Slot Reserved",
+        "desc": "Tandem pilot assigned pending payment confirmation.",
+        "user": "System"
+      }
+    ]
+  },
+  {
+    "id": "BK-5026",
+    "title": "Delhi School IV",
+    "type": "TRANSPORT",
+    "typeClass": "badge-transport",
+    "image": "./images/delhi_school.jpg",
+    "pax": 60,
+    "duration": "2 Days",
+    "dates": "10 Oct - 11 Oct",
+    "travelDateFull": "10 Oct - 11 Oct 2024 (2 Days Educational Tour)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹1,20,000",
+    "rawPrice": 120000,
+    "category": "Assigned",
+    "selected": false,
+    "guest": {
+      "name": "Mrs. Vandana Sehgal",
+      "phone": "+91 98101 02030",
+      "email": "vandana.sehgal@dps.edu",
+      "age": 48,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Mrs. Vandana Sehgal",
+      "initials": "VS",
+      "phone": "+91 98101 02030",
+      "email": "vandana.sehgal@dps.edu",
+      "location": "New Delhi, Delhi",
+      "leadSource": "Corporate / School",
+      "preferredDestination": "Delhi - Agra - Mathura - Delhi",
+      "travelDates": "10 Oct – 11 Oct 2024",
+      "customerType": "School Excursion (60 Pax)",
+      "budgetEst": "₹ 1,20,000 – 1,40,000",
+      "status": "Paid",
+      "shortDetails": "Annual educational excursion for Grade 10 students visiting Taj Mahal, Agra Fort, and Fatehpur Sikri with 2 luxury BharatBenz buses and tour guides.",
+      "leadFlow": [
+        {
+          "date": "01 Oct",
+          "time": "11:00 AM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Initial Inquiry (Call)",
+          "desc": "School administration submitted formal RFP for educational transport and meals.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "03 Oct",
+          "time": "02:00 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Shared Itinerary (WhatsApp)",
+          "desc": "Sent safety certifications, driver police verification, and detailed meal plans.",
+          "author": "By Ruyi Admin"
+        },
+        {
+          "date": "05 Oct",
+          "time": "04:30 PM",
+          "type": "email",
+          "iconBg": "icon-blue",
+          "title": "Sent Quote & Voucher (Email)",
+          "desc": "Signed contract and dispatched trip confirmation voucher #BK-5026.",
+          "author": "By Ruyi Admin"
+        }
+      ]
+    },
+    "destination": "Delhi - Agra - Mathura - Delhi",
+    "bookingType": "School Excursion & Transport",
+    "services": "2x 45-Seater BharatBenz AC Luxury Buses, Tour Guides, Meals",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Rahul Mehta",
+      "role": "Operations Head",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Student safety protocol strictly followed, first aid kits on both buses.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Mrs. Vandana Sehgal",
+        "age": 48,
+        "role": "Lead Teacher / Primary Contact",
+        "phone": "9810102030"
+      },
+      {
+        "id": 2,
+        "name": "Mr. Rakesh Sharma",
+        "age": 44,
+        "role": "Teacher",
+        "phone": "9810102031"
+      },
+      {
+        "id": 3,
+        "name": "Ms. Geeta Nair",
+        "age": 39,
+        "role": "Teacher",
+        "phone": "9810102032"
+      },
+      {
+        "id": 4,
+        "name": "Mr. Arvind Yadav",
+        "age": 42,
+        "role": "Bus Coordinator",
+        "phone": "9810102033"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-61",
+        "icon": "shield",
+        "text": "First Aid & Medical Kit",
+        "color": "#DC2626"
+      },
+      {
+        "id": "SR-62",
+        "icon": "leaf",
+        "text": "Vegetarian Food",
+        "color": "#16A34A"
+      },
+      {
+        "id": "SR-63",
+        "icon": "smile",
+        "text": "Kid Friendly Activities",
+        "color": "#EA580C"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "10 Oct",
+        "items": [
+          {
+            "id": "IT-SCH-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Delhi Campus Departure",
+            "subtitle": "06:00 AM • 2x Luxury AC Buses",
+            "assigned": null
+          },
+          {
+            "id": "IT-SCH-2",
+            "type": "activity",
+            "icon": "camera",
+            "title": "Taj Mahal Guided Heritage Tour",
+            "subtitle": "11:30 AM • UNESCO Heritage guide fitment",
+            "assigned": null
+          },
+          {
+            "id": "IT-SCH-3",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Agra Fort Architectural Walk",
+            "subtitle": "03:30 PM • Historic courtyards and palaces",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "date": "11 Oct",
+        "items": [
+          {
+            "id": "IT-SCH-4",
+            "type": "activity",
+            "icon": "camera",
+            "title": "Fatehpur Sikri & Buland Darwaza",
+            "subtitle": "09:30 AM • Guided educational field session",
+            "assigned": null
+          },
+          {
+            "id": "IT-SCH-5",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Safe Return to Delhi Campus",
+            "subtitle": "03:00 PM • Evening tea stop & arrival at 7 PM",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "itinerary": [
+      {
+        "day": "Day 1",
+        "date": "10 Oct",
+        "title": "Delhi to Agra Heritage Visit",
+        "desc": "Taj Mahal and Agra Fort educational guided tour, overnight hotel stay."
+      },
+      {
+        "day": "Day 2",
+        "date": "11 Oct",
+        "title": "Fatehpur Sikri & Return",
+        "desc": "Buland Darwaza visit and safe return to Delhi campus by 7 PM."
+      }
+    ],
+    "updates": [
+      {
+        "time": "10:00 AM, 10 Oct",
+        "title": "Trip Completed",
+        "desc": "All 60 students and staff returned safely. Final payment settled.",
+        "user": "Rahul Mehta"
+      }
+    ]
+  },
+  {
+    "id": "BK-5028",
+    "title": "Kerala Backwaters & Munnar Hills",
+    "type": "TOUR",
+    "typeClass": "badge-tour",
+    "image": "./images/kashmir.jpg",
+    "pax": 4,
+    "duration": "5D / 4N",
+    "dates": "22 Nov - 26 Nov",
+    "travelDateFull": "22 Nov - 26 Nov 2024 (5D / 4N)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹48,000",
+    "rawPrice": 48000,
+    "category": "Ongoing",
+    "selected": false,
+    "guest": {
+      "name": "Rajesh Nambiar",
+      "phone": "+91 98450 11223",
+      "email": "rajesh.nambiar@gmail.com",
+      "age": 40,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Rajesh Nambiar",
+      "initials": "RN",
+      "phone": "+91 98450 11223",
+      "email": "rajesh.nambiar@gmail.com",
+      "location": "Bengaluru, India",
+      "leadSource": "Website Direct",
+      "preferredDestination": "Kerala, Munnar & Alleppey",
+      "travelDates": "22 Nov - 26 Nov 2024",
+      "customerType": "Family Vacationer",
+      "budgetEst": "₹50,000",
+      "status": "Active Trip",
+      "shortDetails": "Luxury houseboat cruise and tea estate cottage stay.",
+      "leadFlow": [
+        {
+          "type": "call",
+          "iconBg": "icon-green",
+          "title": "Houseboat Check-in Done",
+          "desc": "Guests checked in at Alleppey jetty on time.",
+          "author": "By Priya Sharma"
+        }
+      ]
+    },
+    "destination": "Alleppey, Munnar, Kochi",
+    "bookingType": "Tour Package",
+    "services": "Premium Houseboat (1N), Munnar Resort (3N), Private Innova",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Priya Sharma",
+      "role": "Trip Coordinator",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Provide local South Indian vegetarian meals during houseboat cruise.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Rajesh Nambiar",
+        "age": 40,
+        "role": "Primary Contact",
+        "phone": "9845011223"
+      },
+      {
+        "id": 2,
+        "name": "Divya Nambiar",
+        "age": 36,
+        "role": "Adult",
+        "phone": "9845011224"
+      },
+      {
+        "id": 3,
+        "name": "Aarav Nambiar",
+        "age": 10,
+        "role": "Child",
+        "phone": "9845011225"
+      },
+      {
+        "id": 4,
+        "name": "Meera Nambiar",
+        "age": 8,
+        "role": "Child",
+        "phone": "9845011226"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-71",
+        "icon": "leaf",
+        "text": "Vegetarian Food",
+        "color": "#2563EB"
+      },
+      {
+        "id": "SR-72",
+        "icon": "smile",
+        "text": "Kid Friendly Activities",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "22 Nov",
+        "items": [
+          {
+            "id": "IT-KER-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Cochin Airport Pickup",
+            "subtitle": "09:00 AM • Private AC Innova transfer",
+            "assigned": null
+          },
+          {
+            "id": "IT-KER-2",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Alleppey Luxury Houseboat Boarding",
+            "subtitle": "12:30 PM • Welcome drink & backwaters cruise",
+            "assigned": null
+          }
+        ]
+      },
+      {
+        "day": "Day 2",
+        "date": "23 Nov",
+        "items": [
+          {
+            "id": "IT-KER-3",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Scenic Drive to Munnar",
+            "subtitle": "10:00 AM • Cheeyappara waterfalls viewpoint",
+            "assigned": null
+          },
+          {
+            "id": "IT-KER-4",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Tea Valley Resort Check-in",
+            "subtitle": "02:00 PM • Valley view family cottage",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "12:30 PM, 22 Nov",
+        "title": "Houseboat Cruising",
+        "desc": "Houseboat cruise underway across Vembanad lake.",
+        "user": "Priya Sharma"
+      }
+    ]
+  },
+  {
+    "id": "BK-5029",
+    "title": "Udaipur Royal Lake Villa",
+    "type": "VILLA",
+    "typeClass": "badge-villa",
+    "image": "./images/goa.jpg",
+    "pax": 6,
+    "duration": "3D / 2N",
+    "dates": "28 Nov - 30 Nov",
+    "travelDateFull": "28 Nov - 30 Nov 2024 (3D / 2N)",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "₹52,000",
+    "rawPrice": 52000,
+    "category": "New Bookings",
+    "selected": false,
+    "guest": {
+      "name": "Vikram Singhania",
+      "phone": "+91 98200 44556",
+      "email": "vikram.singhania@yahoo.com",
+      "age": 41,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Vikram Singhania",
+      "initials": "VS",
+      "phone": "+91 98200 44556",
+      "email": "vikram.singhania@yahoo.com",
+      "location": "Mumbai, India",
+      "leadSource": "WhatsApp Business",
+      "preferredDestination": "Udaipur, Rajasthan",
+      "travelDates": "28 Nov - 30 Nov 2024",
+      "customerType": "Luxury Traveler",
+      "budgetEst": "₹60,000",
+      "status": "Inquiry",
+      "shortDetails": "Lakefront royal villa with private courtyard and heritage dinner.",
+      "leadFlow": [
+        {
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Inquiry Received",
+          "desc": "Guest requested quotation for 6 adults lakefront villa.",
+          "author": "By System"
+        }
+      ]
+    },
+    "destination": "Lake Pichola, Udaipur",
+    "bookingType": "Heritage Villa Stay",
+    "services": "Private Courtyard, Butler Service, Airport Pickup",
+    "assignedStatus": "Unassigned • Pending",
+    "assignedTo": {
+      "name": "Unassigned",
+      "role": "Staff",
+      "avatar": ""
+    },
+    "notes": "Requested candlelight terrace dinner on night 2.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Vikram Singhania",
+        "age": 41,
+        "role": "Primary Contact",
+        "phone": "9820044556"
+      },
+      {
+        "id": 2,
+        "name": "Radhika Singhania",
+        "age": 38,
+        "role": "Adult",
+        "phone": "9820044557"
+      },
+      {
+        "id": 3,
+        "name": "Siddharth Singhania",
+        "age": 35,
+        "role": "Adult",
+        "phone": "9820044558"
+      },
+      {
+        "id": 4,
+        "name": "Anushka Singhania",
+        "age": 33,
+        "role": "Adult",
+        "phone": "9820044559"
+      },
+      {
+        "id": 5,
+        "name": "Manish Agarwal",
+        "age": 40,
+        "role": "Adult",
+        "phone": "9820044560"
+      },
+      {
+        "id": 6,
+        "name": "Shalini Agarwal",
+        "age": 37,
+        "role": "Adult",
+        "phone": "9820044561"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-81",
+        "icon": "clock",
+        "text": "Late Check-out (2 PM)",
+        "color": "#2563EB"
+      },
+      {
+        "id": "SR-82",
+        "icon": "utensils",
+        "text": "Barbecue Setup",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "28 Nov",
+        "items": [
+          {
+            "id": "IT-UDA-1",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Royal Villa Check-in",
+            "subtitle": "02:00 PM • Welcome garlands & royal welcome drinks",
+            "assigned": null
+          },
+          {
+            "id": "IT-UDA-2",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Sunset Boat Ride on Lake Pichola",
+            "subtitle": "05:30 PM • Private solar boat cruise",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "11:00 AM, 18 Oct",
+        "title": "Quote Dispatched",
+        "desc": "Quotation sent to Vikram via WhatsApp.",
+        "user": "Admin"
+      }
+    ]
+  },
+  {
+    "id": "BK-5030",
+    "title": "Scuba Diving & Coral Safari",
+    "type": "ACTIVITY",
+    "typeClass": "badge-activity",
+    "image": "./images/rishikesh.jpg",
+    "pax": 2,
+    "duration": "1 Day",
+    "dates": "18 Nov",
+    "travelDateFull": "18 Nov 2024 (Full Day)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹14,500",
+    "rawPrice": 14500,
+    "category": "Assigned",
+    "selected": false,
+    "guest": {
+      "name": "Aditya Roy",
+      "phone": "+91 97110 88990",
+      "email": "aditya.roy@hotmail.com",
+      "age": 27,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Aditya Roy",
+      "initials": "AR",
+      "phone": "+91 97110 88990",
+      "email": "aditya.roy@hotmail.com",
+      "location": "Pune, India",
+      "leadSource": "Instagram Ad",
+      "preferredDestination": "Netrani Island, Murudeshwar",
+      "travelDates": "18 Nov 2024",
+      "customerType": "Adventure Enthusiast",
+      "budgetEst": "₹15,000",
+      "status": "Confirmed",
+      "shortDetails": "Certified boat scuba diving package with underwater GoPro photos.",
+      "leadFlow": [
+        {
+          "type": "call",
+          "iconBg": "icon-green",
+          "title": "Dive Master Assigned",
+          "desc": "Instructor Rahul confirmed for 18 Nov dive session.",
+          "author": "By Rahul Mehta"
+        }
+      ]
+    },
+    "destination": "Netrani Island, Karnataka",
+    "bookingType": "Adventure Activity",
+    "services": "PADI Certified Dive Master, Boat Ride, Full Diving Kit",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Rahul Mehta",
+      "role": "Adventure Lead",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Medical fitness self-declaration received and approved.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Aditya Roy",
+        "age": 27,
+        "role": "Primary Contact",
+        "phone": "9711088990"
+      },
+      {
+        "id": 2,
+        "name": "Kavya Sen",
+        "age": 25,
+        "role": "Adult",
+        "phone": "9711088991"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-91",
+        "icon": "shield",
+        "text": "First Aid & Medical Kit",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "18 Nov",
+        "items": [
+          {
+            "id": "IT-DIV-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Harbor Speedboat Departure",
+            "subtitle": "07:30 AM • 45-min ride to Netrani Island dive site",
+            "assigned": null
+          },
+          {
+            "id": "IT-DIV-2",
+            "type": "activity",
+            "icon": "raft",
+            "title": "Tandem Scuba Dive (12m Depth)",
+            "subtitle": "09:30 AM • PADI Master guided coral dive & photos",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "03:00 PM, 17 Oct",
+        "title": "Kit Prepared",
+        "desc": "Oxygen cylinders and wet suits reserved for 2 pax.",
+        "user": "Rahul Mehta"
+      }
+    ]
+  },
+  {
+    "id": "BK-5031",
+    "title": "Mumbai – Pune Luxury Traveler",
+    "type": "TRANSPORT",
+    "typeClass": "badge-transport",
+    "image": "./images/manali.jpg",
+    "pax": 15,
+    "duration": "2 Days",
+    "dates": "25 Nov - 26 Nov",
+    "travelDateFull": "25 Nov - 26 Nov 2024 (2 Days)",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "₹18,500",
+    "rawPrice": 18500,
+    "category": "New Bookings",
+    "selected": false,
+    "guest": {
+      "name": "Sunita Deshmukh",
+      "phone": "+91 98220 77889",
+      "email": "sunita.deshmukh@gmail.com",
+      "age": 46,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Sunita Deshmukh",
+      "initials": "SD",
+      "phone": "+91 98220 77889",
+      "email": "sunita.deshmukh@gmail.com",
+      "location": "Pune, India",
+      "leadSource": "Phone Referral",
+      "preferredDestination": "Mumbai - Lonavala - Pune",
+      "travelDates": "25 Nov - 26 Nov 2024",
+      "customerType": "Corporate Group",
+      "budgetEst": "₹20,000",
+      "status": "Pending Approval",
+      "shortDetails": "17-seater Force Urbania luxury transfer for corporate offsite.",
+      "leadFlow": [
+        {
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Vehicle Availability Checked",
+          "desc": "Force Urbania AC traveler available with Mohan Rawat.",
+          "author": "By Admin"
+        }
+      ]
+    },
+    "destination": "Mumbai to Pune Expressway",
+    "bookingType": "Fleet Transfer",
+    "services": "17-Seater AC Luxury Tempo Traveler, Tolls & Permits Included",
+    "assignedStatus": "Unassigned • Pending",
+    "assignedTo": {
+      "name": "Unassigned",
+      "role": "Staff",
+      "avatar": ""
+    },
+    "notes": "Overnight parking at Lonavala resort arranged by client.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Sunita Deshmukh",
+        "age": 46,
+        "role": "Primary Contact",
+        "phone": "9822077889"
+      },
+      {
+        "id": 2,
+        "name": "Pramod Deshmukh",
+        "age": 49,
+        "role": "Adult",
+        "phone": "9822077890"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-101",
+        "icon": "shield",
+        "text": "First Aid & Medical Kit",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "25 Nov",
+        "items": [
+          {
+            "id": "IT-TR-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "BKC Mumbai Corporate Pickup",
+            "subtitle": "07:00 AM • Luxury Tempo Traveler boarding",
+            "assigned": null
+          },
+          {
+            "id": "IT-TR-2",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Lonavala Offsite Venue Arrival",
+            "subtitle": "10:30 AM • Expressway drive & safe arrival",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "04:00 PM, 16 Oct",
+        "title": "Inquiry Logged",
+        "desc": "Corporate transfer route verified.",
+        "user": "Admin"
+      }
+    ]
+  },
+  {
+    "id": "BK-5032",
+    "title": "Goa Airport Express Shuttle",
+    "type": "TRANSPORT",
+    "typeClass": "badge-transport",
+    "image": "./images/goa.jpg",
+    "pax": 8,
+    "duration": "1 Day",
+    "dates": "14 Nov",
+    "travelDateFull": "14 Nov 2024 (Single Day)",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "₹8,500",
+    "rawPrice": 8500,
+    "category": "Ongoing",
+    "selected": false,
+    "guest": {
+      "name": "Devendra Joshi",
+      "phone": "+91 98900 11447",
+      "email": "devendra.joshi@gmail.com",
+      "age": 36,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Devendra Joshi",
+      "initials": "DJ",
+      "phone": "+91 98900 11447",
+      "email": "devendra.joshi@gmail.com",
+      "location": "Goa, India",
+      "leadSource": "Hotel Partner",
+      "preferredDestination": "Mopa Airport to Candolim",
+      "travelDates": "14 Nov 2024",
+      "customerType": "VIP Family Group",
+      "budgetEst": "₹9,000",
+      "status": "Active Trip",
+      "shortDetails": "Airport meet & greet with luxury 9-seater luggage carrier van.",
+      "leadFlow": [
+        {
+          "type": "call",
+          "iconBg": "icon-green",
+          "title": "Flight Landed on Time",
+          "desc": "IndiGo 6E-204 landed at Manohar International Airport.",
+          "author": "By Amit Patel"
+        }
+      ]
+    },
+    "destination": "Mopa Airport to North Goa",
+    "bookingType": "Airport Shuttle",
+    "services": "Urbania Luxury Van, Meet & Greet at Arrivals Gate",
+    "assignedStatus": "Assigned • Paid",
+    "assignedTo": {
+      "name": "Amit Patel",
+      "role": "Fleet Manager",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
+    },
+    "notes": "Flight tracking active. Placard with name Devendra Joshi ready.",
+    "guests": [
+      {
+        "id": 1,
+        "name": "Devendra Joshi",
+        "age": 36,
+        "role": "Primary Contact",
+        "phone": "9890011447"
+      },
+      {
+        "id": 2,
+        "name": "Pallavi Joshi",
+        "age": 33,
+        "role": "Adult",
+        "phone": "9890011448"
+      }
+    ],
+    "specialRequirements": [
+      {
+        "id": "SR-111",
+        "icon": "shield",
+        "text": "First Aid & Medical Kit",
+        "color": "#2563EB"
+      }
+    ],
+    "itineraryDays": [
+      {
+        "day": "Day 1",
+        "date": "14 Nov",
+        "items": [
+          {
+            "id": "IT-AIR-1",
+            "type": "transport",
+            "icon": "bus",
+            "title": "Airport Gate Meet & Greet",
+            "subtitle": "11:15 AM • Mopa Terminal 1 VIP pickup",
+            "assigned": null
+          },
+          {
+            "id": "IT-AIR-2",
+            "type": "hotel",
+            "icon": "bed",
+            "title": "Resort Drop-off Candolim",
+            "subtitle": "12:45 PM • Direct non-stop transfer",
+            "assigned": null
+          }
+        ]
+      }
+    ],
+    "updates": [
+      {
+        "time": "11:20 AM, 14 Nov",
+        "title": "Guests Boarded",
+        "desc": "Guests seated in van, departure towards Candolim.",
+        "user": "Amit Patel"
+      }
+    ]
+  }
+];
+
+export const STAFF_MEMBERS = [
+  { id: 'ST-01', name: 'Rahul Mehta', role: 'Tour Operations Manager', phone: '+91 98765 00111', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80', activeTrips: 4 },
+  { id: 'ST-02', name: 'Priya Sharma', role: 'Trip Coordinator', phone: '+91 98765 00222', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80', activeTrips: 3 },
+  { id: 'ST-03', name: 'Amit Patel', role: 'Senior Dispatch Lead', phone: '+91 98765 00333', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80', activeTrips: 5 },
+  { id: 'ST-04', name: 'Vikram Sethi', role: 'Fleet & Logistics Lead', phone: '+91 98765 00444', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80', activeTrips: 2 },
+  { id: 'ST-05', name: 'Karan Sapalia', role: 'Head of Operations', phone: '+91 98765 00555', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80', activeTrips: 6 }
+];
+
+export const VENDORS_LIST = [
+  {
+    id: 'V-01',
+    name: 'Adventure World',
+    phone: '+91 98765 43210',
+    service: 'Rafting • Rishikesh',
+    image: './images/rishikesh.jpg',
+    selected: true
+  },
+  {
+    id: 'V-02',
+    name: 'Himalayan Adventures',
+    phone: '+91 91234 52789',
+    service: 'Rafting & Trekking • Rishikesh',
+    image: './images/kedarnath.jpg',
+    selected: false
+  },
+  {
+    id: 'V-03',
+    name: 'Ganga Adventure Co.',
+    phone: '+91 98887 66554',
+    service: 'White Water Rafting • Kayaking',
+    image: './images/rishikesh.jpg',
+    selected: false
+  },
+  {
+    id: 'V-04',
+    name: 'Garhwal Luxury Transport',
+    phone: '+91 98370 11223',
+    service: 'Fleet Services & Tempo Travelers',
+    image: './images/manali.jpg',
+    selected: false
+  }
+];
+
+export const CONTACTS_LIST = [
+  {
+    id: 'CT-01',
+    name: 'Mohan Rawat',
+    phone: '+91 98371 22334',
+    role: 'Senior Mountain Driver',
+    details: 'Tempo Traveler (UK-07-TA-4421) • 12 Yrs Exp',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80'
+  },
+  {
+    id: 'CT-02',
+    name: 'Suresh Nautiyal',
+    phone: '+91 94120 55667',
+    role: 'Certified Rafting & Trek Guide',
+    details: 'Grade 4 Rafting License • River Rescue Certified',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80'
+  },
+  {
+    id: 'CT-03',
+    name: 'Dr. R.K. Joshi',
+    phone: '+91 98290 88776',
+    role: 'Camp Medical Officer',
+    details: 'High Altitude First Responder • Rishikesh Base',
+    avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&q=80'
+  },
+  {
+    id: 'CT-04',
+    name: 'Anita Negi',
+    phone: '+91 97600 33445',
+    role: 'Resort Front Desk Manager',
+    details: 'Hotel Ganga View • VIP Check-in Coordinator',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80'
+  },
+  {
+    id: 'CT-05',
+    name: 'Rajesh Bhandari',
+    phone: '+91 94101 99887',
+    role: 'Ganga Aarti & Temple Coordinator',
+    details: 'Har Ki Pauri Priority VIP Seating Priest',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80'
+  }
+];
+
+export const SPECIAL_REQUIREMENTS_PRESETS = [
+  { id: 'preset-flame', icon: 'flame', text: 'Room Heating / Bukhari Needed', color: '#2563EB' },
+  { id: 'preset-coffee', icon: 'coffee', text: 'Daily Breakfast & Kahwa Included', color: '#2563EB' },
+  { id: 'preset-shield', icon: 'shield', text: 'Child Snow Safety Gear', color: '#2563EB' },
+  { id: 'preset-1', icon: 'leaf', text: 'Vegetarian Food', color: '#2563EB' },
+  { id: 'preset-2', icon: 'bed', text: '2 Connecting Rooms', color: '#2563EB' },
+  { id: 'preset-3', icon: 'accessibility', text: 'Wheelchair Assistance', color: '#2563EB' },
+  { id: 'preset-4', icon: 'waves', text: 'Near Beach', color: '#2563EB' },
+  { id: 'preset-5', icon: 'smile', text: 'Kid Friendly Activities', color: '#2563EB' },
+  { id: 'preset-6', icon: 'baby', text: 'Baby Crib / Cot', color: '#2563EB' },
+  { id: 'preset-7', icon: 'clock', text: 'Late Check-out', color: '#2563EB' },
+  { id: 'preset-8', icon: 'utensils', text: 'Jain / Non-Spicy Food', color: '#2563EB' },
+  { id: 'preset-9', icon: 'shield', text: 'First Aid & Medical Kit', color: '#2563EB' }
+];
+
+export function getSpecialReqIconSvg(icon, color = '#2563EB') {
+  const strokeColor = color || '#2563EB';
+  switch (icon ? icon.toLowerCase() : '') {
+    case 'flame':
+    case 'heater':
+    case 'heating':
+    case 'fire':
+    case 'bukhari':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`;
+    case 'coffee':
+    case 'tea':
+    case 'kahwa':
+    case 'breakfast':
+    case 'cup':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>`;
+    case 'shield':
+    case 'safety':
+    case 'gear':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+    case 'snowflake':
+    case 'snow':
+    case 'winter':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>`;
+    case 'leaf':
+    case 'veg':
+    case 'vegetarian':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>`;
+    case 'bed':
+    case 'room':
+    case 'rooms':
+    case 'hotel':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>`;
+    case 'accessibility':
+    case 'wheelchair':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="4" r="1.5"/><path d="m19 19-5-3v-5l4.5-1.5"/><path d="M4 19a5 5 0 0 1 4.5-7.5"/><path d="M14 13.5V17a4 4 0 0 1-4 4"/></svg>`;
+    case 'waves':
+    case 'water':
+    case 'beach':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>`;
+    case 'smile':
+    case 'kid':
+    case 'kids':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>`;
+    case 'baby':
+    case 'crib':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.5 1.5.5 2 0"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9M5 6.3A9 9 0 0 0 3.2 10.2"/></svg>`;
+    case 'clock':
+    case 'time':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+    case 'utensils':
+    case 'food':
+    case 'barbecue':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 2v19"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`;
+    case 'camera':
+    case 'recording':
+    case 'gopro':
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`;
+    default:
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`;
+  }
+}
+
