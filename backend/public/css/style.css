@@ -4188,7 +4188,7 @@ body.standalone-mobile .app-global-bar {
 
 /* Left Day Label Column */
 .timeline-day-col {
-  width: 52px;
+  width: 64px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -4333,6 +4333,7 @@ body.standalone-mobile .app-global-bar {
 
 /* Itinerary Header Bar with + Add Event */
 .itinerary-section-header-bar {
+  gap: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4341,6 +4342,7 @@ body.standalone-mobile .app-global-bar {
 }
 
 .itinerary-section-header-bar h3 {
+  white-space: nowrap;
   font-size: 14.5px;
   font-weight: 800;
   color: #0F172A;
@@ -6521,21 +6523,22 @@ html.is-keyboard-open .asg-footer { padding-top: 8px; padding-bottom: 10px; }
 .dd-list li.selected svg { color: inherit; }
 
 /* Itinerary: header actions, day menu, dialogs */
-.itin-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.itin-actions { display: flex; flex: 0 0 auto; }
 .btn-add-event-pill svg { flex-shrink: 0; }
 .btn-add-event-pill { display: inline-flex; align-items: center; gap: 6px; }
-.day-menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-top: 4px; border: none; border-radius: 8px; background: transparent; color: #64748B; cursor: pointer; position: relative; }
+.day-head { display: flex; align-items: center; gap: 2px; margin-left: -2px; }
+.day-empty { margin: 4px 0 0; font-size: 12px; color: #94A3B8; }
+.itin-hint { margin: 0; font-size: 12.5px; color: #1D4ED8; }
+.itin-hint[hidden] { display: none; }
+.day-menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-top: 0; border: none; border-radius: 8px; background: transparent; color: #64748B; cursor: pointer; position: relative; }
 .day-menu-btn::after { content: ""; position: absolute; inset: -8px; }
 .day-menu-btn:hover { background: #F1F5F9; color: #0F172A; }
-.day-title-sub { display: block; font-size: 11px; color: #64748B; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.day-title-sub { display: block; font-size: 11px; color: #64748B; max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .itin-sheet { max-width: 520px; }
 .itin-body { padding: 4px 20px 12px; display: flex; flex-direction: column; gap: 14px; }
 .itin-footer { display: flex; gap: 12px; padding: 10px 20px max(16px, var(--safe-bottom)); border-top: 1px solid #F1F5F9; background: #fff; }
 .itin-footer .btn-primary-desktop { flex: 1; height: 44px; border-radius: 12px; }
 .itin-footer .btn-cancel-assign { flex: 0 0 auto; }
-.itin-newday { border: 1px dashed #BFDBFE; background: #F8FBFF; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
-.itin-newday[hidden] { display: none; }
-.itin-newday-head { display: flex; align-items: center; gap: 8px; color: #1D4ED8; font-size: 13.5px; }
 .state-box .btn-add-event-pill { margin-top: 4px; }
 @media (pointer: coarse) { .itin-body input, .fu-field input { font-size: 16px; } }
 html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-inset) + 24px) !important; }
@@ -6544,3 +6547,17 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
 .modal-card > form { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
 .modal-card > form > .modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 .modal-card > form > .modal-footer { flex: 0 0 auto; }
+
+/* Quick note under the action buttons in the split-view compact list (Inquiries) */
+.compact-booking-card .qn-compact { width: 100%; margin-top: 8px; cursor: default; }
+.compact-booking-card .qn-compact input { flex: 1 1 auto; min-width: 0; width: 0; }
+
+/* Add Itinerary Event: a centered dialog at every width (not a bottom sheet), with full-width dropdowns */
+.asg-overlay:has(.itin-sheet) { align-items: center; padding: 16px; }
+.asg-sheet.itin-sheet { border-radius: 20px; max-height: min(86dvh, calc(var(--ov-h, 100dvh) - 32px)); transform: translateY(16px) scale(0.98); opacity: 0; transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out); }
+.asg-overlay.open .asg-sheet.itin-sheet { transform: none; opacity: 1; }
+.itin-sheet .filter-handle { display: none; }
+.itin-sheet .dd-block, .itin-sheet .dd-block .dd-trigger { width: 100%; max-width: none; }
+.itin-sheet .asg-header { padding: 16px 20px 10px; }
+.itin-sheet .dd-block .dd-trigger .dd-label { flex: 1 1 auto; text-align: left; }
+@media (prefers-reduced-motion: reduce) { .asg-sheet.itin-sheet { transition: none; transform: none; } }

@@ -28,7 +28,7 @@ Dashboard, Calendar, More and Settings appear in the navigation as placeholders 
 | Extra | A Livewire bookings page at `/livewire` |
 | Tests | PHPUnit 11 |
 
-The UI needs no build step. The Vite and Tailwind entries in `package.json` come from the Laravel scaffold and are not used by the current pages.
+The UI needs no build step: assets are served as-is and versioned by file time.
 
 ## Requirements
 

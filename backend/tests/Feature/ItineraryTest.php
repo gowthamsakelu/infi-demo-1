@@ -79,4 +79,29 @@ class ItineraryTest extends TestCase
 
         $this->assertSame([], Booking::find('BK-1')->itinerary_days);
     }
+
+    public function test_a_new_day_is_created_together_with_its_event_in_one_save(): void
+    {
+        $this->inquiry();
+        $event = ['id' => 'IT-2', 'type' => 'food', 'title' => 'Dinner', 'subtitle' => '8 PM', 'completed' => false, 'assigned' => null];
+        $days = [
+            ['day' => 'Day 1', 'date' => '18 Nov', 'items' => []],
+            ['day' => 'Day 2', 'date' => '19 Nov', 'items' => [$event]],
+        ];
+
+        $this->putJson('/api/inquiries/INQ-1/itinerary', ['days' => $days])->assertOk();
+
+        $saved = $this->getJson('/api/inquiries/INQ-1/itinerary')->assertOk()->json('data');
+        $this->assertCount(2, $saved);
+        $this->assertSame('Day 2', $saved[1]['day']);
+        $this->assertSame('Dinner', $saved[1]['items'][0]['title']);
+    }
+
+    public function test_there_is_no_separate_add_day_endpoint(): void
+    {
+        $this->booking();
+
+        $this->postJson('/api/bookings/BK-1/itinerary/days', ['title' => 'x'])->assertStatus(404);
+        $this->postJson('/api/bookings/BK-1/days', [])->assertStatus(404);
+    }
 }

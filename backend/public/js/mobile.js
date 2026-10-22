@@ -907,17 +907,16 @@ export function createMobileView(container, options = {}) {
               </div>
               <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
             </div>
-            <div class="itin-actions"><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button><button class="btn-add-event-pill" id="mobile-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
+            <div class="itin-actions"><button class="btn-add-event-pill" id="mobile-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
           </div>
 
           <div class="itinerary-v2-container">
-          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Add a day to start planning.</p><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button></div>` : ''}
+          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Use Add Event to create the first day.</p></div>` : ''}
           ${days.map((dayGroup, dayIdx) => `
             <div class="itinerary-day-section">
               <!-- Left Day & Date Label -->
               <div class="timeline-day-col">
-                <span class="day-badge-text">${dayGroup.day}</span>
-                <span class="day-date-sub">${dayGroup.date}</span>${dayGroup.title ? `<span class="day-title-sub">${esc(dayGroup.title)}</span>` : ''}<button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button>
+                <div class="day-head"><span class="day-badge-text">${dayGroup.day}</span><button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button></div><span class="day-date-sub">${dayGroup.date}</span>${dayGroup.title ? `<span class="day-title-sub">${esc(dayGroup.title)}</span>` : ''}
               </div>
 
               <!-- Continuous Line & Dot Node -->
@@ -928,6 +927,7 @@ export function createMobileView(container, options = {}) {
 
               <!-- Activity Items for this day -->
               <div class="timeline-items-col">
+                ${dayGroup.items.length ? '' : '<p class="day-empty">No events yet</p>'}
                 ${dayGroup.items.map(item => `
                   <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-itinerary-item-id="${item.id}">
                     <div class="item-left-content">
@@ -2303,7 +2303,6 @@ export function createMobileView(container, options = {}) {
 
       // Add Itinerary Event Modal Triggers & Actions
       if (e.target.closest('#mobile-add-event-btn')) { openEventDialog(activeModalBooking, { onChange: renderSheetBody }); return; }
-      if (e.target.closest('[data-add-day]')) { openDayDialog(activeModalBooking, { onChange: renderSheetBody }); return; }
       const dayMenuBtn = e.target.closest('[data-day-menu]');
       if (dayMenuBtn) {
         e.stopPropagation();

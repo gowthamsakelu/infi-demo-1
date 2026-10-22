@@ -583,6 +583,7 @@ export function createDesktopView(container) {
           </div>
           <div class="card-action-btns-row" style="gap: 5px;">${rowActionButtons(b, 13, 'width: 28px; height: 28px;')}</div>
         </div>
+        ${inquiry ? quickNote(b, 'qn-compact') : ''}
       </div>`;
   }
 
@@ -1058,22 +1059,22 @@ export function createDesktopView(container) {
               </div>
               <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
             </div>
-            <div class="itin-actions"><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button><button class="btn-add-event-pill" id="desktop-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
+            <div class="itin-actions"><button class="btn-add-event-pill" id="desktop-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
           </div>
 
           <div class="itinerary-v2-container">
-          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Add a day to start planning.</p><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button></div>` : ''}
+          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Use Add Event to create the first day.</p></div>` : ''}
           ${days.map((d, dayIdx) => `
             <div class="itinerary-day-section">
               <div class="timeline-day-col">
-                <span class="day-badge-text">${d.day}</span>
-                <span class="day-date-sub">${d.date}</span>${d.title ? `<span class="day-title-sub">${esc(d.title)}</span>` : ''}<button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button>
+                <div class="day-head"><span class="day-badge-text">${d.day}</span><button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button></div><span class="day-date-sub">${d.date}</span>${d.title ? `<span class="day-title-sub">${esc(d.title)}</span>` : ''}
               </div>
               <div class="timeline-track-col">
                 <div class="timeline-line-track"></div>
                 <div class="timeline-dot-node"></div>
               </div>
               <div class="timeline-items-col">
+                ${d.items.length ? '' : '<p class="day-empty">No events yet</p>'}
                 ${d.items.map(item => `
                   <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-desktop-itinerary-item-id="${item.id}">
                     <div class="item-left-content">
@@ -1759,7 +1760,6 @@ export function createDesktopView(container) {
 
       // Desktop Add Event Modal Triggers & Actions
       if (e.target.closest('#desktop-add-event-btn')) { openEventDialog(activeBooking, { onChange: renderDetailPanel }); return; }
-      if (e.target.closest('[data-add-day]')) { openDayDialog(activeBooking, { onChange: renderDetailPanel }); return; }
       const dayMenuBtn = e.target.closest('[data-day-menu]');
       if (dayMenuBtn) {
         e.stopPropagation();
@@ -1987,6 +1987,7 @@ export function createDesktopView(container) {
       // Click on Compact Master List Card (Outlook Split View)
       const compactCard = e.target.closest('[data-compact-booking-id]');
       if (compactCard) {
+        if (e.target.closest('.quick-note')) return; // typing or sending a note never switches the detail pane
         const id = compactCard.dataset.compactBookingId;
         const b = bookings.find(item => item.id === id);
         if (b) {

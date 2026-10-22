@@ -1,4 +1,4 @@
-// Browser test (not run by PHPUnit): Bookings/Inquiries rows, Add Day / Add Event, shared Assign sheet and keyboard fit
+// Browser test (not run by PHPUnit): Bookings/Inquiries rows, Add Event (with Create New Day), shared Assign sheet and keyboard fit
 // at every supported width. Playwright is NOT a project dependency:  npm i playwright && npx playwright install chromium
 // Run against a running app:  BASE=http://127.0.0.1:8000/ node viewport-matrix.mjs     (re-seed afterwards: php artisan db:seed --force)
 import { chromium } from 'playwright';
@@ -37,13 +37,7 @@ for (const [w, h] of VPS) {
   };
   await open();
   await step('noDoublePlus', () => page.evaluate((s) => !/^\s*\+\s*\+|\+\s*\+/.test(document.querySelector(`${s} .itin-actions`).innerText) && !/^\s*\+/.test(document.querySelector(`${s} #${s.includes('mobile') ? 'mobile' : 'desktop'}-add-event-btn`).innerText), slot));
-  await step('addDay', async () => {
-    const n = await page.locator(`${slot} .itinerary-day-section`).count();
-    await page.locator(`${slot} [data-add-day]`).first().click(); await page.waitForTimeout(500);
-    const focusOk = await page.evaluate(() => !document.activeElement || !/INPUT|TEXTAREA/.test(document.activeElement.tagName));
-    await page.locator('.asg-overlay [data-itin-save]').click(); await page.waitForTimeout(800);
-    return focusOk && (await page.locator(`${slot} .itinerary-day-section`).count()) === n + 1;
-  });
+  await step('noAddDay', () => page.evaluate((sl) => !document.querySelector(`${sl} [data-add-day]`) && !/Add Day/.test(document.querySelector(sl).innerText), slot));
   await step('addEventNewDay', async () => {
     await page.locator(`${slot} #${m ? 'mobile' : 'desktop'}-add-event-btn`).click(); await page.waitForTimeout(500);
     const nativeSel = await page.evaluate(() => [...document.querySelectorAll('.asg-overlay select')].some((s) => s.getClientRects().length));
@@ -81,7 +75,7 @@ for (const [w, h] of VPS) {
 }
 await browser.close();
 
-const cols = ['noHScroll', 'rowsOneLine', 'noDoublePlus', 'addDay', 'addEventNewDay', 'assignSheet', 'keyboardFit', 'jsErrors'];
+const cols = ['noHScroll', 'rowsOneLine', 'noDoublePlus', 'noAddDay', 'addEventNewDay', 'assignSheet', 'keyboardFit', 'jsErrors'];
 console.log(['viewport'.padEnd(10), ...cols.map((c) => c.padEnd(14))].join(' '));
 for (const r of rows) console.log([r.vp.padEnd(10), ...cols.map((c) => (r[c] === undefined ? '-' : r[c] ? 'PASS' : 'FAIL').padEnd(14))].join(' '));
 for (const r of rows) for (const c of cols) if (r[c + 'Err']) console.log(`  ${r.vp} ${c}: ${r[c + 'Err']}`);

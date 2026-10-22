@@ -75,10 +75,9 @@ const goto = async (page, hash) => { await page.goto(`${BASE}?a=${Date.now()}#${
   await check(page, 'Itinerary event: title', '#itin-title', '.asg-sheet');
   await check(page, 'Itinerary event: time/subtitle', '#itin-sub', '.asg-sheet');
   await page.locator('#itin-day .dd-trigger').click(); await page.locator('#itin-day li[data-value=new]').click();
-  await check(page, 'Itinerary event: new day title', '#itin-newday-title', '.asg-sheet');
   await page.keyboard.press('Escape'); await page.waitForTimeout(500);
-  await page.locator('#mobile-view-slot [data-add-day]').first().click(); await page.waitForTimeout(500);
-  await check(page, 'Add day: title', '#itin-day-title', '.asg-sheet');
+  await page.locator('#mobile-view-slot [data-day-menu]').first().click(); await page.locator('.row-floating-menu [data-menu-key=rename]').click(); await page.waitForTimeout(500);
+  await check(page, 'Rename day: title', '#itin-day-title', '.asg-sheet');
   await ctx.close();
 }
 {
