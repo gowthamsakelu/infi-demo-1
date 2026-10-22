@@ -4,6 +4,7 @@ import { createDesktopView } from './desktop.js';
 import { INITIAL_BOOKINGS, STAFF_MEMBERS } from './data.js';
 import { refresh } from './shared/page-state.js';
 import { initKeyboard } from './shared/keyboard.js';
+import { initLayout, applyLayout } from './shared/layout.js';
 import { enhanceSelects } from './shared/dropdown-filter.js';
 import { closeRowMenu } from './shared/ui.js';
 import { closeAssign } from './shared/assign-sheet.js';
@@ -19,21 +20,21 @@ const fontsReady = () => Promise.race([
   new Promise((r) => setTimeout(r, 1500)),
 ]);
 
+applyLayout();
+
 document.addEventListener('DOMContentLoaded', async () => {
   const appContainer = document.getElementById('app');
   if (!appContainer) return;
   await fontsReady();
 
-  // Layout can change live (fold/unfold, rotate, resize). CSS swaps the layout; here we reset open
-  // overlays so nothing is left in a state that does not exist in the new layout.
-  ['(min-width: 700px)', '(min-width: 1100px)'].forEach((q) => {
-    matchMedia(q).addEventListener('change', () => {
-      closeRowMenu();
-      closeAssign();
-      closeFollowUpModal();
-      window.dispatchEvent(new Event('layout-changed'));
-      refresh();
-    });
+  // Layout can change live (fold/unfold, rotate, resize). CSS swaps the layout from <html data-layout>; here we reset
+  // open overlays so nothing is left in a state that does not exist in the new layout.
+  initLayout(() => {
+    closeRowMenu();
+    closeAssign();
+    closeFollowUpModal();
+    window.dispatchEvent(new Event('layout-changed'));
+    refresh();
   });
 
   // Global Toast Dispatcher

@@ -93,36 +93,33 @@ body {
   background: #FFFFFF;
 }
 
-@media (min-width: 700px) {
-  html, body {
+html[data-layout="desktop"],
+:where(html[data-layout="desktop"]) body {
     height: 100dvh;
     height: 100dvh;
     overflow: hidden !important;
   }
-  .app-root-container {
+:where(html[data-layout="desktop"]) .app-root-container {
     height: 100dvh;
     height: 100dvh;
     overflow: hidden !important;
   }
-  .view-slot-desktop {
+:where(html[data-layout="desktop"]) .view-slot-desktop {
     display: block !important;
     height: 100dvh;
     height: 100dvh;
     overflow: hidden !important;
   }
-  .view-slot-mobile {
+:where(html[data-layout="desktop"]) .view-slot-mobile {
     display: none !important;
   }
-}
 
-@media (max-width: 699px) {
-  .view-slot-desktop {
+:where(html[data-layout="mobile"]) .view-slot-desktop {
     display: none !important;
   }
-  .view-slot-mobile {
+:where(html[data-layout="mobile"]) .view-slot-mobile {
     display: flex !important;
   }
-}
 
 /* Hide legacy simulation bar - clean production mode */
 .app-global-bar {
@@ -2893,10 +2890,10 @@ body.standalone-mobile .app-global-bar {
 }
 
 .desktop-workspace-split.has-open-detail .desktop-table-container {
-  flex: 0 0 340px !important;
-  width: 340px !important;
-  min-width: 320px !important;
-  max-width: 350px !important;
+  flex: 0 0 clamp(380px, 31vw, 440px) !important;
+  width: clamp(380px, 31vw, 440px) !important;
+  min-width: 0 !important;
+  max-width: none !important;
   height: 100% !important;
   min-height: 0 !important;
   background: transparent !important;
@@ -3436,162 +3433,6 @@ body.standalone-mobile .app-global-bar {
   height: 18px;
   border-radius: 50%;
   object-fit: cover;
-}
-
-/* Tablet & iPad Specific Optimizations (iPad Mini 744px/768px to iPad 13" 1024px/1099px) */
-@media (min-width: 700px) and (max-width: 1099px) {
-  .desktop-sidebar {
-    width: 64px !important;
-    min-width: 64px !important;
-    padding: 14px 6px !important;
-    align-items: center !important;
-  }
-
-  .desktop-sidebar .sidebar-brand {
-    justify-content: center !important;
-    padding: 0 0 14px 0 !important;
-  }
-
-  .desktop-sidebar .sidebar-brand .brand-text-col {
-    display: none !important;
-  }
-
-  .desktop-sidebar .sidebar-nav {
-    align-items: center !important;
-    width: 100% !important;
-  }
-
-  .desktop-sidebar .sidebar-nav .nav-section-title {
-    display: none !important;
-  }
-
-  .desktop-sidebar .sidebar-nav-item {
-    justify-content: center !important;
-    padding: 10px 0 !important;
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 10px !important;
-    margin: 2px 0 !important;
-  }
-
-  .desktop-sidebar .sidebar-nav-item .nav-left span {
-    display: none !important;
-  }
-
-  .desktop-sidebar .sidebar-nav-item .sidebar-badge {
-    display: none !important;
-  }
-
-  .desktop-sidebar .sidebar-profile-box {
-    padding: 10px 0 !important;
-    justify-content: center !important;
-  }
-
-  .desktop-sidebar .sidebar-profile-box .profile-user-left div:last-child {
-    display: none !important;
-  }
-
-  .desktop-sidebar .ks-avatar-badge {
-    margin: 0 !important;
-  }
-
-  .desktop-body {
-    padding: 12px 14px !important;
-  }
-
-  .desktop-workspace-split {
-    gap: 12px !important;
-  }
-
-  /* 2x2 Grid for Metrics Cards on iPad */
-  .metrics-row {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-  }
-
-  /* Table horizontal scrolling on tablet */
-  .desktop-table-container {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  .bookings-table {
-    min-width: 0 !important;
-  }
-
-  .toolbar-tabs-group {
-    overflow-x: auto !important;
-    white-space: nowrap !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-    max-width: 100% !important;
-  }
-  .toolbar-tabs-group::-webkit-scrollbar {
-    display: none !important;
-  }
-  .desktop-tab-btn {
-    flex-shrink: 0 !important;
-  }
-
-  /* Split view on iPad 13" (1024px) down to iPad Air (820px-834px) */
-  .desktop-workspace-split.has-open-detail .desktop-table-container {
-    flex: 0 0 280px !important;
-    width: 280px !important;
-    min-width: 260px !important;
-    max-width: 290px !important;
-  }
-
-  .desktop-details-drawer.open {
-    flex: 1 1 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    min-height: 0 !important;
-    top: 0 !important;
-  }
-
-  .desktop-compact-list-view {
-    height: 100% !important;
-    max-height: 100% !important;
-    min-height: 0 !important;
-  }
-
-  .desktop-details-drawer .customer-info-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 14px !important;
-  }
-
-  .desktop-details-drawer .customer-meta-chips {
-    flex-wrap: wrap !important;
-    gap: 6px !important;
-  }
-
-  .desktop-drawer-footer {
-    padding: 12px 16px 16px 16px !important;
-  }
-}
-
-/* iPad Mini specific (700px - 850px) */
-@media (min-width: 700px) and (max-width: 850px) {
-  .desktop-workspace-split.has-open-detail .desktop-table-container {
-    flex: 0 0 230px !important;
-    width: 230px !important;
-    min-width: 210px !important;
-    max-width: 240px !important;
-  }
-
-  .desktop-details-drawer .customer-info-grid {
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-
-  .desktop-drawer-footer .quick-action-col-btn {
-    min-height: 52px !important;
-    font-size: 11px !important;
-    padding: 6px 2px !important;
-  }
 }
 
 /* Unified Desktop Drawer Header */
@@ -5136,19 +4977,16 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 /* ==========================================================================
    Responsive Adaptability (Automatic switch on mobile devices)
    ========================================================================== */
-@media (max-width: 699px) {
-  body {
+:where(html[data-layout="mobile"]) body {
     background-color: #FFFFFF !important;
   }
-
-  .app-global-bar {
+:where(html[data-layout="mobile"]) .app-global-bar {
     display: none !important; /* Pure native app experience on phone screens */
   }
-
-  .app-viewport,
-  .app-viewport.mode-pc,
-  .app-viewport.mode-mobile,
-  .app-viewport.mode-dual {
+:where(html[data-layout="mobile"]) .app-viewport,
+:where(html[data-layout="mobile"]) .app-viewport.mode-pc,
+:where(html[data-layout="mobile"]) .app-viewport.mode-mobile,
+:where(html[data-layout="mobile"]) .app-viewport.mode-dual {
     padding: 0 !important;
     background: #FFFFFF !important;
     display: flex !important;
@@ -5156,22 +4994,19 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     min-height: 100dvh !important;
     min-height: 100dvh !important;
   }
-
-  .desktop-layout,
-  .app-viewport.mode-pc .desktop-layout,
-  .app-viewport .desktop-layout {
+:where(html[data-layout="mobile"]) .desktop-layout,
+:where(html[data-layout="mobile"]) .app-viewport.mode-pc .desktop-layout,
+:where(html[data-layout="mobile"]) .app-viewport .desktop-layout {
     display: none !important;
   }
-
-  .mobile-frame-container,
-  .app-viewport.mode-pc .mobile-frame-container,
-  .app-viewport .mobile-frame-container {
+:where(html[data-layout="mobile"]) .mobile-frame-container,
+:where(html[data-layout="mobile"]) .app-viewport.mode-pc .mobile-frame-container,
+:where(html[data-layout="mobile"]) .app-viewport .mobile-frame-container {
     display: flex !important;
     width: 100% !important;
     max-width: 100% !important;
   }
-
-  .phone-device {
+:where(html[data-layout="mobile"]) .phone-device {
     width: 100% !important;
     max-width: 100% !important;
     height: 100dvh !important;
@@ -5181,12 +5016,10 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     border: none !important;
     margin: 0 !important;
   }
-
-  .home-indicator {
+:where(html[data-layout="mobile"]) .home-indicator {
     display: none !important; /* Hide mocked bar on real phone screens with native gesture bars */
   }
-
-  .mobile-bottom-nav {
+:where(html[data-layout="mobile"]) .mobile-bottom-nav {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
@@ -5200,8 +5033,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
     z-index: 100 !important;
   }
-
-  .bottom-sheet {
+:where(html[data-layout="mobile"]) .bottom-sheet {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
@@ -5221,37 +5053,32 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     visibility: hidden !important;
     pointer-events: none !important;
   }
-
-  .bottom-sheet.open {
+:where(html[data-layout="mobile"]) .bottom-sheet.open {
     display: flex !important;
     transform: translateY(0) !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
   }
-
-  .bottom-sheet.hide-for-assign,
-  .phone-device:has(.assign-to-sheet.open) .bottom-sheet,
-  body:has(.assign-to-sheet.open) .bottom-sheet {
+:where(html[data-layout="mobile"]) .bottom-sheet.hide-for-assign,
+:where(html[data-layout="mobile"]) .phone-device:has(.assign-to-sheet.open) .bottom-sheet,
+:where(html[data-layout="mobile"]) body:has(.assign-to-sheet.open) .bottom-sheet {
     display: none !important;
     visibility: hidden !important;
     pointer-events: none !important;
   }
-
-  .phone-device:has(.assign-to-sheet.open) .sheet-sticky-footer,
-  .bottom-sheet.hide-for-assign .sheet-sticky-footer {
+:where(html[data-layout="mobile"]) .phone-device:has(.assign-to-sheet.open) .sheet-sticky-footer,
+:where(html[data-layout="mobile"]) .bottom-sheet.hide-for-assign .sheet-sticky-footer {
     display: none !important;
     visibility: hidden !important;
     pointer-events: none !important;
   }
-
-  .sheet-backdrop {
+:where(html[data-layout="mobile"]) .sheet-backdrop {
     position: fixed !important;
     inset: 0 !important;
     z-index: 190 !important;
   }
-
-  .assign-to-sheet {
+:where(html[data-layout="mobile"]) .assign-to-sheet {
     position: fixed !important;
     bottom: 0 !important;
     top: auto !important;
@@ -5274,8 +5101,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     visibility: hidden !important;
     pointer-events: none !important;
   }
-
-  .assign-to-sheet.open {
+:where(html[data-layout="mobile"]) .assign-to-sheet.open {
     display: flex !important;
     transform: translateY(0) !important;
     opacity: 1 !important;
@@ -5285,18 +5111,16 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     top: auto !important;
     margin-top: auto !important;
   }
-
-  .phone-device:has(.assign-to-sheet.open) .mobile-bottom-nav,
-  .phone-device:has(.bottom-sheet.open) .mobile-bottom-nav,
-  body:has(.assign-to-sheet.open) .mobile-bottom-nav,
-  body:has(.bottom-sheet.open) .mobile-bottom-nav,
-  .assign-to-sheet.open ~ .mobile-bottom-nav,
-  .bottom-sheet.open ~ .mobile-bottom-nav {
+:where(html[data-layout="mobile"]) .phone-device:has(.assign-to-sheet.open) .mobile-bottom-nav,
+:where(html[data-layout="mobile"]) .phone-device:has(.bottom-sheet.open) .mobile-bottom-nav,
+:where(html[data-layout="mobile"]) body:has(.assign-to-sheet.open) .mobile-bottom-nav,
+:where(html[data-layout="mobile"]) body:has(.bottom-sheet.open) .mobile-bottom-nav,
+:where(html[data-layout="mobile"]) .assign-to-sheet.open ~ .mobile-bottom-nav,
+:where(html[data-layout="mobile"]) .bottom-sheet.open ~ .mobile-bottom-nav {
     display: none !important;
     visibility: hidden !important;
     pointer-events: none !important;
   }
-}
 
 
 
@@ -5441,45 +5265,38 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 }
 
 /* 2. Short Mobile Heights: iPhone SE (667px height) */
-@media (max-width: 699px) and (max-height: 700px) {
-  .bottom-sheet,
-  .assign-to-sheet {
+@media (max-height: 700px) {
+:where(html[data-layout="mobile"]) .bottom-sheet,
+:where(html[data-layout="mobile"]) .assign-to-sheet {
     height: 94dvh !important;
     height: 94dvh !important;
     max-height: 94dvh !important;
   }
-
-  .sheet-customer-header {
+:where(html[data-layout="mobile"]) .sheet-customer-header {
     padding: 12px 16px 10px 16px !important;
   }
-
-  .sheet-header-top .sheet-avatar-circle {
+:where(html[data-layout="mobile"]) .sheet-header-top .sheet-avatar-circle {
     width: 40px !important;
     height: 40px !important;
     font-size: 15px !important;
   }
-
-  .sheet-title-info h3 {
+:where(html[data-layout="mobile"]) .sheet-title-info h3 {
     font-size: 15px !important;
   }
-
-  .sheet-tab-btn {
+:where(html[data-layout="mobile"]) .sheet-tab-btn {
     padding: 9px 11px !important;
     font-size: 12.5px !important;
   }
-
-  .sheet-sticky-footer {
+:where(html[data-layout="mobile"]) .sheet-sticky-footer {
     padding: 8px 14px 12px 14px !important;
     gap: 8px !important;
   }
-
-  .btn-confirm-booking {
+:where(html[data-layout="mobile"]) .btn-confirm-booking {
     height: 42px !important;
     font-size: 13.5px !important;
     border-radius: 11px !important;
   }
-
-  .quick-action-col-btn {
+:where(html[data-layout="mobile"]) .quick-action-col-btn {
     min-height: 46px !important;
     font-size: 10.5px !important;
     padding: 5px 2px !important;
@@ -5488,218 +5305,46 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   }
 }
 
-/* 3. Small Tablets & Foldables Unfolded (700px - 850px):
-      Galaxy Z Fold 6 unfolded (768px), iPad Mini portrait (768px), Pixel 9 Pro Fold unfolded (840px) */
-@media (min-width: 700px) and (max-width: 850px) {
-  .desktop-sidebar {
-    width: 60px !important;
-    min-width: 60px !important;
-  }
-
-  .desktop-top-header {
-    height: 58px !important;
-    padding: 0 16px !important;
-    gap: 12px !important;
-  }
-
-  .desktop-search-wrapper {
-    width: 220px !important;
-    max-width: 100% !important;
-    height: 38px !important;
-  }
-
-  .desktop-body {
-    height: calc(100dvh - 58px) !important;
-    padding: 10px 12px !important;
-  }
-
-  .desktop-workspace-split {
-    gap: 10px !important;
-  }
-
-  .desktop-workspace-split.has-open-detail .desktop-table-container {
-    flex: 0 0 230px !important;
-    width: 230px !important;
-    min-width: 215px !important;
-    max-width: 240px !important;
-  }
-
-  .compact-list-header {
-    padding: 10px 10px 8px 10px !important;
-    gap: 8px !important;
-  }
-
-  .compact-search-bar {
-    padding: 5px 8px !important;
-  }
-
-  .compact-search-bar input {
-    font-size: 12px !important;
-  }
-
-  .compact-select-filter {
-    max-width: 90px !important;
-    font-size: 11.5px !important;
-    padding: 0 6px !important;
-    height: 32px !important;
-  }
-
-  .compact-tab-btn {
-    padding: 4px 6px !important;
-    font-size: 11px !important;
-  }
-
-  .desktop-drawer-header-box {
-    padding: 10px 14px !important;
-  }
-
-  .desktop-drawer-header-box .drawer-avatar-lg {
-    width: 42px !important;
-    height: 42px !important;
-    font-size: 15px !important;
-  }
-
-  .drawer-title-col h2 {
-    font-size: 16px !important;
-  }
-
-  .drawer-title-col p {
-    font-size: 11.5px !important;
-  }
-
-  .sheet-tab-btn {
-    padding: 8px 10px !important;
-    font-size: 12px !important;
-  }
-
-  .desktop-details-drawer .customer-info-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-  }
-
-  .desktop-drawer-footer {
-    padding: 8px 12px 12px 12px !important;
-    gap: 8px !important;
-  }
-
-  .desktop-drawer-footer .btn-confirm-booking,
-  .desktop-confirm-booking-btn {
-    height: 42px !important;
-    font-size: 13.5px !important;
-  }
-
-  .desktop-drawer-footer .quick-action-col-btn {
-    min-height: 46px !important;
-    font-size: 10px !important;
-    padding: 5px 2px !important;
-  }
-}
-
-/* 4. Medium Tablets & 2-in-1s (851px - 1099px):
-      Surface Pro 10 portrait (912px), iPad Pro 13 portrait (1024px), iPad Mini landscape (1024px) */
-@media (min-width: 851px) and (max-width: 1099px) {
-  .desktop-sidebar {
-    width: 64px !important;
-    min-width: 64px !important;
-  }
-
-  .desktop-top-header {
-    height: 60px !important;
-    padding: 0 20px !important;
-  }
-
-  .desktop-search-wrapper {
-    width: 300px !important;
-    max-width: 100% !important;
-  }
-
-  .desktop-body {
-    height: calc(100dvh - 60px) !important;
-    padding: 12px 16px !important;
-  }
-
-  .desktop-workspace-split.has-open-detail .desktop-table-container {
-    flex: 0 0 290px !important;
-    width: 290px !important;
-    min-width: 270px !important;
-    max-width: 300px !important;
-  }
-
-  .desktop-drawer-header-box {
-    padding: 12px 20px !important;
-  }
-
-  .desktop-details-drawer .customer-info-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 12px 16px !important;
-  }
-
-  .desktop-drawer-footer {
-    padding: 10px 16px 14px 16px !important;
-    gap: 8px !important;
-  }
-
-  .desktop-drawer-footer .btn-confirm-booking,
-  .desktop-confirm-booking-btn {
-    height: 44px !important;
-    font-size: 14px !important;
-  }
-
-  .desktop-drawer-footer .quick-action-col-btn {
-    min-height: 52px !important;
-    font-size: 11px !important;
-  }
-}
-
 /* 5. Short Landscape Displays: Nest Hub Max (1280x800), iPad Mini landscape (1024x768), Laptops (1366x768) */
-@media (min-width: 700px) and (max-height: 820px) {
-  .desktop-top-header {
+@media (max-height: 820px) {
+:where(html[data-layout="desktop"]) .desktop-top-header {
     height: 54px !important;
     padding: 0 20px !important;
   }
-
-  .desktop-body {
+:where(html[data-layout="desktop"]) .desktop-body {
     height: calc(100dvh - 54px) !important;
     padding: 10px 16px !important;
   }
-
-  .compact-list-header {
+:where(html[data-layout="desktop"]) .compact-list-header {
     padding: 10px 12px 8px 12px !important;
     gap: 8px !important;
   }
-
-  .desktop-drawer-header-box {
+:where(html[data-layout="desktop"]) .desktop-drawer-header-box {
     padding: 10px 18px !important;
   }
-
-  .desktop-drawer-header-box .drawer-avatar-lg {
+:where(html[data-layout="desktop"]) .desktop-drawer-header-box .drawer-avatar-lg {
     width: 44px !important;
     height: 44px !important;
     font-size: 16px !important;
   }
-
-  .sheet-tab-btn {
+:where(html[data-layout="desktop"]) .sheet-tab-btn {
     padding: 8px 12px !important;
     font-size: 12.5px !important;
   }
-
-  .desktop-body-scroll {
+:where(html[data-layout="desktop"]) .desktop-body-scroll {
     padding: 12px 18px 20px 18px !important;
   }
-
-  .desktop-drawer-footer {
+:where(html[data-layout="desktop"]) .desktop-drawer-footer {
     padding: 8px 16px 10px 16px !important;
     gap: 6px !important;
   }
-
-  .desktop-drawer-footer .btn-confirm-booking,
-  .desktop-confirm-booking-btn {
+:where(html[data-layout="desktop"]) .desktop-drawer-footer .btn-confirm-booking,
+:where(html[data-layout="desktop"]) .desktop-confirm-booking-btn {
     height: 40px !important;
     font-size: 13.5px !important;
     border-radius: 11px !important;
   }
-
-  .desktop-drawer-footer .quick-action-col-btn {
+:where(html[data-layout="desktop"]) .desktop-drawer-footer .quick-action-col-btn {
     min-height: 46px !important;
     padding: 5px 2px !important;
     font-size: 10.5px !important;
@@ -5826,7 +5471,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .inq-detail-body { display: flex; flex-direction: column; align-items: stretch; gap: 14px; overflow-y: auto; }
 .inq-detail-overlay, .inq-assign-overlay { z-index: 1050; }
 
-@media (max-width: 699px) { .filter-handle { display: block; } }
+:where(html[data-layout="mobile"]) .filter-handle { display: block; }
 
 /* ==========================================================================
    SHARED LIST COMPONENTS v2 (Bookings + Inquiries)
@@ -5910,27 +5555,31 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .list-row-card .card-price-status-row { flex-wrap: wrap; row-gap: 4px; }
 .list-row-card .card-meta-row span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ---- Quick note (Inquiries) ---- */
-.quick-note { display: flex; align-items: center; gap: 6px; }
+/* ---- Quick note (Inquiries): one shared control in every layout ---- */
+.quick-note { display: flex; align-items: center; gap: 6px; min-width: 0; margin: 0; }
 .quick-note input {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
-  height: 36px;
+  width: 0;
+  height: var(--row-btn, 32px);
   padding: 0 10px;
   border: 1px solid #E2E8F0;
-  border-radius: 10px;
+  border-radius: 9px;
   background: #FFFFFF;
-  font-size: 13px;
+  font-size: 12.5px;
   font-family: inherit;
   color: #111827;
   outline: none;
+  box-sizing: border-box;
+  text-overflow: ellipsis;
 }
+.quick-note input::placeholder { color: #94A3B8; opacity: 1; }
 .quick-note input:focus { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
 .quick-note-send {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: none;
+  width: var(--row-btn, 32px);
+  height: var(--row-btn, 32px);
+  border-radius: 9px;
+  border: 1px solid #2563EB;
   background: #2563EB;
   color: #FFFFFF;
   display: inline-flex;
@@ -5939,11 +5588,13 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   cursor: pointer;
   flex-shrink: 0;
   position: relative;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 .quick-note-send::after { content: ""; position: absolute; inset: -2px; }
-.quick-note-send:hover { background: #1D4ED8; }
+.quick-note-send:hover { background: #1D4ED8; border-color: #1D4ED8; }
+.quick-note-send:active { background: #1E40AF; border-color: #1E40AF; transform: scale(0.95); }
 .quick-note-send:focus-visible { outline: 2px solid #2563EB; outline-offset: 2px; }
-.row-quick-note { grid-column: 2 / 4; margin-top: 8px; }
 .bookings-table .quick-note { width: 176px; }
 
 /* ---- Bulk bar ---- */
@@ -6022,13 +5673,10 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 @keyframes splitFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* ---- Mobile ---- */
-@media (max-width: 699px) {
-  .dd-trigger { height: 44px; border-radius: 14px; background: #F8FAFC; border-color: #E2E8F0; font-weight: 600; padding: 0 12px; max-width: 176px; }
-  .dd-list { min-width: 210px; }
-  .tabs-scroller.category-filter-tabs { padding-bottom: 4px; }
-  .bulk-bar { margin-bottom: 12px; }
-
-}
+:where(html[data-layout="mobile"]) .dd-trigger { height: 44px; border-radius: 14px; background: #F8FAFC; border-color: #E2E8F0; font-weight: 600; padding: 0 12px; max-width: 176px; }
+:where(html[data-layout="mobile"]) .dd-list { min-width: 210px; }
+:where(html[data-layout="mobile"]) .tabs-scroller.category-filter-tabs { padding-bottom: 4px; }
+:where(html[data-layout="mobile"]) .bulk-bar { margin-bottom: 12px; }
 
 
 @media (prefers-reduced-motion: reduce) {
@@ -6047,7 +5695,11 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .fu-field select:focus, .fu-field input:focus, .fu-field textarea:focus { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
 .fu-field .fu-textarea textarea { height: auto; min-height: 104px; padding: 10px 12px 34px; resize: none; }
 
-@media (min-width: 700px) and (max-width: 1500px) { .bookings-table th, .bookings-table td { padding-left: 10px; padding-right: 10px; } .bookings-table .quick-note { width: 138px; } }
+@media (max-width: 1500px) {
+:where(html[data-layout="desktop"]) .bookings-table th,
+:where(html[data-layout="desktop"]) .bookings-table td { padding-left: 10px; padding-right: 10px; }
+:where(html[data-layout="desktop"]) .bookings-table .quick-note { width: 138px; }
+}
 
 .table-toolbar { flex-wrap: nowrap; }
 .table-toolbar .toolbar-actions-group { flex-shrink: 0; }
@@ -6058,7 +5710,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 
 /* ==========================================================================
    v3: shared row tokens, quick note, bottom sheets, Assign sheet, responsive
-   Breakpoints: phone < 700px · tablet 700–1099px · desktop >= 1100px
+   Layouts: mobile (< 700px, or a touch phone turned sideways) and desktop (everything else); see js/shared/layout.js
    ========================================================================== */
 :root {
   --row-avatar: 48px;
@@ -6094,15 +5746,6 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .list-row-card .card-right-col { justify-content: space-between; }
 .list-row-card .card-price-status-row { min-height: var(--badge-h); justify-content: flex-end; }
 .list-row-card .card-circle-action-btn, .bookings-table .card-circle-action-btn { width: var(--row-btn); height: var(--row-btn); }
-
-/* ---- Quick note: same height and radius as the icon buttons ---- */
-.quick-note { gap: 6px; }
-.row-quick-note { grid-column: 2 / 4; margin-top: 6px; }
-.quick-note input { height: var(--row-btn); border-radius: 9px; padding: 0 10px; font-size: 12.5px; background: #FFFFFF; border: 1px solid #E2E8F0; }
-.quick-note input::placeholder { color: #94A3B8; }
-.quick-note .quick-note-send { width: var(--row-btn); height: var(--row-btn); border-radius: 9px; background: #2563EB; border: 1px solid #2563EB; color: #FFFFFF; box-shadow: none; transform: none; }
-.quick-note .quick-note-send:not(:disabled):hover { background: #1D4ED8; border-color: #1D4ED8; color: #FFFFFF; transform: none; box-shadow: none; }
-.quick-note .quick-note-send:disabled { background: #DBEAFE; border-color: #DBEAFE; color: #60A5FA; cursor: default; }
 
 /* ---- Table cells shared by both PC tables ---- */
 .cust-name-line { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin: 0; }
@@ -6168,17 +5811,14 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .asg-footer .btn-cancel-assign { flex: 0 0 auto; }
 .asg-footer .btn-whatsapp-assign { flex: 1; min-width: 0; }
 .asg-footer .btn-whatsapp-assign span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-@media (min-width: 700px) {
-  .asg-overlay { align-items: center; padding: 16px; }
-  .asg-sheet { border-radius: 20px; max-height: min(86dvh, 720px); }
-  .asg-sheet .filter-handle { display: none; }
-}
-@media (max-width: 699px) { .asg-sheet .filter-handle { display: block; } }
+:where(html[data-layout="desktop"]) .asg-overlay { align-items: center; padding: 16px; }
+:where(html[data-layout="desktop"]) .asg-sheet { border-radius: 20px; max-height: min(86dvh, 720px); }
+:where(html[data-layout="desktop"]) .asg-sheet .filter-handle { display: none; }
+:where(html[data-layout="mobile"]) .asg-sheet .filter-handle { display: block; }
 
 /* ---- Details: the Bookings bottom sheet, for both pages (phones) ---- */
-@media (max-width: 699px) {
-  .phone-device .bottom-sheet,
-  .phone-device .bottom-sheet:not(.open) {
+:where(html[data-layout="mobile"]) .phone-device .bottom-sheet,
+:where(html[data-layout="mobile"]) .phone-device .bottom-sheet:not(.open) {
     display: flex !important;
     left: 0;
     right: 0;
@@ -6194,22 +5834,22 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     pointer-events: none !important;
     transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.32s !important;
   }
-  .phone-device .bottom-sheet.open {
+:where(html[data-layout="mobile"]) .phone-device .bottom-sheet.open {
     transform: translateY(0) !important;
     visibility: visible !important;
     pointer-events: auto !important;
     transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s !important;
   }
-  .sheet-sticky-footer { padding-bottom: max(12px, var(--safe-bottom)); }
-  .sheet-drag-handle-bar { touch-action: none; }
-}
+:where(html[data-layout="mobile"]) .sheet-sticky-footer { padding-bottom: max(12px, var(--safe-bottom)); }
+:where(html[data-layout="mobile"]) .sheet-drag-handle-bar { touch-action: none; }
 
 /* ---- Safe areas (notches, home indicator) ---- */
 .mobile-app-header { padding-top: max(0px, var(--safe-top)); }
 .mobile-bottom-nav { padding-bottom: var(--safe-bottom); height: calc(68px + var(--safe-bottom)); padding-left: max(10px, var(--safe-left)); padding-right: max(10px, var(--safe-right)); }
 .mobile-screen-content { padding-bottom: calc(90px + var(--safe-bottom)); padding-left: max(18px, var(--safe-left)); padding-right: max(18px, var(--safe-right)); }
 .toast-container { bottom: calc(24px + var(--safe-bottom)); right: max(24px, var(--safe-right)); }
-@media (max-width: 699px) { .toast-container { left: 12px; right: 12px; } .toast { max-width: 100%; } }
+:where(html[data-layout="mobile"]) .toast-container { left: 12px; right: 12px; }
+:where(html[data-layout="mobile"]) .toast { max-width: 100%; }
 
 /* ---- Dialogs never taller than the screen ---- */
 .modal-card { max-height: calc(100dvh - 32px); overflow-y: auto; }
@@ -6230,20 +5870,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   .btn-add-new-vendor, .optional-note-box { margin-left: 12px; margin-right: 12px; padding-left: 0; }
 }
 
-/* ---- Tablet 700–1099px: icon-rail sidebar (existing), condensed table, detail as side panel ---- */
-@media (min-width: 700px) and (max-width: 1099px) {
-  .col-secondary { display: none; }
-  .bookings-table .quick-note { width: 130px; }
-  .desktop-workspace-split.has-open-detail .desktop-full-table-view { display: flex !important; }
-  .desktop-workspace-split.has-open-detail .desktop-compact-list-view { display: none !important; }
-  .desktop-workspace-split.has-open-detail .desktop-table-container {
-    flex: 1 1 auto !important; width: 100% !important; min-width: 0 !important; max-width: none !important;
-    background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 16px !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-  }
-  .desktop-workspace-split .desktop-details-drawer { position: fixed !important; top: 0; right: 0; bottom: 0; height: 100dvh !important; max-height: 100dvh !important; border-radius: 20px 0 0 20px !important; z-index: 900 !important; }
-  .desktop-workspace-split .desktop-details-drawer.open { width: min(560px, 100vw) !important; flex: none !important; box-shadow: -12px 0 40px rgba(15, 23, 42, 0.25) !important; }
-  .desktop-workspace-split.has-open-detail::after { content: ""; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.35); z-index: 850; }
-}
+
 
 /* ---- Touch screens, any size (phones, tablets, Nest Hub Max) ---- */
 @media (pointer: coarse) {
@@ -6257,26 +5884,18 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   .card-circle-action-btn:hover, .booking-card:hover { transform: none; }
 }
 
-@media (max-width: 699px) { :root { --row-name: 14px; --row-gap: 10px; } .mobile-screen-content { padding-left: max(14px, var(--safe-left)); padding-right: max(14px, var(--safe-right)); } }
-@media (max-width: 699px) { :root { --row-avatar: 44px; } .list-row-card .row-avatar { border-radius: 13px; font-size: 14px; } .list-row-card .status-pill { padding: 0 7px; gap: 4px; } .list-row-card .row-name-line { gap: 4px; } .list-row-card .card-action-btns-row { gap: 6px; } }
+html[data-layout="mobile"] { --row-name: 14px; --row-gap: 10px; }
+:where(html[data-layout="mobile"]) .mobile-screen-content { padding-left: max(14px, var(--safe-left)); padding-right: max(14px, var(--safe-right)); }
+html[data-layout="mobile"] { --row-avatar: 44px; }
+:where(html[data-layout="mobile"]) .list-row-card .row-avatar { border-radius: 13px; font-size: 14px; }
+:where(html[data-layout="mobile"]) .list-row-card .status-pill { padding: 0 7px; gap: 4px; }
+:where(html[data-layout="mobile"]) .list-row-card .row-name-line { gap: 4px; }
+:where(html[data-layout="mobile"]) .list-row-card .card-action-btns-row { gap: 6px; }
 
 /* ==========================================================================
    v4: inquiry row (right-column note), solid-blue send, follow-up sheet fields
    ========================================================================== */
-/* Quick note send: always solid primary blue */
-.quick-note .quick-note-send, .quick-note .quick-note-send:disabled { background: #2563EB; border: 1px solid #2563EB; color: #FFFFFF; cursor: pointer; opacity: 1; }
-.quick-note .quick-note-send:not(:disabled):hover { background: #1D4ED8; border-color: #1D4ED8; color: #FFFFFF; }
-.quick-note .quick-note-send:active { background: #1E40AF; border-color: #1E40AF; transform: scale(0.95); }
-
 /* Inquiry card: buttons -> status -> note, all in the right column */
-.list-row-card.is-inquiry .card-right-col { width: 150px; max-width: none; align-items: flex-end; justify-content: flex-start; gap: 6px; }
-.list-row-card.is-inquiry .card-right-col .quick-note { width: 100%; }
-.list-row-card .qn-row { display: none; grid-column: 2 / 4; margin-top: 6px; }
-@media (max-width: 374px) {
-  .list-row-card.is-inquiry .card-right-col { width: auto; }
-  .list-row-card.is-inquiry .card-right-col .quick-note { display: none; }
-  .list-row-card .qn-row { display: flex; }
-}
 
 /* Follow-up sheet: same input look for date/time pickers and the outcome dropdown */
 .fu-card.asg-sheet { max-width: 520px; }
@@ -6290,39 +5909,24 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .fu-outcome .dd-trigger { width: 100%; height: 44px; border-radius: 12px; background: #F8FAFC; border-color: #E2E8F0; justify-content: flex-start; font-weight: 500; }
 .fu-outcome .dd-label { flex: 1; text-align: left; }
 .fu-outcome .dd-list { position: static; width: 100%; min-width: 0; margin-top: 6px; box-shadow: none; }
-@media (min-width: 700px) and (max-width: 1099px) {
-  .fu-overlay { align-items: flex-end; padding: 0; }
-  .fu-card.asg-sheet { border-radius: 26px 26px 0 0; max-height: 92dvh; }
-  .fu-card.asg-sheet .filter-handle { display: block; }
-}
+
 .row-name-line { flex-wrap: nowrap; }
 .list-row-card .card-title { overflow: hidden; text-overflow: ellipsis; }
-.list-row-card.is-inquiry .card-right-col { width: 140px; }
-@media (min-width: 700px) and (max-width: 899px) { .col-note { display: none; } }
-@media (min-width: 700px) and (max-width: 1099px) { .bookings-table th:last-child { min-width: 0 !important; } }
-@media (min-width: 700px) and (max-width: 899px) {
-  .bookings-table th, .bookings-table td { padding-left: 8px; padding-right: 8px; }
-  .bookings-table th.col-main { min-width: 150px !important; }
-  .bookings-table td:first-child, .bookings-table th:first-child { padding-left: 12px; }
-  .bookings-table .table-thumb { width: 40px; height: 40px; }
-  .bookings-table .table-booking-cell { gap: 10px; }
-}
-@media (min-width: 700px) and (max-width: 799px) { .bookings-table th, .bookings-table td { padding-left: 5px; padding-right: 5px; } .bookings-table .cell-amount { font-size: 13.5px; } }
+
+
+
+
 
 /* v5: Inquiries row rebalance (status beside name, note directly under the buttons) */
 .list-row-card.is-inquiry { column-gap: 8px; padding-top: 10px; padding-bottom: 10px; }
-.list-row-card.is-inquiry .card-right-col { width: auto; min-width: 138px; gap: 6px; justify-content: flex-start; align-self: start; }
+.list-row-card.is-inquiry .card-right-col { width: 138px; max-width: none; align-items: flex-end; gap: 6px; justify-content: flex-start; align-self: start; }
 .list-row-card.is-inquiry .card-right-col .quick-note { width: 100%; }
-.list-row-card.is-inquiry .quick-note input { min-width: 100px; }
 .list-row-card.is-inquiry .row-lead-col { gap: 8px; }
 .list-row-card.is-inquiry .card-info-col { gap: 2px; }
-.list-row-card.is-inquiry .qn-row { margin-top: 2px; }
 .compact-name-line { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .compact-name-line .compact-trip-title { min-width: 0; flex: 0 1 auto; }
 .compact-name-line .compact-status-badge { flex-shrink: 0; }
-@media (max-width: 374px) { .list-row-card.is-inquiry .card-right-col { min-width: 0; } }
-.list-row-card.is-inquiry .card-right-col { width: 138px; min-width: 138px; }
-.list-row-card.is-inquiry .quick-note input { width: 0; flex: 1 1 100px; }
+.list-row-card.is-inquiry .quick-note input { width: 0; flex: 1 1 auto; }
 .list-row-card.is-inquiry .row-name-line { flex-wrap: wrap; row-gap: 2px; }
 .list-row-card.is-inquiry .row-name-line .card-title { max-width: 100%; }
 @media (max-width: 374px) { .list-row-card.is-inquiry .card-right-col { width: auto; min-width: 0; } }
@@ -6362,16 +5966,15 @@ body.scroll-locked { overflow: hidden; padding-right: var(--sbw, 0px); }
 .asg-overlay:not(.open) .asg-sheet { transition-timing-function: var(--ease-in); }
 .fu-card.asg-sheet { transform: translateY(100%); }
 .fu-overlay.open .fu-card.asg-sheet { transform: none; }
-@media (min-width: 1100px) {
-  .asg-sheet, .fu-card.asg-sheet { transform: translateY(16px) scale(0.98); opacity: 0; transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out); }
-  .asg-overlay.open .asg-sheet, .fu-overlay.open .fu-card.asg-sheet { transform: none; opacity: 1; }
-}
-@media (min-width: 700px) and (max-width: 1099px) { .asg-sheet:not(.fu-card) { transform: translateY(16px) scale(0.98); opacity: 0; transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out); } .asg-overlay.open .asg-sheet:not(.fu-card) { transform: none; opacity: 1; } }
-@media (max-width: 699px) {
-  .phone-device .bottom-sheet, .phone-device .bottom-sheet:not(.open) { transition: transform var(--motion-slow) var(--ease-out), visibility 0s linear var(--motion-slow) !important; }
-  .phone-device .bottom-sheet.open { transition: transform var(--motion-slow) var(--ease-out), visibility 0s !important; }
-  .sheet-backdrop { transition: opacity var(--motion-base) var(--ease-out); }
-}
+:where(html[data-layout="desktop"]) .asg-sheet,
+:where(html[data-layout="desktop"]) .fu-card.asg-sheet { transform: translateY(16px) scale(0.98); opacity: 0; transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out); }
+:where(html[data-layout="desktop"]) .asg-overlay.open .asg-sheet,
+:where(html[data-layout="desktop"]) .fu-overlay.open .fu-card.asg-sheet { transform: none; opacity: 1; }
+
+:where(html[data-layout="mobile"]) .phone-device .bottom-sheet,
+:where(html[data-layout="mobile"]) .phone-device .bottom-sheet:not(.open) { transition: transform var(--motion-slow) var(--ease-out), visibility 0s linear var(--motion-slow) !important; }
+:where(html[data-layout="mobile"]) .phone-device .bottom-sheet.open { transition: transform var(--motion-slow) var(--ease-out), visibility 0s !important; }
+:where(html[data-layout="mobile"]) .sheet-backdrop { transition: opacity var(--motion-base) var(--ease-out); }
 .desktop-workspace-split .desktop-details-drawer { transition: opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), visibility 0s linear var(--motion-base) !important; }
 .desktop-workspace-split .desktop-details-drawer.open { transition: opacity var(--motion-base) var(--ease-out) 40ms, transform var(--motion-base) var(--ease-out) 40ms, visibility 0s !important; }
 
@@ -6399,17 +6002,9 @@ body.scroll-locked { overflow: hidden; padding-right: var(--sbw, 0px); }
 }
 
 /* ---- Phones (~360px): touch-size buttons, room for names, reachable last row ---- */
-@media (max-width: 699px) {
-  :root { --row-btn: 36px; }
-  .mobile-screen-content { padding-bottom: calc(104px + var(--safe-bottom)); }
-  .list-row-card .card-action-btns-row { gap: 6px; }
-}
-@media (max-width: 379px) {
-  .list-row-card.is-inquiry .card-right-col { width: auto; min-width: 0; }
-  .list-row-card.is-inquiry .card-right-col .quick-note { display: none; }
-  .list-row-card .qn-row { display: flex; }
-}
-@media (min-width: 380px) { .list-row-card .qn-row { display: none; } }
+html[data-layout="mobile"] { --row-btn: 36px; }
+:where(html[data-layout="mobile"]) .mobile-screen-content { padding-bottom: calc(104px + var(--safe-bottom)); }
+:where(html[data-layout="mobile"]) .list-row-card .card-action-btns-row { gap: 6px; }
 
 @media (prefers-reduced-motion: reduce) {
   :root { --motion-fast: 100ms; --motion-base: 120ms; --motion-slow: 120ms; }
@@ -6419,7 +6014,7 @@ body.scroll-locked { overflow: hidden; padding-right: var(--sbw, 0px); }
   .phone-device .bottom-sheet, .phone-device .bottom-sheet:not(.open) { transform: none !important; opacity: 0; transition: opacity var(--motion-base) linear, visibility 0s linear var(--motion-base) !important; }
   .phone-device .bottom-sheet.open { opacity: 1; }
 }
-@media (min-width: 700px) { .asg-sheet { max-height: min(86dvh, 720px, calc(var(--ov-h, 100dvh) * 0.96)); } }
+:where(html[data-layout="desktop"]) .asg-sheet { max-height: min(86dvh, 720px, calc(var(--ov-h, 100dvh) * 0.96)); }
 @media (max-width: 380px) { .dd-trigger { max-width: 164px; } }
 .list-row-card .row-name-line { flex-wrap: wrap; row-gap: 2px; } .list-row-card .row-name-line .card-title { max-width: 100%; }
 
@@ -6450,10 +6045,11 @@ html { scrollbar-gutter: stable; }
 .list-fade { animation: motionFadeIn var(--motion-fast) var(--ease-out); }
 
 /* Paint-heavy blur only where there is room for it */
-@media (max-width: 699px) {
-  .sheet-backdrop, .modal-overlay, .asg-overlay { -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .sheet-backdrop, .asg-overlay { background: rgba(15, 23, 42, 0.55); }
-}
+:where(html[data-layout="mobile"]) .sheet-backdrop,
+:where(html[data-layout="mobile"]) .modal-overlay,
+:where(html[data-layout="mobile"]) .asg-overlay { -webkit-backdrop-filter: none; backdrop-filter: none; }
+:where(html[data-layout="mobile"]) .sheet-backdrop,
+:where(html[data-layout="mobile"]) .asg-overlay { background: rgba(15, 23, 42, 0.55); }
 
 /* Short crossfade of page content between Bookings and Inquiries (shell is identical) */
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 150ms; animation-timing-function: var(--ease-out); }
@@ -6484,7 +6080,7 @@ html { scrollbar-gutter: stable; }
 .asg-sheet { max-height: min(92dvh, calc(var(--vvh) - 12px)); }
 .phone-device .modal-overlay { position: fixed !important; inset: 0 0 var(--kb-inset) 0 !important; z-index: 1100 !important; }
 .phone-device .modal-card, .modal-card { max-height: calc(var(--vvh) - 24px); overflow-y: auto; }
-@media (min-width: 700px) { .asg-sheet { max-height: min(86dvh, 720px, calc(var(--vvh) - 24px)); } }
+:where(html[data-layout="desktop"]) .asg-sheet { max-height: min(86dvh, 720px, calc(var(--vvh) - 24px)); }
 .phone-device .bottom-sheet, .phone-device .bottom-sheet:not(.open) { max-height: min(92dvh, calc(var(--vvh) - 8px)) !important; }
 /* The sheet body is the only scroll area: header and footer are normal flex rows, never floating over the list */
 .asg-sheet { display: flex; flex-direction: column; }
@@ -6548,9 +6144,29 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
 .modal-card > form > .modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 .modal-card > form > .modal-footer { flex: 0 0 auto; }
 
-/* Quick note under the action buttons in the split-view compact list (Inquiries) */
-.compact-booking-card .qn-compact { width: 100%; margin-top: 8px; cursor: default; }
-.compact-booking-card .qn-compact input { flex: 1 1 auto; min-width: 0; width: 0; }
+/* Inquiries split list: text on the left, one compact column on the right with the buttons on top and the
+   quick note directly under them (same arrangement as the mobile row). Height comes from the content only. */
+.compact-booking-card.is-inquiry { padding: 10px 12px; }
+.compact-booking-card.is-inquiry .compact-card-top { gap: 10px; }
+.compact-booking-card.is-inquiry .compact-card-actions { flex: 0 0 150px; width: 150px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.compact-booking-card.is-inquiry .compact-card-actions > .card-action-btns-row { align-self: flex-end; }
+.compact-booking-card.is-inquiry .qn-compact { width: 100%; cursor: default; }
+.compact-booking-card.is-inquiry .compact-name-line { flex-wrap: wrap; row-gap: 2px; }
+.compact-booking-card.is-inquiry .compact-name-line .compact-trip-title { max-width: 100%; }
+
+/* The selected state must not change the compact inquiry row's content box. */
+.compact-booking-card.is-inquiry.active {
+  border-left-width: 1px !important;
+  box-shadow: inset 3px 0 0 #2563EB;
+}
+
+/* The same quick-note node moves below the information column on the narrowest
+   phones; no alternate markup or duplicate form is rendered. */
+@media (max-width: 379px) {
+  .list-row-card.is-inquiry .card-right-col { display: contents; }
+  .list-row-card.is-inquiry .card-action-btns-row { grid-column: 3; grid-row: 1; justify-self: end; }
+  .list-row-card.is-inquiry .quick-note { grid-column: 2 / 4; width: 100%; margin-top: 6px; }
+}
 
 /* Add Itinerary Event: a centered dialog at every width (not a bottom sheet), with full-width dropdowns */
 .asg-overlay:has(.itin-sheet) { align-items: center; padding: 16px; }
@@ -6561,3 +6177,40 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
 .itin-sheet .asg-header { padding: 16px 20px 10px; }
 .itin-sheet .dd-block .dd-trigger .dd-label { flex: 1 1 auto; text-align: left; }
 @media (prefers-reduced-motion: reduce) { .asg-sheet.itin-sheet { transition: none; transform: none; } }
+
+/* ==========================================================================
+   Desktop layout, fitted to the screen (there is no separate tablet layout)
+   ========================================================================== */
+
+/* Below 1100px the sidebar is an icon rail that expands over the content when tapped. */
+@media (max-width: 1099px) {
+  :where(html[data-layout="desktop"]) .desktop-layout { padding-left: 64px; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar { position: fixed; top: 0; bottom: 0; left: 0; z-index: 960; width: 64px; min-width: 64px; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) { padding: 14px 6px; align-items: center; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .sidebar-brand { justify-content: center; padding: 0 0 14px; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .brand-text-col,
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .nav-section-title,
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .nav-left span,
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .sidebar-badge,
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .profile-user-left div:last-child { display: none; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .sidebar-nav { align-items: center; width: 100%; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .sidebar-nav-item { justify-content: center; padding: 10px 0; width: 44px; height: 44px; border-radius: 10px; margin: 2px 0; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .sidebar-profile-box { padding: 10px 0; justify-content: center; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar:not(.rail-open) .ks-avatar-badge { margin: 0; }
+  :where(html[data-layout="desktop"]) .desktop-sidebar.rail-open { width: 260px; box-shadow: 12px 0 40px rgba(15, 23, 42, 0.25); }
+  :where(html[data-layout="desktop"]) .desktop-layout.rail-open::after { content: ""; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.35); z-index: 950; }
+  :where(html[data-layout="desktop"]) .brand-icon-box { cursor: pointer; }
+  :where(html[data-layout="desktop"]) .desktop-body { padding: 12px 14px; }
+  :where(html[data-layout="desktop"]) .desktop-workspace-split { gap: 12px; }
+  /* The table keeps all its columns and scrolls sideways inside its own card, never the page. */
+  :where(html[data-layout="desktop"]) .desktop-table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  :where(html[data-layout="desktop"]) .bookings-table { min-width: 1000px; }
+  :where(html[data-layout="desktop"]) .toolbar-tabs-group { overflow-x: auto; white-space: nowrap; scrollbar-width: none; max-width: 100%; }
+  :where(html[data-layout="desktop"]) .toolbar-tabs-group::-webkit-scrollbar { display: none; }
+  :where(html[data-layout="desktop"]) .desktop-tab-btn { flex-shrink: 0; }
+}
+
+/* Where list + detail cannot sit side by side, the open detail takes the whole content area (close returns to the table). */
+@media (max-width: 999px) {
+  :where(html[data-layout="desktop"]) .desktop-workspace-split.has-open-detail .desktop-table-container { display: none !important; }
+}

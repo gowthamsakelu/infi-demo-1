@@ -11,9 +11,9 @@ Ruyi Admin is a travel operations admin panel for managing bookings and inquirie
 - **Bookings** – list, search, category filter, status tabs, bulk select, Assign, and Mark as Paid / Unpaid (saved to the database).
 - **Inquiries** – lead list with status tabs (New, Ongoing, Warm, Hot), search, category filter, and bulk Assign.
 - **Follow-ups and notes** – schedule a follow-up (Follow-up, Called with outcome, CC) from the ⋮ menu, and add quick notes inline. Both appear in the customer's Lead Flow / Journey.
-- **Details view** – Outlook-style split view on desktop, a side panel on tablets, and a bottom sheet on phones. Same content for Bookings and Inquiries.
+- **Details view** – Outlook-style split view on desktop (the detail opens full width where the split does not fit), and a bottom sheet on phones. Same content for Bookings and Inquiries.
 - **Assign flow** – one shared sheet for team members, vendors and contacts, from the ⋮ menu or the bulk bar.
-- **Responsive** – phone, tablet and desktop layouts that adapt live when the window is resized or a foldable is folded.
+- **Responsive** – two layouts, mobile and desktop, that switch live when the window is resized, the device is rotated or a foldable is folded or unfolded. Tablets use the desktop layout.
 - **REST API** – JSON endpoints for bookings, inquiries and follow-ups.
 
 Dashboard, Calendar, More and Settings appear in the navigation as placeholders and are not built yet.
@@ -88,7 +88,7 @@ backend/
 │   ├── css/style.css        All styles and design tokens
 │   └── js/
 │       ├── main.js          Starts the app, toasts, live layout changes
-│       ├── desktop.js       Desktop and tablet view
+│       ├── desktop.js       Desktop layout (also used on tablets)
 │       ├── mobile.js        Phone view
 │       └── shared/          Components used by both views
 ├── routes/                  web.php, api.php
@@ -134,7 +134,8 @@ The app has no login yet. Actions are recorded for staff member `ST-05` unless `
 - **Icons** come from `shared/icons.js` only.
 - **Tokens** such as row sizes, safe-area insets and motion timings (`--motion-fast`, `--motion-base`, `--motion-slow`, `--ease-out`) are CSS variables in `style.css`. Every overlay animates only `transform` and `opacity` with these tokens, and respects reduced-motion.
 - **No automatic keyboard.** Sheets and menus never focus an input when they open; focus goes to the dialog itself.
-- **Breakpoints:** phones below 700px, tablets from 700px to 1099px, desktop from 1100px. Layout changes use CSS media queries.
+- **Two layouts only.** `js/shared/layout.js` is the single switch: mobile below 700px, or on a touch phone turned sideways (short screen side under 500px); desktop everywhere else, tablets included. It sets `<html data-layout="mobile|desktop">`, which the CSS keys off, and fires `layout-changed` so open overlays close cleanly on rotate, fold or resize.
+- **Fitting the desktop layout.** Below 1100px the sidebar is an icon rail that expands over the content when the logo is tapped; below 1000px an open detail takes the whole content area (the X returns to the table); below about 1000px the table scrolls sideways inside its own card.
 - **Touch:** controls are at least 40px on touch screens, and nothing depends on hover.
 
 ## Loading and performance

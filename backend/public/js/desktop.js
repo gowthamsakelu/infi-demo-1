@@ -560,7 +560,7 @@ export function createDesktopView(container) {
   function compactCard(b, isCardActive) {
     const inquiry = b.kind === 'inquiry';
     return `
-      <div class="compact-booking-card ${isCardActive ? 'active' : ''}" data-compact-booking-id="${b.id}" style="cursor: pointer;">
+      <div class="compact-booking-card ${inquiry ? 'is-inquiry' : ''} ${isCardActive ? 'active' : ''}" data-compact-booking-id="${b.id}" style="cursor: pointer;">
         <div class="compact-card-top">
           <div class="compact-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
           <div class="compact-info-col">
@@ -576,14 +576,18 @@ export function createDesktopView(container) {
               <span>${esc(b.title)}</span><span style="color: #94A3B8;">•</span><span>${b.pax} Pax</span>
             </p>
           </div>
+          ${inquiry ? `<div class="compact-card-actions">
+            <div class="card-action-btns-row">${rowActionButtons(b, 15)}</div>
+            ${quickNote(b, 'qn-compact')}
+          </div>` : ''}
         </div>
-        <div class="compact-card-bottom">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            ${inquiry ? '' : `<span class="compact-price">${esc(b.price)}</span><span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>`}
-          </div>
-          <div class="card-action-btns-row" style="gap: 5px;">${rowActionButtons(b, 13, 'width: 28px; height: 28px;')}</div>
-        </div>
-        ${inquiry ? quickNote(b, 'qn-compact') : ''}
+        ${inquiry ? '' : `
+          <div class="compact-card-bottom">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="compact-price">${esc(b.price)}</span><span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>
+            </div>
+            <div class="card-action-btns-row" style="gap: 5px;">${rowActionButtons(b, 13, 'width: 28px; height: 28px;')}</div>
+          </div>`}
       </div>`;
   }
 
@@ -1571,6 +1575,17 @@ export function createDesktopView(container) {
       }
       else if (key === 'followup') openFollowUpModal(b.raw);
     }
+
+    // Icon-rail sidebar (below 1100px): tap the logo to expand it over the content; tap outside, a link or Esc to fold it.
+    const layoutEl = container.querySelector('.desktop-layout');
+    const sidebar = container.querySelector('.desktop-sidebar');
+    const setRail = (open) => { sidebar.classList.toggle('rail-open', open); layoutEl.classList.toggle('rail-open', open); };
+    container.addEventListener('click', (e) => {
+      if (e.target.closest('.brand-icon-box') && innerWidth < 1100) { setRail(!sidebar.classList.contains('rail-open')); return; }
+      if (sidebar.classList.contains('rail-open') && (e.target.closest('a.sidebar-nav-item') || !e.target.closest('.desktop-sidebar'))) setRail(false);
+    });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') setRail(false); });
+    window.addEventListener('resize', () => { if (innerWidth >= 1100) setRail(false); });
 
     container.addEventListener('submit', async (e) => {
       const form = e.target.closest('[data-quick-note]');

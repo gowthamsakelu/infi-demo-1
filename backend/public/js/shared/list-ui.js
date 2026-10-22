@@ -97,8 +97,8 @@ export function assignItems(list) {
 
 export function quickNote(b, cls = '') {
   return `<form class="quick-note ${cls}" data-quick-note="${esc(b.id)}" autocomplete="off">
-    <input type="text" maxlength="500" placeholder="Add a note..." enterkeyhint="send" aria-label="Quick note for ${esc(b.guest.name)}" />
-    <button type="submit" class="quick-note-send card-circle-action-btn" aria-label="Send note">${icon('send', { size: 15 })}</button>
+    <input type="text" maxlength="500" placeholder="Type a quick note…" enterkeyhint="send" aria-label="Quick note for ${esc(b.guest.name)}" />
+    <button type="submit" class="quick-note-send" aria-label="Send note">${icon('send', { size: 15 })}</button>
   </form>`;
 }
 
@@ -125,7 +125,6 @@ export function mobileRowCard(b) {
         <div class="card-action-btns-row">${rowActionButtons(b, 15)}</div>
         ${inquiry ? quickNote(b) : `<div class="card-price-status-row"><span class="card-price">${esc(b.price)}</span>${statusPill(b)}</div>`}
       </div>
-      ${inquiry ? quickNote(b, 'qn-row') : ''}
     </div>`;
 }
 

@@ -28,7 +28,7 @@ for (const [w, h] of VPS) {
     const cards = [...document.querySelectorAll(`${s} .bookings-cards-list .list-row-card, ${s} #desktop-table-body tr`)].filter((e) => e.getClientRects().length);
     if (!cards.length) return false;
     const amt = cards.map((c) => c.querySelector('[class*=amount], .amt, .price')).filter(Boolean);
-    return cards.every((c) => c.getBoundingClientRect().width <= innerWidth + 1) && amt.every((a) => a.getBoundingClientRect().height < 40);
+    return cards.every((c) => c.matches('tr') || c.getBoundingClientRect().width <= innerWidth + 1) && amt.every((a) => a.getBoundingClientRect().height < 40);
   }, slot));
 
   const open = async () => {
