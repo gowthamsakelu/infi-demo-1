@@ -40,6 +40,9 @@ export function navigate(page) {
   notify();
 }
 
+/** Re-run every subscriber (used after a layout change). */
+export const refresh = notify;
+
 export function subscribe(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);

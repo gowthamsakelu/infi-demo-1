@@ -1,5 +1,5 @@
-// The one category filter used on Bookings and Inquiries: a trigger (funnel + label + chevron)
-// that opens a plain option list directly below it. Selecting applies immediately.
+// One dropdown component: a trigger that opens a plain option list directly below it.
+// Used for the category filter on Bookings/Inquiries and for the filter in the Assign sheet.
 import { icon } from './icons.js';
 import { esc, dismissOnOutside } from './ui.js';
 
@@ -13,24 +13,41 @@ export const CATEGORY_OPTIONS = [
 
 let uid = 0;
 
-export function createCategoryFilter({ onChange }) {
+/**
+ * @param {{ options: {value:string,label:string}[]|(() => {value:string,label:string}[]), onChange: (v:string)=>void,
+ *           variant?: 'labelled'|'icon', ariaLabel?: string }} cfg
+ * variant 'icon' renders a square funnel button with an "active" dot instead of a label.
+ */
+export function createDropdown({ options, onChange, variant = 'labelled', ariaLabel = 'Filter', iconName = 'filter' }) {
   let value = '';
   const hosts = [];
   let open = null; // { host, dispose }
-  const id = `ddf-${++uid}`;
-  const labelOf = (v) => CATEGORY_OPTIONS.find((o) => o.value === v)?.label || CATEGORY_OPTIONS[0].label;
+  const id = `dd-${++uid}`;
+  const opts = () => (typeof options === 'function' ? options() : options);
+  const labelOf = (v) => (opts().find((o) => o.value === v) || opts()[0])?.label || '';
 
   function render() {
     hosts.forEach((host) => {
       const isOpen = open?.host === host;
-      host.innerHTML = `
-        <button type="button" class="dd-trigger" aria-haspopup="listbox" aria-expanded="${isOpen}" aria-label="Category filter: ${esc(labelOf(value))}">
-          ${icon('filter', { size: 15 })}<span class="dd-label">${esc(labelOf(value))}</span>${icon('chevronDown', { size: 13, stroke: 2.5 })}
-        </button>
+      const trigger = variant === 'icon'
+        ? `<button type="button" class="dd-trigger dd-icon-trigger ${value ? 'has-value' : ''}" aria-haspopup="listbox" aria-expanded="${isOpen}" aria-label="${esc(ariaLabel)}${value ? ': ' + esc(labelOf(value)) : ''}" title="${esc(ariaLabel)}">${icon('filter', { size: 16 })}${value ? '<span class="dd-dot" aria-hidden="true"></span>' : ''}</button>`
+        : `<button type="button" class="dd-trigger" aria-haspopup="listbox" aria-expanded="${isOpen}" aria-label="${esc(ariaLabel)}: ${esc(labelOf(value))}">${icon(iconName, { size: 15 })}<span class="dd-label">${esc(labelOf(value))}</span>${icon('chevronDown', { size: 13, stroke: 2.5 })}</button>`;
+      host.innerHTML = `${trigger}
         <ul class="dd-list" role="listbox" id="${id}" ${isOpen ? '' : 'hidden'}>
-          ${CATEGORY_OPTIONS.map((o) => `<li role="option" tabindex="-1" data-value="${esc(o.value)}" aria-selected="${o.value === value}" class="${o.value === value ? 'selected' : ''}">${esc(o.label)}</li>`).join('')}
+          ${opts().map((o) => `<li role="option" tabindex="-1" data-value="${esc(o.value)}" aria-selected="${o.value === value}" class="${o.value === value ? 'selected' : ''}">${esc(o.label)}</li>`).join('')}
         </ul>`;
+      if (isOpen) place(host);
     });
+  }
+
+  // Keep the list inside the viewport: flip above the trigger / align to the other edge when needed.
+  function place(host) {
+    const list = host.querySelector('.dd-list');
+    const r = host.getBoundingClientRect();
+    list.classList.remove('dd-up', 'dd-left');
+    const lr = list.getBoundingClientRect();
+    if (lr.bottom > window.innerHeight - 8 && r.top > lr.height + 12) list.classList.add('dd-up');
+    if (lr.left < 8) list.classList.add('dd-left');
   }
 
   function openList(host) {
@@ -64,7 +81,7 @@ export function createCategoryFilter({ onChange }) {
   }
 
   return {
-    /** Mount into `host` (a span/div). Call once per place the dropdown appears. */
+    /** Mount into `host`; call once per place the dropdown appears. */
     attach(host, extraClass = '') {
       host.classList.add('dd-filter');
       if (extraClass) host.classList.add(extraClass);
@@ -74,10 +91,14 @@ export function createCategoryFilter({ onChange }) {
     },
     setValue(v) { value = v || ''; render(); },
     getValue: () => value,
-    /** Open the list on the first visible host (used by the bulk bar's filter icon). */
+    refresh: render,
+    close: () => closeList(false),
+    /** Open on the first visible host. */
     openVisible() {
       const host = hosts.find((h) => h.offsetParent !== null);
       if (host) openList(host);
     },
   };
 }
+
+export const createCategoryFilter = ({ onChange }) => createDropdown({ options: CATEGORY_OPTIONS, onChange, ariaLabel: 'Category filter' });

@@ -1,6 +1,7 @@
-// Schedule / Follow-up popup: centered modal on desktop, bottom sheet on mobile (CSS decides).
+// Schedule / Follow-up: the same shared sheet as Assign (bottom sheet below 1100px, centered modal above).
 import { icon } from './icons.js';
-import { esc, toast, dismissOnOutside } from './ui.js';
+import { esc, toast, dismissOnOutside, bindSheet } from './ui.js';
+import { createDropdown } from './dropdown-filter.js';
 import { addFollowUpLocal } from './followups.js';
 
 const OUTCOMES = ['Connected', 'No answer', 'Busy', 'Call back later', 'Wrong number'];
@@ -12,18 +13,38 @@ let dispose = null;
 let recognition = null;
 let lastFocus = null;
 
+const pad = (n) => String(n).padStart(2, '0');
+const isoDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const fmtDate = (v) => {
+  if (!v) return '';
+  const d = new Date(`${v}T00:00:00`);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+const fmtTime = (v) => {
+  if (!v) return '';
+  const [h, m] = v.split(':').map(Number);
+  return new Date(2000, 0, 1, h, m).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+};
+
 export function openFollowUpModal(inquiry, { onSaved } = {}) {
   closeFollowUpModal();
   lastFocus = document.activeElement;
   let type = 'follow_up';
 
+  // Sensible defaults: today, next full hour (tomorrow 9:00 AM if that would pass midnight).
+  const now = new Date();
+  let when = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0);
+  if (when.getDate() !== now.getDate()) when = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 9, 0);
+  const defDate = isoDate(when);
+  const defTime = `${pad(when.getHours())}:00`;
+
   overlay = document.createElement('div');
-  overlay.className = 'fu-overlay';
+  overlay.className = 'fu-overlay asg-overlay';
   overlay.innerHTML = `
-    <div class="fu-card" role="dialog" aria-modal="true" aria-labelledby="fu-title">
+    <div class="fu-card asg-sheet" role="dialog" aria-modal="true" aria-labelledby="fu-title">
       <div class="filter-handle" aria-hidden="true"></div>
       <header class="fu-header">
-        <div>
+        <div style="min-width:0;">
           <h3 id="fu-title">Schedule / Follow-up</h3>
           <p class="fu-sub">${esc(inquiry.customer_name)} • ${esc(inquiry.trip)}</p>
         </div>
@@ -36,12 +57,16 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
           <button type="button" role="radio" aria-checked="false" data-fu-type="cc">CC</button>
         </div>
         <div class="fu-field" data-fu-outcome-row hidden>
-          <label for="fu-outcome">Call outcome</label>
-          <select id="fu-outcome">${OUTCOMES.map((o) => `<option>${o}</option>`).join('')}</select>
+          <label>Call outcome</label>
+          <div class="fu-outcome" id="fu-outcome"></div>
         </div>
         <div class="fu-row">
-          <div class="fu-field"><label for="fu-date">Follow-up Date</label><input id="fu-date" type="date" required></div>
-          <div class="fu-field"><label for="fu-time">Time</label><input id="fu-time" type="time" required></div>
+          <div class="fu-field"><label for="fu-date">Follow-up Date</label>
+            <div class="fu-picker"><span class="fu-picker-text" id="fu-date-text"></span>${icon('calendar', { size: 16 })}
+              <input id="fu-date" type="date" value="${defDate}" min="${isoDate(now)}" aria-label="Follow-up date" required></div></div>
+          <div class="fu-field"><label for="fu-time">Time</label>
+            <div class="fu-picker"><span class="fu-picker-text" id="fu-time-text"></span>${icon('clock', { size: 16 })}
+              <input id="fu-time" type="time" value="${defTime}" aria-label="Follow-up time" required></div></div>
         </div>
         <div class="fu-field">
           <label for="fu-comment">Comment</label>
@@ -58,14 +83,30 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
       </footer>
     </div>`;
   document.body.appendChild(overlay);
-  requestAnimationFrame(() => overlay?.classList.add('open'));
+  setTimeout(() => overlay?.classList.add('open'), 10);
 
   const $ = (s) => overlay.querySelector(s);
   const comment = $('#fu-comment');
   const err = $('#fu-error');
   const showError = (msg) => { err.textContent = msg; err.hidden = !msg; };
   const syncCount = () => { $('#fu-count').textContent = `${comment.value.length}/${MAX}`; };
+  const syncPickers = () => {
+    $('#fu-date-text').textContent = fmtDate($('#fu-date').value) || 'Select date';
+    $('#fu-time-text').textContent = fmtTime($('#fu-time').value) || 'Select time';
+    overlay.querySelectorAll('.fu-picker').forEach((p) => p.classList.toggle('is-empty', !p.querySelector('input').value));
+  };
+  syncPickers();
   comment.addEventListener('input', syncCount);
+  ['#fu-date', '#fu-time'].forEach((id) => {
+    $(id).addEventListener('input', syncPickers);
+    $(id).addEventListener('change', syncPickers);
+    // Open the native picker anywhere on the field (where supported).
+    $(id).addEventListener('click', (e) => { try { e.target.showPicker?.(); } catch { /* needs a user gesture on some browsers */ } });
+  });
+
+  const outcome = createDropdown({ options: OUTCOMES.map((o) => ({ value: o, label: o })), onChange: () => {}, ariaLabel: 'Call outcome', iconName: 'phone' });
+  outcome.attach($('#fu-outcome'));
+  outcome.setValue(OUTCOMES[0]);
 
   overlay.addEventListener('click', async (e) => {
     if (e.target === overlay || e.target.closest('[data-fu-close]')) return closeFollowUpModal();
@@ -86,8 +127,10 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
     if (e.target.closest('[data-fu-save]')) return save();
   });
   overlay.addEventListener('keydown', trapTab);
-  dispose = dismissOnOutside($('.fu-card'), closeFollowUpModal);
-  $('#fu-date').focus();
+  const stopOutside = dismissOnOutside($('.fu-card'), closeFollowUpModal);
+  const stopSheet = bindSheet(overlay, $('.fu-card'), closeFollowUpModal);
+  dispose = () => { stopOutside(); stopSheet(); outcome.close(); };
+  $('.sheet-close-btn').focus({ preventScroll: true });
 
   async function save() {
     const date = $('#fu-date').value;
@@ -105,7 +148,7 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           type, date, time,
-          call_outcome: type === 'called' ? $('#fu-outcome').value : null,
+          call_outcome: type === 'called' ? outcome.getValue() : null,
           comment: comment.value.trim() || null,
         }),
       });
@@ -137,13 +180,13 @@ export function closeFollowUpModal() {
   const el = overlay;
   overlay = null;
   el.classList.remove('open');
-  setTimeout(() => el.remove(), 180);
+  setTimeout(() => el.remove(), 200);
   lastFocus?.focus?.();
 }
 
 function trapTab(e) {
   if (e.key !== 'Tab') return;
-  const f = [...overlay.querySelectorAll('button, select, input, textarea')].filter((n) => !n.disabled && !n.closest('[hidden]'));
+  const f = [...overlay.querySelectorAll('button, select, input, textarea')].filter((n) => !n.disabled && n.offsetParent !== null);
   if (!f.length) return;
   const first = f[0]; const last = f[f.length - 1];
   if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }

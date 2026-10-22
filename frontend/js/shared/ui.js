@@ -61,12 +61,12 @@ export function openCall(name, phone) {
   toast(`Dialing ${name} (${phone})...`, 'info');
 }
 
-export function openWhatsApp(name, phone, text) {
+export function openWhatsApp(name, phone, text, { silent = false } = {}) {
   if (!phone) return toast('Phone number not available.', 'warning');
   const digits = phone.replace(/[^0-9]/g, '');
   const to = digits.startsWith('91') ? digits : digits.length === 10 ? `91${digits}` : digits;
   window.open(`https://wa.me/${to}?text=${encodeURIComponent(text)}`, '_blank');
-  toast(`Opening WhatsApp chat with ${name}...`, 'success');
+  if (!silent) toast(`Opening WhatsApp chat with ${name}...`, 'success');
 }
 
 export function emptyState({ title, text, resetId = 'btn-reset-filters', colspanRow = 0 }) {
@@ -140,7 +140,10 @@ export function openRowMenu(trigger, items, onSelect) {
   const mw = menu.offsetWidth;
   const mh = menu.offsetHeight;
   const left = Math.max(8, Math.min(r.right - mw, window.innerWidth - mw - 8));
-  const top = r.bottom + 6 + mh > window.innerHeight - 8 ? Math.max(8, r.top - mh - 6) : r.bottom + 6;
+  const nav = document.querySelector('.mobile-bottom-nav');
+  const navTop = nav && nav.offsetParent !== null ? nav.getBoundingClientRect().top : window.innerHeight;
+  const limit = Math.min(window.innerHeight, navTop) - 8;
+  const top = r.bottom + 6 + mh > limit ? Math.max(8, r.top - mh - 6) : r.bottom + 6;
   menu.style.left = `${left}px`;
   menu.style.top = `${top}px`;
 
@@ -179,4 +182,48 @@ export function openRowMenu(trigger, items, onSelect) {
     if (document.activeElement === document.body) trigger.focus();
   }
   activeMenu = { menu, close };
+}
+
+/**
+ * Shared bottom-sheet behaviour: swipe the handle/header down to close, and keep the sheet inside
+ * the visible area when the on-screen keyboard opens. Returns a disposer.
+ */
+export function bindSheet(overlay, panel, onClose, handleSelector = '.filter-handle, .asg-header, .fu-header') {
+  let startY = null;
+  const handle = (e) => (e.target.closest(handleSelector) ? e.touches[0].clientY : null);
+  const down = (e) => { startY = handle(e); };
+  const move = (e) => {
+    if (startY === null) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 0) { panel.style.transition = 'none'; panel.style.transform = `translateY(${dy}px)`; }
+  };
+  const up = (e) => {
+    if (startY === null) return;
+    const dy = e.changedTouches[0].clientY - startY;
+    startY = null;
+    panel.style.transition = '';
+    panel.style.transform = '';
+    if (dy > 90) onClose();
+  };
+  panel.addEventListener('touchstart', down, { passive: true });
+  panel.addEventListener('touchmove', move, { passive: true });
+  panel.addEventListener('touchend', up);
+
+  const vv = window.visualViewport;
+  const fit = () => {
+    if (!vv) return;
+    overlay.style.top = `${vv.offsetTop}px`;
+    overlay.style.bottom = 'auto';
+    overlay.style.height = `${vv.height}px`;
+  };
+  const focus = (e) => { if (e.target.matches('input, textarea, select')) setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 250); };
+  vv?.addEventListener('resize', fit);
+  vv?.addEventListener('scroll', fit);
+  overlay.addEventListener('focusin', focus);
+  fit();
+  return () => {
+    vv?.removeEventListener('resize', fit);
+    vv?.removeEventListener('scroll', fit);
+    overlay.removeEventListener('focusin', focus);
+  };
 }

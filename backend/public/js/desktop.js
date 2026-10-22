@@ -3,10 +3,11 @@ import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
 import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, initials } from './shared/ui.js';
-import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, quickNote, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
+import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
-import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments, openInquiryAssignModal } from './shared/inquiry-store.js';
+import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
+import { openAssign } from './shared/assign-sheet.js';
 import { matchesCategory } from './shared/booking-filters.js';
 
 export function createDesktopView(container) {
@@ -579,63 +580,54 @@ export function createDesktopView(container) {
       b.guest.name.toLowerCase().includes(q) || (b.guest.phone && b.guest.phone.includes(searchQuery));
   }
 
-  const THEAD_BOOKINGS = `<tr>
-    <th style="width: 44px; padding-left: 20px; padding-right: 0;"><div class="custom-checkbox" id="desktop-th-select-all" role="checkbox" aria-checked="false" aria-label="Select all" tabindex="0">${icon('check', { size: 12, stroke: 3 })}</div></th>
-    <th style="min-width: 240px; padding-left: 14px;">Booking / Trip</th><th>Category</th><th>Pax &amp; Duration</th><th>Travel Dates</th><th>Lead Guest</th><th>Assigned To</th><th>Status</th><th>Amount</th>
-    <th style="text-align: right; padding-right: 24px; min-width: 160px;">Action</th></tr>`;
-  const THEAD_INQUIRIES = `<tr>
-    <th style="width: 44px; padding-left: 20px; padding-right: 0;"><div class="custom-checkbox" id="desktop-th-select-all" role="checkbox" aria-checked="false" aria-label="Select all" tabindex="0">${icon('check', { size: 12, stroke: 3 })}</div></th>
-    <th style="min-width: 170px; padding-left: 14px;">Customer</th><th>Trip</th><th>Category</th><th>Pax &amp; Nights</th><th>Travel Date</th><th>Assigned To</th><th>Status</th><th style="min-width: 160px;">Quick Note</th>
-    <th style="text-align: right; padding-right: 24px; min-width: 160px;">Action</th></tr>`;
+  const TH_CHECK = `<th style="width: 44px; padding-left: 20px; padding-right: 0;"><div class="custom-checkbox" id="desktop-th-select-all" role="checkbox" aria-checked="false" aria-label="Select all" tabindex="0">${icon('check', { size: 12, stroke: 3 })}</div></th>`;
+  const TH_ACTION = '<th style="text-align: right; padding-right: 24px; min-width: 130px;">Action</th>';
+  const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Amount</th>${TH_ACTION}</tr>`;
+  const THEAD_INQUIRIES = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Nights</th><th>Travel Date</th><th class="col-secondary">Assigned To</th><th>Status</th><th class="col-note" style="min-width: 150px;">Quick Note</th>${TH_ACTION}</tr>`;
 
   const checkboxCell = (b) => `
     <td style="width: 44px; padding-left: 20px; padding-right: 0;" class="td-checkbox-cell">
       <div class="custom-checkbox card-select-checkbox ${b.selected ? 'checked' : ''}" data-desktop-select-id="${b.id}" role="checkbox" aria-checked="${!!b.selected}" aria-label="Select ${esc(b.guest.name)}" tabindex="0">${b.selected ? icon('check', { size: 12, stroke: 3 }) : ''}</div>
     </td>`;
   const actionCell = (b) => `<td style="text-align: right; padding-right: 20px;"><div class="desktop-action-btn-group">${rowActionButtons(b, 14)}</div></td>`;
+  // Same customer cell on both pages: avatar, name + category tag, phone.
+  const customerCell = (b) => `
+    <td style="padding-left: 14px;">
+      <div class="table-booking-cell">
+        <div class="table-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
+        <div class="table-booking-info">
+          <h4 class="cust-name-line"><span class="cust-name">${esc(b.guest.name)}</span>${categoryBadge(b)}</h4>
+          <p>${esc(b.guest.phone)}</p>
+        </div>
+      </div>
+    </td>`;
+  const assignedCell = (b) => `<td class="col-secondary"><span class="assigned-name">${esc(b.assignedTo.name)}</span></td>`;
+  const rowClass = (b, isRowActive) => `${isRowActive ? 'row-selected row-active' : ''} ${b.selected ? 'row-checked' : ''}`;
 
   function bookingRow(b, isRowActive) {
     return `
-      <tr class="${isRowActive ? 'row-selected row-active' : ''} ${b.selected ? 'row-checked' : ''}" data-desktop-row-id="${b.id}" style="cursor: pointer;">
-        ${checkboxCell(b)}
-        <td style="padding-left: 14px;">
-          <div class="table-booking-cell">
-            <div class="table-thumb"><img src="${b.image}" alt="" /></div>
-            <div class="table-booking-info"><h4>${b.title}</h4><p>${b.id} • ${b.destination}</p></div>
-          </div>
-        </td>
-        <td>${categoryBadge(b)}</td>
-        <td><span style="font-weight: 600; color: #0F172A;">${b.pax} Pax</span><div style="font-size: 12px; color: #64748B;">${b.duration}</div></td>
-        <td><span style="font-weight: 500; color: #334155;">${b.dates}</span></td>
-        <td><span style="font-weight: 600; color: #0F172A;">${b.guest.name}</span><div style="font-size: 12px; color: #64748B;">${b.guest.phone}</div></td>
-        <td><div style="display: flex; align-items: center; gap: 8px;">
-          ${b.assignedTo.avatar ? `<img src="${b.assignedTo.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />` : ''}
-          <span style="font-size: 13px; font-weight: 500; color: #1E293B;">${b.assignedTo.name}</span></div></td>
+      <tr class="${rowClass(b, isRowActive)}" data-desktop-row-id="${b.id}" style="cursor: pointer;">
+        ${checkboxCell(b)}${customerCell(b)}
+        <td><span class="cell-strong">${esc(b.title)}</span><div class="cell-sub">${b.id} • ${esc(b.destination)}</div></td>
+        <td class="col-secondary"><span class="cell-strong">${b.pax} Pax</span><div class="cell-sub">${esc(b.duration)}</div></td>
+        <td><span class="cell-date">${esc(b.dates)}</span></td>
+        ${assignedCell(b)}
         <td>${statusPill(b)}</td>
-        <td><span style="font-size: 15px; font-weight: 700; color: #0F172A;">${b.price}</span></td>
+        <td><span class="cell-amount">${esc(b.price)}</span></td>
         ${actionCell(b)}
       </tr>`;
   }
 
   function inquiryRow(b, isRowActive) {
     return `
-      <tr class="${isRowActive ? 'row-selected row-active' : ''} ${b.selected ? 'row-checked' : ''}" data-desktop-row-id="${b.id}" style="cursor: pointer;">
-        ${checkboxCell(b)}
-        <td style="padding-left: 14px;">
-          <div class="table-booking-cell">
-            <div class="table-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
-            <div class="table-booking-info"><h4>${esc(b.guest.name)}</h4><p>${esc(b.guest.phone)}</p></div>
-          </div>
-        </td>
-        <td><span style="font-weight: 600; color: #0F172A;">${esc(b.title)}</span><div style="font-size: 12px; color: #64748B;">${b.id}</div></td>
-        <td>${categoryBadge(b)}</td>
-        <td><span style="font-weight: 600; color: #0F172A;">${b.pax} Pax</span><div style="font-size: 12px; color: #64748B;">${b.duration}</div></td>
-        <td><span style="font-weight: 500; color: #334155;">${b.dates}</span></td>
-        <td><div style="display: flex; align-items: center; gap: 8px;">
-          ${b.assignedTo.avatar ? `<img src="${b.assignedTo.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />` : ''}
-          <span style="font-size: 13px; font-weight: 500; color: #1E293B;">${b.assignedTo.name}</span></div></td>
+      <tr class="${rowClass(b, isRowActive)}" data-desktop-row-id="${b.id}" style="cursor: pointer;">
+        ${checkboxCell(b)}${customerCell(b)}
+        <td><span class="cell-strong">${esc(b.title)}</span><div class="cell-sub">${b.id}</div></td>
+        <td class="col-secondary"><span class="cell-strong">${b.pax} Pax</span><div class="cell-sub">${esc(b.duration)}</div></td>
+        <td><span class="cell-date">${esc(b.dates)}</span></td>
+        ${assignedCell(b)}
         <td>${statusPill(b)}</td>
-        <td>${quickNote(b)}</td>
+        <td class="col-note">${quickNote(b)}</td>
         ${actionCell(b)}
       </tr>`;
   }
@@ -645,22 +637,22 @@ export function createDesktopView(container) {
     return `
       <div class="compact-booking-card ${isCardActive ? 'active' : ''}" data-compact-booking-id="${b.id}" style="cursor: pointer;">
         <div class="compact-card-top">
-          ${inquiry ? `<div class="compact-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>` : `<img src="${b.image}" class="compact-thumb" alt="" />`}
+          <div class="compact-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
           <div class="compact-info-col">
             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
               ${categoryBadge(b, 'style="font-size: 10px; padding: 2px 6px;"')}
-              <span class="compact-dates" style="font-size: 11px; color: #64748B;">${b.dates}</span>
+              <span class="compact-dates" style="font-size: 11px; color: #64748B;">${esc(b.dates)}</span>
             </div>
-            <h4 class="compact-trip-title" title="${esc(inquiry ? b.guest.name : b.title)}">${esc(inquiry ? b.guest.name : b.title)}</h4>
+            <h4 class="compact-trip-title" title="${esc(b.guest.name)}">${esc(b.guest.name)}</h4>
             <p class="compact-guest-sub" style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
-              <span>${esc(inquiry ? b.title : b.guest.name)}</span><span style="color: #94A3B8;">•</span><span>${b.pax} Pax</span>
+              <span>${esc(b.title)}</span><span style="color: #94A3B8;">•</span><span>${b.pax} Pax</span>
             </p>
           </div>
         </div>
         <div class="compact-card-bottom">
           <div style="display: flex; align-items: center; gap: 6px;">
-            ${inquiry ? '' : `<span class="compact-price">${b.price}</span>`}
-            <span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${b.status}</span>
+            ${inquiry ? '' : `<span class="compact-price">${esc(b.price)}</span>`}
+            <span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>
           </div>
           <div class="card-action-btns-row" style="gap: 5px;">${rowActionButtons(b, 13, 'width: 28px; height: 28px;')}</div>
         </div>
@@ -949,13 +941,13 @@ export function createDesktopView(container) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              <button class="btn-add-followup" id="btn-add-followup-action">
+              ${b.kind === 'inquiry' ? '' : `<button class="btn-add-followup" id="btn-add-followup-action">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="12" x2="12" y1="5" y2="19"/>
                   <line x1="5" x2="19" y1="12" y2="12"/>
                 </svg>
                 Add Follow-up
-              </button>
+              </button>`}
             </div>
 
             <div class="lead-journey-timeline">
@@ -1546,7 +1538,7 @@ export function createDesktopView(container) {
       container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
       if (topSearch) topSearch.placeholder = 'Search by name, trip, destination, or phone...';
-      container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Convert to Booking' : 'Confirm Booking');
+      container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking');
       applyParams();
     }
     subscribePage(route);
@@ -1560,6 +1552,8 @@ export function createDesktopView(container) {
     subscribeFollowUps(() => {
       if (isDetailDrawerOpen && activeDetailTab === 'customer-details' && activeBooking) renderDetailPanel();
     });
+    window.addEventListener('layout-changed', () => { if (isDetailDrawerOpen) closeDrawer(); });
+    container.addEventListener('click', (e) => { if (e.target.id === 'desktop-workspace-split' && isDetailDrawerOpen) closeDrawer(); });
     window.addEventListener('bookings-changed', () => { renderTable(); if (isDetailDrawerOpen && activeBooking) renderDetailPanel(); });
     loadFollowUps();
     loadInquiries();
@@ -1577,15 +1571,27 @@ export function createDesktopView(container) {
       onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); renderTable(); },
       onClear: () => { bookings.forEach(b => { b.selected = false; }); renderTable(); },
       onAssign: () => assignSelected(),
-      onSearch: () => container.querySelector('#desktop-table-search-input')?.focus(),
-      onFilter: () => categoryFilter.openVisible(),
     });
+
+    function startAssign(list) {
+      openAssign({
+        kind: page === 'inquiries' ? 'inquiry' : 'booking',
+        items: assignItems(list),
+        onDone: (who) => {
+          if (page === 'bookings') {
+            list.forEach(b => { b.assignedTo = { name: who.name, avatar: who.avatar, role: who.role }; b.assignedStatus = 'Assigned'; });
+            window.dispatchEvent(new Event('bookings-changed'));
+          }
+          bookings.forEach(b => { b.selected = false; });
+          renderTable();
+        },
+      });
+    }
 
     function assignSelected() {
       const sel = bookings.filter(b => b.selected);
       if (!sel.length) return toast('Select at least 1 item to assign.', 'info');
-      if (page === 'inquiries') openInquiryAssignModal(sel.map(b => b.id), () => { bookings.forEach(b => { b.selected = false; }); renderTable(); });
-      else openDesktopBulkAssignModal(sel);
+      startAssign(sel);
     }
 
     function setPayment(b, status) {
@@ -1597,10 +1603,7 @@ export function createDesktopView(container) {
 
     function runRowMenu(b, key) {
       if (key === 'view') openDrawer(b);
-      else if (key === 'assign') {
-        if (b.kind === 'inquiry') openInquiryAssignModal([b.id]);
-        else openDesktopBulkAssignModal([b]);
-      }
+      else if (key === 'assign') startAssign([b]);
       else if (key === 'paid') setPayment(b, 'Paid');
       else if (key === 'unpaid') setPayment(b, 'Pending');
       else if (key === 'email') {
@@ -1616,6 +1619,7 @@ export function createDesktopView(container) {
       if (!form) return;
       e.preventDefault();
       const input = form.querySelector('input');
+      if (!input.value.trim()) { input.focus(); return; } // empty: just focus the field
       if (await saveQuickNote(form.dataset.quickNote, input.value)) input.value = '';
     });
 
@@ -2264,7 +2268,7 @@ export function createDesktopView(container) {
       // Confirm Booking Button inside Drawer
       if (e.target.closest('#desktop-confirm-booking-btn')) {
         if (activeBooking?.kind === 'inquiry') {
-          toast(`Conversion of ${activeBooking.id} to a booking is not connected yet.`, 'info');
+          toast(`Inquiry ${activeBooking.id} (${activeBooking.title}) confirmed.`, 'success');
           return;
         }
         if (activeBooking) {

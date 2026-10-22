@@ -80,6 +80,9 @@ class FollowUpTest extends TestCase
         $this->postJson('/api/inquiries/assign', ['ids' => [$inq->id], 'staff_id' => 'ST-05'])
             ->assertOk()->assertJsonPath('data.0.assigned_to_name', 'Karan Sapalia');
         $this->assertDatabaseHas('inquiries', ['id' => 'INQ-1', 'assigned_to_id' => 'ST-05']);
+        $this->postJson('/api/inquiries/assign', ['ids' => [$inq->id], 'assignee_id' => 'V-01', 'assignee_name' => 'Adventure World'])
+            ->assertOk()->assertJsonPath('data.0.assigned_to_name', 'Adventure World');
+        $this->postJson('/api/inquiries/assign', ['ids' => [$inq->id]])->assertJsonValidationErrors(['assignee_id']);
         $this->postJson('/api/inquiries/assign', ['ids' => ['nope'], 'staff_id' => 'ST-05'])->assertJsonValidationErrors(['ids.0']);
     }
 

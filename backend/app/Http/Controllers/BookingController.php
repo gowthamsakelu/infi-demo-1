@@ -62,6 +62,40 @@ class BookingController extends Controller
     }
 
     /**
+     * Assign one or many bookings to a team member, vendor or contact.
+     */
+    public function assign(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'string|exists:bookings,id',
+            'assignee.id' => 'required|string|max:50',
+            'assignee.name' => 'required|string|max:120',
+            'assignee.type' => 'nullable|string|max:30',
+            'assignee.avatar' => 'nullable|string|max:500',
+            'assignee.role' => 'nullable|string|max:150',
+        ]);
+
+        $assignee = $data['assignee'];
+        foreach (Booking::whereIn('id', $data['ids'])->get() as $booking) {
+            $booking->assigned_to = [
+                'id' => $assignee['id'],
+                'name' => $assignee['name'],
+                'avatar' => $assignee['avatar'] ?? '',
+                'role' => $assignee['role'] ?? ($assignee['type'] ?? ''),
+            ];
+            $booking->assigned_status = 'Assigned';
+            $booking->save();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => count($data['ids']).' booking(s) assigned to '.$assignee['name'],
+            'data' => Booking::whereIn('id', $data['ids'])->get()->map(fn ($b) => ['id' => $b->id, 'assigned_to' => $b->assigned_to, 'assigned_status' => $b->assigned_status]),
+        ]);
+    }
+
+    /**
      * Mark a booking Paid or back to Pending.
      */
     public function updatePayment(Request $request, string $id): JsonResponse

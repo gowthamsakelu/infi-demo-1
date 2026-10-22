@@ -78,28 +78,27 @@ export function rowActionButtons(b, size = 15, style = '') {
 
 /** Items of the ⋮ menu, per page. */
 export function rowMenuItems(b) {
+  const common = [{ key: 'assign', label: 'Assign', icon: 'assign' }, { key: 'view', label: 'View details', icon: 'eye' }];
   if (b.kind === 'inquiry') {
-    return [
-      { key: 'view', label: 'View details', icon: 'eye' },
-      { key: 'assign', label: 'Assign', icon: 'assign' },
-      { key: 'email', label: 'Email', icon: 'mail' },
-      { key: 'followup', label: 'Follow up', icon: 'calendar' },
-    ];
+    return [...common, { key: 'email', label: 'Email', icon: 'mail' }, { key: 'followup', label: 'Follow up', icon: 'calendar' }];
   }
-  const paid = b.status === 'Paid';
-  return [
-    { key: 'assign', label: 'Assign', icon: 'assign' },
-    { key: 'view', label: 'View details', icon: 'eye' },
-    paid ? { key: 'unpaid', label: 'Mark as Unpaid', icon: 'alertCircle' } : { key: 'paid', label: 'Mark as Paid', icon: 'checkCircle' },
-  ];
+  return [...common, b.status === 'Paid' ? { key: 'unpaid', label: 'Mark as Unpaid', icon: 'alertCircle' } : { key: 'paid', label: 'Mark as Paid', icon: 'checkCircle' }];
+}
+
+/** Items handed to the shared Assign sheet. */
+export function assignItems(list) {
+  return list.map((b) => ({
+    id: b.id, title: b.title, name: b.guest.name,
+    badge: b.kind === 'inquiry' ? b.status : '', badgeClass: b.kind === 'inquiry' ? b.statusClass : '',
+  }));
 }
 
 /* ---------- Quick note (Inquiries only) ---------- */
 
 export function quickNote(b, cls = '') {
   return `<form class="quick-note ${cls}" data-quick-note="${esc(b.id)}" autocomplete="off">
-    <input type="text" maxlength="500" placeholder="Type a quick note..." aria-label="Quick note for ${esc(b.guest.name)}" />
-    <button type="submit" class="quick-note-send" aria-label="Send note">${icon('send', { size: 15 })}</button>
+    <input type="text" maxlength="500" placeholder="Add a note..." enterkeyhint="send" aria-label="Quick note for ${esc(b.guest.name)}" />
+    <button type="submit" class="quick-note-send card-circle-action-btn" aria-label="Send note">${icon('send', { size: 15 })}</button>
   </form>`;
 }
 
@@ -108,7 +107,7 @@ export function quickNote(b, cls = '') {
 export function mobileRowCard(b) {
   const inquiry = b.kind === 'inquiry';
   return `
-    <div class="booking-card list-row-card ${b.selected ? 'card-selected' : ''}" data-booking-id="${esc(b.id)}">
+    <div class="booking-card list-row-card ${inquiry ? 'is-inquiry' : ''} ${b.selected ? 'card-selected' : ''}" data-booking-id="${esc(b.id)}">
       <div class="row-lead-col">
         ${avatar(b.guest.name)}
         ${checkbox({ checked: b.selected, attr: 'data-select-id', id: b.id, label: `Select ${b.guest.name}` })}
@@ -116,7 +115,7 @@ export function mobileRowCard(b) {
       <div class="card-info-col">
         <div class="row-name-line">
           <h3 class="card-title">${esc(b.guest.name)}</h3>
-          ${inquiry ? statusPill(b) : categoryBadge(b)}
+          ${categoryBadge(b)}
         </div>
         <p class="row-trip">${esc(b.title)}</p>
         <div class="card-meta-row">${icon('user', { size: 13 })}<span>${b.pax} Pax • ${esc(b.duration)}</span></div>
@@ -125,10 +124,11 @@ export function mobileRowCard(b) {
       <div class="card-right-col">
         <div class="card-action-btns-row">${rowActionButtons(b, 15)}</div>
         <div class="card-price-status-row">
-          ${inquiry ? categoryBadge(b) : `<span class="card-price">${esc(b.price)}</span>${statusPill(b)}`}
+          ${inquiry ? statusPill(b) : `<span class="card-price">${esc(b.price)}</span>${statusPill(b)}`}
         </div>
+        ${inquiry ? quickNote(b) : ''}
       </div>
-      ${inquiry ? quickNote(b, 'row-quick-note') : ''}
+      ${inquiry ? quickNote(b, 'qn-row') : ''}
     </div>`;
 }
 
@@ -148,15 +148,13 @@ export function bulkBar(prefix, { desktop = false } = {}) {
         </div>
       </div>
       <div class="bulk-actions">
-        <button type="button" class="bulk-icon-btn" data-bulk-search aria-label="Search">${icon('search', { size: 17 })}</button>
-        <button type="button" class="bulk-icon-btn" data-bulk-filter aria-label="Filter">${icon('filter', { size: 17 })}</button>
         <button type="button" class="btn-primary-desktop bulk-assign-btn" data-bulk-assign>${icon('assign', { size: 16 })}<span>Assign</span></button>
       </div>
     </div>`;
 }
 
 /** Wire the bulk bar's count menu (Select all / Clear). Returns nothing; actions call back. */
-export function bindBulkBar(root, prefix, { onSelectAll, onClear, onAssign, onSearch, onFilter }) {
+export function bindBulkBar(root, prefix, { onSelectAll, onClear, onAssign }) {
   const btn = root.querySelector(`#${prefix}-count-btn`);
   const menu = root.querySelector(`#${prefix}-count-menu`);
   if (!btn) return;
@@ -171,8 +169,6 @@ export function bindBulkBar(root, prefix, { onSelectAll, onClear, onAssign, onSe
   });
   root.querySelector(`#${prefix}-selection-bar`).addEventListener('click', (e) => {
     if (e.target.closest('[data-bulk-assign]')) onAssign();
-    if (e.target.closest('[data-bulk-search]')) onSearch();
-    if (e.target.closest('[data-bulk-filter]')) onFilter();
   });
 }
 

@@ -1,8 +1,7 @@
 // Inquiries data + the adapter that lets the Bookings list, split view and detail pane render them.
-import { INITIAL_BOOKINGS, STAFF_MEMBERS } from '../data.js';
+import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST } from '../data.js';
 import { phoneKey, addFollowUpLocal } from './followups.js';
-import { icon } from './icons.js';
-import { esc, toast, dismissOnOutside } from './ui.js';
+import { toast } from './ui.js';
 
 export const INQUIRY_TABS = [
   { key: 'all', label: 'All', short: 'All' },
@@ -34,7 +33,7 @@ function baselineFlow(phone) {
 
 /** Inquiry -> the booking-shaped object the shared list / detail code understands. */
 export function inquiryToBooking(i, prev) {
-  const staff = STAFF_MEMBERS.find((s) => s.id === i.assigned_to_id);
+  const staff = [...STAFF_MEMBERS, ...VENDORS_LIST.map((v) => ({ ...v, avatar: v.image })), ...CONTACTS_LIST].find((s) => s.id === i.assigned_to_id);
   const initialsOf = i.customer_name.split(/\s+/).map((n) => n[0]).join('').slice(0, 2).toUpperCase();
   return {
     kind: 'inquiry',
@@ -153,58 +152,4 @@ export async function syncBookingPayments() {
       if (b && b.status !== r.status) { b.status = r.status; b.statusClass = r.status_class; }
     });
   } catch { /* standalone */ }
-}
-
-/** Assign modal for one or many inquiries (same card style as Bookings' assign list). */
-export function openInquiryAssignModal(ids, onDone) {
-  let staffId = STAFF_MEMBERS[0].id;
-  const ov = document.createElement('div');
-  ov.className = 'modal-overlay open inq-assign-overlay';
-  ov.innerHTML = `
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="inq-assign-title">
-      <div class="modal-header"><h3 id="inq-assign-title">Assign ${ids.length} inquir${ids.length === 1 ? 'y' : 'ies'}</h3>
-        <button class="sheet-close-btn" data-x aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></div>
-      <div class="modal-body" style="display:flex;flex-direction:column;gap:8px;align-items:stretch;" role="radiogroup" aria-label="Team member">
-        ${STAFF_MEMBERS.map((m, k) => `
-          <div class="vendor-item-card ${k === 0 ? 'selected' : ''}" data-staff="${m.id}" role="radio" aria-checked="${k === 0}" tabindex="0" style="padding:8px 12px;cursor:pointer;">
-            <div class="vendor-item-left" style="gap:10px;">
-              <div class="custom-radio ${k === 0 ? 'checked' : ''}"></div>
-              <img src="${esc(m.avatar)}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" />
-              <div class="vendor-info"><h4 style="font-size:13.5px;margin:0;">${esc(m.name)}</h4><p style="font-size:12px;color:#64748B;margin:0;">${esc(m.role)}</p></div>
-            </div>
-          </div>`).join('')}
-      </div>
-      <div class="modal-footer"><button class="btn-secondary-desktop" data-x>Cancel</button><button class="btn-primary-desktop" data-ok>Assign</button></div>
-    </div>`;
-  document.body.appendChild(ov);
-  const stop = dismissOnOutside(ov.querySelector('.modal-card'), close);
-  const pick = (card) => {
-    staffId = card.dataset.staff;
-    ov.querySelectorAll('[data-staff]').forEach((c) => {
-      const on = c === card;
-      c.classList.toggle('selected', on);
-      c.setAttribute('aria-checked', on);
-      c.querySelector('.custom-radio').classList.toggle('checked', on);
-    });
-  };
-  ov.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('[data-staff]')) { e.preventDefault(); pick(e.target.closest('[data-staff]')); } });
-  ov.addEventListener('click', async (e) => {
-    const card = e.target.closest('[data-staff]');
-    if (card) return pick(card);
-    if (e.target.closest('[data-x]')) return close();
-    if (!e.target.closest('[data-ok]')) return;
-    try {
-      const res = await fetch('/api/inquiries/assign', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ ids, staff_id: staffId }),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error();
-      applyInquiryUpdates(body.data);
-      close();
-      toast(body.message, 'success');
-      onDone?.();
-    } catch { toast('Could not assign. Try again.', 'warning'); }
-  });
-  function close() { stop(); ov.remove(); }
-  ov.querySelector('[data-staff]').focus();
 }

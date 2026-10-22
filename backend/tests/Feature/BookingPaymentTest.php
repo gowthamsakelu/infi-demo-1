@@ -31,6 +31,16 @@ class BookingPaymentTest extends TestCase
         $this->assertDatabaseHas('bookings', ['id' => 'BK-1', 'status' => 'Pending', 'status_class' => 'status-pending']);
     }
 
+    public function test_bookings_can_be_assigned_to_any_assignee(): void
+    {
+        $this->booking();
+
+        $this->postJson('/api/bookings/assign', ['ids' => ['BK-1'], 'assignee' => ['id' => 'V-01', 'name' => 'Adventure World', 'type' => 'Vendors']])
+            ->assertOk()->assertJsonPath('data.0.assigned_to.name', 'Adventure World');
+        $this->assertSame('Assigned', Booking::find('BK-1')->assigned_status);
+        $this->postJson('/api/bookings/assign', ['ids' => ['NOPE'], 'assignee' => ['id' => 'x', 'name' => 'y']])->assertJsonValidationErrors(['ids.0']);
+    }
+
     public function test_payment_update_validates_status_and_booking(): void
     {
         $this->booking();

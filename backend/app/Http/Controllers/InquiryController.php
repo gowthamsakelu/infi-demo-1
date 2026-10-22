@@ -95,18 +95,28 @@ class InquiryController extends Controller
         $data = $request->validate([
             'ids' => ['required', 'array', 'min:1'],
             'ids.*' => ['string', 'exists:inquiries,id'],
-            'staff_id' => ['required', 'exists:staff,id'],
+            'staff_id' => ['nullable', 'exists:staff,id'],
+            'assignee_id' => ['required_without:staff_id', 'nullable', 'string', 'max:50'],
+            'assignee_name' => ['required_without:staff_id', 'nullable', 'string', 'max:120'],
         ]);
 
-        $staff = Staff::findOrFail($data['staff_id']);
+        if (! empty($data['staff_id'])) {
+            $staff = Staff::findOrFail($data['staff_id']);
+            $assigneeId = $staff->id;
+            $assigneeName = $staff->name;
+        } else {
+            $assigneeId = $data['assignee_id'];
+            $assigneeName = $data['assignee_name'];
+        }
+
         Inquiry::whereIn('id', $data['ids'])->update([
-            'assigned_to_id' => $staff->id,
-            'assigned_to_name' => $staff->name,
+            'assigned_to_id' => $assigneeId,
+            'assigned_to_name' => $assigneeName,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => count($data['ids']).' inquiries assigned to '.$staff->name,
+            'message' => count($data['ids']).' inquiries assigned to '.$assigneeName,
             'data' => Inquiry::with('followUps')->whereIn('id', $data['ids'])->get()->map(fn (Inquiry $i) => $this->present($i)),
         ]);
     }

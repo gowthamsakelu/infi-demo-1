@@ -3,10 +3,11 @@ import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
 import { searchBox, emptyState, toast, openRowMenu, esc } from './shared/ui.js';
-import { renderTabs, mobileRowCard, rowMenuItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
+import { renderTabs, mobileRowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
-import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments, openInquiryAssignModal } from './shared/inquiry-store.js';
+import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
+import { openAssign } from './shared/assign-sheet.js';
 import { matchesCategory } from './shared/booking-filters.js';
 
 export function createMobileView(container, options = {}) {
@@ -594,7 +595,9 @@ export function createMobileView(container, options = {}) {
 
     // Uniform Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
     headerCard.innerHTML = `
-      <button class="sheet-back-btn" id="mobile-sheet-back-btn" aria-label="Back to list">${icon('arrowLeft', { size: 20 })}</button>
+      <div class="sheet-drag-handle-bar" id="mobile-sheet-handle">
+        <div class="sheet-handle"></div>
+      </div>
       <div class="sheet-customer-header">
         <div class="customer-avatar-badge">${initials}</div>
         <div class="customer-header-info">
@@ -872,13 +875,13 @@ export function createMobileView(container, options = {}) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              <button class="btn-add-followup" id="btn-add-followup-action">
+              ${b.kind === 'inquiry' ? '' : `<button class="btn-add-followup" id="btn-add-followup-action">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="12" x2="12" y1="5" y2="19"/>
                   <line x1="5" x2="19" y1="12" y2="12"/>
                 </svg>
                 Add Follow-up
-              </button>
+              </button>`}
             </div>
 
             <div class="lead-journey-timeline">
@@ -1668,7 +1671,7 @@ export function createMobileView(container, options = {}) {
       container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
       if (subtitleEl) subtitleEl.textContent = page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
-      if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Convert to Booking' : 'Confirm Booking';
+      if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking';
       applyParams();
     }
     subscribePage(route);
@@ -1683,6 +1686,7 @@ export function createMobileView(container, options = {}) {
     subscribeFollowUps(() => {
       if (isModalOpen && activeModalTab === 'customer-details' && activeModalBooking) renderSheetBody();
     });
+    window.addEventListener('layout-changed', () => { if (isModalOpen) closeModal(); });
     window.addEventListener('bookings-changed', () => { renderCards(); if (isModalOpen && activeModalBooking) { renderSheetHeader(); renderSheetBody(); } });
     loadFollowUps();
     loadInquiries();
@@ -1697,16 +1701,27 @@ export function createMobileView(container, options = {}) {
       onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); renderCards(); },
       onClear: () => { bookings.forEach(b => { b.selected = false; }); renderCards(); },
       onAssign: () => assignSelected(),
-      onSearch: () => { container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0, behavior: 'smooth' }); container.querySelector('#mobile-search-input')?.focus(); },
-      onFilter: () => { container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0, behavior: 'smooth' }); categoryFilter.openVisible(); },
     });
+
+    function startAssign(list) {
+      openAssign({
+        kind: page === 'inquiries' ? 'inquiry' : 'booking',
+        items: assignItems(list),
+        onDone: (who) => {
+          if (page === 'bookings') {
+            list.forEach(b => { b.assignedTo = { name: who.name, avatar: who.avatar, role: who.role }; b.assignedStatus = 'Assigned'; });
+            window.dispatchEvent(new Event('bookings-changed'));
+          }
+          bookings.forEach(b => { b.selected = false; });
+          renderCards();
+        },
+      });
+    }
 
     function assignSelected() {
       const sel = bookings.filter(b => b.selected);
       if (!sel.length) return toast('Select at least 1 item to assign.', 'info');
-      if (page === 'inquiries') return openInquiryAssignModal(sel.map(b => b.id), () => { bookings.forEach(b => { b.selected = false; }); renderCards(); });
-      targetActivityItem = { id: 'BULK-ASSIGN', title: `${sel.length} Bookings Selected`, subtitle: sel.map(b => b.id).join(', '), type: 'activity', isBulk: true };
-      openAssignSheet(targetActivityItem);
+      startAssign(sel);
     }
 
     function setPayment(b, status) {
@@ -1718,12 +1733,7 @@ export function createMobileView(container, options = {}) {
 
     function runRowMenu(b, key) {
       if (key === 'view') openModal(b, 'customer-details');
-      else if (key === 'assign') {
-        if (b.kind === 'inquiry') return openInquiryAssignModal([b.id]);
-        bookings.forEach(x => { x.selected = x === b; });
-        renderCards();
-        assignSelected();
-      }
+      else if (key === 'assign') startAssign([b]);
       else if (key === 'paid') setPayment(b, 'Paid');
       else if (key === 'unpaid') setPayment(b, 'Pending');
       else if (key === 'email') {
@@ -1739,6 +1749,7 @@ export function createMobileView(container, options = {}) {
       if (!form) return;
       e.preventDefault();
       const input = form.querySelector('input');
+      if (!input.value.trim()) { input.focus(); return; } // empty: just focus the field
       if (await saveQuickNote(form.dataset.quickNote, input.value)) input.value = '';
     });
 
@@ -2023,6 +2034,26 @@ export function createMobileView(container, options = {}) {
       }, { passive: true });
     }
 
+    // Bottom sheet: Esc and swipe-down on the handle/header close it
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isModalOpen && !document.querySelector('.asg-overlay, .fu-overlay, .row-floating-menu')) closeModal(); });
+    (() => {
+      const sheetEl = container.querySelector('#mobile-bottom-sheet');
+      let startY = null;
+      sheetEl.addEventListener('touchstart', (e) => { if (e.target.closest('#sheet-header-card-content')) startY = e.touches[0].clientY; }, { passive: true });
+      sheetEl.addEventListener('touchmove', (e) => {
+        if (startY === null) return;
+        const dy = e.touches[0].clientY - startY;
+        if (dy > 0) sheetEl.style.transform = `translateY(${dy}px)`;
+      }, { passive: true });
+      sheetEl.addEventListener('touchend', (e) => {
+        if (startY === null) return;
+        const dy = e.changedTouches[0].clientY - startY;
+        startY = null;
+        sheetEl.style.transform = '';
+        if (dy > 90) closeModal();
+      });
+    })();
+
     // Select All
     const selectAllBox = container.querySelector('#mobile-select-all-box');
     if (selectAllBox) {
@@ -2255,7 +2286,7 @@ export function createMobileView(container, options = {}) {
       }
 
       // Sheet close button or backdrop
-      if (e.target.closest('#mobile-sheet-close-btn') || e.target.closest('#mobile-sheet-back-btn') || e.target.id === 'mobile-sheet-backdrop') {
+      if (e.target.closest('#mobile-sheet-close-btn') || e.target.id === 'mobile-sheet-backdrop') {
         closeModal();
         return;
       }
@@ -2708,7 +2739,7 @@ export function createMobileView(container, options = {}) {
 
       // Confirm Booking
       if (e.target.closest('#mobile-confirm-booking-btn')) {
-        if (activeModalBooking?.kind === 'inquiry') { toast(`Conversion of ${activeModalBooking.id} to a booking is not connected yet.`, 'info'); return; }
+        if (activeModalBooking?.kind === 'inquiry') { toast(`Inquiry ${activeModalBooking.id} (${activeModalBooking.title}) confirmed.`, 'success'); return; }
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: `Booking ${activeModalBooking.id} (${activeModalBooking.title}) confirmed successfully!`, type: 'success' }
         }));
