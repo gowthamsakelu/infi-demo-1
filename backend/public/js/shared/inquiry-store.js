@@ -15,7 +15,7 @@ const BADGE = { TOUR: 'badge-tour', VILLA: 'badge-villa', ACTIVITY: 'badge-activ
 
 const state = { raw: [], list: [], loaded: false, failed: false };
 const listeners = new Set();
-const notify = () => listeners.forEach((fn) => fn());
+const notify = (ids) => listeners.forEach((fn) => fn(ids));
 export const subscribeInquiries = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 export const inquiryState = state;
 
@@ -108,7 +108,7 @@ export function applyInquiryUpdates(rows) {
     if (k > -1) state.raw[k] = u;
   });
   rebuild();
-  notify();
+  notify(rows.map((r) => r.id));
 }
 
 /** Quick note: validates, saves, and returns true on success. */

@@ -137,6 +137,14 @@ The app has no login yet. Actions are recorded for staff member `ST-05` unless `
 - **Breakpoints:** phones below 700px, tablets from 700px to 1099px, desktop from 1100px. Layout changes use CSS media queries.
 - **Touch:** controls are at least 40px on touch screens, and nothing depends on hover.
 
+## Loading and performance
+
+- Fonts (Plus Jakarta Sans, Inter) are self-hosted in `backend/public/fonts` and preloaded. The app waits up to 1.5 seconds for them before the first render, so text does not shift when they arrive.
+- `index.html` contains a small boot skeleton and preloads the JavaScript modules, so the first paint is stable.
+- Lists keep their previous rows while search, tabs or filters change. Row actions (assign, mark paid) update only the affected row and roll back if the server rejects them.
+- The `/` route versions the entry CSS and JS by file time, and `public/.htaccess` turns on compression, revalidation for scripts and styles, and long caching for fonts and images.
+- On deploy run `php artisan migrate --force`. The start script already caches config, routes and views.
+
 ## Common commands
 
 Run these from `backend/`.

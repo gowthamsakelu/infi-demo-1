@@ -7,9 +7,20 @@ import { closeRowMenu } from './shared/ui.js';
 import { closeAssign } from './shared/assign-sheet.js';
 import { closeFollowUpModal } from './shared/followup-modal.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+// Wait (briefly) for the web fonts before the first render, so text never reflows when they arrive.
+// The boot skeleton stays on screen meanwhile; after 1.5s we render with the fallback anyway.
+const fontsReady = () => Promise.race([
+  Promise.all([
+    document.fonts.load('400 14px "Plus Jakarta Sans"'),
+    document.fonts.load('700 14px "Plus Jakarta Sans"'),
+  ]).catch(() => {}),
+  new Promise((r) => setTimeout(r, 1500)),
+]);
+
+document.addEventListener('DOMContentLoaded', async () => {
   const appContainer = document.getElementById('app');
   if (!appContainer) return;
+  await fontsReady();
 
   // Layout can change live (fold/unfold, rotate, resize). CSS swaps the layout; here we reset open
   // overlays so nothing is left in a state that does not exist in the new layout.
@@ -102,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   `;
 
+  document.getElementById('boot')?.remove();
   const desktopSlot = document.getElementById('desktop-view-slot');
   const mobileSlot = document.getElementById('mobile-view-slot');
 

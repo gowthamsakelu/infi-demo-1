@@ -2,7 +2,7 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, esc } from './shared/ui.js';
+import { searchBox, emptyState, toast, openRowMenu, esc, skeletonCards, errorState } from './shared/ui.js';
 import { renderTabs, mobileRowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
@@ -101,14 +101,14 @@ export function createMobileView(container, options = {}) {
           </svg>
           Dashboard
         </button>
-        <button class="nav-item active" data-route="bookings">
+        <button class="nav-item ${currentPage() === 'bookings' ? 'active' : ''}" data-route="bookings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
             <rect width="20" height="14" x="2" y="6" rx="2"/>
           </svg>
           Bookings
         </button>
-        <button class="nav-item" data-route="inquiries">
+        <button class="nav-item ${currentPage() === 'inquiries' ? 'active' : ''}" data-route="inquiries">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
@@ -566,6 +566,23 @@ export function createMobileView(container, options = {}) {
     updateBulkBar(container, 'mobile', bookings.filter(b => b.selected).length);
   }
 
+  // Re-render only the cards that changed (assign, paid, ...), keeping the rest of the DOM untouched.
+  function patchRows(ids) {
+    if (!ids || !ids.length) return renderCards();
+    let ok = true;
+    ids.forEach((id) => {
+      const b = bookings.find(x => x.id === id);
+      const el = container.querySelector(`.list-row-card[data-booking-id="${id}"]`);
+      if (!b || !el) { ok = false; return; }
+      const t = document.createElement('div');
+      t.innerHTML = mobileRowCard(b).trim();
+      el.replaceWith(t.firstElementChild);
+    });
+    if (!ok) return renderCards();
+    if (isModalOpen && activeModalBooking && ids.includes(activeModalBooking.id)) { renderSheetHeader(); renderSheetBody(); }
+    syncSelectionUI();
+  }
+
   function renderCards() {
     const listEl = container.querySelector('#mobile-cards-list');
     if (!listEl) return;
@@ -585,7 +602,9 @@ export function createMobileView(container, options = {}) {
     if (searchEl) { searchEl.placeholder = `Search ${what}...`; searchEl.setAttribute('aria-label', `Search ${what}`); }
 
     if (inquiry && !inquiryState.loaded) {
-      listEl.innerHTML = '<p style="text-align:center;padding:48px 0;color:#94A3B8;">Loading inquiries...</p>';
+      listEl.innerHTML = skeletonCards(5);
+    } else if (inquiry && inquiryState.failed) {
+      listEl.innerHTML = errorState({ title: 'Could not load inquiries', text: 'Check your connection and try again.', retryId: 'btn-retry-inquiries' });
     } else if (filtered.length === 0) {
       listEl.innerHTML = emptyState({ title: `No ${what} found`, text: 'No results matching your selected filters.', resetId: 'btn-clear-mobile-empty-filters' });
     } else {
@@ -1647,10 +1666,13 @@ export function createMobileView(container, options = {}) {
     // Search input
     const searchInput = container.querySelector('#mobile-search-input');
     if (searchInput) {
+      let searchTimer = null;
       searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value;
-        setParams({ q: searchQuery.trim() }, { push: false, silent: true });
-        renderCards();
+        const val = e.target.value;
+        searchQuery = val;
+        // Debounced: one render per pause in typing; the list stays visible meanwhile.
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => setParams({ q: val.trim() }, { push: false }), 200);
       });
     }
 
@@ -1670,6 +1692,8 @@ export function createMobileView(container, options = {}) {
 
     // Page routing: Bookings <-> Inquiries share one list, one detail panel
     const subtitleEl = container.querySelector('#mobile-header-subtitle');
+    const scrollMemory = {};
+    let needRestore = false;
     function route() {
       const next = currentPage();
       const changed = next !== page;
@@ -1679,28 +1703,31 @@ export function createMobileView(container, options = {}) {
         bookings = page === 'inquiries' ? inquiryState.list : bookingsData;
         bookings.forEach(b => { b.selected = false; });
         activeCategory = allKey();
-        container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0 });
+        const sc = container.querySelector('#mobile-screen-scroll');
+        scrollMemory[page === 'inquiries' ? 'bookings' : 'inquiries'] = sc ? sc.scrollTop : 0;
+        needRestore = true;
       }
       container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
       if (subtitleEl) subtitleEl.textContent = page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
       if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking';
       applyParams();
+      if (needRestore) { const sc = container.querySelector('#mobile-screen-scroll'); if (sc) sc.scrollTop = scrollMemory[page] || 0; needRestore = false; }
     }
     subscribePage(route);
-    subscribeInquiries(() => {
+    subscribeInquiries((ids) => {
       if (page !== 'inquiries') return;
       bookings = inquiryState.list;
       if (activeModalBooking) activeModalBooking = bookings.find(b => b.id === activeModalBooking.id) || activeModalBooking;
       if (subtitleEl) subtitleEl.textContent = `Inquiries • ${inquiryState.list.length} Total`;
-      renderCards();
-      if (isModalOpen) { renderSheetHeader(); renderSheetBody(); }
+      if (ids && ids.length) patchRows(ids); else renderCards();
+      if (isModalOpen && !(ids && ids.length)) { renderSheetHeader(); renderSheetBody(); }
     });
     subscribeFollowUps(() => {
       if (isModalOpen && activeModalTab === 'customer-details' && activeModalBooking) renderSheetBody();
     });
     window.addEventListener('layout-changed', () => { if (isModalOpen) closeModal(); });
-    window.addEventListener('bookings-changed', () => { renderCards(); if (isModalOpen && activeModalBooking) { renderSheetHeader(); renderSheetBody(); } });
+    window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
     loadFollowUps();
     loadInquiries();
     syncBookingPayments().then(() => renderCards());
@@ -1708,6 +1735,12 @@ export function createMobileView(container, options = {}) {
       b.addEventListener('click', () => navigate(b.dataset.route));
     });
     route();
+
+    // Pages that are not built yet: stay on the current page and say so
+    container.querySelectorAll('.mobile-bottom-nav .nav-item:not([data-route])').forEach((b) => {
+      b.addEventListener('click', () => toast(`${b.textContent.trim()} is coming soon.`, 'info'));
+    });
+    container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries')) loadInquiries(); });
 
     // Bulk bar: select all / clear / search / filter / Assign
     bindBulkBar(container, 'mobile', {
@@ -1717,17 +1750,18 @@ export function createMobileView(container, options = {}) {
     });
 
     function startAssign(list) {
+      const prev = list.map(b => ({ b, assignedTo: b.assignedTo, assignedStatus: b.assignedStatus }));
+      const ids = list.map(b => b.id);
+      const repaint = () => window.dispatchEvent(new CustomEvent('bookings-changed', { detail: { ids } }));
       openAssign({
         kind: page === 'inquiries' ? 'inquiry' : 'booking',
         items: assignItems(list),
-        onDone: (who) => {
-          if (page === 'bookings') {
-            list.forEach(b => { b.assignedTo = { name: who.name, avatar: who.avatar, role: who.role }; b.assignedStatus = 'Assigned'; });
-            window.dispatchEvent(new Event('bookings-changed'));
-          }
-          bookings.forEach(b => { b.selected = false; });
-          renderCards();
+        onApply: (who) => {
+          list.forEach(b => { b.assignedTo = { name: who.name, avatar: who.avatar, role: who.role }; b.assignedStatus = 'Assigned'; b.selected = false; });
+          repaint();
         },
+        onRevert: () => { prev.forEach(p => { p.b.assignedTo = p.assignedTo; p.b.assignedStatus = p.assignedStatus; }); repaint(); },
+        onDone: () => syncSelectionUI(),
       });
     }
 
@@ -1738,10 +1772,14 @@ export function createMobileView(container, options = {}) {
     }
 
     function setPayment(b, status) {
-      b.status = status;
-      b.statusClass = status === 'Paid' ? 'status-paid' : 'status-pending';
-      window.dispatchEvent(new Event('bookings-changed'));
-      savePayment(b.id, status).then(ok => toast(ok ? `${b.id} marked as ${status === 'Paid' ? 'Paid' : 'Unpaid'}` : 'Updated here, but saving to the server failed.', ok ? 'success' : 'warning'));
+      const prev = { status: b.status, statusClass: b.statusClass };
+      const apply = (v) => { b.status = v.status; b.statusClass = v.statusClass; window.dispatchEvent(new CustomEvent('bookings-changed', { detail: { ids: [b.id] } })); };
+      apply({ status, statusClass: status === 'Paid' ? 'status-paid' : 'status-pending' }); // optimistic
+      savePayment(b.id, status).then((ok) => {
+        if (ok) return toast(`${b.id} marked as ${status === 'Paid' ? 'Paid' : 'Unpaid'}`, 'success');
+        apply(prev); // roll back
+        toast('Could not save the payment status. It was reverted.', 'warning');
+      });
     }
 
     function runRowMenu(b, key) {
@@ -2807,8 +2845,7 @@ export function createMobileView(container, options = {}) {
     }
   }
 
-  // Initial renders
-  renderCards();
+  // Initial cards render in route() (inside bindEvents), so the first paint is already the right page.
   renderSheetHeader();
   renderSheetBody();
   renderAssignVendorsList();

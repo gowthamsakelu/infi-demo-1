@@ -35,7 +35,9 @@ class BookingController extends Controller
             });
         }
 
-        $bookings = $query->get();
+        // Cap the list so a large table cannot make the page heavy; callers can page with ?limit=&offset=.
+        $limit = min((int) $request->query('limit', 500), 500);
+        $bookings = $query->orderBy('id')->offset((int) $request->query('offset', 0))->limit($limit)->get();
 
         return response()->json([
             'status' => 'success',

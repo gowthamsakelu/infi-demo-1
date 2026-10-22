@@ -47,7 +47,7 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-sheet: 0 -10px 25px -5px rgba(0, 0, 0, 0.15);
 
-  --font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', 'Inter', 'Inter Fallback', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {
@@ -450,7 +450,7 @@ body.standalone-mobile .app-global-bar {
   color: #475569;
   border: none;
   font-family: var(--font-family);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 }
 
 .tab-pill .pill-badge {
@@ -505,7 +505,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   cursor: pointer;
   background: #FFFFFF;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   user-select: none;
 }
 
@@ -534,7 +534,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .action-pill-btn:hover {
@@ -552,7 +552,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   color: #334155;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .action-more-btn:hover {
@@ -589,7 +589,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   border-radius: 8px;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   text-align: left;
 }
 
@@ -632,7 +632,7 @@ body.standalone-mobile .app-global-bar {
   border-radius: 16px;
   border: 1px solid #F1F5F9;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   cursor: pointer;
 }
 
@@ -761,7 +761,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   flex-shrink: 0;
   text-decoration: none;
   box-sizing: border-box;
@@ -1288,7 +1288,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   font-family: var(--font-family);
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   white-space: nowrap;
 }
 
@@ -1469,7 +1469,7 @@ body.standalone-mobile .app-global-bar {
   position: static !important;
   margin-left: auto !important;
   margin-top: 2px !important;
-  transition: all 0.15s ease !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease !important;
   z-index: 10 !important;
   padding: 0 !important;
 }
@@ -1795,7 +1795,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   font-family: var(--font-family);
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   white-space: nowrap;
 }
 
@@ -1885,7 +1885,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   margin-top: 8px;
   font-family: var(--font-family);
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
 }
 
 .more-guests-toggle-btn:hover {
@@ -2032,7 +2032,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
   font-family: var(--font-family);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2065,7 +2065,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .quick-action-col-btn:hover {
@@ -2152,7 +2152,7 @@ body.standalone-mobile .app-global-bar {
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   cursor: pointer;
 }
 
@@ -2292,7 +2292,7 @@ body.standalone-mobile .app-global-bar {
   border: 1px solid #E2E8F0;
   background: #FFFFFF;
   color: #334155;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
@@ -2427,7 +2427,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   font-family: var(--font-family);
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
 }
 
 .btn-primary-desktop:hover {
@@ -2448,7 +2448,7 @@ body.standalone-mobile .app-global-bar {
   gap: 8px;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
 }
 
 .btn-secondary-desktop:hover {
@@ -2576,7 +2576,7 @@ body.standalone-mobile .app-global-bar {
   border: 1px solid transparent;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
 }
 
 .desktop-tab-btn:hover {
@@ -2608,7 +2608,7 @@ body.standalone-mobile .app-global-bar {
   height: 38px;
   width: 220px;
   color: #64748B;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .table-toolbar-search-box:focus-within {
@@ -2639,7 +2639,7 @@ body.standalone-mobile .app-global-bar {
   outline: none;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .desktop-select-filter:hover {
@@ -2856,7 +2856,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .row-view-details-btn:hover,
@@ -2882,14 +2882,14 @@ body.standalone-mobile .app-global-bar {
   flex: 1;
   position: relative;
   overflow: hidden;
-  transition: all 0.25s ease;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
 }
 
 .desktop-table-container {
   flex: 1;
   width: 100%;
   min-width: 0;
-  transition: all 0.25s ease;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
 }
 
 .desktop-workspace-split.has-open-detail .desktop-table-container {
@@ -2998,7 +2998,7 @@ body.standalone-mobile .app-global-bar {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   flex-shrink: 0;
 }
 
@@ -3030,7 +3030,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .compact-tab-btn.active {
@@ -3053,7 +3053,7 @@ body.standalone-mobile .app-global-bar {
   border: 1px solid #F1F5F9;
   background: #FFFFFF;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -3250,7 +3250,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   border: 1px solid transparent;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .pill-btn-call {
@@ -3296,7 +3296,7 @@ body.standalone-mobile .app-global-bar {
   border: 1px solid #CBD5E1;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .btn-edit-customer-pill:hover {
@@ -3643,7 +3643,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   cursor: pointer;
   color: #64748B;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .drawer-close-btn:hover {
@@ -3864,7 +3864,7 @@ body.standalone-mobile .app-global-bar {
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
-  transition: all 0.15s ease !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease !important;
   font-family: var(--font-family) !important;
 }
 
@@ -3898,7 +3898,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600 !important;
   cursor: pointer !important;
   font-family: var(--font-family) !important;
-  transition: all 0.15s ease !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 
@@ -4257,7 +4257,7 @@ body.standalone-mobile .app-global-bar {
   background: #FFFFFF;
   border: 1px solid #F1F5F9;
   position: relative;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .itinerary-card-item:hover {
@@ -4365,7 +4365,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   font-family: var(--font-family);
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   white-space: nowrap;
 }
 
@@ -4400,7 +4400,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer !important;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
   font-family: var(--font-family) !important;
-  transition: all 0.15s ease !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
   line-height: 1 !important;
@@ -4500,7 +4500,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   color: #1E293B;
   user-select: none;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .special-req-chip:hover {
@@ -4546,7 +4546,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   color: #334155;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
   font-family: var(--font-family);
 }
 
@@ -4983,7 +4983,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   background: #FFFFFF;
   border: 1px solid #F1F5F9;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
 .vendor-item-card:hover {
@@ -5124,7 +5124,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   gap: 8px;
   font-family: var(--font-family);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-  transition: all 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
 }
 
 .btn-whatsapp-assign:hover {
@@ -5790,7 +5790,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 .fu-toggle button.active { background: #2563EB; color: #FFFFFF; box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35); }
 .fu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -6420,3 +6420,40 @@ body.scroll-locked { overflow: hidden; padding-right: var(--sbw, 0px); }
 @media (min-width: 700px) { .asg-sheet { max-height: min(86dvh, 720px, calc(var(--ov-h, 100dvh) * 0.96)); } }
 @media (max-width: 380px) { .dd-trigger { max-width: 164px; } }
 .list-row-card .row-name-line { flex-wrap: wrap; row-gap: 2px; } .list-row-card .row-name-line .card-title { max-width: 100%; }
+
+/* ==========================================================================
+   v7: seamless loading (skeletons, stable scrollbars, cheaper overlays, view transition)
+   ========================================================================== */
+html { scrollbar-gutter: stable; }
+.mobile-screen-content, .desktop-full-table-view, .compact-list-items, .asg-scroll, .fu-body, .vendor-list-scroll { scrollbar-gutter: stable; }
+
+/* Skeleton rows: same dimensions as real rows, compositor-only shimmer */
+.skel { position: relative; overflow: hidden; background: #EEF2F7; border-radius: 10px; }
+.skel::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent); animation: skelSweep 1.3s var(--ease-out) infinite; }
+@keyframes skelSweep { to { transform: translateX(100%); } }
+.skel-card { display: grid; grid-template-columns: 44px 1fr 120px; column-gap: 10px; align-items: start; padding: 12px; min-height: 96px; border: 1px solid #F1F5F9; border-radius: 16px; background: #fff; margin-bottom: 12px; box-sizing: border-box; }
+.skel-card .skel-avatar { width: 44px; height: 44px; border-radius: 13px; }
+.skel-lines { display: flex; flex-direction: column; gap: 8px; }
+.skel-lines .skel { height: 12px; }
+.skel-btns { display: flex; gap: 6px; justify-content: flex-end; }
+.skel-btns .skel { width: 36px; height: 36px; border-radius: 9px; }
+.skel-row td { padding: 16px 12px; height: 75px; }
+.skel-row .skel { height: 14px; width: 80%; }
+.state-box { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 48px 20px; text-align: center; color: #64748B; }
+.state-box h4 { font-size: 15px; color: #0F172A; font-weight: 700; margin: 0; }
+.state-box p { font-size: 13px; color: #94A3B8; margin: 0 0 6px; }
+.state-box.is-error h4 { color: #B91C1C; }
+
+/* List content swaps with a short fade instead of blanking */
+.list-fade { animation: motionFadeIn var(--motion-fast) var(--ease-out); }
+
+/* Paint-heavy blur only where there is room for it */
+@media (max-width: 699px) {
+  .sheet-backdrop, .modal-overlay, .asg-overlay { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .sheet-backdrop, .asg-overlay { background: rgba(15, 23, 42, 0.55); }
+}
+
+/* Short crossfade of page content between Bookings and Inquiries (shell is identical) */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 150ms; animation-timing-function: var(--ease-out); }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } .skel::after { animation: none; } }
+.bookings-table thead tr { height: 59px; } .bookings-table thead th { vertical-align: middle; }

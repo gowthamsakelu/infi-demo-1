@@ -6,9 +6,46 @@
   <title>Ruyi Admin - Bookings & Tour Operations</title>
   <meta name="description" content="Manage and track all types of travel bookings across tours, villas, activities, and resorts on PC and mobile." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563EB'><rect width='24' height='24' rx='6' fill='%232563EB'/><path d='M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z' fill='%23FFFFFF'/></svg>" />
+  <link rel="preload" href="./fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="./fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="./css/fonts.css" />
   <link rel="stylesheet" href="./css/style.css" />
+  <!-- Fetch the module graph in parallel instead of one import at a time -->
+  <link rel="modulepreload" href="./js/data.js" />
+  <link rel="modulepreload" href="./js/mobile.js" />
+  <link rel="modulepreload" href="./js/desktop.js" />
+  <link rel="modulepreload" href="./js/shared/icons.js" />
+  <link rel="modulepreload" href="./js/shared/ui.js" />
+  <link rel="modulepreload" href="./js/shared/page-state.js" />
+  <link rel="modulepreload" href="./js/shared/list-ui.js" />
+  <link rel="modulepreload" href="./js/shared/dropdown-filter.js" />
+  <link rel="modulepreload" href="./js/shared/followups.js" />
+  <link rel="modulepreload" href="./js/shared/followup-modal.js" />
+  <link rel="modulepreload" href="./js/shared/inquiry-store.js" />
+  <link rel="modulepreload" href="./js/shared/assign-sheet.js" />
+  <link rel="modulepreload" href="./js/shared/booking-filters.js" />
+  <style>
+    /* Critical: correct first paint before the stylesheet and scripts arrive */
+    html { scrollbar-gutter: stable; }
+    html, body { margin: 0; background: #F8FAFC; }
+    #app:empty { display: none; }
+    .boot { display: block; min-height: 100dvh; }
+    .boot-side { display: none; }
+    .boot-bar, .boot-row, .boot-side i { background: #E8EDF3; border-radius: 12px; }
+    .boot-main { padding: 14px; max-width: 480px; margin: 0 auto; background: #fff; min-height: 100dvh; }
+    .boot-bar { height: 44px; margin-bottom: 12px; }
+    .boot-row { height: 96px; margin-bottom: 12px; border-radius: 16px; }
+    @media (min-width: 700px) {
+      .boot { display: flex; }
+      .boot-side { display: block; width: 260px; flex: none; height: 100dvh; background: #fff; border-right: 1px solid #E2E8F0; padding: 16px; box-sizing: border-box; }
+      .boot-side i { display: block; height: 40px; margin-bottom: 8px; }
+      .boot-main { flex: 1; max-width: none; background: #F8FAFC; }
+      .boot-row { height: 62px; }
+    }
+  </style>
 </head>
 <body>
+  <div id="boot" class="boot" aria-hidden="true"><div class="boot-side"><i></i><i></i><i></i><i></i></div><div class="boot-main"><div class="boot-bar"></div><div class="boot-bar"></div><div class="boot-row"></div><div class="boot-row"></div><div class="boot-row"></div><div class="boot-row"></div></div></div>
   <div id="app"></div>
   <script type="module" src="./js/main.js"></script>
 </body>

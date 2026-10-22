@@ -38,7 +38,7 @@ let current = null;
  * @param {{ kind: 'booking'|'inquiry', items: Array<{id:string,title:string,name:string,badge?:string,badgeClass?:string,image?:string}>,
  *           onDone?: () => void }} cfg
  */
-export function openAssign({ kind, items, onDone }) {
+export function openAssign({ kind, items, onApply, onRevert, onDone }) {
   closeAssign();
   if (!items.length) return;
   let tab = 'Team Members';
@@ -170,6 +170,10 @@ export function openAssign({ kind, items, onDone }) {
       const what = items.length === 1 ? `${first.title} (${first.id})` : `${items.length} ${noun.toLowerCase()} (${items.map((i) => i.id).join(', ')})`;
       openWhatsApp(a.name, a.phone, `Hi ${a.name}, you have been assigned ${what}.${note ? ` Note: ${note}` : ''}`, { silent: true });
     }
+    // Optimistic: update the row and close the sheet now; roll back if the server says no.
+    onApply?.({ id: a.id, name: a.name, avatar: a.avatar, role: a.role });
+    closeAssign();
+    toast(`Assigned ${a.name} to ${items.length} ${items.length === 1 ? (kind === 'inquiry' ? 'inquiry' : 'booking') : noun.toLowerCase()}`, 'success');
     try {
       const body = kind === 'inquiry'
         ? { ids: items.map((i) => i.id), assignee_id: a.id, assignee_name: a.name }
@@ -180,12 +184,10 @@ export function openAssign({ kind, items, onDone }) {
       const out = await res.json();
       if (!res.ok) throw new Error();
       if (kind === 'inquiry') applyInquiryUpdates(out.data);
-      closeAssign();
-      toast(`Assigned ${a.name} to ${items.length} ${items.length === 1 ? (kind === 'inquiry' ? 'inquiry' : 'booking') : noun.toLowerCase()}`, 'success');
       onDone?.({ id: a.id, name: a.name, avatar: a.avatar, role: a.role });
     } catch {
-      btn.disabled = false;
-      toast('Could not assign. Try again.', 'warning');
+      onRevert?.();
+      toast('Could not save the assignment. It was reverted.', 'warning');
     }
   }
 

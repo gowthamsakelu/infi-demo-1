@@ -36,8 +36,14 @@ export function setParams(patch, { push = true, silent = false } = {}) {
 /** Go to another page; filters and search do not carry over. */
 export function navigate(page) {
   if (page === currentPage() && !location.search) return;
-  history.pushState(null, '', buildUrl(new URLSearchParams(), page));
-  notify();
+  const go = () => {
+    history.pushState(null, '', buildUrl(new URLSearchParams(), page));
+    notify();
+  };
+  // Short crossfade of the content (the shell is identical on every page). Falls back to an instant swap.
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (document.startViewTransition && !reduced) document.startViewTransition(go);
+  else go();
 }
 
 /** Re-run every subscriber (used after a layout change). */

@@ -1589,7 +1589,7 @@ export const INITIAL_BOOKINGS = [
     "title": "Kerala Backwaters & Munnar Hills",
     "type": "TOUR",
     "typeClass": "badge-tour",
-    "image": "./images/kashmir.jpg",
+    "image": "./images/manali.jpg",
     "pax": 4,
     "duration": "5D / 4N",
     "dates": "22 Nov - 26 Nov",

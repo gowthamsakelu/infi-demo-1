@@ -2,7 +2,7 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, initials } from './shared/ui.js';
+import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, initials, skeletonRows, errorState } from './shared/ui.js';
 import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
@@ -58,7 +58,7 @@ export function createDesktopView(container) {
             </div>
           </a>
 
-          <a class="sidebar-nav-item active" href="#bookings" id="nav-bookings">
+          <a class="sidebar-nav-item ${currentPage() === 'bookings' ? 'active' : ''}" href="#bookings" id="nav-bookings">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
@@ -69,7 +69,7 @@ export function createDesktopView(container) {
             <span class="sidebar-badge" id="sidebar-total-badge">28</span>
           </a>
 
-          <a class="sidebar-nav-item" href="#inquiries" id="nav-inquiries">
+          <a class="sidebar-nav-item ${currentPage() === 'inquiries' ? 'active' : ''}" href="#inquiries" id="nav-inquiries">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -677,6 +677,26 @@ export function createDesktopView(container) {
     updateBulkBar(container, 'desktop', n);
   }
 
+  // Re-render only the rows that changed (assign, paid, ...), keeping the rest of the DOM untouched.
+  function patchRows(ids) {
+    if (!ids || !ids.length) return renderTable();
+    let ok = true;
+    ids.forEach((id) => {
+      const b = bookings.find(x => x.id === id);
+      const tr = container.querySelector(`#desktop-table-body [data-desktop-row-id="${id}"]`);
+      if (!b || !tr) { ok = false; return; }
+      const active = !!(activeBooking && activeBooking.id === id);
+      const t = document.createElement('tbody');
+      t.innerHTML = (isInquiries() ? inquiryRow : bookingRow)(b, active).trim();
+      tr.replaceWith(t.firstElementChild);
+      const cc = container.querySelector(`#desktop-compact-list-items [data-compact-booking-id="${id}"]`);
+      if (cc) { const d = document.createElement('div'); d.innerHTML = compactCard(b, active).trim(); cc.replaceWith(d.firstElementChild); }
+    });
+    if (!ok) return renderTable();
+    if (isDetailDrawerOpen && activeBooking && ids.includes(activeBooking.id)) renderDetailPanel();
+    syncSelectionUI();
+  }
+
   function renderTable() {
     const tbody = container.querySelector('#desktop-table-body');
     if (!tbody) return;
@@ -698,8 +718,11 @@ export function createDesktopView(container) {
     const keepScroll = compact ? compact.scrollTop : 0;
 
     if (inquiry && !inquiryState.loaded) {
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 48px; color: #94A3B8;">Loading inquiries...</td></tr>';
+      tbody.innerHTML = skeletonRows(10);
       if (compact) compact.innerHTML = '';
+    } else if (inquiry && inquiryState.failed) {
+      tbody.innerHTML = `<tr><td colspan="10">${errorState({ title: 'Could not load inquiries', text: 'Check your connection and try again.', retryId: 'btn-retry-inquiries' })}</td></tr>`;
+      if (compact) compact.innerHTML = errorState({ title: 'Could not load inquiries', text: 'Try again.', retryId: 'btn-retry-inquiries-c' });
     } else if (filtered.length === 0) {
       tbody.innerHTML = emptyState({ title: `No ${what} found`, text: 'No results matching your query. Try resetting filters.', colspanRow: 10 });
       if (compact) compact.innerHTML = emptyState({ title: `No ${what} found`, text: 'Try resetting filters.', resetId: 'btn-reset-filters-compact' });
@@ -1499,18 +1522,16 @@ export function createDesktopView(container) {
     const tableSearch = container.querySelector('#desktop-table-search-input');
     const compactSearch = container.querySelector('#desktop-compact-search-input');
 
+    let searchTimer = null;
     function syncSearch(val) {
       searchQuery = val;
       if (topSearch && topSearch.value !== val) topSearch.value = val;
       if (tableSearch && tableSearch.value !== val) tableSearch.value = val;
       if (compactSearch && compactSearch.value !== val) compactSearch.value = val;
       if (topClear) topClear.style.display = val ? 'block' : 'none';
-      if (currentPage() === 'inquiries') {
-        setParams({ q: val }, { push: false });
-        return;
-      }
-      setParams({ q: val }, { push: false, silent: true });
-      renderTable();
+      // Debounced: one render per pause in typing; the list stays visible meanwhile.
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => setParams({ q: val }, { push: false }), 200);
     }
 
     if (topSearch) {
@@ -1543,11 +1564,14 @@ export function createDesktopView(container) {
     }
 
     // Page routing: Bookings <-> Inquiries share one workspace (table, split view, detail pane)
+    const scrollMemory = {};
     function route() {
       const next = currentPage();
       const changed = next !== page;
       page = next;
+      const scroller = container.querySelector('.desktop-full-table-view');
       if (changed) {
+        scrollMemory[page === 'inquiries' ? 'bookings' : 'inquiries'] = scroller ? scroller.scrollTop : 0;
         if (isDetailDrawerOpen) closeDrawer();
         bookings = page === 'inquiries' ? inquiryState.list : bookingsData;
         bookings.forEach(b => { b.selected = false; });
@@ -1558,13 +1582,14 @@ export function createDesktopView(container) {
       if (topSearch) topSearch.placeholder = 'Search by name, trip, destination, or phone...';
       container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking');
       applyParams();
+      if (changed && scroller) scroller.scrollTop = scrollMemory[page] || 0;
     }
     subscribePage(route);
-    subscribeInquiries(() => {
+    subscribeInquiries((ids) => {
       if (page !== 'inquiries') return;
       bookings = inquiryState.list;
       if (activeBooking) activeBooking = bookings.find(b => b.id === activeBooking.id) || null;
-      renderTable();
+      if (ids && ids.length) patchRows(ids); else renderTable();
       if (isDetailDrawerOpen && activeBooking) renderDetailPanel();
     });
     subscribeFollowUps(() => {
@@ -1572,7 +1597,7 @@ export function createDesktopView(container) {
     });
     window.addEventListener('layout-changed', () => { if (isDetailDrawerOpen) closeDrawer(); });
     container.addEventListener('click', (e) => { if (e.target.id === 'desktop-workspace-split' && isDetailDrawerOpen) closeDrawer(); });
-    window.addEventListener('bookings-changed', () => { renderTable(); if (isDetailDrawerOpen && activeBooking) renderDetailPanel(); });
+    window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
     loadFollowUps();
     loadInquiries();
     syncBookingPayments().then(() => renderTable());
@@ -1584,6 +1609,12 @@ export function createDesktopView(container) {
       });
     });
 
+    // Pages that are not built yet: stay on the current page and say so (no hash change, no mismatch)
+    container.querySelectorAll('a.sidebar-nav-item[href="#dashboard"], a.sidebar-nav-item[href="#calendar"], a.sidebar-nav-item[href="#settings"]').forEach((a) => {
+      a.addEventListener('click', (e) => { e.preventDefault(); toast(`${a.textContent.trim()} is coming soon.`, 'info'); });
+    });
+    container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
+
     // Bulk bar: select all / clear / search / filter / Assign
     bindBulkBar(container, 'desktop', {
       onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); syncSelectionUI(); },
@@ -1592,17 +1623,18 @@ export function createDesktopView(container) {
     });
 
     function startAssign(list) {
+      const prev = list.map(b => ({ b, assignedTo: b.assignedTo, assignedStatus: b.assignedStatus }));
+      const ids = list.map(b => b.id);
+      const repaint = () => window.dispatchEvent(new CustomEvent('bookings-changed', { detail: { ids } }));
       openAssign({
         kind: page === 'inquiries' ? 'inquiry' : 'booking',
         items: assignItems(list),
-        onDone: (who) => {
-          if (page === 'bookings') {
-            list.forEach(b => { b.assignedTo = { name: who.name, avatar: who.avatar, role: who.role }; b.assignedStatus = 'Assigned'; });
-            window.dispatchEvent(new Event('bookings-changed'));
-          }
-          bookings.forEach(b => { b.selected = false; });
-          renderTable();
+        onApply: (who) => {
+          list.forEach(b => { b.assignedTo = { name: who.name, avatar: who.avatar, role: who.role }; b.assignedStatus = 'Assigned'; b.selected = false; });
+          repaint();
         },
+        onRevert: () => { prev.forEach(p => { p.b.assignedTo = p.assignedTo; p.b.assignedStatus = p.assignedStatus; }); repaint(); },
+        onDone: () => syncSelectionUI(),
       });
     }
 
@@ -1613,10 +1645,14 @@ export function createDesktopView(container) {
     }
 
     function setPayment(b, status) {
-      b.status = status;
-      b.statusClass = status === 'Paid' ? 'status-paid' : 'status-pending';
-      window.dispatchEvent(new Event('bookings-changed'));
-      savePayment(b.id, status).then(ok => toast(ok ? `${b.id} marked as ${status === 'Paid' ? 'Paid' : 'Unpaid'}` : 'Updated here, but saving to the server failed.', ok ? 'success' : 'warning'));
+      const prev = { status: b.status, statusClass: b.statusClass };
+      const apply = (v) => { b.status = v.status; b.statusClass = v.statusClass; window.dispatchEvent(new CustomEvent('bookings-changed', { detail: { ids: [b.id] } })); };
+      apply({ status, statusClass: status === 'Paid' ? 'status-paid' : 'status-pending' }); // optimistic
+      savePayment(b.id, status).then((ok) => {
+        if (ok) return toast(`${b.id} marked as ${status === 'Paid' ? 'Paid' : 'Unpaid'}`, 'success');
+        apply(prev); // roll back
+        toast('Could not save the payment status. It was reverted.', 'warning');
+      });
     }
 
     function runRowMenu(b, key) {
@@ -2471,8 +2507,7 @@ export function createDesktopView(container) {
     });
   }
 
-  // Initial renders
-  renderTable();
+  // Initial render happens in route() (inside bindEvents), so the first paint is already the right page.
   bindEvents();
 
   return {

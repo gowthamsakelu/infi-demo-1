@@ -282,3 +282,20 @@ export function bindSheet(overlay, panel, onClose, handleSelector = '.filter-han
     overlay.removeEventListener('focusin', focus);
   };
 }
+
+
+/** Skeleton rows with the same dimensions as real rows. */
+export function skeletonCards(n = 5) {
+  return Array.from({ length: n }, () => `
+    <div class="skel-card" aria-hidden="true">
+      <div class="skel skel-avatar"></div>
+      <div class="skel-lines"><div class="skel" style="width:70%"></div><div class="skel" style="width:90%"></div><div class="skel" style="width:55%"></div></div>
+      <div class="skel-btns"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+    </div>`).join('');
+}
+export function skeletonRows(cols, n = 8) {
+  return Array.from({ length: n }, () => `<tr class="skel-row" aria-hidden="true">${Array.from({ length: cols }, () => '<td><div class="skel"></div></td>').join('')}</tr>`).join('');
+}
+export function errorState({ title, text, retryId }) {
+  return `<div class="state-box is-error" role="alert"><h4>${esc(title)}</h4><p>${esc(text)}</p><button class="btn-secondary-desktop" id="${retryId}" style="height:36px;">Try again</button></div>`;
+}
