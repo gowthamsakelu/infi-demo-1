@@ -1,6 +1,6 @@
 // Schedule / Follow-up: the same shared sheet as Assign (bottom sheet below 1100px, centered modal above).
 import { icon } from './icons.js';
-import { esc, toast, dismissOnOutside, bindSheet } from './ui.js';
+import { esc, toast, dismissOnOutside, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { addFollowUpLocal } from './followups.js';
 
@@ -12,6 +12,7 @@ let overlay = null;
 let dispose = null;
 let recognition = null;
 let lastFocus = null;
+let unlockScroll = null;
 
 const pad = (n) => String(n).padStart(2, '0');
 const isoDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -83,7 +84,9 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
       </footer>
     </div>`;
   document.body.appendChild(overlay);
-  setTimeout(() => overlay?.classList.add('open'), 10);
+  unlockScroll = lockScroll();
+  const shown = overlay;
+  afterPaint(() => shown.classList.add('open'));
 
   const $ = (s) => overlay.querySelector(s);
   const comment = $('#fu-comment');
@@ -130,7 +133,8 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
   const stopOutside = dismissOnOutside($('.fu-card'), closeFollowUpModal);
   const stopSheet = bindSheet(overlay, $('.fu-card'), closeFollowUpModal);
   dispose = () => { stopOutside(); stopSheet(); outcome.close(); };
-  $('.sheet-close-btn').focus({ preventScroll: true });
+  $('.fu-card').tabIndex = -1;
+  $('.fu-card').focus({ preventScroll: true }); // the dialog, not a field
 
   async function save() {
     const date = $('#fu-date').value;
@@ -178,10 +182,13 @@ export function closeFollowUpModal() {
   recognition = null;
   dispose?.();
   const el = overlay;
+  const unlock = unlockScroll;
   overlay = null;
+  unlockScroll = null;
   el.classList.remove('open');
-  setTimeout(() => el.remove(), 200);
-  lastFocus?.focus?.();
+  el.classList.add('closing');
+  afterTransition(el.querySelector('.fu-card'), 380).then(() => { el.remove(); unlock?.(); });
+  lastFocus?.focus?.({ preventScroll: true });
 }
 
 function trapTab(e) {

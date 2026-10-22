@@ -1,7 +1,7 @@
 // List components shared by the Bookings and Inquiries pages (desktop + mobile):
 // scrolling status tabs, avatar, mobile row card, desktop action cell, bulk bar, quick note, row menus.
 import { icon } from './icons.js';
-import { esc, initials, contactButtons, rowMenuButton, checkbox } from './ui.js';
+import { esc, initials, contactButtons, rowMenuButton, checkbox, openRowMenu } from './ui.js';
 
 /* ---------- Status tabs (one component; horizontal scroll on mobile) ---------- */
 
@@ -133,46 +133,45 @@ export function mobileRowCard(b) {
 
 export function bulkBar(prefix, { desktop = false } = {}) {
   return `
-    <div class="mobile-selection-bar bulk-bar ${desktop ? 'desktop-selection-bar' : ''}" id="${prefix}-selection-bar" style="display:none;">
-      <div class="bulk-count-wrap">
-        <button type="button" class="bulk-count-btn" id="${prefix}-count-btn" aria-haspopup="menu" aria-expanded="false">
-          <span id="${prefix}-selected-count">0 selected</span>${icon('chevronDown', { size: 14, stroke: 2.5 })}
-        </button>
-        <div class="bulk-more-dropdown" id="${prefix}-count-menu" role="menu" style="display:none;">
-          <button class="dropdown-item-btn" role="menuitem" data-bulk-select-all>${icon('check', { size: 15 })}<span>Select all</span></button>
-          <div class="dropdown-divider"></div>
-          <button class="dropdown-item-btn item-danger" role="menuitem" data-bulk-clear>${icon('close', { size: 14 })}<span>Clear selection</span></button>
+    <div class="bulk-wrap" id="${prefix}-bulk-wrap" inert>
+      <div class="bulk-collapse">
+        <div class="mobile-selection-bar bulk-bar ${desktop ? 'desktop-selection-bar' : ''}" id="${prefix}-selection-bar">
+          <button type="button" class="bulk-count-btn" id="${prefix}-count-btn" aria-haspopup="menu" aria-expanded="false">
+            <span id="${prefix}-selected-count">0 selected</span>${icon('chevronDown', { size: 14, stroke: 2.5 })}
+          </button>
+          <div class="bulk-actions">
+            <button type="button" class="btn-primary-desktop bulk-assign-btn" data-bulk-assign>${icon('assign', { size: 16 })}<span>Assign</span></button>
+          </div>
         </div>
-      </div>
-      <div class="bulk-actions">
-        <button type="button" class="btn-primary-desktop bulk-assign-btn" data-bulk-assign>${icon('assign', { size: 16 })}<span>Assign</span></button>
       </div>
     </div>`;
 }
 
-/** Wire the bulk bar's count menu (Select all / Clear). Returns nothing; actions call back. */
+/** Wire the bulk bar: the count menu (Select all / Clear) and Assign. */
 export function bindBulkBar(root, prefix, { onSelectAll, onClear, onAssign }) {
   const btn = root.querySelector(`#${prefix}-count-btn`);
-  const menu = root.querySelector(`#${prefix}-count-menu`);
   if (!btn) return;
-  const set = (open) => { menu.style.display = open ? 'block' : 'none'; btn.setAttribute('aria-expanded', open); };
-  btn.addEventListener('click', (e) => { e.stopPropagation(); set(menu.style.display === 'none'); });
-  document.addEventListener('mousedown', (e) => { if (!menu.contains(e.target) && !btn.contains(e.target)) set(false); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false); });
-  menu.addEventListener('click', (e) => {
-    set(false);
-    if (e.target.closest('[data-bulk-select-all]')) onSelectAll();
-    if (e.target.closest('[data-bulk-clear]')) onClear();
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openRowMenu(btn, [
+      { key: 'all', label: 'Select all', icon: 'check' },
+      { key: 'clear', label: 'Clear selection', icon: 'close', danger: true },
+    ], (key) => (key === 'all' ? onSelectAll() : onClear()));
   });
   root.querySelector(`#${prefix}-selection-bar`).addEventListener('click', (e) => {
     if (e.target.closest('[data-bulk-assign]')) onAssign();
   });
 }
 
+/** Slide the bar in/out (grid-rows 0fr -> 1fr) and update the count in place. */
 export function updateBulkBar(root, prefix, selectedCount) {
-  const bar = root.querySelector(`#${prefix}-selection-bar`);
-  if (!bar) return;
-  bar.style.display = selectedCount > 0 ? 'flex' : 'none';
-  const c = root.querySelector(`#${prefix}-selected-count`);
-  if (c) c.textContent = `${selectedCount} selected`;
+  const wrap = root.querySelector(`#${prefix}-bulk-wrap`);
+  if (!wrap) return;
+  const open = selectedCount > 0;
+  if (open) wrap.removeAttribute('inert'); else wrap.setAttribute('inert', '');
+  wrap.classList.toggle('is-open', open);
+  if (open) {
+    const c = root.querySelector(`#${prefix}-selected-count`);
+    if (c) c.textContent = `${selectedCount} selected`;
+  }
 }

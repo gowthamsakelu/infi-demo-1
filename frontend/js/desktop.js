@@ -587,7 +587,7 @@ export function createDesktopView(container) {
 
   const checkboxCell = (b) => `
     <td style="width: 44px; padding-left: 20px; padding-right: 0;" class="td-checkbox-cell">
-      <div class="custom-checkbox card-select-checkbox ${b.selected ? 'checked' : ''}" data-desktop-select-id="${b.id}" role="checkbox" aria-checked="${!!b.selected}" aria-label="Select ${esc(b.guest.name)}" tabindex="0">${b.selected ? icon('check', { size: 12, stroke: 3 }) : ''}</div>
+      <div class="custom-checkbox card-select-checkbox ${b.selected ? 'checked' : ''}" data-desktop-select-id="${b.id}" role="checkbox" aria-checked="${!!b.selected}" aria-label="Select ${esc(b.guest.name)}" tabindex="0">${icon('check', { size: 12, stroke: 3 })}</div>
     </td>`;
   const actionCell = (b) => `<td style="text-align: right; padding-right: 20px;"><div class="desktop-action-btn-group">${rowActionButtons(b, 14)}</div></td>`;
   // Same customer cell on both pages: avatar, name + category tag, phone.
@@ -659,6 +659,22 @@ export function createDesktopView(container) {
           <div class="card-action-btns-row" style="gap: 5px;">${rowActionButtons(b, 13, 'width: 28px; height: 28px;')}</div>
         </div>
       </div>`;
+  }
+
+  // Update selection visuals in place (no re-render, so rows never remount or shift).
+  function syncSelectionUI() {
+    container.querySelectorAll('[data-desktop-row-id]').forEach((tr) => {
+      const b = bookings.find(x => x.id === tr.dataset.desktopRowId);
+      if (!b) return;
+      tr.classList.toggle('row-checked', !!b.selected);
+      const cb = tr.querySelector('.custom-checkbox');
+      cb.classList.toggle('checked', !!b.selected);
+      cb.setAttribute('aria-checked', !!b.selected);
+    });
+    const n = bookings.filter(b => b.selected).length;
+    const th = container.querySelector('#desktop-th-select-all');
+    if (th) { th.classList.toggle('checked', n > 0); th.setAttribute('aria-checked', n > 0); }
+    updateBulkBar(container, 'desktop', n);
   }
 
   function renderTable() {
@@ -1570,8 +1586,8 @@ export function createDesktopView(container) {
 
     // Bulk bar: select all / clear / search / filter / Assign
     bindBulkBar(container, 'desktop', {
-      onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); renderTable(); },
-      onClear: () => { bookings.forEach(b => { b.selected = false; }); renderTable(); },
+      onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); syncSelectionUI(); },
+      onClear: () => { bookings.forEach(b => { b.selected = false; }); syncSelectionUI(); },
       onAssign: () => assignSelected(),
     });
 
@@ -2006,7 +2022,7 @@ export function createDesktopView(container) {
         const b = bookings.find(item => item.id === id);
         if (b) {
           b.selected = !b.selected;
-          renderTable();
+          syncSelectionUI();
         }
         return;
       }
@@ -2017,7 +2033,7 @@ export function createDesktopView(container) {
         e.stopPropagation();
         const anyUnselected = bookings.some(b => !b.selected);
         bookings.forEach(b => b.selected = anyUnselected);
-        renderTable();
+        syncSelectionUI();
         return;
       }
 

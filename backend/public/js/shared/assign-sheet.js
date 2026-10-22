@@ -2,13 +2,13 @@
 // Bottom sheet on phones, centered modal on larger screens (CSS decides); same markup everywhere.
 import { STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST } from '../data.js';
 import { icon } from './icons.js';
-import { esc, toast, initials, dismissOnOutside, openWhatsApp, bindSheet } from './ui.js';
+import { esc, toast, initials, dismissOnOutside, openWhatsApp, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { applyInquiryUpdates } from './inquiry-store.js';
 
 const TABS = ['Team Members', 'Vendors', 'Contacts'];
 const ADD_LABEL = { 'Team Members': 'Add New Team Member', Vendors: 'Add New Vendor', Contacts: 'Add New Contact' };
-const SEARCH_HINT = { 'Team Members': 'Search team member by name, role or phone...', Vendors: 'Search vendor by name, service or phone...', Contacts: 'Search contact by name, role or phone...' };
+const SEARCH_HINT = { 'Team Members': 'Search team members...', Vendors: 'Search vendors...', Contacts: 'Search contacts...' };
 
 const FILTERS = {
   'Team Members': [
@@ -85,7 +85,9 @@ export function openAssign({ kind, items, onDone }) {
       </div>
     </div>`;
   document.body.appendChild(ov);
-  setTimeout(() => ov.classList.add('open'), 10);
+  const unlock = lockScroll();
+  const trigger = document.activeElement;
+  afterPaint(() => ov.classList.add('open'));
 
   const $ = (s) => ov.querySelector(s);
   const dd = createDropdown({ options: () => FILTERS[tab], onChange: (v) => { filter = v; renderList(); }, variant: 'icon', ariaLabel: 'Filter list' });
@@ -130,7 +132,7 @@ export function openAssign({ kind, items, onDone }) {
     }
     const pick = e.target.closest('[data-asg-pick]');
     if (pick) { selected = people(tab).find((p) => p.id === pick.dataset.asgPick); renderList(); return; }
-    if (e.target.closest('[data-asg-add]')) { adding = !adding; $('#asg-add-form').hidden = !adding; if (adding) $('#asg-add-form input').focus(); return; }
+    if (e.target.closest('[data-asg-add]')) { adding = !adding; $('#asg-add-form').hidden = !adding; return; }
     if (e.target.closest('[data-asg-submit]')) submit();
   });
   ov.addEventListener('keydown', (e) => {
@@ -153,7 +155,9 @@ export function openAssign({ kind, items, onDone }) {
     selected = p; adding = false; e.target.reset(); e.target.hidden = true;
     renderList();
   });
-  $('#asg-search').focus({ preventScroll: true });
+  // Focus the dialog itself, never a field: the keyboard opens only when the user taps one.
+  $('.asg-sheet').tabIndex = -1;
+  $('.asg-sheet').focus({ preventScroll: true });
 
   async function submit() {
     if (!selected) return toast('Choose who to assign to.', 'info');
@@ -185,15 +189,17 @@ export function openAssign({ kind, items, onDone }) {
     }
   }
 
-  current = { ov, stop, dd };
+  current = { ov, stop, dd, unlock, trigger };
 }
 
 export function closeAssign() {
   if (!current) return;
-  current.stop();
-  current.dd.close();
-  const { ov } = current;
+  const { ov, stop, dd, unlock, trigger } = current;
   current = null;
+  stop();
+  dd.close();
   ov.classList.remove('open');
-  setTimeout(() => ov.remove(), 200);
+  ov.classList.add('closing');
+  afterTransition(ov.querySelector('.asg-sheet'), 380).then(() => { ov.remove(); unlock(); });
+  trigger?.focus?.({ preventScroll: true });
 }

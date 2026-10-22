@@ -1,6 +1,47 @@
 // Shared list-page building blocks used by Bookings and Inquiries (desktop + mobile).
 import { icon } from './icons.js';
 
+/** Run `fn` after the browser has painted the start state (double rAF, with a timer fallback). */
+export function afterPaint(fn) {
+  let done = false;
+  const run = () => { if (!done) { done = true; fn(); } };
+  requestAnimationFrame(() => requestAnimationFrame(run));
+  setTimeout(run, 60);
+}
+
+/** Resolve after a CSS transition on `el` ends (or after `ms` as a safety net). */
+export function afterTransition(el, ms = 360) {
+  return new Promise((resolve) => {
+    let done = false;
+    const end = () => { if (!done) { done = true; el.removeEventListener('transitionend', onEnd); resolve(); } };
+    const onEnd = (e) => { if (e.target === el) end(); };
+    el.addEventListener('transitionend', onEnd);
+    setTimeout(end, ms);
+  });
+}
+
+let lockCount = 0;
+let lockedScroll = 0;
+/** Lock page scroll for overlays without a layout jump (no scrollbar shift). Returns an unlock fn. */
+export function lockScroll() {
+  if (lockCount++ === 0) {
+    const sbw = window.innerWidth - document.documentElement.clientWidth;
+    lockedScroll = window.scrollY;
+    document.body.style.setProperty('--sbw', `${sbw}px`);
+    document.body.classList.add('scroll-locked');
+  }
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    if (--lockCount === 0) {
+      document.body.classList.remove('scroll-locked');
+      document.body.style.removeProperty('--sbw');
+      window.scrollTo(0, lockedScroll);
+    }
+  };
+}
+
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function toast(message, type = 'info') {
@@ -98,7 +139,7 @@ export function selectionBar({ prefix, desktop }) {
 }
 
 export function checkbox({ checked, attr, id, label }) {
-  return `<div class="custom-checkbox card-select-checkbox ${checked ? 'checked' : ''}" ${attr}="${esc(id)}" role="checkbox" aria-checked="${!!checked}" aria-label="${esc(label)}" tabindex="0">${checked ? icon('check', { size: 12, stroke: 3 }) : ''}</div>`;
+  return `<div class="custom-checkbox card-select-checkbox ${checked ? 'checked' : ''}" ${attr}="${esc(id)}" role="checkbox" aria-checked="${!!checked}" aria-label="${esc(label)}" tabindex="0">${icon('check', { size: 12, stroke: 3 })}</div>`;
 }
 
 /** Close `el` on outside click or Esc. Returns a disposer. */
@@ -123,17 +164,19 @@ export function dismissOnOutside(el, onClose, ignore = []) {
  * items: [{ key, label, icon, danger }]
  */
 let activeMenu = null;
-export function closeRowMenu() { activeMenu?.close(); }
+export function closeRowMenu(instant = false) { activeMenu?.close(instant); }
 
 export function openRowMenu(trigger, items, onSelect) {
-  closeRowMenu();
+  closeRowMenu(true);
   const menu = document.createElement('div');
   menu.className = 'bulk-more-dropdown row-floating-menu';
   menu.setAttribute('role', 'menu');
+  menu.tabIndex = -1;
   menu.innerHTML = items.map((it) => `
     <button class="dropdown-item-btn ${it.danger ? 'item-danger' : ''}" role="menuitem" data-menu-key="${it.key}">
       ${icon(it.icon, { size: 15 })}<span>${esc(it.label)}</span>
     </button>`).join('');
+  menu.style.visibility = 'hidden';
   document.body.appendChild(menu);
 
   const r = trigger.getBoundingClientRect();
@@ -141,16 +184,21 @@ export function openRowMenu(trigger, items, onSelect) {
   const mh = menu.offsetHeight;
   const left = Math.max(8, Math.min(r.right - mw, window.innerWidth - mw - 8));
   const nav = document.querySelector('.mobile-bottom-nav');
-  const navTop = nav && nav.offsetParent !== null ? nav.getBoundingClientRect().top : window.innerHeight;
+  const navTop = nav && nav.getClientRects().length ? nav.getBoundingClientRect().top : window.innerHeight;
   const limit = Math.min(window.innerHeight, navTop) - 8;
-  const top = r.bottom + 6 + mh > limit ? Math.max(8, r.top - mh - 6) : r.bottom + 6;
+  const up = r.bottom + 6 + mh > limit;
+  const top = up ? Math.max(8, r.top - mh - 6) : r.bottom + 6;
   menu.style.left = `${left}px`;
   menu.style.top = `${top}px`;
+  // Grow from the trigger: origin is the trigger centre relative to the menu.
+  menu.style.transformOrigin = `${Math.round(r.left + r.width / 2 - left)}px ${up ? '100%' : '0'}`;
+  menu.style.visibility = '';
 
   trigger.setAttribute('aria-expanded', 'true');
-  menu.querySelector('button')?.focus();
+  afterPaint(() => menu.classList.add('open'));
+  menu.focus({ preventScroll: true }); // the menu itself, never an input
 
-  const dispose = dismissOnOutside(menu, close, [trigger]);
+  const dispose = dismissOnOutside(menu, () => close(), [trigger]);
   // Close when the page scrolls the trigger away from where the menu was placed.
   const onScroll = () => {
     const now = trigger.getBoundingClientRect();
@@ -172,14 +220,20 @@ export function openRowMenu(trigger, items, onSelect) {
     if (e.key === 'ArrowUp') { e.preventDefault(); btns[(i - 1 + btns.length) % btns.length].focus(); }
   });
 
-  function close() {
+  let closed = false;
+  function close(instant = false) {
+    if (closed) return;
+    closed = true;
     dispose();
     window.removeEventListener('resize', onScroll);
     window.removeEventListener('scroll', onScroll, true);
     trigger.setAttribute('aria-expanded', 'false');
-    menu.remove();
     if (activeMenu && activeMenu.menu === menu) activeMenu = null;
-    if (document.activeElement === document.body) trigger.focus();
+    if (instant) { menu.remove(); return; }
+    menu.classList.remove('open');
+    menu.classList.add('closing');
+    afterTransition(menu, 220).then(() => menu.remove());
+    if (document.activeElement === document.body || menu.contains(document.activeElement)) trigger.focus({ preventScroll: true });
   }
   activeMenu = { menu, close };
 }
@@ -215,6 +269,7 @@ export function bindSheet(overlay, panel, onClose, handleSelector = '.filter-han
     overlay.style.top = `${vv.offsetTop}px`;
     overlay.style.bottom = 'auto';
     overlay.style.height = `${vv.height}px`;
+    overlay.style.setProperty('--ov-h', `${vv.height}px`);
   };
   const focus = (e) => { if (e.target.matches('input, textarea, select')) setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 250); };
   vv?.addEventListener('resize', fit);

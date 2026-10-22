@@ -553,6 +553,19 @@ export function createMobileView(container, options = {}) {
   const tabDefs = () => (page === 'inquiries' ? INQUIRY_TABS : BOOKING_TABS);
   const allKey = () => tabDefs()[0].key;
 
+  // Update selection visuals in place (no re-render, so cards never remount or shift).
+  function syncSelectionUI() {
+    container.querySelectorAll('.list-row-card').forEach((card) => {
+      const b = bookings.find(x => x.id === card.dataset.bookingId);
+      if (!b) return;
+      card.classList.toggle('card-selected', !!b.selected);
+      const cb = card.querySelector('.card-select-checkbox');
+      cb.classList.toggle('checked', !!b.selected);
+      cb.setAttribute('aria-checked', !!b.selected);
+    });
+    updateBulkBar(container, 'mobile', bookings.filter(b => b.selected).length);
+  }
+
   function renderCards() {
     const listEl = container.querySelector('#mobile-cards-list');
     if (!listEl) return;
@@ -1698,8 +1711,8 @@ export function createMobileView(container, options = {}) {
 
     // Bulk bar: select all / clear / search / filter / Assign
     bindBulkBar(container, 'mobile', {
-      onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); renderCards(); },
-      onClear: () => { bookings.forEach(b => { b.selected = false; }); renderCards(); },
+      onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); syncSelectionUI(); },
+      onClear: () => { bookings.forEach(b => { b.selected = false; }); syncSelectionUI(); },
       onAssign: () => assignSelected(),
     });
 
@@ -2225,7 +2238,7 @@ export function createMobileView(container, options = {}) {
         const b = bookings.find(item => item.id === id);
         if (b) {
           b.selected = !b.selected;
-          renderCards();
+          syncSelectionUI();
         }
         return;
       }

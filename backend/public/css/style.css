@@ -6325,3 +6325,98 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .list-row-card.is-inquiry .row-name-line .card-title { max-width: 100%; }
 @media (max-width: 374px) { .list-row-card.is-inquiry .card-right-col { width: auto; min-width: 0; } }
 .list-row-card.is-inquiry { padding-left: 10px; padding-right: 10px; }
+
+/* ==========================================================================
+   v6: one motion system (tokens), smooth selection bar, phone cleanup
+   Animate transform + opacity only. Start state is painted before the "open" class is added.
+   ========================================================================== */
+:root {
+  --motion-fast: 150ms;
+  --motion-base: 260ms;
+  --motion-slow: 320ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+@keyframes motionFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes motionPopIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes motionSlideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+body.scroll-locked { overflow: hidden; padding-right: var(--sbw, 0px); }
+
+/* ⋮ menu: grows from the trigger, same on exit */
+.row-floating-menu { opacity: 0; transform: scale(0.96); transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); outline: none; }
+.row-floating-menu.open { opacity: 1; transform: none; }
+.row-floating-menu.closing { opacity: 0; transform: scale(0.96); pointer-events: none; transition-timing-function: var(--ease-in); }
+.dd-list:not([hidden]) { animation: motionPopIn var(--motion-fast) var(--ease-out); transform-origin: top right; }
+.dd-list.dd-up:not([hidden]) { transform-origin: bottom right; }
+.toast { animation-duration: var(--motion-base); animation-timing-function: var(--ease-out); }
+
+/* Sheets: backdrop fades, panel slides up (Assign, Follow-up; detail sheet below) */
+.asg-overlay { opacity: 0; transition: opacity var(--motion-base) var(--ease-out); }
+.asg-overlay.open { opacity: 1; }
+.asg-overlay:not(.open) { pointer-events: none; }
+.asg-sheet { transform: translateY(100%); transition: transform var(--motion-slow) var(--ease-out); max-height: min(92dvh, calc(var(--ov-h, 100dvh) * 0.96)); outline: none; }
+.asg-overlay.open .asg-sheet { transform: none; }
+.asg-overlay:not(.open) .asg-sheet { transition-timing-function: var(--ease-in); }
+.fu-card.asg-sheet { transform: translateY(100%); }
+.fu-overlay.open .fu-card.asg-sheet { transform: none; }
+@media (min-width: 1100px) {
+  .asg-sheet, .fu-card.asg-sheet { transform: translateY(16px) scale(0.98); opacity: 0; transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out); }
+  .asg-overlay.open .asg-sheet, .fu-overlay.open .fu-card.asg-sheet { transform: none; opacity: 1; }
+}
+@media (min-width: 700px) and (max-width: 1099px) { .asg-sheet:not(.fu-card) { transform: translateY(16px) scale(0.98); opacity: 0; transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out); } .asg-overlay.open .asg-sheet:not(.fu-card) { transform: none; opacity: 1; } }
+@media (max-width: 699px) {
+  .phone-device .bottom-sheet, .phone-device .bottom-sheet:not(.open) { transition: transform var(--motion-slow) var(--ease-out), visibility 0s linear var(--motion-slow) !important; }
+  .phone-device .bottom-sheet.open { transition: transform var(--motion-slow) var(--ease-out), visibility 0s !important; }
+  .sheet-backdrop { transition: opacity var(--motion-base) var(--ease-out); }
+}
+.desktop-workspace-split .desktop-details-drawer { transition: opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), visibility 0s linear var(--motion-base) !important; }
+.desktop-workspace-split .desktop-details-drawer.open { transition: opacity var(--motion-base) var(--ease-out) 40ms, transform var(--motion-base) var(--ease-out) 40ms, visibility 0s !important; }
+
+/* Selection bar: space and bar animate together, so the list glides instead of snapping */
+.bulk-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--motion-base) var(--ease-out); }
+.bulk-wrap.is-open { grid-template-rows: 1fr; }
+.bulk-collapse { overflow: hidden; min-height: 0; }
+.bulk-wrap:not(.is-open) .bulk-collapse { visibility: hidden; transition: visibility 0s linear var(--motion-base); }
+.bulk-collapse .bulk-bar { margin-bottom: 0; padding: 8px 0 12px; opacity: 0; transform: translateY(-8px); transition: opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out); }
+.bulk-wrap.is-open .bulk-bar { opacity: 1; transform: none; }
+.desktop-full-table-view .bulk-collapse .bulk-bar { padding-left: 20px; padding-right: 20px; }
+
+/* Checkbox + selected row: quick check animation, fading highlight, no layout shift */
+.custom-checkbox { transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); }
+.custom-checkbox svg { opacity: 0; transform: scale(0.5); transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); }
+.custom-checkbox.checked { transform: scale(1.04); }
+.custom-checkbox.checked svg { opacity: 1; transform: none; }
+.booking-card { transition: background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out); }
+.bookings-table tbody tr { transition: background-color var(--motion-base) var(--ease-out); }
+
+/* Inputs must be 16px on touch screens, or iOS zooms the page on focus */
+@media (pointer: coarse) {
+  .search-input-wrapper input, .quick-note input, .vendor-search-input-box input, .optional-note-input,
+  .asg-add-form input, .fu-field textarea, .fu-field select, .fu-picker input, .table-toolbar-search-box input { font-size: 16px; }
+}
+
+/* ---- Phones (~360px): touch-size buttons, room for names, reachable last row ---- */
+@media (max-width: 699px) {
+  :root { --row-btn: 36px; }
+  .mobile-screen-content { padding-bottom: calc(104px + var(--safe-bottom)); }
+  .list-row-card .card-action-btns-row { gap: 6px; }
+}
+@media (max-width: 379px) {
+  .list-row-card.is-inquiry .card-right-col { width: auto; min-width: 0; }
+  .list-row-card.is-inquiry .card-right-col .quick-note { display: none; }
+  .list-row-card .qn-row { display: flex; }
+}
+@media (min-width: 380px) { .list-row-card .qn-row { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 100ms; --motion-base: 120ms; --motion-slow: 120ms; }
+  .row-floating-menu, .row-floating-menu.closing, .asg-sheet, .fu-card.asg-sheet, .bulk-collapse .bulk-bar,
+  .dd-list:not([hidden]), .custom-checkbox svg, .custom-checkbox.checked { transform: none !important; animation: none !important; }
+  .asg-overlay.open .asg-sheet, .asg-sheet { transform: none !important; }
+  .phone-device .bottom-sheet, .phone-device .bottom-sheet:not(.open) { transform: none !important; opacity: 0; transition: opacity var(--motion-base) linear, visibility 0s linear var(--motion-base) !important; }
+  .phone-device .bottom-sheet.open { opacity: 1; }
+}
+@media (min-width: 700px) { .asg-sheet { max-height: min(86dvh, 720px, calc(var(--ov-h, 100dvh) * 0.96)); } }
+@media (max-width: 380px) { .dd-trigger { max-width: 164px; } }
+.list-row-card .row-name-line { flex-wrap: wrap; row-gap: 2px; } .list-row-card .row-name-line .card-title { max-width: 100%; }

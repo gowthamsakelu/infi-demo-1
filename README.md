@@ -132,7 +132,8 @@ The app has no login yet. Actions are recorded for staff member `ST-05` unless `
 
 - **One component per job.** Bookings and Inquiries share the row, action cell (Phone, WhatsApp, ⋮), ⋮ menu, category dropdown, status tabs, bulk bar, bottom sheets, Assign sheet and detail pane. They live in `backend/public/js/shared/`.
 - **Icons** come from `shared/icons.js` only.
-- **Tokens** such as row sizes and safe-area insets are CSS variables, defined at the top of the "v3" section of `style.css`.
+- **Tokens** such as row sizes, safe-area insets and motion timings (`--motion-fast`, `--motion-base`, `--motion-slow`, `--ease-out`) are CSS variables in `style.css`. Every overlay animates only `transform` and `opacity` with these tokens, and respects reduced-motion.
+- **No automatic keyboard.** Sheets and menus never focus an input when they open; focus goes to the dialog itself.
 - **Breakpoints:** phones below 700px, tablets from 700px to 1099px, desktop from 1100px. Layout changes use CSS media queries.
 - **Touch:** controls are at least 40px on touch screens, and nothing depends on hover.
 
@@ -153,7 +154,7 @@ php artisan route:list
 - **"No application encryption key"** – run `php artisan key:generate`.
 - **"no such table: cache"** – run `php artisan migrate`, or set `CACHE_STORE=file` in `.env`.
 - **Inquiries stay empty or show an error** – the page needs the Laravel server for its API. Open it through `php artisan serve`, not as a static file.
-- **Old screens after an update** – hard-refresh the browser, because the JavaScript modules are cached.
+- **Old screens after an update** – the entry CSS and JS URLs carry a version based on file times, and `public/.htaccess` makes browsers revalidate scripts and styles, so a redeploy is picked up on the next load. If a phone still shows an old screen, reload once.
 - **Reset the sample data** – run `php artisan migrate:fresh --seed`.
 
 ## Notes

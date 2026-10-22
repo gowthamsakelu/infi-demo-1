@@ -54,7 +54,7 @@ export function createDropdown({ options, onChange, variant = 'labelled', ariaLa
     closeList(false);
     open = { host, dispose: dismissOnOutside(host, () => closeList(true)) };
     render();
-    host.querySelector('li.selected')?.focus();
+    host.querySelector('li.selected')?.focus({ preventScroll: true });
   }
   function closeList(refocus) {
     if (!open) return;
