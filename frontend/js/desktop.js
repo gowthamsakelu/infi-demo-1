@@ -8,6 +8,8 @@ import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } fro
 import { openFollowUpModal } from './shared/followup-modal.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
+import { openEventDialog, openDayDialog, commit } from './shared/itinerary-dialog.js';
+import { daysOf, persist, renumber, EVENT_TYPES } from './shared/itinerary.js';
 import { matchesCategory } from './shared/booking-filters.js';
 
 export function createDesktopView(container) {
@@ -311,7 +313,7 @@ export function createDesktopView(container) {
               <label>Add Custom Requirement</label>
               <div style="display: flex; gap: 8px;">
                 <input type="text" id="desktop-modal-custom-req-input" placeholder="e.g. Extra pillows, Non-smoking room" style="flex: 1;" />
-                <button class="btn-primary-desktop" id="desktop-btn-add-custom-req" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">+ Add</button>
+                <button class="btn-primary-desktop" id="desktop-btn-add-custom-req" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">Add</button>
               </div>
             </div>
           </div>
@@ -376,83 +378,6 @@ export function createDesktopView(container) {
         </div>
       </div>
 
-      <!-- Desktop Modal 4: Add Itinerary Event -->
-      <div class="modal-overlay" id="desktop-add-event-modal">
-        <div class="modal-card">
-          <div class="modal-header">
-            <h3>Add Itinerary Event</h3>
-            <button class="sheet-close-btn" id="close-desktop-modal-add-event-btn" style="position: static;">✕</button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <label>Select Day</label>
-              <select id="desktop-modal-add-event-day-select"></select>
-            </div>
-            <div class="form-group">
-              <label>Event Title</label>
-              <input type="text" id="desktop-modal-add-event-title" placeholder="e.g. Sunset Boat Cruise & Tea" />
-            </div>
-            <div class="form-group">
-              <label>Time & Subtitle / Location</label>
-              <input type="text" id="desktop-modal-add-event-subtitle" placeholder="e.g. 05:30 PM • 1-hour cruise with DJ" />
-            </div>
-            <div class="form-group">
-              <label>Category / Icon</label>
-              <select id="desktop-modal-add-event-type">
-                <option value="sightseeing">Sightseeing / Tour</option>
-                <option value="transport">Transport / Bus</option>
-                <option value="hotel">Hotel / Accommodation</option>
-                <option value="activity">Sport / Adventure</option>
-                <option value="food">Restaurant / Meal</option>
-              </select>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="action-pill-btn" id="desktop-btn-cancel-add-event">Cancel</button>
-            <button class="btn-primary-desktop" id="desktop-btn-submit-add-event" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Add to Itinerary</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Desktop Modal 5: Assign Coordinator / Vendor -->
-      <div class="modal-overlay" id="desktop-assign-modal">
-        <div class="modal-card" style="width: 520px;">
-          <div class="modal-header">
-            <h3>Assign Activity</h3>
-            <button class="sheet-close-btn" id="close-desktop-assign-modal-btn" style="position: static;">✕</button>
-          </div>
-          <div class="modal-body">
-            <!-- Selected Activity Preview Card (Matches Mobile Screen 3) -->
-            <div class="assign-activity-card" id="desktop-assign-activity-card" style="margin: 0 0 14px 0; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 12px;">
-              <div style="width: 38px; height: 38px; border-radius: 10px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" id="desktop-assign-activity-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              </div>
-              <div style="flex: 1; min-width: 0;">
-                <h4 id="desktop-assign-activity-title" style="margin: 0; font-size: 13.5px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Activity Title</h4>
-                <p id="desktop-assign-activity-subtitle" style="margin: 2px 0 0 0; font-size: 12px; color: #64748B;">Time & Location</p>
-              </div>
-              <span class="tag-activity-pill" id="desktop-assign-activity-category" style="padding: 3px 8px; border-radius: 9999px; background: #EFF6FF; color: #2563EB; font-size: 11px; font-weight: 700; text-transform: uppercase;">ACTIVITY</span>
-            </div>
-
-            <div class="form-group">
-              <label>Select Assignee Category</label>
-              <div class="assign-tabs-row" style="margin-bottom: 6px;">
-                <button class="assign-tab-btn active" id="desktop-assign-tab-team">Team Members</button>
-                <button class="assign-tab-btn" id="desktop-assign-tab-vendors">Vendors</button>
-                <button class="assign-tab-btn" id="desktop-assign-tab-contacts">Contacts</button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Choose Person / Supplier</label>
-              <div id="desktop-assign-picker-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;"></div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="action-pill-btn" id="desktop-btn-cancel-assign">Cancel</button>
-            <button class="btn-primary-desktop" id="desktop-btn-confirm-assign" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Confirm Assignment</button>
-          </div>
-        </div>
-      </div>
       <!-- Desktop Modal 6: Edit Customer Details (App-based Modal) -->
       <div class="modal-overlay" id="desktop-edit-customer-modal">
         <div class="modal-card" style="width: 520px; max-width: 95vw;">
@@ -555,7 +480,7 @@ export function createDesktopView(container) {
           </div>
           <div class="modal-footer" style="display: flex; gap: 8px; justify-content: flex-end;">
             <button class="action-pill-btn" id="desktop-btn-cancel-add-followup">Cancel</button>
-            <button class="btn-primary-desktop" id="desktop-btn-save-add-followup" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Log Follow-up</button>
+            <button class="btn-primary-desktop" id="desktop-btn-save-add-followup" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Log Follow-up</button>
           </div>
         </div>
       </div>
@@ -1133,21 +1058,16 @@ export function createDesktopView(container) {
               </div>
               <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
             </div>
-            <button class="btn-add-event-pill" id="desktop-add-event-btn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" x2="12" y1="5" y2="19"/>
-                <line x1="5" x2="19" y1="12" y2="12"/>
-              </svg>
-              + Add Event
-            </button>
+            <div class="itin-actions"><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button><button class="btn-add-event-pill" id="desktop-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
           </div>
 
           <div class="itinerary-v2-container">
-          ${days.map(d => `
+          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Add a day to start planning.</p><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button></div>` : ''}
+          ${days.map((d, dayIdx) => `
             <div class="itinerary-day-section">
               <div class="timeline-day-col">
                 <span class="day-badge-text">${d.day}</span>
-                <span class="day-date-sub">${d.date}</span>
+                <span class="day-date-sub">${d.date}</span>${d.title ? `<span class="day-title-sub">${esc(d.title)}</span>` : ''}<button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button>
               </div>
               <div class="timeline-track-col">
                 <div class="timeline-line-track"></div>
@@ -1308,7 +1228,7 @@ export function createDesktopView(container) {
       return `
         <button class="preset-chip-btn ${alreadyHas ? 'is-active' : ''}" data-desktop-preset-text="${p.text}" data-desktop-preset-icon="${p.icon}" data-desktop-preset-color="${p.color}">
           ${getSpecialReqIconSvg(p.icon, alreadyHas ? '#2563EB' : p.color)}
-          <span>${alreadyHas ? '✓ ' + p.text : '+ ' + p.text}</span>
+          <span>${alreadyHas ? '✓ ' + p.text : p.text}</span>
         </button>
       `;
     }).join('');
@@ -1418,28 +1338,7 @@ export function createDesktopView(container) {
     if (modal) modal.classList.remove('open');
   }
 
-  function openDesktopAddEventModal() {
-    const modal = container.querySelector('#desktop-add-event-modal');
-    const daySelect = container.querySelector('#desktop-modal-add-event-day-select');
-    const titleInput = container.querySelector('#desktop-modal-add-event-title');
-    const subtitleInput = container.querySelector('#desktop-modal-add-event-subtitle');
 
-    if (titleInput) titleInput.value = '';
-    if (subtitleInput) subtitleInput.value = '';
-
-    if (daySelect && activeBooking.itineraryDays) {
-      daySelect.innerHTML = activeBooking.itineraryDays.map((d, idx) => `
-        <option value="${idx}">${d.day} (${d.date})</option>
-      `).join('') + `<option value="new">+ Create New Day</option>`;
-    }
-
-    if (modal) modal.classList.add('open');
-  }
-
-  function closeDesktopAddEventModal() {
-    const modal = container.querySelector('#desktop-add-event-modal');
-    if (modal) modal.classList.remove('open');
-  }
 
   let isBulkAssign = false;
   let bulkSelectedBookings = [];
@@ -1455,22 +1354,26 @@ export function createDesktopView(container) {
     });
   }
 
-  function openDesktopAssignModal(item) {
-    if (!item) return;
-    modalActiveItem = item;
-    const modal = container.querySelector('#desktop-assign-modal');
-    const actTitle = container.querySelector('#desktop-assign-activity-title');
-    const actSubtitle = container.querySelector('#desktop-assign-activity-subtitle');
-    const actCat = container.querySelector('#desktop-assign-activity-category');
-    if (actTitle) actTitle.textContent = item.title;
-    if (actSubtitle) actSubtitle.textContent = item.subtitle;
-    if (actCat) actCat.textContent = (item.type || 'activity').toUpperCase();
-
-    renderDesktopAssignList(desktopAssignTab);
-    if (modal) modal.classList.add('open');
+  // Assign an itinerary event: the same shared Assign sheet as everywhere else, with the event as the summary card.
+  function assignItineraryItem(item) {
+    const rec = activeBooking;
+    if (!item || !rec) return;
+    const prev = item.assigned;
+    const t = EVENT_TYPES.find(x => x.value === item.type) || EVENT_TYPES[0];
+    openAssign({
+      kind: 'itinerary',
+      items: [{ id: item.id, title: item.title, name: item.title }],
+      summary: { title: item.title, subtitle: item.subtitle, badge: t.label.split(' / ')[0], iconHtml: icon(t.icon, { size: 22 }) },
+      onApply: (who) => { item.assigned = { isAssigned: true, name: who.name, avatar: who.avatar }; renderDetailPanel(); },
+      onRevert: () => { item.assigned = prev; renderDetailPanel(); },
+      persist: () => persist(rec, { onRollback: renderDetailPanel }),
+    });
   }
 
+  function openDesktopAssignModal(item) { assignItineraryItem(item); }
+
   function closeDesktopAssignModal() {
+    return;
     isBulkAssign = false;
     bulkSelectedBookings = [];
     const modal = container.querySelector('#desktop-assign-modal');
@@ -1770,6 +1673,7 @@ export function createDesktopView(container) {
         } else if (act === 'complete') {
           if (foundItem) {
             foundItem.completed = !foundItem.completed;
+            persist(activeBooking, { onRollback: renderDetailPanel });
             renderDetailPanel();
             window.dispatchEvent(new CustomEvent('show-toast', {
               detail: { 
@@ -1784,6 +1688,7 @@ export function createDesktopView(container) {
               const idx = d.items.indexOf(foundItem);
               if (idx !== -1) d.items.splice(idx, 1);
             });
+            persist(activeBooking, { onRollback: renderDetailPanel });
             renderDetailPanel();
             window.dispatchEvent(new CustomEvent('show-toast', {
               detail: { message: `Removed "${foundItem.title}" from itinerary`, type: 'info' }
@@ -1853,62 +1758,21 @@ export function createDesktopView(container) {
       }
 
       // Desktop Add Event Modal Triggers & Actions
-      if (e.target.closest('#desktop-add-event-btn')) {
-        openDesktopAddEventModal();
-        return;
-      }
-
-      if (e.target.closest('#desktop-btn-cancel-add-event') || e.target.closest('#close-desktop-modal-add-event-btn')) {
-        closeDesktopAddEventModal();
-        return;
-      }
-
-      if (e.target.closest('#desktop-btn-submit-add-event')) {
-        const dayVal = container.querySelector('#desktop-modal-add-event-day-select')?.value;
-        const title = container.querySelector('#desktop-modal-add-event-title')?.value?.trim();
-        const subtitle = container.querySelector('#desktop-modal-add-event-subtitle')?.value?.trim();
-        const type = container.querySelector('#desktop-modal-add-event-type')?.value || 'sightseeing';
-
-        if (!title) {
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: 'Please enter an event title.', type: 'warning' }
-          }));
-          return;
-        }
-
-        const newEvent = {
-          id: 'IT-EVT-' + Date.now(),
-          type,
-          icon: type === 'transport' ? 'bus' : type === 'hotel' ? 'bed' : type === 'activity' ? 'raft' : type === 'food' ? 'restaurant' : 'camera',
-          title,
-          subtitle: subtitle || 'Scheduled event',
-          assigned: null,
-          completed: false
-        };
-
-        if (activeBooking) {
-          activeBooking.itineraryDays = activeBooking.itineraryDays || [];
-
-          if (dayVal === 'new') {
-            const nextDayNum = activeBooking.itineraryDays.length + 1;
-            activeBooking.itineraryDays.push({
-              day: `Day ${nextDayNum}`,
-              date: 'TBD',
-              items: [newEvent]
-            });
-          } else {
-            const dIdx = parseInt(dayVal, 10);
-            if (activeBooking.itineraryDays[dIdx]) {
-              activeBooking.itineraryDays[dIdx].items.push(newEvent);
-            }
-          }
-
-          closeDesktopAddEventModal();
-          renderDetailPanel();
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Added "${title}" to itinerary!`, type: 'success' }
-          }));
-        }
+      if (e.target.closest('#desktop-add-event-btn')) { openEventDialog(activeBooking, { onChange: renderDetailPanel }); return; }
+      if (e.target.closest('[data-add-day]')) { openDayDialog(activeBooking, { onChange: renderDetailPanel }); return; }
+      const dayMenuBtn = e.target.closest('[data-day-menu]');
+      if (dayMenuBtn) {
+        e.stopPropagation();
+        const idx = Number(dayMenuBtn.dataset.dayMenu);
+        const rec = activeBooking;
+        openRowMenu(dayMenuBtn, [
+          { key: 'rename', label: 'Rename day', icon: 'edit' },
+          { key: 'delete', label: 'Delete day', icon: 'trash', danger: true },
+        ], (key) => {
+          if (key === 'rename') return openDayDialog(rec, { index: idx, onChange: renderDetailPanel });
+          if (daysOf(rec)[idx]?.items.length) return toast('Only empty days can be deleted. Remove its events first.', 'warning');
+          commit(rec, () => { daysOf(rec).splice(idx, 1); renumber(rec); }, renderDetailPanel, 'Day deleted');
+        });
         return;
       }
 
@@ -1962,6 +1826,7 @@ export function createDesktopView(container) {
           modalActiveItem.title = title;
           if (subtitle) modalActiveItem.subtitle = subtitle;
           if (type) modalActiveItem.type = type;
+          persist(activeBooking, { onRollback: renderDetailPanel });
           closeDesktopEditActivityModal();
           renderDetailPanel();
           window.dispatchEvent(new CustomEvent('show-toast', {

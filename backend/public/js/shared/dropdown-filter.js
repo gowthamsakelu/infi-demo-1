@@ -24,6 +24,7 @@ export function createDropdown({ options, onChange, variant = 'labelled', ariaLa
   let open = null; // { host, dispose }
   const id = `dd-${++uid}`;
   const opts = () => (typeof options === 'function' ? options() : options);
+  const selectedIcon = () => (opts().find((o) => o.value === value) || {}).icon;
   const labelOf = (v) => (opts().find((o) => o.value === v) || opts()[0])?.label || '';
 
   function render() {
@@ -31,10 +32,10 @@ export function createDropdown({ options, onChange, variant = 'labelled', ariaLa
       const isOpen = open?.host === host;
       const trigger = variant === 'icon'
         ? `<button type="button" class="dd-trigger dd-icon-trigger ${value ? 'has-value' : ''}" aria-haspopup="listbox" aria-expanded="${isOpen}" aria-label="${esc(ariaLabel)}${value ? ': ' + esc(labelOf(value)) : ''}" title="${esc(ariaLabel)}">${icon('filter', { size: 16 })}${value ? '<span class="dd-dot" aria-hidden="true"></span>' : ''}</button>`
-        : `<button type="button" class="dd-trigger" aria-haspopup="listbox" aria-expanded="${isOpen}" aria-label="${esc(ariaLabel)}: ${esc(labelOf(value))}">${icon(iconName, { size: 15 })}<span class="dd-label">${esc(labelOf(value))}</span>${icon('chevronDown', { size: 13, stroke: 2.5 })}</button>`;
+        : `<button type="button" class="dd-trigger" aria-haspopup="listbox" aria-expanded="${isOpen}" aria-label="${esc(ariaLabel)}: ${esc(labelOf(value))}">${icon(selectedIcon() || iconName, { size: 15 })}<span class="dd-label">${esc(labelOf(value))}</span>${icon('chevronDown', { size: 13, stroke: 2.5 })}</button>`;
       host.innerHTML = `${trigger}
         <ul class="dd-list" role="listbox" id="${id}" ${isOpen ? '' : 'hidden'}>
-          ${opts().map((o) => `<li role="option" tabindex="-1" data-value="${esc(o.value)}" aria-selected="${o.value === value}" class="${o.value === value ? 'selected' : ''}">${esc(o.label)}</li>`).join('')}
+          ${opts().map((o) => `<li role="option" tabindex="-1" data-value="${esc(o.value)}" aria-selected="${o.value === value}" class="${o.value === value ? 'selected' : ''}">${o.icon ? icon(o.icon, { size: 15 }) : ''}<span>${esc(o.label)}</span></li>`).join('')}
         </ul>`;
       if (isOpen) place(host);
     });
@@ -102,3 +103,38 @@ export function createDropdown({ options, onChange, variant = 'labelled', ariaLa
 }
 
 export const createCategoryFilter = ({ onChange }) => createDropdown({ options: CATEGORY_OPTIONS, onChange, ariaLabel: 'Category filter' });
+
+
+/**
+ * Replace a native <select> with the shared dropdown. The select stays in the DOM (hidden) as the source of truth,
+ * so existing code that reads or sets `select.value` and listens for `change` keeps working.
+ */
+export function enhanceSelect(select) {
+  if (!select || select.dataset.enhanced) return;
+  select.dataset.enhanced = '1';
+  const read = () => [...select.options].map((o) => ({ value: o.value, label: o.textContent.trim() }));
+  const host = document.createElement('div');
+  host.className = 'dd-block';
+  select.after(host);
+  select.style.display = 'none';
+
+  const dd = createDropdown({
+    options: read,
+    ariaLabel: select.getAttribute('aria-label') || select.closest('.form-group')?.querySelector('label')?.textContent?.trim() || 'Choose',
+    iconName: 'chevronDown',
+    onChange: (v) => { setNative(v); select.dispatchEvent(new Event('change', { bubbles: true })); },
+  });
+  dd.attach(host);
+
+  // Keep the shared dropdown in step with programmatic changes to the native select.
+  const proto = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+  const setNative = (v) => proto.set.call(select, v);
+  Object.defineProperty(select, 'value', {
+    get() { return proto.get.call(select); },
+    set(v) { proto.set.call(select, v); dd.setValue(proto.get.call(select)); },
+  });
+  new MutationObserver(() => { dd.setValue(proto.get.call(select)); }).observe(select, { childList: true });
+  dd.setValue(proto.get.call(select));
+}
+
+export const enhanceSelects = (root = document) => root.querySelectorAll('select:not([data-enhanced])').forEach(enhanceSelect);

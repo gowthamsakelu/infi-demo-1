@@ -61,7 +61,7 @@ body {
   font-family: var(--font-family);
   background-color: var(--bg-app);
   color: var(--text-main);
-  min-height: 100vh;
+  min-height: 100dvh;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
@@ -72,21 +72,21 @@ body {
 
 .app-root-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   min-height: 100dvh;
   background-color: var(--bg-app);
 }
 
 .view-slot-desktop {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   height: 100dvh;
   overflow: hidden;
 }
 
 .view-slot-mobile {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   min-height: 100dvh;
   display: flex;
   justify-content: center;
@@ -95,18 +95,18 @@ body {
 
 @media (min-width: 700px) {
   html, body {
-    height: 100vh;
+    height: 100dvh;
     height: 100dvh;
     overflow: hidden !important;
   }
   .app-root-container {
-    height: 100vh;
+    height: 100dvh;
     height: 100dvh;
     overflow: hidden !important;
   }
   .view-slot-desktop {
     display: block !important;
-    height: 100vh;
+    height: 100dvh;
     height: 100dvh;
     overflow: hidden !important;
   }
@@ -138,14 +138,14 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   min-height: 100dvh;
 }
 
 .phone-device {
   width: 100%;
   max-width: 480px;
-  min-height: 100vh;
+  min-height: 100dvh;
   min-height: 100dvh;
   background: #FFFFFF;
   position: relative;
@@ -167,7 +167,7 @@ body.standalone-mobile .phone-device {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  min-height: 100vh;
+  min-height: 100dvh;
   min-height: 100dvh;
   border-radius: 0;
 }
@@ -2096,7 +2096,7 @@ body.standalone-mobile .app-global-bar {
 .desktop-layout {
   display: flex;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   height: 100dvh;
   overflow: hidden;
   background: #F8FAFC;
@@ -2105,7 +2105,7 @@ body.standalone-mobile .app-global-bar {
 /* Left Sidebar (Desktop) */
 .desktop-sidebar {
   width: 260px;
-  height: 100vh;
+  height: 100dvh;
   height: 100dvh;
   background: #FFFFFF;
   border-right: 1px solid #E2E8F0;
@@ -2227,7 +2227,7 @@ body.standalone-mobile .app-global-bar {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
   height: 100dvh;
   min-width: 0;
   overflow: hidden;
@@ -2459,7 +2459,7 @@ body.standalone-mobile .app-global-bar {
 .desktop-body {
   flex: 1;
   min-height: 0;
-  height: calc(100vh - 64px);
+  height: calc(100dvh - 64px);
   padding: 14px 18px;
   overflow: hidden !important;
   display: flex;
@@ -4011,7 +4011,7 @@ body.standalone-mobile .app-global-bar {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-height: 70vh;
+  max-height: 70dvh;
   overflow-y: auto;
 }
 
@@ -5151,7 +5151,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     background: #FFFFFF !important;
     display: flex !important;
     width: 100% !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
     min-height: 100dvh !important;
   }
 
@@ -5172,7 +5172,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   .phone-device {
     width: 100% !important;
     max-width: 100% !important;
-    height: 100vh !important;
+    height: 100dvh !important;
     height: 100dvh !important;
     border-radius: 0 !important;
     box-shadow: none !important;
@@ -5205,11 +5205,11 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    height: 92vh !important;
     height: 92dvh !important;
-    min-height: 92vh !important;
+    height: 92dvh !important;
     min-height: 92dvh !important;
-    max-height: 92vh !important;
+    min-height: 92dvh !important;
+    max-height: 92dvh !important;
     max-height: 92dvh !important;
     border-radius: 26px 26px 0 0 !important;
     z-index: 200 !important;
@@ -5257,11 +5257,11 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    height: 92vh !important;
     height: 92dvh !important;
-    min-height: 92vh !important;
+    height: 92dvh !important;
     min-height: 92dvh !important;
-    max-height: 92vh !important;
+    min-height: 92dvh !important;
+    max-height: 92dvh !important;
     max-height: 92dvh !important;
     border-radius: 24px 24px 0 0 !important;
     box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.22) !important;
@@ -5442,9 +5442,9 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 @media (max-width: 699px) and (max-height: 700px) {
   .bottom-sheet,
   .assign-to-sheet {
-    height: 94vh !important;
     height: 94dvh !important;
-    max-height: 94vh !important;
+    height: 94dvh !important;
+    max-height: 94dvh !important;
   }
 
   .sheet-customer-header {
@@ -5507,7 +5507,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   }
 
   .desktop-body {
-    height: calc(100vh - 58px) !important;
+    height: calc(100dvh - 58px) !important;
     padding: 10px 12px !important;
   }
 
@@ -5612,7 +5612,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   }
 
   .desktop-body {
-    height: calc(100vh - 60px) !important;
+    height: calc(100dvh - 60px) !important;
     padding: 12px 16px !important;
   }
 
@@ -5657,7 +5657,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   }
 
   .desktop-body {
-    height: calc(100vh - 54px) !important;
+    height: calc(100dvh - 54px) !important;
     padding: 10px 16px !important;
   }
 
@@ -6457,3 +6457,90 @@ html { scrollbar-gutter: stable; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 150ms; animation-timing-function: var(--ease-out); }
 @media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } .skel::after { animation: none; } }
 .bookings-table thead tr { height: 59px; } .bookings-table thead th { vertical-align: middle; }
+
+
+/* ==========================================================================
+   v8: keyboard-aware overlays, uniform Bookings amount/status line, itinerary dialogs, selects
+   --vvh (visible height) and --kb-inset (keyboard height) come from shared/keyboard.js
+   ========================================================================== */
+:root { --vvh: 100dvh; --kb-inset: 0px; }
+
+/* Bookings rows: ONE layout per width, decided on the list container (never per row) */
+.bookings-cards-list { container-type: inline-size; container-name: rows; }
+.list-row-card:not(.is-inquiry) .card-right-col { max-width: none; width: auto; align-items: flex-end; }
+.list-row-card:not(.is-inquiry) .card-price-status-row { display: flex; flex-direction: column; align-items: flex-end; flex-wrap: nowrap; gap: 4px; }
+.list-row-card:not(.is-inquiry) .card-price { font-variant-numeric: tabular-nums; white-space: nowrap; }
+@container rows (min-width: 330px) {
+  .list-row-card:not(.is-inquiry) .card-price-status-row { flex-direction: row; align-items: center; gap: 6px; justify-content: flex-end; }
+  .list-row-card:not(.is-inquiry) .card-price { font-size: 14px; }
+  .list-row-card:not(.is-inquiry) .status-pill { padding: 0 7px; gap: 4px; }
+}
+.bookings-table .cell-amount, .bookings-table .status-pill { font-variant-numeric: tabular-nums; }
+
+/* Shared overlays sit above the keyboard: bottom edge = top of the keyboard, height = visible area */
+.asg-overlay, .modal-overlay { inset: 0 0 var(--kb-inset) 0; }
+.asg-sheet { max-height: min(92dvh, calc(var(--vvh) - 12px)); }
+.phone-device .modal-overlay { position: fixed !important; inset: 0 0 var(--kb-inset) 0 !important; z-index: 1100 !important; }
+.phone-device .modal-card, .modal-card { max-height: calc(var(--vvh) - 24px); overflow-y: auto; }
+@media (min-width: 700px) { .asg-sheet { max-height: min(86dvh, 720px, calc(var(--vvh) - 24px)); } }
+.phone-device .bottom-sheet, .phone-device .bottom-sheet:not(.open) { max-height: min(92dvh, calc(var(--vvh) - 8px)) !important; }
+/* The sheet body is the only scroll area: header and footer are normal flex rows, never floating over the list */
+.asg-sheet { display: flex; flex-direction: column; }
+.asg-scroll, .fu-body, .itin-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.asg-footer, .fu-footer, .itin-footer { flex: 0 0 auto; position: static; }
+
+/* Bottom nav gets out of the way while typing */
+.mobile-bottom-nav { transition: transform var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out); }
+html.is-keyboard-open .mobile-bottom-nav { transform: translateY(100%); opacity: 0; pointer-events: none; }
+html.is-keyboard-open .mobile-screen-content { padding-bottom: 24px; }
+
+/* Compact the Assign sheet while the keyboard is open so the list keeps room */
+html.is-keyboard-open .asg-summary { margin: 0 20px 6px; padding: 6px 10px; }
+html.is-keyboard-open .asg-summary .row-avatar, html.is-keyboard-open .asg-summary .asg-thumb { width: 28px; height: 28px; border-radius: 8px; font-size: 11px; }
+html.is-keyboard-open .asg-summary-info p, html.is-keyboard-open .btn-add-new-vendor { display: none; }
+html.is-keyboard-open .asg-summary-info h4 { font-size: 13px; }
+html.is-keyboard-open .asg-header { padding-top: 2px; padding-bottom: 2px; }
+html.is-keyboard-open .asg-tabs .assign-tab-btn { min-height: 36px; }
+html.is-keyboard-open .asg-search-row { padding-top: 6px; padding-bottom: 4px; }
+html.is-keyboard-open .optional-note-box:not(:focus-within) { display: none; }
+html.is-keyboard-open .asg-footer { padding-top: 8px; padding-bottom: 10px; }
+.asg-summary, .asg-header, .asg-search-row { transition: margin var(--motion-base) var(--ease-out), padding var(--motion-base) var(--ease-out); }
+
+/* Summary icon box for itinerary events */
+.asg-thumb.asg-icon { display: flex; align-items: center; justify-content: center; background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+
+/* Native selects are replaced by the shared dropdown (the hidden select stays as the value) */
+.dd-block { position: relative; width: 100%; }
+.dd-block .dd-trigger { width: 100%; height: 44px; border-radius: 12px; background: #F8FAFC; border-color: #E2E8F0; justify-content: space-between; font-weight: 500; font-size: 14px; }
+.dd-block .dd-trigger svg:first-child { color: #64748B; }
+.dd-block .dd-trigger svg:last-child { margin-left: auto; color: #64748B; }
+.dd-block .dd-label { flex: 1; text-align: left; margin-left: 2px; }
+.dd-block .dd-list { position: static; width: 100%; min-width: 0; margin-top: 6px; box-shadow: none; max-height: 224px; overflow-y: auto; }
+.dd-list li { display: flex; align-items: center; gap: 8px; }
+.dd-list li svg { color: #64748B; flex-shrink: 0; }
+.dd-list li.selected svg { color: inherit; }
+
+/* Itinerary: header actions, day menu, dialogs */
+.itin-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.btn-add-event-pill svg { flex-shrink: 0; }
+.btn-add-event-pill { display: inline-flex; align-items: center; gap: 6px; }
+.day-menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-top: 4px; border: none; border-radius: 8px; background: transparent; color: #64748B; cursor: pointer; position: relative; }
+.day-menu-btn::after { content: ""; position: absolute; inset: -8px; }
+.day-menu-btn:hover { background: #F1F5F9; color: #0F172A; }
+.day-title-sub { display: block; font-size: 11px; color: #64748B; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.itin-sheet { max-width: 520px; }
+.itin-body { padding: 4px 20px 12px; display: flex; flex-direction: column; gap: 14px; }
+.itin-footer { display: flex; gap: 12px; padding: 10px 20px max(16px, var(--safe-bottom)); border-top: 1px solid #F1F5F9; background: #fff; }
+.itin-footer .btn-primary-desktop { flex: 1; height: 44px; border-radius: 12px; }
+.itin-footer .btn-cancel-assign { flex: 0 0 auto; }
+.itin-newday { border: 1px dashed #BFDBFE; background: #F8FBFF; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
+.itin-newday[hidden] { display: none; }
+.itin-newday-head { display: flex; align-items: center; gap: 8px; color: #1D4ED8; font-size: 13.5px; }
+.state-box .btn-add-event-pill { margin-top: 4px; }
+@media (pointer: coarse) { .itin-body input, .fu-field input { font-size: 16px; } }
+html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-inset) + 24px) !important; }
+
+/* Forms that wrap a modal's body + footer keep the body scrollable and the footer pinned (Add Guest). */
+.modal-card > form { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.modal-card > form > .modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.modal-card > form > .modal-footer { flex: 0 0 auto; }

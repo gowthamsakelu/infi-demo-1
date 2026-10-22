@@ -38,7 +38,7 @@ let current = null;
  * @param {{ kind: 'booking'|'inquiry', items: Array<{id:string,title:string,name:string,badge?:string,badgeClass?:string,image?:string}>,
  *           onDone?: () => void }} cfg
  */
-export function openAssign({ kind, items, onApply, onRevert, onDone }) {
+export function openAssign({ kind, items, summary, persist, onApply, onRevert, onDone }) {
   closeAssign();
   if (!items.length) return;
   let tab = 'Team Members';
@@ -47,7 +47,7 @@ export function openAssign({ kind, items, onApply, onRevert, onDone }) {
   let selected = people(tab)[0];
   let adding = false;
 
-  const noun = kind === 'inquiry' ? 'Inquiries' : 'Bookings';
+  const noun = kind === 'inquiry' ? 'Inquiries' : kind === 'itinerary' ? 'Events' : 'Bookings';
   const first = items[0];
   const ov = document.createElement('div');
   ov.className = 'asg-overlay';
@@ -57,9 +57,9 @@ export function openAssign({ kind, items, onApply, onRevert, onDone }) {
       <header class="asg-header"><h3 id="asg-title">Assign to</h3>
         <button type="button" class="sheet-close-btn" data-asg-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
       <div class="asg-summary">
-        ${first.image ? `<div class="asg-thumb"><img src="${esc(first.image)}" alt="" /></div>` : `<div class="row-avatar">${esc(initials(first.name))}</div>`}
-        <div class="asg-summary-info"><h4>${items.length} ${noun} Selected</h4><p>${esc(items.map((i) => i.id).join(', '))}</p></div>
-        ${items.length === 1 && first.badge ? `<span class="status-pill ${esc(first.badgeClass || '')}"><span class="dot"></span>${esc(first.badge)}</span>` : ''}
+        ${summary ? `<div class="asg-thumb asg-icon">${summary.iconHtml || ''}</div>` : first.image ? `<div class="asg-thumb"><img src="${esc(first.image)}" alt="" width="48" height="48" /></div>` : `<div class="row-avatar">${esc(initials(first.name))}</div>`}
+        <div class="asg-summary-info"><h4>${summary ? esc(summary.title) : `${items.length} ${noun} Selected`}</h4><p>${summary ? esc(summary.subtitle || '') : esc(items.map((i) => i.id).join(', '))}</p></div>
+        ${summary && summary.badge ? `<span class="tag-activity-pill">${esc(summary.badge)}</span>` : items.length === 1 && first.badge ? `<span class="status-pill ${esc(first.badgeClass || '')}"><span class="dot"></span>${esc(first.badge)}</span>` : ''}
       </div>
       <div class="assign-tabs-row asg-tabs" role="tablist">${TABS.map((t) => `<button type="button" role="tab" class="assign-tab-btn ${t === tab ? 'active' : ''}" aria-selected="${t === tab}" data-asg-tab="${t}">${t}</button>`).join('')}</div>
       <div class="asg-search-row">
@@ -167,14 +167,19 @@ export function openAssign({ kind, items, onApply, onRevert, onDone }) {
     btn.disabled = true;
     // Open WhatsApp in the click gesture so browsers don't block it.
     if (a.phone) {
-      const what = items.length === 1 ? `${first.title} (${first.id})` : `${items.length} ${noun.toLowerCase()} (${items.map((i) => i.id).join(', ')})`;
+      const what = items.length === 1 ? `${first.title}${kind === 'itinerary' ? '' : ` (${first.id})`}` : `${items.length} ${noun.toLowerCase()} (${items.map((i) => i.id).join(', ')})`;
       openWhatsApp(a.name, a.phone, `Hi ${a.name}, you have been assigned ${what}.${note ? ` Note: ${note}` : ''}`, { silent: true });
     }
     // Optimistic: update the row and close the sheet now; roll back if the server says no.
     onApply?.({ id: a.id, name: a.name, avatar: a.avatar, role: a.role });
     closeAssign();
-    toast(`Assigned ${a.name} to ${items.length} ${items.length === 1 ? (kind === 'inquiry' ? 'inquiry' : 'booking') : noun.toLowerCase()}`, 'success');
+    toast(`Assigned ${a.name} to ${items.length === 1 ? (kind === 'inquiry' ? '1 inquiry' : kind === 'itinerary' ? first.title : '1 booking') : `${items.length} ${noun.toLowerCase()}`}`, 'success');
     try {
+      if (persist) {
+        if (!(await persist({ id: a.id, name: a.name, avatar: a.avatar, role: a.role }))) throw new Error();
+        onDone?.({ id: a.id, name: a.name, avatar: a.avatar, role: a.role });
+        return;
+      }
       const body = kind === 'inquiry'
         ? { ids: items.map((i) => i.id), assignee_id: a.id, assignee_name: a.name }
         : { ids: items.map((i) => i.id), assignee: { id: a.id, name: a.name, type: tab, avatar: a.avatar, role: a.role } };

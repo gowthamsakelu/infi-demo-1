@@ -3,6 +3,8 @@ import { createMobileView } from './mobile.js';
 import { createDesktopView } from './desktop.js';
 import { INITIAL_BOOKINGS, STAFF_MEMBERS } from './data.js';
 import { refresh } from './shared/page-state.js';
+import { initKeyboard } from './shared/keyboard.js';
+import { enhanceSelects } from './shared/dropdown-filter.js';
 import { closeRowMenu } from './shared/ui.js';
 import { closeAssign } from './shared/assign-sheet.js';
 import { closeFollowUpModal } from './shared/followup-modal.js';
@@ -91,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="modal-footer">
             <button type="button" class="btn-secondary-desktop" id="cancel-add-guest-modal">Cancel</button>
-            <button type="submit" class="btn-primary-desktop">+ Add Guest</button>
+            <button type="submit" class="btn-primary-desktop">Add Guest</button>
           </div>
         </form>
       </div>
@@ -114,12 +116,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
 
   document.getElementById('boot')?.remove();
+  initKeyboard();
   const desktopSlot = document.getElementById('desktop-view-slot');
   const mobileSlot = document.getElementById('mobile-view-slot');
 
   // Initialize Views
   const mobileView = createMobileView(mobileSlot);
   const desktopView = createDesktopView(desktopSlot);
+
+  enhanceSelects(document); // no unstyled OS lists: every <select> uses the shared dropdown
 
   // Modal Listeners
   window.addEventListener('open-add-guest-modal', (e) => {

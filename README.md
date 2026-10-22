@@ -126,7 +126,7 @@ The UI is a single page that switches by URL hash.
 | GET | `/api/follow-ups?phone=` | Follow-ups and notes for a customer, newest first |
 | GET | `/api/metadata` | Staff, vendors and contacts |
 
-The app has no login yet. Actions are recorded for staff member `ST-05` unless `created_by` is sent.
+The app has no login yet. Actions are recorded for staff member `ST-05` unless `created_by` is sent. Because there are no users or roles, there are **no permission or policy checks**: the itinerary API validates data (types, lengths, at most 60 days and 100 events per day) but does not decide who may edit. Add authorization when login is introduced.
 
 ## UI conventions
 
@@ -144,6 +144,43 @@ The app has no login yet. Actions are recorded for staff member `ST-05` unless `
 - Lists keep their previous rows while search, tabs or filters change. Row actions (assign, mark paid) update only the affected row and roll back if the server rejects them.
 - The `/` route versions the entry CSS and JS by file time, and `public/.htaccess` turns on compression, revalidation for scripts and styles, and long caching for fonts and images.
 - On deploy run `php artisan migrate --force`. The start script already caches config, routes and views.
+
+## Keyboard checklist for a real phone
+
+An emulator cannot reproduce a real on-screen keyboard, so run these on a phone against the deployed site, at the narrowest width you have. Expected result everywhere: the keyboard never opens by itself, the focused field stays visible above the keyboard, the footer buttons stay visible, no page shows below a sheet, and the bottom nav hides while typing and returns without a jump.
+
+### Android (Brave and Chrome)
+
+Do the whole list once in Brave and once in Chrome. Also try with the address bar collapsed and expanded.
+
+1. Bookings: tap a row's ⋮, then Assign. The keyboard must not open. Tap Search: the sheet shrinks above the keyboard.
+2. Tap Optional Note, then "Add new member" (name, phone): each field is visible above the keyboard.
+3. Inquiries: ⋮ then Follow-up, tap the comment field. Tap the date and time fields: the system picker opens and the sheet is not covered.
+4. Open a booking, Itinerary tab, Add Event: Title and Time fields; choose "Add new day" and type its title.
+5. Add Day: the title field. Edit customer: scroll the form with the keyboard open.
+6. Inquiries: scroll to the last row, tap its quick note. The row stays visible.
+7. Close the keyboard with the back gesture: everything returns with no jump.
+
+### iPhone (Safari)
+
+Do the list in Safari, then once more added to the Home Screen if you use it that way.
+
+1. Same steps 1 to 6 as Android. Nothing may zoom when a field is tapped (fields are 16px or larger).
+2. Tap a field, then drag the sheet or scroll its list: the page behind must not scroll.
+3. Rotate to landscape with the keyboard open: the sheet still fits above the keyboard.
+4. Tap the date field in Follow-up: the iOS date wheel opens and the Save button is still reachable.
+5. Dismiss the keyboard by tapping outside the field: the bottom nav returns without a jump.
+
+### Browser tests that run without a phone
+
+`backend/tests/e2e/` has two Playwright scripts. Playwright is not a project dependency; install it outside the app (`npm i playwright && npx playwright install chromium`) and run them against a running app:
+
+```bash
+BASE=http://127.0.0.1:8000/ node backend/tests/e2e/input-audit.mjs
+BASE=http://127.0.0.1:8000/ node backend/tests/e2e/viewport-matrix.mjs
+```
+
+`viewport-matrix.mjs` adds days and events to BK-5022, so re-seed afterwards (`php artisan db:seed --force`).
 
 ## Common commands
 

@@ -263,24 +263,8 @@ export function bindSheet(overlay, panel, onClose, handleSelector = '.filter-han
   panel.addEventListener('touchmove', move, { passive: true });
   panel.addEventListener('touchend', up);
 
-  const vv = window.visualViewport;
-  const fit = () => {
-    if (!vv) return;
-    overlay.style.top = `${vv.offsetTop}px`;
-    overlay.style.bottom = 'auto';
-    overlay.style.height = `${vv.height}px`;
-    overlay.style.setProperty('--ov-h', `${vv.height}px`);
-  };
-  const focus = (e) => { if (e.target.matches('input, textarea, select')) setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 250); };
-  vv?.addEventListener('resize', fit);
-  vv?.addEventListener('scroll', fit);
-  overlay.addEventListener('focusin', focus);
-  fit();
-  return () => {
-    vv?.removeEventListener('resize', fit);
-    vv?.removeEventListener('scroll', fit);
-    overlay.removeEventListener('focusin', focus);
-  };
+  // Keyboard handling lives in shared/keyboard.js (CSS variables), so the sheet needs no viewport code here.
+  return () => {};
 }
 
 

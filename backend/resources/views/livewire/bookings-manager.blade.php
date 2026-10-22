@@ -707,7 +707,7 @@
                             </div>
                         </div>
                         @empty
-                        <p style="text-align: center; color: #94A3B8; padding: 24px;">No guests registered. Click "+ Add Guest" above.</p>
+                        <p style="text-align: center; color: #94A3B8; padding: 24px;">No guests registered. Click "Add Guest" above.</p>
                         @endforelse
                     </div>
 
@@ -731,7 +731,7 @@
                                     <line x1="12" x2="12" y1="5" y2="19"/>
                                     <line x1="5" x2="19" y1="12" y2="12"/>
                                 </svg>
-                                + Add Event
+                                Add Event
                             </button>
                         </div>
 
@@ -743,7 +743,7 @@
                                     <span style="font-size: 13px; font-weight: 800; color: #2563EB; background: #EFF6FF; padding: 2px 8px; border-radius: 6px;">{{ $dayGroup['day'] }}</span>
                                     <span style="font-size: 12.5px; color: #64748B; font-weight: 500;">{{ $dayGroup['date'] ?? '' }}</span>
                                 </div>
-                                <button class="action-pill-btn" wire:click="openAddEvent('{{ $dayGroup['day'] }}')" style="padding: 2px 8px; font-size: 11px;">+ Add</button>
+                                <button class="action-pill-btn" wire:click="openAddEvent('{{ $dayGroup['day'] }}')" style="padding: 2px 8px; font-size: 11px;">Add</button>
                             </div>
 
                             <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -769,7 +769,7 @@
                                             <span style="font-size: 11px; font-weight: 600; color: #059669;">✓ {{ $item['assigned']['name'] ?? 'Assigned' }}</span>
                                         </div>
                                         @else
-                                        <button class="action-pill-btn" wire:click="openAssignModal('{{ $dayGroup['day'] }}', '{{ $item['id'] }}')" style="padding: 3px 8px; font-size: 11px;">+ Assign</button>
+                                        <button class="action-pill-btn" wire:click="openAssignModal('{{ $dayGroup['day'] }}', '{{ $item['id'] }}')" style="padding: 3px 8px; font-size: 11px;">Assign</button>
                                         @endif
 
                                         <button wire:click="toggleActivityCompleted('{{ $dayGroup['day'] }}', '{{ $item['id'] }}')" class="action-pill-btn" style="padding: 3px 8px; font-size: 11px; {{ $isCompleted ? 'background: #DCFCE7; color: #16A34A;' : '' }}">
@@ -1095,7 +1095,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary-desktop" wire:click="closeAddGuestModal">Cancel</button>
-                    <button type="submit" class="btn-primary-desktop">+ Add Guest</button>
+                    <button type="submit" class="btn-primary-desktop">Add Guest</button>
                 </div>
             </form>
         </div>
@@ -1129,13 +1129,13 @@
                 <div class="form-group">
                     <label>Quick Add Presets</label>
                     <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        <button type="button" wire:click="addPresetRequirement('preset-1')" class="action-pill-btn" style="font-size: 11px;">+ Veg Food</button>
-                        <button type="button" wire:click="addPresetRequirement('preset-2')" class="action-pill-btn" style="font-size: 11px;">+ Connecting Rooms</button>
-                        <button type="button" wire:click="addPresetRequirement('preset-3')" class="action-pill-btn" style="font-size: 11px;">+ Wheelchair</button>
-                        <button type="button" wire:click="addPresetRequirement('preset-4')" class="action-pill-btn" style="font-size: 11px;">+ Near Beach</button>
-                        <button type="button" wire:click="addPresetRequirement('preset-5')" class="action-pill-btn" style="font-size: 11px;">+ Kid Friendly</button>
-                        <button type="button" wire:click="addPresetRequirement('preset-6')" class="action-pill-btn" style="font-size: 11px;">+ Baby Cot</button>
-                        <button type="button" wire:click="addPresetRequirement('preset-7')" class="action-pill-btn" style="font-size: 11px;">+ Late Check-out</button>
+                        <button type="button" wire:click="addPresetRequirement('preset-1')" class="action-pill-btn" style="font-size: 11px;">Veg Food</button>
+                        <button type="button" wire:click="addPresetRequirement('preset-2')" class="action-pill-btn" style="font-size: 11px;">Connecting Rooms</button>
+                        <button type="button" wire:click="addPresetRequirement('preset-3')" class="action-pill-btn" style="font-size: 11px;">Wheelchair</button>
+                        <button type="button" wire:click="addPresetRequirement('preset-4')" class="action-pill-btn" style="font-size: 11px;">Near Beach</button>
+                        <button type="button" wire:click="addPresetRequirement('preset-5')" class="action-pill-btn" style="font-size: 11px;">Kid Friendly</button>
+                        <button type="button" wire:click="addPresetRequirement('preset-6')" class="action-pill-btn" style="font-size: 11px;">Baby Cot</button>
+                        <button type="button" wire:click="addPresetRequirement('preset-7')" class="action-pill-btn" style="font-size: 11px;">Late Check-out</button>
                     </div>
                 </div>
 
@@ -1143,7 +1143,7 @@
                     <label>Add Custom Requirement</label>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" wire:model="customReqText" placeholder="e.g. Extra pillows, Non-smoking room" style="flex: 1;" />
-                        <button type="button" wire:click="addCustomRequirement" class="btn-primary-desktop" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">+ Add</button>
+                        <button type="button" wire:click="addCustomRequirement" class="btn-primary-desktop" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">Add</button>
                     </div>
                 </div>
             </div>
@@ -1226,7 +1226,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="action-pill-btn" wire:click="closeAddEvent">Cancel</button>
-                <button type="button" class="btn-primary-desktop" wire:click="saveAddEvent" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Add to Itinerary</button>
+                <button type="button" class="btn-primary-desktop" wire:click="saveAddEvent" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Add to Itinerary</button>
             </div>
         </div>
     </div>

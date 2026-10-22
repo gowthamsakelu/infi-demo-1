@@ -29,12 +29,14 @@ class Inquiry extends Model
         'assigned_to_id',
         'assigned_to_name',
         'notes',
+        'itinerary_days',
     ];
 
     protected $casts = [
         'pax' => 'integer',
         'nights' => 'integer',
         'travel_date' => 'date:Y-m-d',
+        'itinerary_days' => 'array',
     ];
 
     public function followUps(): HasMany

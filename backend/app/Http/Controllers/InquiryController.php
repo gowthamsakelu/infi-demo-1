@@ -156,6 +156,7 @@ class InquiryController extends Controller
             'assigned_to_id' => $i->assigned_to_id,
             'assigned_to_name' => $i->assigned_to_name,
             'notes' => $i->notes,
+            'itinerary_days' => $i->itinerary_days ?? [],
             'follow_up_count' => $i->followUps->count(),
             'last_follow_up' => $last ? $this->presentFollowUp($last) : null,
         ];

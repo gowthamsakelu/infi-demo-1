@@ -8,6 +8,8 @@ import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } fro
 import { openFollowUpModal } from './shared/followup-modal.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
+import { openEventDialog, openDayDialog, commit } from './shared/itinerary-dialog.js';
+import { daysOf, persist, renumber, EVENT_TYPES } from './shared/itinerary.js';
 import { matchesCategory } from './shared/booking-filters.js';
 
 export function createMobileView(container, options = {}) {
@@ -186,96 +188,6 @@ export function createMobileView(container, options = {}) {
         </div>
       </div>
 
-      <!-- Assign to Modal Sheet (Screen 3) -->
-      <div class="assign-to-sheet ${isAssignSheetOpen ? 'open' : ''}" id="mobile-assign-to-sheet">
-        <!-- Top Drag Handle & Bar -->
-        <div class="sheet-drag-handle-bar">
-          <div class="sheet-handle"></div>
-        </div>
-        <div class="assign-header-bar">
-          <h3>Assign to</h3>
-          <button class="sheet-close-btn" id="close-assign-to-sheet-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Selected Activity Card -->
-        <div class="assign-activity-card" id="assign-activity-card-view">
-          <div class="assign-activity-thumb">
-            <img src="./images/rishikesh.jpg" alt="River Rafting" />
-          </div>
-          <div class="assign-activity-info">
-            <h4>River Rafting (16 km)</h4>
-            <p>Day 2 • 10:00 AM • Rishikesh</p>
-          </div>
-          <span class="tag-activity-pill">Activity</span>
-        </div>
-
-        <!-- Tabs: Team Members, Vendors, Contacts -->
-        <div class="assign-tabs-row">
-          <button class="assign-tab-btn ${assignVendorTab === 'Team Members' ? 'active' : ''}" data-assign-tab="Team Members">Team Members</button>
-          <button class="assign-tab-btn ${assignVendorTab === 'Vendors' ? 'active' : ''}" data-assign-tab="Vendors">Vendors</button>
-          <button class="assign-tab-btn ${assignVendorTab === 'Contacts' ? 'active' : ''}" data-assign-tab="Contacts">Contacts</button>
-        </div>
-
-        <!-- Search & Filter Bar -->
-        <div class="vendor-search-row">
-          <div class="vendor-search-input-box">
-            ${icon('search', { size: 16 })}
-            <input type="text" id="assign-vendor-search" placeholder="Search vendor by name, service or location..." />
-          </div>
-          <button class="filter-btn-square" style="width: 38px; height: 38px;" title="Filter Vendors">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="21" x2="14" y1="4" y2="4"/>
-              <line x1="10" x2="3" y1="4" y2="4"/>
-              <line x1="21" x2="12" y1="12" y2="12"/>
-              <line x1="8" x2="3" y1="12" y2="12"/>
-              <line x1="14" x2="14" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="10" y2="14"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Vendors List -->
-        <div class="vendor-list-scroll" id="assign-vendors-list">
-          <!-- Rendered dynamically -->
-        </div>
-
-        <!-- Add New Item link -->
-        <button class="btn-add-new-vendor" id="btn-add-new-vendor-trigger">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="12" x2="12" y1="5" y2="19"/>
-            <line x1="5" x2="19" y1="12" y2="12"/>
-          </svg>
-          <span id="assign-add-btn-label">Add New Team Member</span>
-        </button>
-
-        <!-- Optional Note Input -->
-        <div class="optional-note-box">
-          <div class="optional-note-label">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" x2="12" y1="16" y2="12"/>
-              <line x1="12" x2="12.01" y1="8" y2="8"/>
-            </svg>
-            Optional Note
-          </div>
-          <input type="text" class="optional-note-input" id="assign-optional-note-input" placeholder="e.g. Confirm timing and group size with vendor" />
-        </div>
-
-        <!-- Action Footer -->
-        <div class="assign-footer-actions">
-          <button class="btn-cancel-assign" id="btn-cancel-assign-sheet">Cancel</button>
-          <button class="btn-whatsapp-assign" id="btn-submit-assign-whatsapp">
-            ${icon('whatsapp', { size: 18 })}
-            Assign & Send on WhatsApp
-          </button>
-        </div>
-      </div>
-
       <!-- Modal 1: Edit Special Requirements -->
       <div class="modal-overlay" id="mobile-special-req-modal">
         <div class="modal-card">
@@ -305,7 +217,7 @@ export function createMobileView(container, options = {}) {
               <label>Add Custom Requirement</label>
               <div style="display: flex; gap: 8px;">
                 <input type="text" id="modal-custom-req-input" placeholder="e.g. Extra pillows, Non-smoking room" style="flex: 1;" />
-                <button class="btn-primary-desktop" id="btn-add-custom-req" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">+ Add</button>
+                <button class="btn-primary-desktop" id="btn-add-custom-req" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">Add</button>
               </div>
             </div>
           </div>
@@ -370,47 +282,9 @@ export function createMobileView(container, options = {}) {
         </div>
       </div>
 
-      <!-- Modal 4: Add Itinerary Event -->
-      <div class="modal-overlay" id="mobile-add-event-modal">
-        <div class="modal-card">
-          <div class="modal-header">
-            <h3>Add Itinerary Event</h3>
-            <button class="sheet-close-btn" id="close-modal-add-event-btn" style="position: static;">✕</button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <label>Select Day</label>
-              <select id="modal-add-event-day-select"></select>
-            </div>
-            <div class="form-group">
-              <label>Event Title</label>
-              <input type="text" id="modal-add-event-title" placeholder="e.g. Sunset Boat Cruise & Tea" />
-            </div>
-            <div class="form-group">
-              <label>Time & Subtitle / Location</label>
-              <input type="text" id="modal-add-event-subtitle" placeholder="e.g. 05:30 PM • 1-hour cruise with DJ" />
-            </div>
-            <div class="form-group">
-              <label>Category / Icon</label>
-              <select id="modal-add-event-type">
-                <option value="sightseeing">Sightseeing / Tour</option>
-                <option value="transport">Transport / Bus</option>
-                <option value="hotel">Hotel / Accommodation</option>
-                <option value="activity">Sport / Adventure</option>
-                <option value="food">Restaurant / Meal</option>
-              </select>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="action-pill-btn" id="btn-cancel-add-event">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-submit-add-event" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Add to Itinerary</button>
-          </div>
-        </div>
-      </div>
-
       <!-- Mobile Modal 5: Edit Customer Details (App-based modal) -->
       <div class="modal-overlay" id="mobile-edit-customer-modal">
-        <div class="modal-card" style="width: 92%; max-width: 480px; max-height: 85vh; overflow-y: auto;">
+        <div class="modal-card" style="width: 92%; max-width: 480px; max-height: calc(var(--vvh) - 24px); overflow-y: auto;">
           <div class="modal-header">
             <h3>Edit Customer Details</h3>
             <button class="sheet-close-btn" id="close-mobile-modal-edit-customer-btn" style="position: static;">✕</button>
@@ -508,7 +382,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-add-followup">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-submit-add-followup" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">+ Save Follow-up</button>
+            <button class="btn-primary-desktop" id="btn-submit-add-followup" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Follow-up</button>
           </div>
         </div>
       </div>
@@ -1033,22 +907,17 @@ export function createMobileView(container, options = {}) {
               </div>
               <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
             </div>
-            <button class="btn-add-event-pill" id="mobile-add-event-btn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" x2="12" y1="5" y2="19"/>
-                <line x1="5" x2="19" y1="12" y2="12"/>
-              </svg>
-              + Add Event
-            </button>
+            <div class="itin-actions"><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button><button class="btn-add-event-pill" id="mobile-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
           </div>
 
           <div class="itinerary-v2-container">
-          ${days.map(dayGroup => `
+          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Add a day to start planning.</p><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button></div>` : ''}
+          ${days.map((dayGroup, dayIdx) => `
             <div class="itinerary-day-section">
               <!-- Left Day & Date Label -->
               <div class="timeline-day-col">
                 <span class="day-badge-text">${dayGroup.day}</span>
-                <span class="day-date-sub">${dayGroup.date}</span>
+                <span class="day-date-sub">${dayGroup.date}</span>${dayGroup.title ? `<span class="day-title-sub">${esc(dayGroup.title)}</span>` : ''}<button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button>
               </div>
 
               <!-- Continuous Line & Dot Node -->
@@ -1334,47 +1203,26 @@ export function createMobileView(container, options = {}) {
     if (bottomNav) bottomNav.style.removeProperty('display');
   }
 
-  function openAssignSheet(item) {
-    targetActivityItem = item || activeModalBooking.itineraryDays?.[1]?.items?.[1];
-    isAssignSheetOpen = true;
-    openDropdownItemId = null;
-
-    // Completely hide bottom sheet so its sticky footer (Call, Message, etc.) cannot peek below!
-    const bottomSheet = container.querySelector('#mobile-bottom-sheet');
-    if (bottomSheet) {
-      bottomSheet.classList.add('hide-for-assign');
-      bottomSheet.style.setProperty('display', 'none', 'important');
-    }
-
-    // Completely hide bottom nav
-    const bottomNav = container.querySelector('.mobile-bottom-nav');
-    if (bottomNav) bottomNav.style.setProperty('display', 'none', 'important');
-
-    // Update target activity card
-    const cardEl = container.querySelector('#assign-activity-card-view');
-    if (cardEl && targetActivityItem) {
-      cardEl.innerHTML = `
-        <div class="assign-activity-thumb">
-          <img src="${targetActivityItem.image || './images/rishikesh.jpg'}" alt="${targetActivityItem.title}" />
-        </div>
-        <div class="assign-activity-info">
-          <h4>${targetActivityItem.title}</h4>
-          <p>${targetActivityItem.subtitle}</p>
-        </div>
-        <span class="tag-activity-pill">${targetActivityItem.tag || 'Activity'}</span>
-      `;
-    }
-
-    renderAssignVendorsList();
-
-    const sheet = container.querySelector('#mobile-assign-to-sheet');
-    if (sheet) {
-      sheet.classList.add('open');
-      sheet.style.setProperty('display', 'flex', 'important');
-    }
+  // Assign an itinerary event: the same shared Assign sheet as everywhere else, with the event as the summary card.
+  function assignItineraryItem(item) {
+    const rec = activeModalBooking;
+    if (!item || !rec) return;
+    const prev = item.assigned;
+    const t = EVENT_TYPES.find(x => x.value === item.type) || EVENT_TYPES[0];
+    openAssign({
+      kind: 'itinerary',
+      items: [{ id: item.id, title: item.title, name: item.title }],
+      summary: { title: item.title, subtitle: item.subtitle, badge: t.label.split(' / ')[0], iconHtml: icon(t.icon, { size: 22 }) },
+      onApply: (who) => { item.assigned = { isAssigned: true, name: who.name, avatar: who.avatar }; renderSheetBody(); },
+      onRevert: () => { item.assigned = prev; renderSheetBody(); },
+      persist: () => persist(rec, { onRollback: renderSheetBody }),
+    });
   }
 
+  function openAssignSheet(item) { assignItineraryItem(item); }
+
   function closeAssignSheet() {
+    return;
     isAssignSheetOpen = false;
     const sheet = container.querySelector('#mobile-assign-to-sheet');
     if (sheet) {
@@ -1436,7 +1284,7 @@ export function createMobileView(container, options = {}) {
       return `
         <button class="preset-chip-btn ${alreadyHas ? 'is-active' : ''}" data-preset-text="${p.text}" data-preset-icon="${p.icon}" data-preset-color="${p.color}">
           ${getSpecialReqIconSvg(p.icon, alreadyHas ? '#2563EB' : p.color)}
-          <span>${alreadyHas ? '✓ ' + p.text : '+ ' + p.text}</span>
+          <span>${alreadyHas ? '✓ ' + p.text : p.text}</span>
         </button>
       `;
     }).join('');
@@ -1548,28 +1396,7 @@ export function createMobileView(container, options = {}) {
     if (modal) modal.classList.remove('open');
   }
 
-  function openAddEventModal() {
-    const modal = container.querySelector('#mobile-add-event-modal');
-    const daySelect = container.querySelector('#modal-add-event-day-select');
-    const titleInput = container.querySelector('#modal-add-event-title');
-    const subtitleInput = container.querySelector('#modal-add-event-subtitle');
 
-    if (titleInput) titleInput.value = '';
-    if (subtitleInput) subtitleInput.value = '';
-
-    if (daySelect && activeModalBooking.itineraryDays) {
-      daySelect.innerHTML = activeModalBooking.itineraryDays.map((d, idx) => `
-        <option value="${idx}">${d.day} (${d.date})</option>
-      `).join('') + `<option value="new">+ Create New Day</option>`;
-    }
-
-    if (modal) modal.classList.add('open');
-  }
-
-  function closeAddEventModal() {
-    const modal = container.querySelector('#mobile-add-event-modal');
-    if (modal) modal.classList.remove('open');
-  }
 
   function openMobileEditCustomerModal() {
     if (!activeModalBooking) return;
@@ -2395,6 +2222,7 @@ export function createMobileView(container, options = {}) {
         } else if (act === 'complete') {
           if (foundItem) {
             foundItem.completed = !foundItem.completed;
+            persist(activeModalBooking, { onRollback: renderSheetBody });
             renderSheetBody();
             window.dispatchEvent(new CustomEvent('show-toast', {
               detail: { 
@@ -2474,60 +2302,21 @@ export function createMobileView(container, options = {}) {
       }
 
       // Add Itinerary Event Modal Triggers & Actions
-      if (e.target.closest('#mobile-add-event-btn')) {
-        openAddEventModal();
-        return;
-      }
-
-      if (e.target.closest('#btn-cancel-add-event') || e.target.closest('#close-modal-add-event-btn')) {
-        closeAddEventModal();
-        return;
-      }
-
-      if (e.target.closest('#btn-submit-add-event')) {
-        const dayVal = container.querySelector('#modal-add-event-day-select')?.value;
-        const title = container.querySelector('#modal-add-event-title')?.value?.trim();
-        const subtitle = container.querySelector('#modal-add-event-subtitle')?.value?.trim();
-        const type = container.querySelector('#modal-add-event-type')?.value || 'sightseeing';
-
-        if (!title) {
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: 'Please enter an event title.', type: 'warning' }
-          }));
-          return;
-        }
-
-        const newEvent = {
-          id: 'IT-EVT-' + Date.now(),
-          type,
-          icon: type === 'transport' ? 'bus' : type === 'hotel' ? 'bed' : type === 'activity' ? 'raft' : type === 'food' ? 'restaurant' : 'camera',
-          title,
-          subtitle: subtitle || 'Scheduled activity',
-          assigned: null,
-          completed: false
-        };
-
-        activeModalBooking.itineraryDays = activeModalBooking.itineraryDays || [];
-
-        if (dayVal === 'new') {
-          const nextDayNum = activeModalBooking.itineraryDays.length + 1;
-          activeModalBooking.itineraryDays.push({
-            day: `Day ${nextDayNum}`,
-            date: 'TBD',
-            items: [newEvent]
-          });
-        } else {
-          const dIdx = parseInt(dayVal, 10);
-          if (activeModalBooking.itineraryDays[dIdx]) {
-            activeModalBooking.itineraryDays[dIdx].items.push(newEvent);
-          }
-        }
-
-        closeAddEventModal();
-        renderSheetBody();
-        window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { message: `Added "${title}" to itinerary!`, type: 'success' }
-        }));
+      if (e.target.closest('#mobile-add-event-btn')) { openEventDialog(activeModalBooking, { onChange: renderSheetBody }); return; }
+      if (e.target.closest('[data-add-day]')) { openDayDialog(activeModalBooking, { onChange: renderSheetBody }); return; }
+      const dayMenuBtn = e.target.closest('[data-day-menu]');
+      if (dayMenuBtn) {
+        e.stopPropagation();
+        const idx = Number(dayMenuBtn.dataset.dayMenu);
+        const rec = activeModalBooking;
+        openRowMenu(dayMenuBtn, [
+          { key: 'rename', label: 'Rename day', icon: 'edit' },
+          { key: 'delete', label: 'Delete day', icon: 'trash', danger: true },
+        ], (key) => {
+          if (key === 'rename') return openDayDialog(rec, { index: idx, onChange: renderSheetBody });
+          if (daysOf(rec)[idx]?.items.length) return toast('Only empty days can be deleted. Remove its events first.', 'warning');
+          commit(rec, () => { daysOf(rec).splice(idx, 1); renumber(rec); }, renderSheetBody, 'Day deleted');
+        });
         return;
       }
 
@@ -2581,6 +2370,7 @@ export function createMobileView(container, options = {}) {
           modalActiveItem.title = title;
           if (subtitle) modalActiveItem.subtitle = subtitle;
           if (type) modalActiveItem.type = type;
+          persist(activeModalBooking, { onRollback: renderSheetBody });
           closeEditActivityModal();
           renderSheetBody();
           window.dispatchEvent(new CustomEvent('show-toast', {
@@ -2869,8 +2659,6 @@ export function createMobileView(container, options = {}) {
     closeAssignSheet,
     openSpecialReqModal,
     closeSpecialReqModal,
-    openAddEventModal,
-    closeAddEventModal,
     openActivityDetailsModal,
     closeActivityDetailsModal,
     openEditActivityModal,

@@ -2,6 +2,7 @@
 import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST } from '../data.js';
 import { phoneKey, addFollowUpLocal } from './followups.js';
 import { toast } from './ui.js';
+import { markSaved } from './itinerary.js';
 
 export const INQUIRY_TABS = [
   { key: 'all', label: 'All', short: 'All' },
@@ -72,7 +73,7 @@ export function inquiryToBooking(i, prev) {
     assignedTo: { name: staff?.name || i.assigned_to_name || 'Unassigned', avatar: staff?.avatar || '' },
     assignedStatus: i.assigned_to_id ? 'Assigned' : 'Unassigned',
     guests: [{ id: 1, name: i.customer_name, age: '', role: 'Primary Contact', phone: i.customer_phone, isPrimary: true }],
-    itineraryDays: [],
+    itineraryDays: prev?.itineraryDays ?? JSON.parse(JSON.stringify(i.itinerary_days || [])),
     specialRequirements: [],
     updates: [{ title: 'Inquiry received', time: '', desc: `${i.customer_name} inquired about ${i.trip}${i.lead_source ? ` via ${i.lead_source}` : ''}.`, user: 'Ruyi Admin' }],
   };
@@ -149,7 +150,11 @@ export async function syncBookingPayments() {
     const rows = (await res.json()).data || [];
     rows.forEach((r) => {
       const b = INITIAL_BOOKINGS.find((x) => x.id === r.id);
-      if (b && b.status !== r.status) { b.status = r.status; b.statusClass = r.status_class; }
+      if (!b) return;
+      if (b.status !== r.status) { b.status = r.status; b.statusClass = r.status_class; }
+      if (Array.isArray(r.itinerary_days) && r.itinerary_days.length) b.itineraryDays = r.itinerary_days;
+      if (r.assigned_to && r.assigned_to.name) b.assignedTo = { ...(b.assignedTo || {}), name: r.assigned_to.name, avatar: r.assigned_to.avatar || b.assignedTo?.avatar || '' };
+      markSaved(b);
     });
   } catch { /* standalone */ }
 }
