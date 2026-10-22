@@ -596,7 +596,7 @@ export function createDesktopView(container) {
       <div class="table-booking-cell">
         <div class="table-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
         <div class="table-booking-info">
-          <h4 class="cust-name-line"><span class="cust-name">${esc(b.guest.name)}</span>${categoryBadge(b)}</h4>
+          <h4 class="cust-name-line"><span class="cust-name">${esc(b.guest.name)}</span>${b.kind === 'inquiry' ? '' : categoryBadge(b)}</h4>
           <p>${esc(b.guest.phone)}</p>
         </div>
       </div>
@@ -640,10 +640,13 @@ export function createDesktopView(container) {
           <div class="compact-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
           <div class="compact-info-col">
             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-              ${categoryBadge(b, 'style="font-size: 10px; padding: 2px 6px;"')}
+              ${inquiry ? '' : categoryBadge(b, 'style="font-size: 10px; padding: 2px 6px;"')}
               <span class="compact-dates" style="font-size: 11px; color: #64748B;">${esc(b.dates)}</span>
             </div>
-            <h4 class="compact-trip-title" title="${esc(b.guest.name)}">${esc(b.guest.name)}</h4>
+            <div class="compact-name-line">
+              <h4 class="compact-trip-title" title="${esc(b.guest.name)}">${esc(b.guest.name)}</h4>
+              ${inquiry ? `<span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>` : ''}
+            </div>
             <p class="compact-guest-sub" style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
               <span>${esc(b.title)}</span><span style="color: #94A3B8;">•</span><span>${b.pax} Pax</span>
             </p>
@@ -651,8 +654,7 @@ export function createDesktopView(container) {
         </div>
         <div class="compact-card-bottom">
           <div style="display: flex; align-items: center; gap: 6px;">
-            ${inquiry ? '' : `<span class="compact-price">${esc(b.price)}</span>`}
-            <span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>
+            ${inquiry ? '' : `<span class="compact-price">${esc(b.price)}</span><span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>`}
           </div>
           <div class="card-action-btns-row" style="gap: 5px;">${rowActionButtons(b, 13, 'width: 28px; height: 28px;')}</div>
         </div>

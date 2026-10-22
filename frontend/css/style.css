@@ -6306,3 +6306,22 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   .bookings-table .table-booking-cell { gap: 10px; }
 }
 @media (min-width: 700px) and (max-width: 799px) { .bookings-table th, .bookings-table td { padding-left: 5px; padding-right: 5px; } .bookings-table .cell-amount { font-size: 13.5px; } }
+
+/* v5: Inquiries row rebalance (status beside name, note directly under the buttons) */
+.list-row-card.is-inquiry { column-gap: 8px; padding-top: 10px; padding-bottom: 10px; }
+.list-row-card.is-inquiry .card-right-col { width: auto; min-width: 138px; gap: 6px; justify-content: flex-start; align-self: start; }
+.list-row-card.is-inquiry .card-right-col .quick-note { width: 100%; }
+.list-row-card.is-inquiry .quick-note input { min-width: 100px; }
+.list-row-card.is-inquiry .row-lead-col { gap: 8px; }
+.list-row-card.is-inquiry .card-info-col { gap: 2px; }
+.list-row-card.is-inquiry .qn-row { margin-top: 2px; }
+.compact-name-line { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.compact-name-line .compact-trip-title { min-width: 0; flex: 0 1 auto; }
+.compact-name-line .compact-status-badge { flex-shrink: 0; }
+@media (max-width: 374px) { .list-row-card.is-inquiry .card-right-col { min-width: 0; } }
+.list-row-card.is-inquiry .card-right-col { width: 138px; min-width: 138px; }
+.list-row-card.is-inquiry .quick-note input { width: 0; flex: 1 1 100px; }
+.list-row-card.is-inquiry .row-name-line { flex-wrap: wrap; row-gap: 2px; }
+.list-row-card.is-inquiry .row-name-line .card-title { max-width: 100%; }
+@media (max-width: 374px) { .list-row-card.is-inquiry .card-right-col { width: auto; min-width: 0; } }
+.list-row-card.is-inquiry { padding-left: 10px; padding-right: 10px; }

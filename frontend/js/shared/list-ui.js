@@ -115,7 +115,7 @@ export function mobileRowCard(b) {
       <div class="card-info-col">
         <div class="row-name-line">
           <h3 class="card-title">${esc(b.guest.name)}</h3>
-          ${categoryBadge(b)}
+          ${inquiry ? statusPill(b) : categoryBadge(b)}
         </div>
         <p class="row-trip">${esc(b.title)}</p>
         <div class="card-meta-row">${icon('user', { size: 13 })}<span>${b.pax} Pax • ${esc(b.duration)}</span></div>
@@ -123,10 +123,7 @@ export function mobileRowCard(b) {
       </div>
       <div class="card-right-col">
         <div class="card-action-btns-row">${rowActionButtons(b, 15)}</div>
-        <div class="card-price-status-row">
-          ${inquiry ? statusPill(b) : `<span class="card-price">${esc(b.price)}</span>${statusPill(b)}`}
-        </div>
-        ${inquiry ? quickNote(b) : ''}
+        ${inquiry ? quickNote(b) : `<div class="card-price-status-row"><span class="card-price">${esc(b.price)}</span>${statusPill(b)}</div>`}
       </div>
       ${inquiry ? quickNote(b, 'qn-row') : ''}
     </div>`;
