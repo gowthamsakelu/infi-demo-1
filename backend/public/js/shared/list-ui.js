@@ -36,27 +36,35 @@ export function renderTabs(host, { tabs, active, variant = 'desktop', attr = 'da
   }
 }
 
-/** Momentum touch scroll is native; add mouse-drag, wheel-to-horizontal and edge fades. */
+/**
+ * Momentum touch scroll is native; add mouse-drag (mouse only), wheel-to-horizontal and edge fades.
+ * The window listeners exist once for the whole app and act on whichever scroller the mouse went down on,
+ * so re-rendering a tab row never adds more of them.
+ */
+let drag = null;
+window.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.startX;
+  if (Math.abs(dx) > 4) drag.moved = true;
+  drag.el.scrollLeft = drag.startLeft - dx;
+});
+window.addEventListener('pointerup', () => { if (drag) { const d = drag; drag = null; if (d.moved) d.el.dataset.dragged = '1'; } });
+
 function bindTabsScroller(el) {
+  let fadeQueued = false;
   const fade = () => {
+    fadeQueued = false;
     el.classList.toggle('fade-left', el.scrollLeft > 4);
     el.classList.toggle('fade-right', el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
   };
+  const queueFade = () => { if (!fadeQueued) { fadeQueued = true; requestAnimationFrame(fade); } };
   fade();
-  el.addEventListener('scroll', fade, { passive: true });
-  let down = false, startX = 0, startLeft = 0, moved = false;
+  el.addEventListener('scroll', queueFade, { passive: true });
   el.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse') return;
-    down = true; moved = false; startX = e.clientX; startLeft = el.scrollLeft;
+    drag = { el, startX: e.clientX, startLeft: el.scrollLeft, moved: false };
   });
-  window.addEventListener('pointermove', (e) => {
-    if (!down) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > 4) moved = true;
-    el.scrollLeft = startLeft - dx;
-  });
-  window.addEventListener('pointerup', () => { down = false; });
-  el.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  el.addEventListener('click', (e) => { if (el.dataset.dragged) { delete el.dataset.dragged; e.stopPropagation(); e.preventDefault(); } }, true);
   el.addEventListener('wheel', (e) => {
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && el.scrollWidth > el.clientWidth) { el.scrollLeft += e.deltaY; e.preventDefault(); }
   }, { passive: false });
@@ -98,19 +106,28 @@ export function assignItems(list) {
 export function quickNote(b, cls = '') {
   return `<form class="quick-note ${cls}" data-quick-note="${esc(b.id)}" autocomplete="off">
     <input type="text" maxlength="500" placeholder="Type a quick note…" enterkeyhint="send" aria-label="Quick note for ${esc(b.guest.name)}" />
-    <button type="submit" class="quick-note-send" aria-label="Send note">${icon('send', { size: 15 })}</button>
+    <button type="submit" class="quick-note-send" aria-label="Send note" disabled>${icon('send', { size: 15 })}</button>
   </form>`;
 }
 
-/* ---------- Mobile row card (Bookings + Inquiries) ---------- */
+/** Keep every Send button disabled while its note is empty. One listener per view root. */
+export function bindQuickNotes(root) {
+  root.addEventListener('input', (e) => {
+    const input = e.target.closest?.('.quick-note input');
+    if (input) input.form.querySelector('.quick-note-send').disabled = !input.value.trim();
+  });
+}
 
-export function mobileRowCard(b) {
+/* ---------- Row card (Bookings + Inquiries, phone list and PC split list) ---------- */
+
+/** `split` = the card in the PC split list (own data attributes for its click and checkbox handlers); `active` = the open record. */
+export function rowCard(b, { split = false, active = false } = {}) {
   const inquiry = b.kind === 'inquiry';
   return `
-    <div class="booking-card list-row-card ${inquiry ? 'is-inquiry' : ''} ${b.selected ? 'card-selected' : ''}" data-booking-id="${esc(b.id)}">
+    <div class="booking-card list-row-card ${inquiry ? 'is-inquiry' : ''} ${b.selected ? 'card-selected' : ''} ${active ? 'active' : ''}" ${split ? 'data-compact-booking-id' : 'data-booking-id'}="${esc(b.id)}">
       <div class="row-lead-col">
         ${avatar(b.guest.name)}
-        ${checkbox({ checked: b.selected, attr: 'data-select-id', id: b.id, label: `Select ${b.guest.name}` })}
+        ${checkbox({ checked: b.selected, attr: split ? 'data-desktop-select-id' : 'data-select-id', id: b.id, label: `Select ${b.guest.name}` })}
       </div>
       <div class="card-info-col">
         <div class="row-name-line">

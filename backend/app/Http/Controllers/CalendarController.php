@@ -16,9 +16,9 @@ class CalendarController extends Controller
 
     /** Itinerary event type -> calendar category (current and older icon-style keys). */
     private const ITEM_CATEGORY = [
-        'sightseeing' => 'tours', 'camera' => 'tours', 'food' => 'tours', 'restaurant' => 'tours',
+        'sightseeing' => 'tours', 'camera' => 'tours', 'food' => 'tours', 'restaurant' => 'tours', 'meal' => 'tours',
         'activity' => 'activities', 'raft' => 'activities',
-        'hotel' => 'hotel', 'bed' => 'hotel',
+        'hotel' => 'hotel', 'bed' => 'hotel', 'stay' => 'hotel',
         'transport' => 'transport', 'bus' => 'transport',
     ];
 
@@ -38,7 +38,7 @@ class CalendarController extends Controller
         abort_if($from->diffInDays($to) >= self::MAX_DAYS, 422, 'The range is too long.');
 
         $bookings = Booking::query()
-            ->select('id', 'title', 'type', 'pax', 'status', 'destination', 'customer', 'guests', 'itinerary_days', 'start_date', 'end_date')
+            ->select('id', 'title', 'type', 'pax', 'status', 'destination', 'customer', 'guests', 'start_date', 'end_date')
             ->whereDate('start_date', '<=', $to->toDateString())
             ->whereDate('end_date', '>=', $from->toDateString())
             ->get();
@@ -96,10 +96,13 @@ class CalendarController extends Controller
                 continue;
             }
             foreach ($day['items'] ?? [] as $j => $item) {
+                if (($item['type'] ?? '') === 'note') {
+                    continue; // notes have no place on the calendar
+                }
                 $sub = trim((string) ($item['subtitle'] ?? ''));
-                $time = preg_match('/^\d{1,2}:\d{2}\s*[AP]M/i', $sub, $m) ? $m[0] : null;
+                $time = preg_match('/^\d{1,2}:\d{2}\s*[AP]M/i', $sub, $m) ? $m[0] : ($item['time'] ?? null);
                 $rest = $time ? trim(preg_replace('/^\d{1,2}:\d{2}\s*[AP]M\s*[•\-–]?\s*/iu', '', $sub)) : $sub;
-                $out[] = $make('item', "$i-$j", $date, (string) ($item['title'] ?? 'Event'), trim(($rest ?: $b->title)." • $pax", ' •'), self::ITEM_CATEGORY[$item['type'] ?? ''] ?? $category, $time);
+                $out[] = $make('item', "$i-$j", $date, (string) ($item['title'] ?? 'Event'), trim(($rest ?: $b->title)." • $pax", ' •'), ($item['icon'] ?? '') === 'camera' ? 'tours' : (self::ITEM_CATEGORY[$item['type'] ?? ''] ?? $category), $time);
             }
         }
 

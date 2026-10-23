@@ -70,10 +70,11 @@ class InquiryController extends Controller
 
     public function storeNote(Request $request, Inquiry $inquiry): JsonResponse
     {
-        $staff = Staff::find($request->input('created_by', 'ST-05'));
-        abort_if($staff === null, 403);
-
         $data = $request->validate(['comment' => ['required', 'string', 'max:500']]);
+        $staffId = (string) $request->input('created_by', 'ST-05');
+        $staff = Staff::find($staffId);
+        // An unknown staff id sent by the client is refused; the built-in default may be missing on a fresh database.
+        abort_if($staff === null && $request->has('created_by'), 403);
         $data['comment'] = trim($data['comment']);
         abort_if($data['comment'] === '', 422, 'Note cannot be empty.');
 
@@ -83,8 +84,8 @@ class InquiryController extends Controller
             'type' => 'note',
             'scheduled_at' => now(),
             'comment' => $data['comment'],
-            'created_by' => $staff->id,
-            'created_by_name' => $staff->name,
+            'created_by' => $staff?->id ?? $staffId,
+            'created_by_name' => $staff?->name ?? 'Ruyi Admin',
         ]);
 
         return response()->json(['success' => true, 'message' => 'Note saved', 'data' => $this->presentFollowUp($note)], 201);

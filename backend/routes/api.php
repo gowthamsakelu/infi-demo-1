@@ -25,5 +25,7 @@ Route::get('/follow-ups', [InquiryController::class, 'followUps']);
 
 Route::get('/{kind}/{id}/itinerary', [ItineraryController::class, 'show'])->whereIn('kind', ['bookings', 'inquiries']);
 Route::put('/{kind}/{id}/itinerary', [ItineraryController::class, 'update'])->whereIn('kind', ['bookings', 'inquiries']);
+Route::patch('/{kind}/{id}/itinerary/items/{uid}', [ItineraryController::class, 'updateItem'])->whereIn('kind', ['bookings', 'inquiries']);
+Route::delete('/{kind}/{id}/itinerary/items/{uid}', [ItineraryController::class, 'destroyItem'])->whereIn('kind', ['bookings', 'inquiries']);
 
 Route::get('/calendar/events', [CalendarController::class, 'events']);

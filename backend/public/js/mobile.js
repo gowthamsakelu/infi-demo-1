@@ -1,16 +1,18 @@
 import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, getSpecialReqIconSvg } from './data.js';
 import { icon } from './shared/icons.js';
 import { createMobileCalendar } from './calendar-mobile.js';
+import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
 import { searchBox, emptyState, toast, openRowMenu, esc, skeletonCards, errorState } from './shared/ui.js';
-import { renderTabs, mobileRowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
+import { renderTabs, bindQuickNotes, rowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
-import { openEventDialog, openDayDialog, commit } from './shared/itinerary-dialog.js';
-import { daysOf, persist, renumber, EVENT_TYPES } from './shared/itinerary.js';
+import { openDayDialog, commit } from './shared/itinerary-dialog.js';
+import { daysOf, persist, renumber, eventKind, itemIconHtml, itemPills } from './shared/itinerary.js';
+import { openItineraryBuilder } from './shared/itinerary-builder-ui.js';
 import { matchesCategory } from './shared/booking-filters.js';
 
 export function createMobileView(container, options = {}) {
@@ -65,12 +67,12 @@ export function createMobileView(container, options = {}) {
             </div>
           </div>
           <div class="app-header-right">
-            <button class="icon-bell-btn" id="mobile-bell-btn" title="Notifications">
+            <button class="icon-bell-btn" id="mobile-bell-btn" title="Notifications" aria-label="Notifications">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
-              <span class="bell-dot"></span>
+              <span class="bell-dot" id="mobile-bell-dot"></span>
             </button>
             <div class="ks-avatar-badge" title="Karan Sapalia">KS</div>
           </div>
@@ -89,10 +91,14 @@ export function createMobileView(container, options = {}) {
         ${bulkBar('mobile')}
 
         <!-- Bookings Cards List -->
-        <div class="bookings-cards-list" id="mobile-cards-list"></div>
+        <div class="bookings-cards-list row-list" id="mobile-cards-list"></div>
         </div>
         <div id="mobile-calendar-page" hidden></div>
       </div>
+
+      <!-- Notifications: the same panel as on PC, across the screen under the header -->
+      <div class="notif-backdrop" id="mobile-notif-backdrop" hidden></div>
+      <div class="notifications-panel mobile-notifications" id="mobile-notifications" role="dialog" aria-label="Notifications" hidden>${notificationsHtml()}</div>
 
       <!-- Bottom Navigation Bar (Fixed) -->
       <div class="mobile-bottom-nav">
@@ -451,7 +457,7 @@ export function createMobileView(container, options = {}) {
       const el = container.querySelector(`.list-row-card[data-booking-id="${id}"]`);
       if (!b || !el) { ok = false; return; }
       const t = document.createElement('div');
-      t.innerHTML = mobileRowCard(b).trim();
+      t.innerHTML = rowCard(b).trim();
       el.replaceWith(t.firstElementChild);
     });
     if (!ok) return renderCards();
@@ -484,7 +490,7 @@ export function createMobileView(container, options = {}) {
     } else if (filtered.length === 0) {
       listEl.innerHTML = emptyState({ title: `No ${what} found`, text: 'No results matching your selected filters.', resetId: 'btn-clear-mobile-empty-filters' });
     } else {
-      listEl.innerHTML = filtered.map(mobileRowCard).join('');
+      listEl.innerHTML = filtered.map(rowCard).join('');
     }
 
     const tabs = tabDefs().map(t => ({ ...t, count: t.key === allKey() ? base.length : base.filter(b => b.category === t.key).length }));
@@ -558,73 +564,6 @@ export function createMobileView(container, options = {}) {
     if (guestBadge) guestBadge.textContent = b.guests.length;
   }
 
-  function getItemIconSvg(type) {
-    switch (type) {
-      case 'bus':
-      case 'transport':
-        return `
-          <div class="item-icon-box item-icon-bus">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M8 6v6"/>
-              <path d="M15 6v6"/>
-              <path d="M2 12h19.6"/>
-              <path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5.3c-.3-1.1-1.3-1.9-2.4-1.9H5c-1.1 0-2.1.8-2.4 1.9L1.2 12.8c-.1.4-.2.8-.2 1.2 0 .4.1.8.2 1.2.3 1.1.8 2.8.8 2.8h3"/>
-              <circle cx="7" cy="18" r="2"/>
-              <path d="M9 18h5"/>
-              <circle cx="16" cy="18" r="2"/>
-            </svg>
-          </div>
-        `;
-      case 'bed':
-      case 'hotel':
-        return `
-          <div class="item-icon-box item-icon-bed">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 4v16"/>
-              <path d="M2 8h18a2 2 0 0 1 2 2v10"/>
-              <path d="M2 17h20"/>
-              <path d="M6 8v9"/>
-            </svg>
-          </div>
-        `;
-      case 'camera':
-      case 'sightseeing':
-        return `
-          <div class="item-icon-box item-icon-camera">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
-              <circle cx="12" cy="13" r="3"/>
-            </svg>
-          </div>
-        `;
-      case 'raft':
-      case 'activity':
-        return `
-          <div class="item-icon-box item-icon-raft">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 12h20"/>
-              <path d="M20 12v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3"/>
-              <line x1="8" y1="12" x2="6" y2="6"/>
-              <line x1="16" y1="12" x2="18" y2="6"/>
-            </svg>
-          </div>
-        `;
-      case 'restaurant':
-      case 'food':
-        return `
-          <div class="item-icon-box item-icon-restaurant">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/>
-              <path d="M15 11v11"/>
-              <path d="M4 2v20"/>
-              <path d="M4 2c2 0 5 1 5 4v2a3 3 0 0 1-3 3H4"/>
-            </svg>
-          </div>
-        `;
-      default:
-        return `<div class="item-icon-box item-icon-bus"><svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>`;
-    }
-  }
 
   function renderSheetBody() {
     const bodyEl = container.querySelector('#sheet-body-content');
@@ -933,14 +872,15 @@ export function createMobileView(container, options = {}) {
                 ${dayGroup.items.map(item => `
                   <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-itinerary-item-id="${item.id}">
                     <div class="item-left-content">
-                      ${getItemIconSvg(item.type)}
+                      ${itemIconHtml(item, 20)}
                       <div class="item-text-info">
-                        <h4 class="item-text-title">${item.title}</h4>
-                        <p class="item-text-sub">${item.subtitle}</p>
+                        <h4 class="item-text-title">${esc(item.title)}</h4>
+                        <p class="item-text-sub">${esc(item.subtitle)}</p>
                       </div>
                     </div>
 
                     <div class="item-right-content">
+                      ${itemPills(item)}
                       <!-- Completed Pill Badge -->
                       ${item.completed ? `
                         <span class="completed-pill-badge" title="Completed">
@@ -1213,11 +1153,11 @@ export function createMobileView(container, options = {}) {
     const rec = activeModalBooking;
     if (!item || !rec) return;
     const prev = item.assigned;
-    const t = EVENT_TYPES.find(x => x.value === item.type) || EVENT_TYPES[0];
+    const t = eventKind(item);
     openAssign({
       kind: 'itinerary',
       items: [{ id: item.id, title: item.title, name: item.title }],
-      summary: { title: item.title, subtitle: item.subtitle, badge: t.label.split(' / ')[0], iconHtml: icon(t.icon, { size: 22 }) },
+      summary: { title: item.title, subtitle: item.subtitle, badge: t.label, iconHtml: icon(t.icon, { size: 22 }) },
       onApply: (who) => { item.assigned = { isAssigned: true, name: who.name, avatar: who.avatar }; renderSheetBody(); },
       onRevert: () => { item.assigned = prev; renderSheetBody(); },
       persist: () => persist(rec, { onRollback: renderSheetBody }),
@@ -1305,7 +1245,7 @@ export function createMobileView(container, options = {}) {
     const toggleBtn = container.querySelector('#btn-modal-details-toggle-complete');
 
     if (titleText) titleText.textContent = item.title;
-    if (iconBox) iconBox.innerHTML = getItemIconSvg(item.type);
+    if (iconBox) iconBox.innerHTML = itemIconHtml(item, 20);
     if (toggleBtn) {
       toggleBtn.textContent = item.completed ? 'Mark Incomplete' : 'Mark Completed ✓';
       toggleBtn.style.color = item.completed ? '#DC2626' : '#16A34A';
@@ -1522,6 +1462,7 @@ export function createMobileView(container, options = {}) {
       renderCards();
     }
 
+    bindNotifications({ bell: container.querySelector('#mobile-bell-btn'), panel: container.querySelector('#mobile-notifications'), dot: container.querySelector('#mobile-bell-dot'), backdrop: container.querySelector('#mobile-notif-backdrop') });
     const calendar = createMobileCalendar(container.querySelector('#mobile-calendar-page'), {
       isActive: () => page === 'calendar' && document.documentElement.dataset.layout === 'mobile',
       onOpen: (b) => openModal(b),
@@ -1635,13 +1576,17 @@ export function createMobileView(container, options = {}) {
       else if (key === 'followup') openFollowUpModal(b.raw);
     }
 
+    bindQuickNotes(container);
     container.addEventListener('submit', async (e) => {
       const form = e.target.closest('[data-quick-note]');
       if (!form) return;
       e.preventDefault();
       const input = form.querySelector('input');
-      if (!input.value.trim()) { input.focus(); return; } // empty: just focus the field
+      const send = form.querySelector('.quick-note-send');
+      if (!input.value.trim() || send.disabled) return; // empty notes cannot be sent
+      send.disabled = true; // one request at a time; it stays off until the field changes
       if (await saveQuickNote(form.dataset.quickNote, input.value)) input.value = '';
+      else send.disabled = !input.value.trim();
     });
 
     container.addEventListener('click', (e) => {
@@ -1725,8 +1670,11 @@ export function createMobileView(container, options = {}) {
     const screenArea = container.querySelector('.bookings-screen') || container;
 
     // Touch event listeners (Mobile swipe left/right)
+    // The swipe-to-change-tab gesture belongs to the Bookings / Inquiries list only: on the Calendar page (or in the
+    // header and nav) a horizontal swipe is the page's own scrolling and must never switch a list tab.
+    const inList = (t) => page !== 'calendar' && !!t.closest('#mobile-bookings-page');
     screenArea.addEventListener('touchstart', (e) => {
-      if (isModalOpen || isAssignSheetOpen || e.target.closest('.tabs-scroller')) return;
+      if (isModalOpen || isAssignSheetOpen || !inList(e.target) || e.target.closest('.tabs-scroller')) { isTouchSwiping = false; return; }
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
       touchEndX = touchStartX;
@@ -1766,7 +1714,7 @@ export function createMobileView(container, options = {}) {
     let mouseEndY = 0;
 
     screenArea.addEventListener('mousedown', (e) => {
-      if (isModalOpen || isAssignSheetOpen || e.button !== 0) return;
+      if (isModalOpen || isAssignSheetOpen || e.button !== 0 || !inList(e.target)) return;
       if (e.target.closest('button, input, select, textarea, .custom-checkbox, .card-select-checkbox')) return;
       isMouseDownDrag = true;
       mouseStartX = e.clientX;
@@ -2315,16 +2263,18 @@ export function createMobileView(container, options = {}) {
       }
 
       // Add Itinerary Event Modal Triggers & Actions
-      if (e.target.closest('#mobile-add-event-btn')) { openEventDialog(activeModalBooking, { onChange: renderSheetBody }); return; }
+      if (e.target.closest('#mobile-add-event-btn')) { openItineraryBuilder(activeModalBooking, { onChange: renderSheetBody }); return; }
       const dayMenuBtn = e.target.closest('[data-day-menu]');
       if (dayMenuBtn) {
         e.stopPropagation();
         const idx = Number(dayMenuBtn.dataset.dayMenu);
         const rec = activeModalBooking;
         openRowMenu(dayMenuBtn, [
+          { key: 'add', label: 'Add event', icon: 'plus' },
           { key: 'rename', label: 'Rename day', icon: 'edit' },
           { key: 'delete', label: 'Delete day', icon: 'trash', danger: true },
         ], (key) => {
+          if (key === 'add') return openItineraryBuilder(rec, { day: idx, step: 2, onChange: renderSheetBody });
           if (key === 'rename') return openDayDialog(rec, { index: idx, onChange: renderSheetBody });
           if (daysOf(rec)[idx]?.items.length) return toast('Only empty days can be deleted. Remove its events first.', 'warning');
           commit(rec, () => { daysOf(rec).splice(idx, 1); renumber(rec); }, renderSheetBody, 'Day deleted');

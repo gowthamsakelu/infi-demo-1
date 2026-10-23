@@ -148,7 +148,8 @@ export function dismissOnOutside(el, onClose, ignore = []) {
     if (el.contains(e.target) || ignore.some((n) => n && n.contains(e.target))) return;
     onClose();
   };
-  const key = (e) => { if (e.key === 'Escape') onClose(); };
+  // Esc is used up by the open overlay, so nothing behind it (such as the detail pane) reacts to the same key press.
+  const key = (e) => { if (e.key === 'Escape') { e.preventDefault(); onClose(); } };
   document.addEventListener('mousedown', down, true);
   document.addEventListener('touchstart', down, true);
   document.addEventListener('keydown', key);

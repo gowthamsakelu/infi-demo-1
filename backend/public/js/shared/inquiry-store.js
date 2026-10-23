@@ -122,7 +122,7 @@ export async function saveQuickNote(id, text) {
       method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ comment }),
     });
     const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(Object.values(body.errors || {}).flat()[0] || 'Could not save the note.');
+    if (!res.ok) throw new Error(Object.values(body.errors || {}).flat()[0] || body.message || `Could not save the note (${res.status}).`);
     addFollowUpLocal(body.data);
     toast('Note saved', 'success');
     return true;

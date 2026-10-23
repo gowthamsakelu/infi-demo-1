@@ -16,6 +16,7 @@ Ruyi Admin is a travel operations admin panel for managing bookings and inquirie
 - **Responsive** – two layouts, mobile and desktop, that switch live when the window is resized, the device is rotated or a foldable is folded or unfolded. Tablets use the desktop layout.
 - **REST API** – JSON endpoints for bookings, inquiries and follow-ups.
 
+- **Itinerary builder** – "+ Add Event" on the Itinerary tab opens a two-step builder (a dialog on desktop, a bottom sheet on phones) for bookings and inquiries. Step 1 sets the route (start, end, stops) and dates; step 2 builds each day: location, hotel stay with a meal plan, transport (included or customer-arranged), activities, meals and notes. "Done" saves the plan and the Day-wise Schedule shows it. Drafts are kept in the browser until the plan is saved.
 - **Calendar** – a month view of every booking's trip start and end plus its itinerary events, split into Tours, Activities, Hotel and Transport. Week strip and swipeable categories on phones; month grid, agenda and the shared detail pane on desktop. Searches with the top bar.
 
 Dashboard, More and Settings appear in the navigation as placeholders and are not built yet.
@@ -80,7 +81,8 @@ backend/
 │   ├── Http/Controllers/    BookingController, InquiryController
 │   ├── Http/Requests/       StoreFollowUpRequest
 │   ├── Livewire/            BookingsManager (the /livewire page)
-│   └── Models/              Booking, Inquiry, FollowUp, Staff, Vendor, Contact
+│   ├── Models/              Booking, Inquiry, Itinerary (+ Day, Item), FollowUp, Staff, Vendor, Contact
+│   └── Support/             TripDates, ItineraryWriter
 ├── database/
 │   ├── data/                Seed data (JSON)
 │   ├── migrations/          Tables for bookings, inquiries, follow-ups, staff and more
@@ -93,6 +95,8 @@ backend/
 │       ├── desktop.js       Desktop layout (also used on tablets)
 │       ├── mobile.js        Phone view
 │       ├── calendar-desktop.js, calendar-mobile.js   Calendar page for each layout
+│       ├── shared/itinerary-builder.js, itinerary-builder-ui.js   Itinerary builder (plan model and dialog)
+│       ├── shared/notifications.js   Notification panel behind the bell (PC dropdown, phone card)
 │       └── shared/          Components used by both views (calendar-store.js holds the calendar data)
 ├── routes/                  web.php, api.php
 └── tests/Feature/           Follow-up, note, assign and payment tests
@@ -131,6 +135,17 @@ The UI is a single page that switches by URL hash.
 | GET | `/api/calendar/events?from=&to=&category=` | Trip start/end and itinerary events for a date range (at most 70 days; `category` is `tours`, `activities`, `hotel` or `transport`) |
 | GET | `/api/metadata` | Staff, vendors and contacts |
 
+Itinerary endpoints, for `{kind}` = `bookings` or `inquiries`:
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/{kind}/{id}/itinerary` | Days with their events (`data`) and the route and dates (`meta`) |
+| PUT | `/api/{kind}/{id}/itinerary` | Save the whole plan in one transaction (`days`, optional `meta`) |
+| PATCH | `/api/{kind}/{id}/itinerary/items/{uid}` | Change one event (title, time, inclusion, assignee, done) |
+| DELETE | `/api/{kind}/{id}/itinerary/items/{uid}` | Remove one event |
+
+The itinerary lives in the `itineraries`, `itinerary_days` and `itinerary_items` tables, shared by bookings and inquiries. `$booking->itinerary_days` still reads and writes the day list as an array.
+
 The app has no login yet. Actions are recorded for staff member `ST-05` unless `created_by` is sent. Because there are no users or roles, there are **no permission or policy checks**: the itinerary API validates data (types, lengths, at most 60 days and 100 events per day) but does not decide who may edit. Add authorization when login is introduced.
 
 ## UI conventions
@@ -162,8 +177,8 @@ Do the whole list once in Brave and once in Chrome. Also try with the address ba
 1. Bookings: tap a row's ⋮, then Assign. The keyboard must not open. Tap Search: the sheet shrinks above the keyboard.
 2. Tap Optional Note, then "Add new member" (name, phone): each field is visible above the keyboard.
 3. Inquiries: ⋮ then Follow-up, tap the comment field. Tap the date and time fields: the system picker opens and the sheet is not covered.
-4. Open a booking, Itinerary tab, Add Event: Title and Time fields; choose "Add new day" and type its title.
-5. Add Day: the title field. Edit customer: scroll the form with the keyboard open.
+4. Open a booking, Itinerary tab, Add Event: step 1 (Trip starts from, Trip ends at, Add stop), then step 2: Day title and the Add Activity form.
+5. Day menu, Rename day: the title field. Edit customer: scroll the form with the keyboard open.
 6. Inquiries: scroll to the last row, tap its quick note. The row stays visible.
 7. Close the keyboard with the back gesture: everything returns with no jump.
 

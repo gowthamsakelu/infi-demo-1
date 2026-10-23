@@ -10,7 +10,8 @@ import { categoryTabs, dateSection, loadingAgenda, emptyAgenda, errorAgenda, fin
 export function createMobileCalendar(host, { onOpen, isActive }) {
   const collapsed = new Set();
   let paneIndex = 0;
-  let programmatic = false; // true while we scroll the panes ourselves (tab tap, swipe settling)
+  let programmatic = false; // true while we scroll the panes ourselves (tab tap)
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
   host.innerHTML = `
     <section class="cal-week">
@@ -64,7 +65,25 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
   }
 
   const currentWeek = () => Math.round(weekVp.scrollLeft / (weekVp.clientWidth || 1));
-  const showWeek = (i, smooth) => { weekVp.scrollTo({ left: i * weekVp.clientWidth, behavior: smooth ? 'smooth' : 'auto' }); $('#cal-week-label').textContent = weekLabel(i); };
+
+  /**
+   * Smooth programmatic scroll on a snapping pager. Snapping is switched off while it animates (smooth scrolling and
+   * mandatory snapping fight each other) and back on when it ends.
+   */
+  function glideX(el, left, smooth, done) {
+    if (!smooth || reduced.matches || Math.abs(el.scrollLeft - left) < 1) { el.scrollTo({ left, behavior: 'auto' }); done?.(); return; }
+    el.style.scrollSnapType = 'none';
+    let timer;
+    const end = () => { clearTimeout(timer); el.removeEventListener('scrollend', end); el.style.scrollSnapType = ''; done?.(); };
+    el.addEventListener('scrollend', end);
+    timer = setTimeout(end, 700);
+    el.scrollTo({ left, behavior: 'smooth' });
+  }
+
+  const showWeek = (i, smooth) => {
+    $('#cal-week-label').textContent = weekLabel(i);
+    if (currentWeek() !== i || !smooth) glideX(weekVp, i * weekVp.clientWidth, smooth);
+  };
 
   function renderPanes() {
     const s = store.getState();
@@ -89,8 +108,7 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
   function goToPane(i, smooth = true) {
     paneIndex = i;
     programmatic = true;
-    panes.scrollTo({ left: i * panes.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
-    setTimeout(() => { programmatic = false; }, smooth ? 400 : 0);
+    glideX(panes, i * panes.clientWidth, smooth, () => { programmatic = false; });
   }
 
   function renderCategoryTabs() {
@@ -105,6 +123,7 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
     $('#cal-month-short').textContent = store.MONTH_NAMES[s.month].slice(0, 3);
     paneIndex = store.CATEGORIES.findIndex((c) => c.key === s.category);
     renderWeeks();
+    observeWeeks();
     showWeek(Math.max(0, weekOfSelected()), false);
     renderCategoryTabs();
     renderPanes();
@@ -186,18 +205,21 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
     if (e.target.closest('#btn-retry-calendar')) store.load({ force: true });
   });
 
-  let weekTimer;
-  weekVp.addEventListener('scroll', () => { clearTimeout(weekTimer); weekTimer = setTimeout(() => { $('#cal-week-label').textContent = weekLabel(Math.max(0, currentWeek())); }, 80); }, { passive: true });
+  // Which week and which category pane is in view is read from IntersectionObserver, not from scroll events, so
+  // swiping does no work on the main thread until a page is actually mostly visible.
+  const weekSeen = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) $('#cal-week-label').textContent = weekLabel(Number(en.target.dataset.week)); });
+  }, { root: weekVp, threshold: 0.6 });
+  const observeWeeks = () => { weekSeen.disconnect(); weekVp.querySelectorAll('.cal-week-slide').forEach((el) => weekSeen.observe(el)); };
 
-  let paneTimer;
-  panes.addEventListener('scroll', () => {
-    if (programmatic) return;
-    clearTimeout(paneTimer);
-    paneTimer = setTimeout(() => {
-      const i = Math.round(panes.scrollLeft / (panes.clientWidth || 1));
+  const paneSeen = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting || programmatic) return;
+      const i = Number(en.target.dataset.calPane);
       if (i !== paneIndex && store.CATEGORIES[i]) { paneIndex = i; store.setCategory(store.CATEGORIES[i].key); }
-    }, 90);
-  }, { passive: true });
+    });
+  }, { root: panes, threshold: 0.6 });
+  panes.querySelectorAll('.cal-pane').forEach((el) => paneSeen.observe(el));
 
   return {
     activate() { lastMonth = null; lastSelected = null; render(); store.load().then(() => requestAnimationFrame(() => scrollPaneToSelected(false))); },

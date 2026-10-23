@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasItinerary;
 use App\Support\TripDates;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
+    use HasItinerary;
+
     protected $table = 'bookings';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -45,12 +49,21 @@ class Booking extends Model
         'assigned_to' => 'array',
         'special_requirements' => 'array',
         'guests' => 'array',
-        'itinerary_days' => 'array',
         'raw_price' => 'integer',
         'pax' => 'integer',
         'start_date' => 'date:Y-m-d',
         'end_date' => 'date:Y-m-d',
     ];
+
+    public function itineraryKind(): string
+    {
+        return 'booking';
+    }
+
+    public function itineraryTripStart(): ?CarbonImmutable
+    {
+        return $this->start_date ? CarbonImmutable::parse($this->start_date) : null;
+    }
 
     protected static function booted(): void
     {

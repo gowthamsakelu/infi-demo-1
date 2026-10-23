@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasItinerary;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Inquiry extends Model
 {
+    use HasItinerary;
+
     public const STATUSES = ['new', 'ongoing', 'warm', 'hot'];
 
     protected $table = 'inquiries';
@@ -36,8 +40,17 @@ class Inquiry extends Model
         'pax' => 'integer',
         'nights' => 'integer',
         'travel_date' => 'date:Y-m-d',
-        'itinerary_days' => 'array',
     ];
+
+    public function itineraryKind(): string
+    {
+        return 'inquiry';
+    }
+
+    public function itineraryTripStart(): ?CarbonImmutable
+    {
+        return $this->travel_date ? CarbonImmutable::parse($this->travel_date) : null;
+    }
 
     public function followUps(): HasMany
     {

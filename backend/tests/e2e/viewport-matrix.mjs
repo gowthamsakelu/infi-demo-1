@@ -1,4 +1,4 @@
-// Browser test (not run by PHPUnit): Bookings/Inquiries rows, Add Event (with Create New Day), shared Assign sheet and keyboard fit
+// Browser test (not run by PHPUnit): Bookings/Inquiries rows, Add Event (itinerary builder), shared Assign sheet and keyboard fit
 // at every supported width. Playwright is NOT a project dependency:  npm i playwright && npx playwright install chromium
 // Run against a running app:  BASE=http://127.0.0.1:8000/ node viewport-matrix.mjs     (re-seed afterwards: php artisan db:seed --force)
 import { chromium } from 'playwright';
@@ -38,16 +38,16 @@ for (const [w, h] of VPS) {
   await open();
   await step('noDoublePlus', () => page.evaluate((s) => !/^\s*\+\s*\+|\+\s*\+/.test(document.querySelector(`${s} .itin-actions`).innerText) && !/^\s*\+/.test(document.querySelector(`${s} #${s.includes('mobile') ? 'mobile' : 'desktop'}-add-event-btn`).innerText), slot));
   await step('noAddDay', () => page.evaluate((sl) => !document.querySelector(`${sl} [data-add-day]`) && !/Add Day/.test(document.querySelector(sl).innerText), slot));
-  await step('addEventNewDay', async () => {
-    await page.locator(`${slot} #${m ? 'mobile' : 'desktop'}-add-event-btn`).click(); await page.waitForTimeout(500);
+  await step('builder', async () => {
+    // "+ Add Event" opens the itinerary builder: a dialog on PC, a bottom sheet on phones, fully on screen, no native selects, Esc closes it.
+    await page.locator(`${slot} #${m ? 'mobile' : 'desktop'}-add-event-btn`).click(); await page.waitForTimeout(900);
     const nativeSel = await page.evaluate(() => [...document.querySelectorAll('.asg-overlay select')].some((s) => s.getClientRects().length));
-    await page.locator('.asg-overlay #itin-day .dd-trigger').click();
-    await page.locator('.asg-overlay #itin-day li[data-value="new"]').click();
-    await page.fill('.asg-overlay #itin-title', `Probe ${w}`);
-    const box = await page.locator('.asg-overlay .asg-sheet').boundingBox();
+    const noAuto = await page.evaluate(() => !/INPUT|TEXTAREA/.test(document.activeElement.tagName));
+    const stepper = await page.locator('.bld-step-item').count();
+    const box = await page.locator('.bld-sheet').boundingBox();
     const fits = box.x >= 0 && box.y >= 0 && box.x + box.width <= w + 1 && box.y + box.height <= h + 1;
-    await page.locator('.asg-overlay [data-itin-save]').click(); await page.waitForTimeout(900);
-    return !nativeSel && fits;
+    await page.keyboard.press('Escape'); await page.waitForTimeout(700);
+    return !nativeSel && noAuto && stepper === 2 && fits && !(await page.locator('.bld-sheet').count());
   });
   await step('assignSheet', async () => {
     await page.locator(`${slot} .item-menu-btn`).first().click(); await page.waitForTimeout(200);
@@ -75,7 +75,7 @@ for (const [w, h] of VPS) {
 }
 await browser.close();
 
-const cols = ['noHScroll', 'rowsOneLine', 'noDoublePlus', 'noAddDay', 'addEventNewDay', 'assignSheet', 'keyboardFit', 'jsErrors'];
+const cols = ['noHScroll', 'rowsOneLine', 'noDoublePlus', 'noAddDay', 'builder', 'assignSheet', 'keyboardFit', 'jsErrors'];
 console.log(['viewport'.padEnd(10), ...cols.map((c) => c.padEnd(14))].join(' '));
 for (const r of rows) console.log([r.vp.padEnd(10), ...cols.map((c) => (r[c] === undefined ? '-' : r[c] ? 'PASS' : 'FAIL').padEnd(14))].join(' '));
 for (const r of rows) for (const c of cols) if (r[c + 'Err']) console.log(`  ${r.vp} ${c}: ${r[c + 'Err']}`);
