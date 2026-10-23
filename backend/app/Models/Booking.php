@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\TripDates;
 use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
@@ -35,6 +36,8 @@ class Booking extends Model
         'special_requirements',
         'guests',
         'itinerary_days',
+        'start_date',
+        'end_date',
     ];
 
     protected $casts = [
@@ -45,5 +48,19 @@ class Booking extends Model
         'itinerary_days' => 'array',
         'raw_price' => 'integer',
         'pax' => 'integer',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
     ];
+
+    protected static function booted(): void
+    {
+        // Keep the indexed trip dates in step with the travel dates text (the calendar queries them).
+        static::saving(function (self $booking) {
+            if ($booking->isDirty('travel_date_full') || !$booking->start_date) {
+                $dates = TripDates::parse($booking->travel_date_full);
+                $booking->start_date = $dates[0] ?? null;
+                $booking->end_date = $dates[1] ?? null;
+            }
+        });
+    }
 }

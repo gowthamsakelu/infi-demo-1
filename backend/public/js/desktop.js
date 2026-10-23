@@ -11,6 +11,7 @@ import { openAssign } from './shared/assign-sheet.js';
 import { openEventDialog, openDayDialog, commit } from './shared/itinerary-dialog.js';
 import { daysOf, persist, renumber, EVENT_TYPES } from './shared/itinerary.js';
 import { matchesCategory } from './shared/booking-filters.js';
+import { createDesktopCalendar } from './calendar-desktop.js';
 
 export function createDesktopView(container) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -81,7 +82,7 @@ export function createDesktopView(container) {
             <span class="sidebar-badge" id="sidebar-inquiries-badge">8</span>
           </a>
 
-          <a class="sidebar-nav-item" href="#calendar" id="nav-calendar">
+          <a class="sidebar-nav-item ${currentPage() === 'calendar' ? 'active' : ''}" href="#calendar" id="nav-calendar">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
@@ -230,6 +231,12 @@ export function createDesktopView(container) {
                   </div>
                 </div>
               </div>
+
+              <!-- Calendar page: the month and agenda take the list's place; the detail pane stays the same -->
+              <section class="desktop-compact-list-view desktop-calendar-col" id="desktop-calendar-col" aria-label="Calendar"></section>
+              <aside class="desktop-calendar-empty" id="desktop-calendar-empty">
+                <div class="state-box"><h4>Select a booking</h4><p>Choose an item from the agenda to see its details here.</p></div>
+              </aside>
 
               <!-- Right Column: Inline Detail Pane (Outlook Style - NO dark popup backdrop!) -->
               <aside class="desktop-details-drawer" id="desktop-details-drawer">
@@ -507,6 +514,11 @@ export function createDesktopView(container) {
 
   const TH_CHECK = `<th style="width: 44px; padding-left: 20px; padding-right: 0;"><div class="custom-checkbox" id="desktop-th-select-all" role="checkbox" aria-checked="false" aria-label="Select all" tabindex="0">${icon('check', { size: 12, stroke: 3 })}</div></th>`;
   const TH_ACTION = '<th style="text-align: right; padding-right: 24px; min-width: 130px;">Action</th>';
+  const calendar = createDesktopCalendar(container.querySelector('#desktop-calendar-col'), {
+    isActive: () => page === 'calendar' && document.documentElement.dataset.layout === 'desktop',
+    onOpen: (b) => openDrawer(b),
+  });
+
   const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Amount</th>${TH_ACTION}</tr>`;
   const THEAD_INQUIRIES = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Nights</th><th>Travel Date</th><th class="col-secondary">Assigned To</th><th>Status</th><th class="col-note" style="min-width: 150px;">Quick Note</th>${TH_ACTION}</tr>`;
 
@@ -673,6 +685,9 @@ export function createDesktopView(container) {
     activeBooking = booking;
     isDetailDrawerOpen = true;
     renderDetailPanel();
+    // On the Calendar page the primary action only applies to pending bookings.
+    const confirmBtn = container.querySelector('#desktop-confirm-booking-btn');
+    if (page === 'calendar' && booking.status !== 'Pending') confirmBtn?.style.setProperty('display', 'none', 'important'); else confirmBtn?.style.removeProperty('display');
     const split = container.querySelector('#desktop-workspace-split');
     const drawer = container.querySelector('#desktop-details-drawer');
     split.classList.add('has-open-detail');
@@ -688,6 +703,7 @@ export function createDesktopView(container) {
     const drawer = container.querySelector('#desktop-details-drawer');
     split.classList.remove('has-open-detail');
     drawer.classList.remove('open');
+    calendar.clearSelection();
     renderTable();
   }
 
@@ -707,7 +723,8 @@ export function createDesktopView(container) {
 
     // Header: Unified Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
     headerEl.innerHTML = `
-      <div class="sheet-drag-handle-bar desktop-sheet-top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px 0 18px; background: #FFFFFF;">
+      <div class="sheet-drag-handle-bar desktop-sheet-top-bar" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 12px 18px 0 18px; background: #FFFFFF;">
+        ${page === 'calendar' ? '<button type="button" class="cal-view-booking" id="desktop-view-booking">View booking</button>' : ''}
         <button class="sheet-close-btn" id="close-desktop-detail-btn" title="Close Drawer (Esc)" aria-label="Close">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -1487,6 +1504,9 @@ export function createDesktopView(container) {
       }
       container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
+      container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
+      container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
+      if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
       if (topSearch) topSearch.placeholder = 'Search by name, trip, destination, or phone...';
       container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking');
       applyParams();
@@ -1510,7 +1530,7 @@ export function createDesktopView(container) {
     loadInquiries();
     syncBookingPayments().then(() => renderTable());
 
-    container.querySelectorAll('a.sidebar-nav-item[href="#bookings"], a.sidebar-nav-item[href="#inquiries"]').forEach((a) => {
+    container.querySelectorAll('a.sidebar-nav-item[href="#bookings"], a.sidebar-nav-item[href="#inquiries"], a.sidebar-nav-item[href="#calendar"]').forEach((a) => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
         navigate(a.getAttribute('href').slice(1));
@@ -1518,7 +1538,7 @@ export function createDesktopView(container) {
     });
 
     // Pages that are not built yet: stay on the current page and say so (no hash change, no mismatch)
-    container.querySelectorAll('a.sidebar-nav-item[href="#dashboard"], a.sidebar-nav-item[href="#calendar"], a.sidebar-nav-item[href="#settings"]').forEach((a) => {
+    container.querySelectorAll('a.sidebar-nav-item[href="#dashboard"], a.sidebar-nav-item[href="#settings"]').forEach((a) => {
       a.addEventListener('click', (e) => { e.preventDefault(); toast(`${a.textContent.trim()} is coming soon.`, 'info'); });
     });
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
@@ -1633,6 +1653,10 @@ export function createDesktopView(container) {
       // Drawer Close Button (delegated)
       if (e.target.closest('#close-desktop-detail-btn')) {
         closeDrawer();
+        return;
+      }
+      if (e.target.closest('#desktop-view-booking') && activeBooking) {
+        navigate('bookings', { q: activeBooking.id });
         return;
       }
       // Reset filters button in empty state

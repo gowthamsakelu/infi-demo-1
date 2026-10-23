@@ -13,3 +13,4 @@ Route::get('/livewire', BookingsManager::class)->name('bookings.livewire');
 Route::redirect('/enquiries', '/inquiries', 301);
 Route::redirect('/enquiries/{any}', '/inquiries', 301)->where('any', '.*');
 Route::redirect('/inquiries', '/#inquiries')->name('inquiries');
+Route::redirect('/calendar', '/#calendar')->name('calendar.index');

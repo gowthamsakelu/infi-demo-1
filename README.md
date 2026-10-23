@@ -16,7 +16,9 @@ Ruyi Admin is a travel operations admin panel for managing bookings and inquirie
 - **Responsive** – two layouts, mobile and desktop, that switch live when the window is resized, the device is rotated or a foldable is folded or unfolded. Tablets use the desktop layout.
 - **REST API** – JSON endpoints for bookings, inquiries and follow-ups.
 
-Dashboard, Calendar, More and Settings appear in the navigation as placeholders and are not built yet.
+- **Calendar** – a month view of every booking's trip start and end plus its itinerary events, split into Tours, Activities, Hotel and Transport. Week strip and swipeable categories on phones; month grid, agenda and the shared detail pane on desktop. Searches with the top bar.
+
+Dashboard, More and Settings appear in the navigation as placeholders and are not built yet.
 
 ## Tech stack
 
@@ -90,7 +92,8 @@ backend/
 │       ├── main.js          Starts the app, toasts, live layout changes
 │       ├── desktop.js       Desktop layout (also used on tablets)
 │       ├── mobile.js        Phone view
-│       └── shared/          Components used by both views
+│       ├── calendar-desktop.js, calendar-mobile.js   Calendar page for each layout
+│       └── shared/          Components used by both views (calendar-store.js holds the calendar data)
 ├── routes/                  web.php, api.php
 └── tests/Feature/           Follow-up, note, assign and payment tests
 frontend/                    Static copy of the UI (no API, so Inquiries will not load)
@@ -105,6 +108,7 @@ The UI is a single page that switches by URL hash.
 | Bookings | `/#bookings` | Bookings list, details, assign, payment status |
 | Inquiries | `/#inquiries` | Leads, follow-ups, quick notes, assign |
 | Livewire bookings | `/livewire` | Older Livewire version of the bookings page |
+| Calendar | `/#calendar` | Month calendar of trips and itinerary events (`/calendar` redirects here) |
 | Health check | `/up` | Returns 200 when the app is running |
 
 `/enquiries` redirects to `/inquiries`, which opens `/#inquiries`.
@@ -124,6 +128,7 @@ The UI is a single page that switches by URL hash.
 | POST | `/api/inquiries/{id}/follow-ups` | Save a follow-up (`type`, `date`, `time`, `comment`) |
 | POST | `/api/inquiries/{id}/notes` | Save a quick note (`comment`, max 500 characters) |
 | GET | `/api/follow-ups?phone=` | Follow-ups and notes for a customer, newest first |
+| GET | `/api/calendar/events?from=&to=&category=` | Trip start/end and itinerary events for a date range (at most 70 days; `category` is `tours`, `activities`, `hotel` or `transport`) |
 | GET | `/api/metadata` | Staff, vendors and contacts |
 
 The app has no login yet. Actions are recorded for staff member `ST-05` unless `created_by` is sent. Because there are no users or roles, there are **no permission or policy checks**: the itinerary API validates data (types, lengths, at most 60 days and 100 events per day) but does not decide who may edit. Add authorization when login is introduced.

@@ -4,7 +4,7 @@
 const listeners = new Set();
 const notify = () => listeners.forEach((fn) => fn());
 
-const PAGES = ['bookings', 'inquiries'];
+const PAGES = ['bookings', 'inquiries', 'calendar'];
 const ALIASES = { enquiries: 'inquiries', enquiry: 'inquiries', inquiry: 'inquiries' };
 
 export function currentPage() {
@@ -33,11 +33,11 @@ export function setParams(patch, { push = true, silent = false } = {}) {
   if (!silent) notify();
 }
 
-/** Go to another page; filters and search do not carry over. */
-export function navigate(page) {
-  if (page === currentPage() && !location.search) return;
+/** Go to another page; filters and search do not carry over (unless `params` sets them for the new page). */
+export function navigate(page, params = {}) {
+  if (page === currentPage() && !location.search && !Object.keys(params).length) return;
   const go = () => {
-    history.pushState(null, '', buildUrl(new URLSearchParams(), page));
+    history.pushState(null, '', buildUrl(new URLSearchParams(params), page));
     notify();
   };
   // Short crossfade of the content (the shell is identical on every page). Falls back to an instant swap.

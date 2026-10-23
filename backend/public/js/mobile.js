@@ -1,5 +1,6 @@
 import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, getSpecialReqIconSvg } from './data.js';
 import { icon } from './shared/icons.js';
+import { createMobileCalendar } from './calendar-mobile.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
 import { searchBox, emptyState, toast, openRowMenu, esc, skeletonCards, errorState } from './shared/ui.js';
@@ -90,6 +91,7 @@ export function createMobileView(container, options = {}) {
         <!-- Bookings Cards List -->
         <div class="bookings-cards-list" id="mobile-cards-list"></div>
         </div>
+        <div id="mobile-calendar-page" hidden></div>
       </div>
 
       <!-- Bottom Navigation Bar (Fixed) -->
@@ -116,7 +118,7 @@ export function createMobileView(container, options = {}) {
           </svg>
           Inquiries
         </button>
-        <button class="nav-item">
+        <button class="nav-item ${currentPage() === 'calendar' ? 'active' : ''}" data-route="calendar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
             <line x1="16" x2="16" y1="2" y2="6"/>
@@ -1165,6 +1167,9 @@ export function createMobileView(container, options = {}) {
     activeModalBooking = booking || bookings[0];
     activeModalTab = tab;
     isModalOpen = true;
+    // On the Calendar page the primary action only applies to pending bookings.
+    const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
+    if (page === 'calendar' && activeModalBooking.status !== 'Pending') confirmBtn?.style.setProperty('display', 'none', 'important'); else confirmBtn?.style.removeProperty('display');
     showAllGuests = false;
     openDropdownItemId = null;
 
@@ -1517,6 +1522,11 @@ export function createMobileView(container, options = {}) {
       renderCards();
     }
 
+    const calendar = createMobileCalendar(container.querySelector('#mobile-calendar-page'), {
+      isActive: () => page === 'calendar' && document.documentElement.dataset.layout === 'mobile',
+      onOpen: (b) => openModal(b),
+    });
+
     // Page routing: Bookings <-> Inquiries share one list, one detail panel
     const subtitleEl = container.querySelector('#mobile-header-subtitle');
     const scrollMemory = {};
@@ -1535,7 +1545,10 @@ export function createMobileView(container, options = {}) {
         needRestore = true;
       }
       container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
-      if (subtitleEl) subtitleEl.textContent = page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
+      container.querySelector('#mobile-bookings-page').hidden = page === 'calendar';
+      container.querySelector('#mobile-calendar-page').hidden = page !== 'calendar';
+      if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
+      if (subtitleEl) subtitleEl.textContent = page === 'calendar' ? 'Calendar' : page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
       if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking';
       applyParams();

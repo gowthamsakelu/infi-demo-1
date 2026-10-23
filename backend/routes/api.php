@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\ItineraryController;
 
@@ -24,3 +25,5 @@ Route::get('/follow-ups', [InquiryController::class, 'followUps']);
 
 Route::get('/{kind}/{id}/itinerary', [ItineraryController::class, 'show'])->whereIn('kind', ['bookings', 'inquiries']);
 Route::put('/{kind}/{id}/itinerary', [ItineraryController::class, 'update'])->whereIn('kind', ['bookings', 'inquiries']);
+
+Route::get('/calendar/events', [CalendarController::class, 'events']);
