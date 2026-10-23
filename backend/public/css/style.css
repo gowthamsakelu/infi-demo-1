@@ -6372,3 +6372,17 @@ body,
   background: transparent !important;
 }
 
+/* ==========================================================================
+   Split list selection: checkbox under the avatar, selection bar over the search row.
+   ========================================================================== */
+.compact-lead-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 0 0 auto; }
+.compact-booking-card.is-checked:not(.active) { background: #F0F7FF; border-color: var(--primary-border); }
+.compact-header-top { position: relative; min-height: 36px; }
+.compact-header-top > :not(.compact-selection-bar) { transition: opacity var(--motion-fast) var(--ease-out); }
+.compact-header-top.is-selecting > :not(.compact-selection-bar):not(.btn-expand-full-table) { opacity: 0; pointer-events: none; }
+.compact-selection-bar { position: absolute; top: 0; bottom: 0; left: 0; right: 40px; margin: 0; padding: 0; gap: 8px; background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity var(--motion-fast) var(--ease-out); }
+.compact-header-top.is-selecting .compact-selection-bar { opacity: 1; pointer-events: auto; }
+.compact-selection-bar .bulk-assign-btn { height: 36px; padding: 0 14px; }
+.compact-selection-bar .bulk-count-btn { height: 36px; }
+@media (prefers-reduced-motion: reduce) { .compact-selection-bar, .compact-header-top > :not(.compact-selection-bar) { transition: none; } }
+.compact-selection-bar .bulk-assign-btn, .compact-selection-bar .bulk-count-btn { min-height: 36px; }

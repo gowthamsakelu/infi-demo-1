@@ -2,8 +2,9 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, initials, skeletonRows, errorState } from './shared/ui.js';
-import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
+import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, initials, skeletonRows, errorState, checkbox } from './shared/ui.js';
+import { selectedOf, setSelected, toggleRow } from './shared/selection.js';
+import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bulkBar, bindBulkBar, updateBulkBar, inlineSelectionBar, updateInlineBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
@@ -22,6 +23,7 @@ export function createDesktopView(container) {
   let contacts = [...CONTACTS_LIST];
   let activeTab = 'All Bookings';
   let searchQuery = '';
+  let lastToggled = null; // anchor for Shift+click ranges
   let selectedCategory = 'ALL';
   let activeBooking = null; // Default: closed popup, table is full-width!
   let isDetailDrawerOpen = false;
@@ -223,6 +225,7 @@ export function createDesktopView(container) {
                       <button class="btn-expand-full-table" id="desktop-btn-expand-table" title="Expand to Full Table View" aria-label="Expand to full table">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                       </button>
+                      ${inlineSelectionBar('compact')}
                     </div>
                     <div id="desktop-compact-tabs-host"></div>
                   </div>
@@ -572,9 +575,12 @@ export function createDesktopView(container) {
   function compactCard(b, isCardActive) {
     const inquiry = b.kind === 'inquiry';
     return `
-      <div class="compact-booking-card ${inquiry ? 'is-inquiry' : ''} ${isCardActive ? 'active' : ''}" data-compact-booking-id="${b.id}" style="cursor: pointer;">
+      <div class="compact-booking-card ${inquiry ? 'is-inquiry' : ''} ${isCardActive ? 'active' : ''} ${b.selected ? 'is-checked' : ''}" data-compact-booking-id="${b.id}" style="cursor: pointer;">
         <div class="compact-card-top">
-          <div class="compact-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
+          <div class="compact-lead-col">
+            <div class="compact-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
+            ${checkbox({ checked: b.selected, attr: 'data-desktop-select-id', id: b.id, label: `Select ${b.guest.name}` })}
+          </div>
           <div class="compact-info-col">
             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
               ${inquiry ? '' : categoryBadge(b, 'style="font-size: 10px; padding: 2px 6px;"')}
@@ -603,20 +609,37 @@ export function createDesktopView(container) {
       </div>`;
   }
 
-  // Update selection visuals in place (no re-render, so rows never remount or shift).
-  function syncSelectionUI() {
-    container.querySelectorAll('[data-desktop-row-id]').forEach((tr) => {
-      const b = bookings.find(x => x.id === tr.dataset.desktopRowId);
-      if (!b) return;
-      tr.classList.toggle('row-checked', !!b.selected);
-      const cb = tr.querySelector('.custom-checkbox');
-      cb.classList.toggle('checked', !!b.selected);
-      cb.setAttribute('aria-checked', !!b.selected);
-    });
-    const n = bookings.filter(b => b.selected).length;
+  // The rows the current tab, search and category show: what Select all applies to.
+  const viewRows = () => {
+    const catValue = selectedCategory === 'ALL' ? '' : selectedCategory;
+    return bookings.filter(b => matchesSearch(b) && matchesCategory(b, catValue) && (activeTab === allKey() || b.category === activeTab));
+  };
+
+  function syncBulkBars() {
+    const n = selectedOf(bookings).length;
     const th = container.querySelector('#desktop-th-select-all');
     if (th) { th.classList.toggle('checked', n > 0); th.setAttribute('aria-checked', n > 0); }
     updateBulkBar(container, 'desktop', n);
+    updateInlineBar(container, 'compact', n);
+  }
+
+  // Update selection visuals in place (no re-render, so rows never remount or shift).
+  function syncSelectionUI() {
+    const paint = (el, b, cls) => {
+      el.classList.toggle(cls, !!b.selected);
+      const cb = el.querySelector('.custom-checkbox');
+      cb.classList.toggle('checked', !!b.selected);
+      cb.setAttribute('aria-checked', !!b.selected);
+    };
+    container.querySelectorAll('[data-desktop-row-id]').forEach((tr) => {
+      const b = bookings.find(x => x.id === tr.dataset.desktopRowId);
+      if (b) paint(tr, b, 'row-checked');
+    });
+    container.querySelectorAll('[data-compact-booking-id]').forEach((card) => {
+      const b = bookings.find(x => x.id === card.dataset.compactBookingId);
+      if (b) paint(card, b, 'is-checked');
+    });
+    syncBulkBars();
   }
 
   // Re-render only the rows that changed (assign, paid, ...), keeping the rest of the DOM untouched.
@@ -674,10 +697,7 @@ export function createDesktopView(container) {
     }
     if (compact) compact.scrollTop = keepScroll;
 
-    const selectedCount = bookings.filter(b => b.selected).length;
-    updateBulkBar(container, 'desktop', selectedCount);
-    const thAll = container.querySelector('#desktop-th-select-all');
-    if (thAll) { thAll.classList.toggle('checked', selectedCount > 0); thAll.setAttribute('aria-checked', selectedCount > 0); }
+    syncBulkBars();
   }
 
   // Open & Close Detail Pane (Outlook Inline Split View)
@@ -1544,11 +1564,14 @@ export function createDesktopView(container) {
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
 
     // Bulk bar: select all / clear / search / filter / Assign
-    bindBulkBar(container, 'desktop', {
-      onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); syncSelectionUI(); },
-      onClear: () => { bookings.forEach(b => { b.selected = false; }); syncSelectionUI(); },
-      onAssign: () => assignSelected(),
-    });
+    for (const prefix of ['desktop', 'compact']) {
+      bindBulkBar(container, prefix, {
+        selectAllLabel: () => `Select all ${viewRows().length}`,
+        onSelectAll: () => { setSelected(viewRows(), true); syncSelectionUI(); },
+        onClear: () => { setSelected(bookings, false); syncSelectionUI(); },
+        onAssign: () => assignSelected(),
+      });
+    }
 
     function startAssign(list) {
       const prev = list.map(b => ({ b, assignedTo: b.assignedTo, assignedStatus: b.assignedStatus }));
@@ -1640,6 +1663,29 @@ export function createDesktopView(container) {
     // Backdrop click closes drawer
     const backdrop = container.querySelector('#desktop-drawer-backdrop');
     if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+    // Selection from the keyboard: Space toggles the focused checkbox, Ctrl/Cmd+A selects every row in view, Esc clears.
+    container.addEventListener('keydown', (e) => {
+      const chk = e.target.closest?.('[data-desktop-select-id]');
+      if (chk && (e.key === ' ' || e.key === 'Enter')) {
+        e.preventDefault();
+        const id = chk.dataset.desktopSelectId;
+        toggleRow(viewRows(), id);
+        lastToggled = id;
+        syncSelectionUI();
+        return;
+      }
+      if (!e.target.closest?.('#desktop-compact-list-view, #desktop-full-table-view') || e.target.closest('input, textarea')) return;
+      if ((e.key === 'a' || e.key === 'A') && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        setSelected(viewRows(), true);
+        syncSelectionUI();
+      } else if (e.key === 'Escape' && selectedOf(bookings).length) {
+        e.stopPropagation();
+        setSelected(bookings, false);
+        syncSelectionUI();
+      }
+    });
 
     // Keyboard Esc closes drawer
     window.addEventListener('keydown', (e) => {
@@ -1959,11 +2005,9 @@ export function createDesktopView(container) {
       if (chk) {
         e.stopPropagation();
         const id = chk.dataset.desktopSelectId;
-        const b = bookings.find(item => item.id === id);
-        if (b) {
-          b.selected = !b.selected;
-          syncSelectionUI();
-        }
+        toggleRow(viewRows(), id, { from: lastToggled, shift: e.shiftKey });
+        lastToggled = id;
+        syncSelectionUI();
         return;
       }
 
@@ -1971,8 +2015,8 @@ export function createDesktopView(container) {
       const selectAllTrigger = e.target.closest('#desktop-select-all-box, #desktop-th-select-all');
       if (selectAllTrigger) {
         e.stopPropagation();
-        const anyUnselected = bookings.some(b => !b.selected);
-        bookings.forEach(b => b.selected = anyUnselected);
+        const rows = viewRows();
+        setSelected(rows, rows.some(b => !b.selected));
         syncSelectionUI();
         return;
       }

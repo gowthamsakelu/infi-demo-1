@@ -146,14 +146,39 @@ export function bulkBar(prefix, { desktop = false } = {}) {
     </div>`;
 }
 
-/** Wire the bulk bar: the count menu (Select all / Clear) and Assign. */
-export function bindBulkBar(root, prefix, { onSelectAll, onClear, onAssign }) {
+/** The same bar, inline: it overlays the split list's search row while rows are selected (same height, no layout shift). */
+export function inlineSelectionBar(prefix) {
+  return `
+    <div class="mobile-selection-bar bulk-bar compact-selection-bar" id="${prefix}-selection-bar" inert>
+      <button type="button" class="bulk-count-btn" id="${prefix}-count-btn" aria-haspopup="menu" aria-expanded="false">
+        <span id="${prefix}-selected-count">0 selected</span>${icon('chevronDown', { size: 14, stroke: 2.5 })}
+      </button>
+      <div class="bulk-actions">
+        <button type="button" class="btn-primary-desktop bulk-assign-btn" data-bulk-assign>${icon('assign', { size: 16 })}<span>Assign</span></button>
+      </div>
+    </div>`;
+}
+
+/** Show the inline bar (and hide the controls it covers) when something is selected; update its count in place. */
+export function updateInlineBar(root, prefix, selectedCount) {
+  const bar = root.querySelector(`#${prefix}-selection-bar`);
+  if (!bar) return;
+  const on = selectedCount > 0;
+  const top = bar.parentElement;
+  top.classList.toggle('is-selecting', on);
+  bar.toggleAttribute('inert', !on);
+  [...top.children].forEach((el) => { if (el !== bar && !el.matches('.btn-expand-full-table')) el.toggleAttribute('inert', on); });
+  if (on) root.querySelector(`#${prefix}-selected-count`).textContent = `${selectedCount} selected`;
+}
+
+/** Wire the bulk bar: the count menu (Select all / Clear) and Assign. `selectAllLabel` can show the real count. */
+export function bindBulkBar(root, prefix, { onSelectAll, onClear, onAssign, selectAllLabel = () => 'Select all' }) {
   const btn = root.querySelector(`#${prefix}-count-btn`);
   if (!btn) return;
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     openRowMenu(btn, [
-      { key: 'all', label: 'Select all', icon: 'check' },
+      { key: 'all', label: selectAllLabel(), icon: 'check' },
       { key: 'clear', label: 'Clear selection', icon: 'close', danger: true },
     ], (key) => (key === 'all' ? onSelectAll() : onClear()));
   });
