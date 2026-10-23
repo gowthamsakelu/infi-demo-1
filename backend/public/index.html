@@ -26,7 +26,9 @@
   <link rel="modulepreload" href="./js/shared/booking-filters.js" />
   <style>
     /* Critical: correct first paint before the stylesheet and scripts arrive */
-    html { scrollbar-gutter: stable; }
+    html { scrollbar-gutter: auto; }
+    html, body, * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+    *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
     html, body { margin: 0; background: #F8FAFC; }
     #app:empty { display: none; }
     .boot { display: block; min-height: 100dvh; }

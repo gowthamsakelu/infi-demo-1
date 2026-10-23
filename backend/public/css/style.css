@@ -50,12 +50,26 @@
   --font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', 'Inter', 'Inter Fallback', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-* {
+*,
+html,
+body {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
+
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
 
 body {
   font-family: var(--font-family);
@@ -209,11 +223,12 @@ body.standalone-mobile .app-global-bar {
 }
 
 .mobile-screen-content::-webkit-scrollbar {
-  width: 4px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 .mobile-screen-content::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  display: none !important;
 }
 
 /* Mobile Header: Logo, Ruyi Admin, KS badge */
@@ -1621,11 +1636,12 @@ body.standalone-mobile .app-global-bar {
 }
 
 .sheet-body-scroll::-webkit-scrollbar {
-  width: 4px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 .sheet-body-scroll::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  display: none !important;
 }
 
 /* Overview Tab Rows */
@@ -2457,7 +2473,7 @@ body.standalone-mobile .app-global-bar {
   flex: 1;
   min-height: 0;
   height: calc(100dvh - 64px);
-  padding: 14px 18px;
+  padding: 8px 8px;
   overflow: hidden !important;
   display: flex;
   flex-direction: column;
@@ -2871,7 +2887,7 @@ body.standalone-mobile .app-global-bar {
 /* Inline Split Workspace (Outlook / Productivity SaaS Style) */
 .desktop-workspace-split {
   display: flex;
-  gap: 16px;
+  gap: 8px;
   align-items: stretch;
   width: 100%;
   height: 100%;
@@ -5313,7 +5329,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   }
 :where(html[data-layout="desktop"]) .desktop-body {
     height: calc(100dvh - 54px) !important;
-    padding: 10px 16px !important;
+    padding: 8px 8px !important;
   }
 :where(html[data-layout="desktop"]) .compact-list-header {
     padding: 10px 12px 8px 12px !important;
@@ -6021,8 +6037,8 @@ html[data-layout="mobile"] { --row-btn: 36px; }
 /* ==========================================================================
    v7: seamless loading (skeletons, stable scrollbars, cheaper overlays, view transition)
    ========================================================================== */
-html { scrollbar-gutter: stable; }
-.mobile-screen-content, .desktop-full-table-view, .compact-list-items, .asg-scroll, .fu-body, .vendor-list-scroll { scrollbar-gutter: stable; }
+html { scrollbar-gutter: auto; }
+.mobile-screen-content, .desktop-full-table-view, .compact-list-items, .asg-scroll, .fu-body, .vendor-list-scroll { scrollbar-gutter: auto; }
 
 /* Skeleton rows: same dimensions as real rows, compositor-only shimmer */
 .skel { position: relative; overflow: hidden; background: #EEF2F7; border-radius: 10px; }
@@ -6200,8 +6216,8 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
   :where(html[data-layout="desktop"]) .desktop-sidebar.rail-open { width: 260px; box-shadow: 12px 0 40px rgba(15, 23, 42, 0.25); }
   :where(html[data-layout="desktop"]) .desktop-layout.rail-open::after { content: ""; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.35); z-index: 950; }
   :where(html[data-layout="desktop"]) .brand-icon-box { cursor: pointer; }
-  :where(html[data-layout="desktop"]) .desktop-body { padding: 12px 14px; }
-  :where(html[data-layout="desktop"]) .desktop-workspace-split { gap: 12px; }
+  :where(html[data-layout="desktop"]) .desktop-body { padding: 8px 8px; }
+  :where(html[data-layout="desktop"]) .desktop-workspace-split { gap: 8px; }
   /* The table keeps all its columns and scrolls sideways inside its own card, never the page. */
   :where(html[data-layout="desktop"]) .desktop-table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   :where(html[data-layout="desktop"]) .bookings-table { min-width: 1000px; }
@@ -6317,3 +6333,42 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
 :where(html[data-layout="mobile"]) .cal-section-head { min-height: 44px; }
 @media (pointer: coarse) { .cal-day { width: 40px; height: 40px; } .cal-today { min-height: 40px; } .cal-view-booking { min-height: 40px; } }
 @media (prefers-reduced-motion: reduce) { .cal-chev, .cal-pill, .cal-day, .cal-arrow { transition: none; } }
+
+/* ==========================================================================
+   Global Scrollbar Hiding (Bookings, Inquiries, Calendar, Sheets, Modals)
+   ========================================================================== */
+html,
+body,
+#app,
+.app-root-container,
+.desktop-workspace-split,
+.desktop-table-container,
+.desktop-full-table-view,
+.compact-list-items,
+.mobile-screen-content,
+.cal-agenda,
+.cal-pane,
+.cal-panes,
+.cal-week-viewport,
+.desktop-calendar-col,
+.inq-detail-body,
+.asg-scroll,
+.fu-body,
+.vendor-list-scroll,
+.modal-card,
+.modal-body,
+.sheet-body-scroll,
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar,
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
