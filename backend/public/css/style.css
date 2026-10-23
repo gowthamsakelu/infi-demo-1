@@ -6210,7 +6210,14 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
   :where(html[data-layout="desktop"]) .desktop-tab-btn { flex-shrink: 0; }
 }
 
-/* Where list + detail cannot sit side by side, the open detail takes the whole content area (close returns to the table). */
-@media (max-width: 999px) {
-  :where(html[data-layout="desktop"]) .desktop-workspace-split.has-open-detail .desktop-table-container { display: none !important; }
+/* List + detail stay side by side at every desktop-layout width; on narrower screens the list pane is slimmer. */
+@media (max-width: 1031px) {
+  :where(html[data-layout="desktop"]) .desktop-workspace-split.has-open-detail .desktop-table-container { flex: 0 0 clamp(320px, 40vw, 400px) !important; width: clamp(320px, 40vw, 400px) !important; }
+  :where(html[data-layout="desktop"]) .desktop-details-drawer .customer-info-grid { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (max-width: 899px) {
+  :where(html[data-layout="desktop"]) .desktop-workspace-split.has-open-detail .desktop-table-container { flex-basis: clamp(340px, 46vw, 400px) !important; width: clamp(340px, 46vw, 400px) !important; }
+  :where(html[data-layout="desktop"]) .compact-booking-card.is-inquiry .compact-card-actions { flex-basis: 136px; width: 136px; }
+  :where(html[data-layout="desktop"]) .desktop-tabs-nav { overflow-x: auto; scrollbar-width: none; }
+  :where(html[data-layout="desktop"]) .desktop-tabs-nav .sheet-tab-btn { flex-shrink: 0; }
 }
