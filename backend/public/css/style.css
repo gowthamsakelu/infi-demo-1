@@ -6281,7 +6281,7 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
 /* Desktop: the month and agenda column takes the list place; the detail pane is the shared one. */
 .desktop-calendar-col, .desktop-calendar-empty { display: none; }
 .desktop-workspace-split.calendar-mode .desktop-table-container { display: none !important; }
-.desktop-workspace-split.calendar-mode .desktop-calendar-col { display: flex; flex: 0 0 clamp(380px, 31vw, 440px); width: clamp(380px, 31vw, 440px); min-width: 0; }
+.desktop-workspace-split.calendar-mode .desktop-calendar-col { display: flex; flex-direction: column; flex: 0 0 clamp(380px, 31vw, 440px); width: clamp(380px, 31vw, 440px); min-width: 0; height: 100%; min-height: 0; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04); }
 .desktop-workspace-split.calendar-mode:not(.has-open-detail) .desktop-calendar-empty { display: flex; flex: 1 1 auto; min-width: 0; align-items: center; justify-content: center; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; }
 .desktop-calendar-col .cal-head { gap: 8px; }
 @media (max-width: 1031px) { .desktop-workspace-split.calendar-mode .desktop-calendar-col { flex-basis: clamp(320px, 40vw, 400px); width: clamp(320px, 40vw, 400px); } }

@@ -233,7 +233,7 @@ export function createDesktopView(container) {
               </div>
 
               <!-- Calendar page: the month and agenda take the list's place; the detail pane stays the same -->
-              <section class="desktop-compact-list-view desktop-calendar-col" id="desktop-calendar-col" aria-label="Calendar"></section>
+              <section class="desktop-calendar-col" id="desktop-calendar-col" aria-label="Calendar"></section>
               <aside class="desktop-calendar-empty" id="desktop-calendar-empty">
                 <div class="state-box"><h4>Select a booking</h4><p>Choose an item from the agenda to see its details here.</p></div>
               </aside>
