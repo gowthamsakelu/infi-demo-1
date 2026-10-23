@@ -8,8 +8,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/manali.jpg",
     "pax": 3,
     "duration": "5D / 4N",
-    "dates": "15 Jan - 20 Jan",
-    "travelDateFull": "15 Jan - 20 Jan 2025 (5D / 4N)",
+    "dates": "23 Dec - 28 Dec",
+    "travelDateFull": "23 Dec - 28 Dec 2026 (5D / 4N)",
     "status": "Pending",
     "statusClass": "status-pending",
     "price": "₹45,000",
@@ -31,7 +31,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Chandigarh, Punjab",
       "leadSource": "Google Search",
       "preferredDestination": "Srinagar, Gulmarg, Pahalgam",
-      "travelDates": "15 Jan – 20 Jan 2025",
+      "travelDates": "23 Dec – 28 Dec 2026",
       "customerType": "Family (3 Pax)",
       "budgetEst": "₹ 45,000 – 50,000",
       "status": "Pending",
@@ -122,7 +122,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "15 Jan",
+        "date": "23 Dec",
         "items": [
           {
             "id": "IT-KASH-101",
@@ -156,7 +156,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 2",
-        "date": "16 Jan",
+        "date": "24 Dec",
         "items": [
           {
             "id": "IT-KASH-201",
@@ -182,7 +182,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 3",
-        "date": "17 Jan",
+        "date": "25 Dec",
         "items": [
           {
             "id": "IT-KASH-301",
@@ -226,8 +226,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/kedarnath.jpg",
     "pax": 12,
     "duration": "4D / 3N",
-    "dates": "12 Nov - 15 Nov",
-    "travelDateFull": "12 Nov - 15 Nov 2024 (4D / 3N)",
+    "dates": "20 Oct - 23 Oct",
+    "travelDateFull": "20 Oct - 23 Oct 2026 (4D / 3N)",
     "status": "Paid",
     "statusClass": "status-paid",
     "price": "₹36,000",
@@ -249,7 +249,7 @@ export const INITIAL_BOOKINGS = [
       "location": "New Delhi, Delhi",
       "leadSource": "Website",
       "preferredDestination": "Haridwar, Rishikesh, Kashi",
-      "travelDates": "12 Nov – 15 Nov 2024",
+      "travelDates": "20 Oct – 23 Oct 2026",
       "customerType": "Family (12 Pax)",
       "budgetEst": "₹ 35,000 – 40,000",
       "status": "Paid",
@@ -415,7 +415,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "12 Nov",
+        "date": "20 Oct",
         "items": [
           {
             "id": "IT-101",
@@ -449,7 +449,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 2",
-        "date": "13 Nov",
+        "date": "21 Oct",
         "items": [
           {
             "id": "IT-201",
@@ -493,7 +493,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 3",
-        "date": "14 Nov",
+        "date": "22 Oct",
         "items": [
           {
             "id": "IT-301",
@@ -561,8 +561,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/goa.jpg",
     "pax": 8,
     "duration": "2N/3D",
-    "dates": "18 Nov - 20 Nov",
-    "travelDateFull": "18 Nov - 20 Nov 2024 (2N/3D)",
+    "dates": "26 Oct - 28 Oct",
+    "travelDateFull": "26 Oct - 28 Oct 2026 (2N/3D)",
     "status": "Part Paid",
     "statusClass": "status-part-paid",
     "price": "₹22,000",
@@ -584,7 +584,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Mumbai, Maharashtra",
       "leadSource": "Instagram",
       "preferredDestination": "Candolim Beach, North Goa",
-      "travelDates": "18 Nov – 20 Nov 2024",
+      "travelDates": "26 Oct – 28 Oct 2026",
       "customerType": "Friends Group (8 Pax)",
       "budgetEst": "₹ 22,000 – 26,000",
       "status": "Part Paid",
@@ -710,7 +710,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "18 Nov",
+        "date": "26 Oct",
         "items": [
           {
             "id": "IT-GOA-1",
@@ -732,7 +732,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 2",
-        "date": "19 Nov",
+        "date": "27 Oct",
         "items": [
           {
             "id": "IT-GOA-3",
@@ -796,8 +796,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/rishikesh.jpg",
     "pax": 6,
     "duration": "1 Day",
-    "dates": "10 Nov - 15 Nov",
-    "travelDateFull": "10 Nov - 15 Nov 2024 (1 Day Activity)",
+    "dates": "18 Oct - 23 Oct",
+    "travelDateFull": "18 Oct - 23 Oct 2026 (1 Day Activity)",
     "status": "Paid",
     "statusClass": "status-paid",
     "price": "₹9,000",
@@ -819,7 +819,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Gurugram, Haryana",
       "leadSource": "Google Search",
       "preferredDestination": "Shivpuri to NIM Beach, Rishikesh",
-      "travelDates": "10 Nov – 15 Nov 2024",
+      "travelDates": "18 Oct – 23 Oct 2026",
       "customerType": "Adventure Group (6 Pax)",
       "budgetEst": "₹ 9,000 – 12,000",
       "status": "Paid",
@@ -931,7 +931,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "11 Nov",
+        "date": "18 Oct",
         "items": [
           {
             "id": "IT-RFT-1",
@@ -977,8 +977,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/manali.jpg",
     "pax": 4,
     "duration": "3N/4D",
-    "dates": "25 Nov - 28 Nov",
-    "travelDateFull": "25 Nov - 28 Nov 2024 (3N/4D)",
+    "dates": "2 Nov - 5 Nov",
+    "travelDateFull": "2 Nov - 5 Nov 2026 (3N/4D)",
     "status": "Pending",
     "statusClass": "status-pending",
     "price": "₹26,500",
@@ -1000,7 +1000,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Ahmedabad, Gujarat",
       "leadSource": "Referral",
       "preferredDestination": "Old Manali, Himachal Pradesh",
-      "travelDates": "25 Nov – 28 Nov 2024",
+      "travelDates": "2 Nov – 5 Nov 2026",
       "customerType": "Family (4 Pax)",
       "budgetEst": "₹ 26,500 – 30,000",
       "status": "Pending",
@@ -1098,7 +1098,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "25 Nov",
+        "date": "2 Nov",
         "items": [
           {
             "id": "IT-MAN-1",
@@ -1120,7 +1120,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 2",
-        "date": "26 Nov",
+        "date": "3 Nov",
         "items": [
           {
             "id": "IT-MAN-3",
@@ -1142,7 +1142,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 3",
-        "date": "27 Nov",
+        "date": "4 Nov",
         "items": [
           {
             "id": "IT-MAN-5",
@@ -1164,7 +1164,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 4",
-        "date": "28 Nov",
+        "date": "5 Nov",
         "items": [
           {
             "id": "IT-MAN-7",
@@ -1220,8 +1220,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/paragliding.jpg",
     "pax": 2,
     "duration": "1 Day",
-    "dates": "5 Nov - 7 Nov",
-    "travelDateFull": "5 Nov - 7 Nov 2024 (1 Day Activity)",
+    "dates": "13 Oct - 15 Oct",
+    "travelDateFull": "13 Oct - 15 Oct 2026 (1 Day Activity)",
     "status": "Pending",
     "statusClass": "status-pending",
     "price": "₹6,000",
@@ -1243,7 +1243,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Chandigarh, Punjab",
       "leadSource": "Instagram",
       "preferredDestination": "Bir Billing, Himachal Pradesh",
-      "travelDates": "5 Nov – 7 Nov 2024",
+      "travelDates": "13 Oct – 15 Oct 2026",
       "customerType": "Couple (2 Pax)",
       "budgetEst": "₹ 6,000 – 8,000",
       "status": "Pending",
@@ -1321,7 +1321,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "5 Nov",
+        "date": "13 Oct",
         "items": [
           {
             "id": "IT-BIR-1",
@@ -1343,7 +1343,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 2",
-        "date": "6 Nov",
+        "date": "14 Oct",
         "items": [
           {
             "id": "IT-BIR-3",
@@ -1389,8 +1389,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/delhi_school.jpg",
     "pax": 60,
     "duration": "2 Days",
-    "dates": "10 Oct - 11 Oct",
-    "travelDateFull": "10 Oct - 11 Oct 2024 (2 Days Educational Tour)",
+    "dates": "17 Sep - 18 Sep",
+    "travelDateFull": "17 Sep - 18 Sep 2026 (2 Days Educational Tour)",
     "status": "Paid",
     "statusClass": "status-paid",
     "price": "₹1,20,000",
@@ -1412,7 +1412,7 @@ export const INITIAL_BOOKINGS = [
       "location": "New Delhi, Delhi",
       "leadSource": "Corporate / School",
       "preferredDestination": "Delhi - Agra - Mathura - Delhi",
-      "travelDates": "10 Oct – 11 Oct 2024",
+      "travelDates": "17 Sep – 18 Sep 2026",
       "customerType": "School Excursion (60 Pax)",
       "budgetEst": "₹ 1,20,000 – 1,40,000",
       "status": "Paid",
@@ -1510,7 +1510,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "10 Oct",
+        "date": "17 Sep",
         "items": [
           {
             "id": "IT-SCH-1",
@@ -1540,7 +1540,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 2",
-        "date": "11 Oct",
+        "date": "18 Sep",
         "items": [
           {
             "id": "IT-SCH-4",
@@ -1592,8 +1592,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/manali.jpg",
     "pax": 4,
     "duration": "5D / 4N",
-    "dates": "22 Nov - 26 Nov",
-    "travelDateFull": "22 Nov - 26 Nov 2024 (5D / 4N)",
+    "dates": "30 Oct - 3 Nov",
+    "travelDateFull": "30 Oct - 3 Nov 2026 (5D / 4N)",
     "status": "Paid",
     "statusClass": "status-paid",
     "price": "₹48,000",
@@ -1615,7 +1615,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Bengaluru, India",
       "leadSource": "Website Direct",
       "preferredDestination": "Kerala, Munnar & Alleppey",
-      "travelDates": "22 Nov - 26 Nov 2024",
+      "travelDates": "30 Oct – 3 Nov 2026",
       "customerType": "Family Vacationer",
       "budgetEst": "₹50,000",
       "status": "Active Trip",
@@ -1687,7 +1687,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "22 Nov",
+        "date": "30 Oct",
         "items": [
           {
             "id": "IT-KER-1",
@@ -1709,7 +1709,7 @@ export const INITIAL_BOOKINGS = [
       },
       {
         "day": "Day 2",
-        "date": "23 Nov",
+        "date": "31 Oct",
         "items": [
           {
             "id": "IT-KER-3",
@@ -1747,8 +1747,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/goa.jpg",
     "pax": 6,
     "duration": "3D / 2N",
-    "dates": "28 Nov - 30 Nov",
-    "travelDateFull": "28 Nov - 30 Nov 2024 (3D / 2N)",
+    "dates": "5 Nov - 7 Nov",
+    "travelDateFull": "5 Nov - 7 Nov 2026 (3D / 2N)",
     "status": "Pending",
     "statusClass": "status-pending",
     "price": "₹52,000",
@@ -1770,7 +1770,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Mumbai, India",
       "leadSource": "WhatsApp Business",
       "preferredDestination": "Udaipur, Rajasthan",
-      "travelDates": "28 Nov - 30 Nov 2024",
+      "travelDates": "5 Nov – 7 Nov 2026",
       "customerType": "Luxury Traveler",
       "budgetEst": "₹60,000",
       "status": "Inquiry",
@@ -1856,7 +1856,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "28 Nov",
+        "date": "5 Nov",
         "items": [
           {
             "id": "IT-UDA-1",
@@ -1894,8 +1894,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/rishikesh.jpg",
     "pax": 2,
     "duration": "1 Day",
-    "dates": "18 Nov",
-    "travelDateFull": "18 Nov 2024 (Full Day)",
+    "dates": "26 Oct",
+    "travelDateFull": "26 Oct 2026 (Full Day)",
     "status": "Paid",
     "statusClass": "status-paid",
     "price": "₹14,500",
@@ -1917,7 +1917,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Pune, India",
       "leadSource": "Instagram Ad",
       "preferredDestination": "Netrani Island, Murudeshwar",
-      "travelDates": "18 Nov 2024",
+      "travelDates": "26 Oct 2026",
       "customerType": "Adventure Enthusiast",
       "budgetEst": "₹15,000",
       "status": "Confirmed",
@@ -1969,7 +1969,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "18 Nov",
+        "date": "26 Oct",
         "items": [
           {
             "id": "IT-DIV-1",
@@ -2007,8 +2007,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/manali.jpg",
     "pax": 15,
     "duration": "2 Days",
-    "dates": "25 Nov - 26 Nov",
-    "travelDateFull": "25 Nov - 26 Nov 2024 (2 Days)",
+    "dates": "2 Nov - 3 Nov",
+    "travelDateFull": "2 Nov - 3 Nov 2026 (2 Days)",
     "status": "Pending",
     "statusClass": "status-pending",
     "price": "₹18,500",
@@ -2030,7 +2030,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Pune, India",
       "leadSource": "Phone Referral",
       "preferredDestination": "Mumbai - Lonavala - Pune",
-      "travelDates": "25 Nov - 26 Nov 2024",
+      "travelDates": "2 Nov – 3 Nov 2026",
       "customerType": "Corporate Group",
       "budgetEst": "₹20,000",
       "status": "Pending Approval",
@@ -2082,7 +2082,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "25 Nov",
+        "date": "2 Nov",
         "items": [
           {
             "id": "IT-TR-1",
@@ -2120,8 +2120,8 @@ export const INITIAL_BOOKINGS = [
     "image": "./images/goa.jpg",
     "pax": 8,
     "duration": "1 Day",
-    "dates": "14 Nov",
-    "travelDateFull": "14 Nov 2024 (Single Day)",
+    "dates": "22 Oct",
+    "travelDateFull": "22 Oct 2026 (Single Day)",
     "status": "Paid",
     "statusClass": "status-paid",
     "price": "₹8,500",
@@ -2143,7 +2143,7 @@ export const INITIAL_BOOKINGS = [
       "location": "Goa, India",
       "leadSource": "Hotel Partner",
       "preferredDestination": "Mopa Airport to Candolim",
-      "travelDates": "14 Nov 2024",
+      "travelDates": "22 Oct 2026",
       "customerType": "VIP Family Group",
       "budgetEst": "₹9,000",
       "status": "Active Trip",
@@ -2195,7 +2195,7 @@ export const INITIAL_BOOKINGS = [
     "itineraryDays": [
       {
         "day": "Day 1",
-        "date": "14 Nov",
+        "date": "22 Oct",
         "items": [
           {
             "id": "IT-AIR-1",
