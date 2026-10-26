@@ -18,6 +18,12 @@ return [
         'key' => env('POSTMARK_API_KEY'),
     ],
 
+    // Google Places API (New). The key stays on the server: the browser only talks to /api/places/*.
+    'google_places' => [
+        'key' => env('GOOGLE_PLACES_API_KEY'),
+        'base_url' => env('GOOGLE_PLACES_BASE_URL', 'https://places.googleapis.com'),
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],

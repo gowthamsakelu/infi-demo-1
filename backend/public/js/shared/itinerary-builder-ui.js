@@ -5,6 +5,7 @@ import { esc, toast, openRowMenu } from './ui.js';
 import { openSheet, confirmDialog } from './sheet.js';
 import { kindOf, daysOf, markSaved, snapshot, saveItinerary } from './itinerary.js';
 import * as M from './itinerary-builder.js';
+import { hotelForm, transportForm, activityForm, mealForm, noteForm } from './itinerary-forms.js';
 
 const DRAFT_PREFIX = 'ruyi.itinerary-draft.';
 const draftKey = (b) => `${DRAFT_PREFIX}${kindOf(b)}.${b.id}`;
@@ -13,192 +14,9 @@ const writeDraft = (b, v) => { try { localStorage.setItem(draftKey(b), JSON.stri
 const clearDraft = (b) => { try { localStorage.removeItem(draftKey(b)); } catch { /* ignore */ } };
 
 const SECTION_ICON = { hotel: 'bed', transport: 'bus', activity: 'camera', meal: 'utensils', note: 'note', legacy: 'clock', pin: 'pin' };
+const rupee = (n) => `₹${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+const withTotal = (parts, total) => [...parts, total ? rupee(total) : ''].filter(Boolean).join(' · ');
 const SECTION_TILE = { hotel: 'bed', transport: 'bus', activity: 'camera', meal: 'restaurant', note: 'note', legacy: 'camera', pin: 'bed' };
-
-/* ------------------------------------------------------------------------------------------------
-   Small form sheet used for hotel, transport, activity, meal and note (stacks above the builder)
-   ------------------------------------------------------------------------------------------------ */
-
-function fieldHtml(f, v) {
-  const id = `bf-${f.key}`;
-  const hint = f.hint ? `<p class="bld-hint">${esc(typeof f.hint === 'function' ? f.hint(v) : f.hint)}</p>` : '';
-  const label = f.label ? `<label${['text', 'number', 'textarea', 'phone'].includes(f.type) ? ` for="${id}"` : ''}>${esc(f.label)}${f.required ? '' : '<span class="bld-optional"> (optional)</span>'}</label>` : '';
-  let control = '';
-  if (f.type === 'chips') {
-    control = `<div class="bld-chips" role="radiogroup" aria-label="${esc(f.label)}">${f.options.map((o) => `<button type="button" role="radio" aria-checked="${v[f.key] === o.value}" class="bld-chip ${v[f.key] === o.value ? 'is-on' : ''}" data-chip="${f.key}" data-value="${esc(o.value)}">${esc(o.label)}</button>`).join('')}</div>`;
-  } else if (f.type === 'seg') {
-    control = `<div class="fu-toggle bld-seg" role="radiogroup" aria-label="${esc(f.label)}">${f.options.map((o) => `<button type="button" role="radio" aria-checked="${String(v[f.key]) === String(o.value)}" class="${String(v[f.key]) === String(o.value) ? 'active' : ''}" data-seg="${f.key}" data-value="${esc(o.value)}">${esc(o.label)}</button>`).join('')}</div>`;
-  } else if (f.type === 'switch') {
-    control = `<button type="button" role="switch" aria-checked="${!!v[f.key]}" class="bld-switch ${v[f.key] ? 'is-on' : ''}" data-switch="${f.key}"><span class="bld-switch-knob"></span><span class="bld-switch-text">${esc(f.text)}</span></button>`;
-  } else if (f.type === 'time' || f.type === 'date') {
-    const text = f.type === 'time' ? (v[f.key] ? M.to12h(v[f.key]) : f.placeholder || 'Set time') : (v[f.key] ? M.fmtShort(v[f.key]) : 'Select date');
-    control = `<div class="fu-picker ${v[f.key] ? '' : 'is-empty'}"><span class="fu-picker-text" data-picker-text="${f.key}">${esc(text)}</span>${icon(f.type === 'time' ? 'clock' : 'calendar', { size: 16 })}<input id="${id}" type="${f.type}" data-field="${f.key}" value="${esc(v[f.key] || '')}" aria-label="${esc(f.label)}"></div>`;
-  } else if (f.type === 'textarea') {
-    control = `<textarea id="${id}" class="bld-textarea" data-field="${f.key}" rows="4" maxlength="${f.max || 500}" placeholder="${esc(f.placeholder || '')}">${esc(v[f.key] || '')}</textarea>`;
-  } else {
-    control = `<input id="${id}" class="bld-text" type="${f.type === 'number' ? 'number' : f.type === 'phone' ? 'tel' : 'text'}" ${f.type === 'number' ? 'min="1" max="99"' : ''} maxlength="${f.max || 120}" data-field="${f.key}" value="${esc(v[f.key] ?? '')}" placeholder="${esc(f.placeholder || '')}" autocomplete="off">`;
-  }
-  return `<div class="fu-field bld-field" data-key="${f.key}">${label}${control}${hint}<p class="fu-error" data-error="${f.key}" role="alert" hidden></p></div>`;
-}
-
-/** @returns {{ close: () => void }} */
-function openForm({ title, fields, values, saveLabel = 'Save', onSave }) {
-  const v = { ...values };
-  const body = (dlg) => { dlg.$('.bld-form-body').innerHTML = fields.filter((f) => !f.show || f.show(v)).map((f) => fieldHtml(f, v)).join(''); };
-  const dlg = openSheet({
-    label: title,
-    cls: 'bld-form-sheet',
-    html: `<header class="asg-header"><h3>${esc(title)}</h3><button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
-      <div class="bld-form-body" role="group"></div>
-      <footer class="fu-footer itin-footer"><button type="button" class="btn-cancel-assign" data-sheet-close>Cancel</button><button type="button" class="btn-primary-desktop" data-form-save>${esc(saveLabel)}</button></footer>`,
-  });
-  body(dlg);
-
-  const refresh = () => { const y = dlg.$('.bld-form-body').scrollTop; body(dlg); dlg.$('.bld-form-body').scrollTop = y; };
-  dlg.ov.addEventListener('input', (e) => {
-    const el = e.target.closest('[data-field]');
-    if (!el || el.type === 'time' || el.type === 'date') return;
-    v[el.dataset.field] = el.value;
-    const hintOwner = fields.find((f) => f.key === el.dataset.field);
-    if (hintOwner?.refreshOnInput) refresh();
-  });
-  dlg.ov.addEventListener('change', (e) => {
-    const el = e.target.closest('[data-field]');
-    if (!el || !(el.type === 'time' || el.type === 'date')) return;
-    v[el.dataset.field] = el.value;
-    refresh();
-  });
-  dlg.ov.addEventListener('click', (e) => {
-    const chip = e.target.closest('[data-chip]');
-    const seg = e.target.closest('[data-seg]');
-    const sw = e.target.closest('[data-switch]');
-    if (chip) { v[chip.dataset.chip] = chip.dataset.value; refresh(); return; }
-    if (seg) { const f = fields.find((x) => x.key === seg.dataset.seg); const raw = seg.dataset.value; v[seg.dataset.seg] = f.numeric ? Number(raw) : raw; refresh(); return; }
-    if (sw) { v[sw.dataset.switch] = !v[sw.dataset.switch]; refresh(); return; }
-    if (e.target.closest('[data-form-save]')) {
-      let ok = true;
-      fields.filter((f) => !f.show || f.show(v)).forEach((f) => {
-        const empty = !String(v[f.key] ?? '').trim();
-        const err = dlg.$(`[data-error="${f.key}"]`);
-        if (f.required && empty && err) { err.textContent = `${f.label} is required.`; err.hidden = false; ok = false; }
-        else if (err) err.hidden = true;
-      });
-      if (!ok) return;
-      dlg.close();
-      onSave({ ...v });
-    }
-  });
-  return dlg;
-}
-
-/* ------------------------------------------------------------------------------------------------
-   Forms for each kind of item
-   ------------------------------------------------------------------------------------------------ */
-
-const optionsOf = (list) => list.map((x) => ({ value: x, label: x }));
-const INCLUSION = [{ value: 'included', label: 'Included' }, { value: 'paid_extra', label: 'Paid extra' }];
-
-function hotelForm(model, i, existing, onSave) {
-  const day = model.days[i];
-  const checkIn = day.iso || '';
-  const stay = existing || { id: M.newId('h'), name: '', city: M.locationAfter(model, i), checkIn, checkOut: checkIn ? M.addDaysIso(checkIn, 1) : '', checkInTime: '', checkOutTime: '', rooms: 1, roomType: '', plan: 'bb', planOther: '', confirmation: '', phone: '' };
-  openForm({
-    title: existing ? 'Edit hotel' : 'Add hotel',
-    values: { ...stay, checkIn: stay.checkIn || checkIn, checkOut: stay.checkOut || (checkIn ? M.addDaysIso(checkIn, 1) : '') },
-    fields: [
-      { key: 'name', label: 'Hotel name', type: 'text', required: true, placeholder: 'Hotel name' },
-      { key: 'city', label: 'City', type: 'text', placeholder: 'City', max: 80 },
-      { key: 'checkIn', label: 'Check-in', type: 'date' },
-      { key: 'checkOut', label: 'Check-out', type: 'date', hint: (v) => (v.checkIn && v.checkOut ? (v.checkOut > v.checkIn ? `${M.daysBetween(v.checkIn, v.checkOut)} night${M.daysBetween(v.checkIn, v.checkOut) === 1 ? '' : 's'}` : 'Check-out is before check-in, so one night is used.') : '') },
-      { key: 'checkInTime', label: 'Check-in time', type: 'time' },
-      { key: 'checkOutTime', label: 'Check-out time', type: 'time' },
-      { key: 'rooms', label: 'Rooms', type: 'number', max: 2 },
-      { key: 'roomType', label: 'Room type', type: 'chips', options: optionsOf(M.ROOM_TYPES) },
-      { key: 'plan', label: 'Meal plan', type: 'chips', required: true, options: M.MEAL_PLANS.map((p) => ({ value: p.key, label: p.label })) },
-      { key: 'planOther', label: 'Meal plan details', type: 'text', max: 40, show: (v) => v.plan === 'other' },
-      { key: 'confirmation', label: 'Confirmation number', type: 'text', max: 40 },
-      { key: 'phone', label: 'Hotel phone', type: 'phone', max: 30 },
-    ],
-    onSave: (v) => {
-      let nights = v.checkIn && v.checkOut ? M.daysBetween(v.checkIn, v.checkOut) : 1;
-      if (nights < 1) nights = 1;
-      onSave({ ...v, id: stay.id, rooms: Number(v.rooms) || 1 }, nights);
-    },
-  });
-}
-
-function transportForm(model, i, existing, onSave) {
-  const day = model.days[i];
-  const from = M.locationBefore(model, i);
-  const to = day.locationMode === 'transit' ? day.to : from;
-  const t = existing || { id: M.newId('t'), mode: 'Cab', from, to, dep: '', arr: '', plusDay: 0, vehicle: '', driver: '', driverPhone: '', operator: '', arrangedBy: 'package' };
-  openForm({
-    title: existing ? 'Edit transport' : 'Add transport',
-    values: t,
-    fields: [
-      { key: 'mode', label: 'Mode', type: 'chips', required: true, options: optionsOf(M.TRANSPORT_MODES) },
-      { key: 'from', label: 'From', type: 'text', placeholder: 'From' },
-      { key: 'to', label: 'To', type: 'text', placeholder: 'To' },
-      { key: 'dep', label: 'Departure', type: 'time' },
-      { key: 'arr', label: 'Arrival', type: 'time' },
-      { key: 'plusDay', label: 'Arrives', type: 'seg', numeric: true, options: [{ value: 0, label: 'Same day' }, { value: 1, label: '+1 day' }] },
-      { key: 'vehicle', label: 'Vehicle type', type: 'chips', options: optionsOf(M.VEHICLES), show: (v) => ['Cab', 'Bus'].includes(v.mode) },
-      { key: 'driver', label: 'Driver name', type: 'text', max: 80, show: (v) => v.mode === 'Cab' },
-      { key: 'driverPhone', label: 'Driver phone', type: 'phone', max: 30, show: (v) => v.mode === 'Cab' },
-      { key: 'operator', label: 'Operator / ticket info', type: 'text', max: 120, show: (v) => ['Bus', 'Train', 'Flight', 'Boat', 'Other'].includes(v.mode) },
-      { key: 'arrangedBy', label: 'Who arranges and pays?', type: 'seg', required: true, options: [{ value: 'package', label: 'Included in package' }, { value: 'customer', label: 'Customer arranges (not included)' }] },
-    ],
-    onSave: (v) => onSave({ ...v, plusDay: Number(v.plusDay) || 0 }),
-  });
-}
-
-function activityForm(existing, onSave) {
-  const a = existing || { id: M.newId('a'), title: '', time: '', duration: '', place: '', tickets: '', inclusion: 'included', notes: '' };
-  openForm({
-    title: existing ? 'Edit activity' : 'Add activity',
-    values: a,
-    fields: [
-      { key: 'title', label: 'Activity', type: 'text', required: true, placeholder: 'Activity name' },
-      { key: 'time', label: 'Time', type: 'time' },
-      { key: 'duration', label: 'Duration', type: 'text', max: 30, placeholder: 'e.g. 3 hrs' },
-      { key: 'place', label: 'Place / meeting point', type: 'text', max: 100 },
-      { key: 'tickets', label: 'Tickets', type: 'number', max: 2 },
-      { key: 'inclusion', label: 'Cost', type: 'seg', options: INCLUSION },
-      { key: 'notes', label: 'Notes', type: 'textarea', max: 300 },
-    ],
-    onSave: (v) => onSave({ ...v, durationMin: M.durationToMinutes(v.duration) }),
-  });
-}
-
-function mealForm(existing, onSave) {
-  const m = existing || { id: M.newId('m'), kind: 'Lunch', time: '', atHotel: false, place: '', diet: '', inclusion: 'included' };
-  openForm({
-    title: existing ? 'Edit meal' : 'Add meal',
-    values: m,
-    fields: [
-      { key: 'kind', label: 'Meal', type: 'chips', required: true, options: optionsOf(M.MEAL_KINDS) },
-      { key: 'time', label: 'Time', type: 'time' },
-      { key: 'atHotel', label: 'Where', type: 'switch', text: 'At the hotel' },
-      { key: 'place', label: 'Restaurant', type: 'text', max: 100, show: (v) => !v.atHotel },
-      { key: 'diet', label: 'Dietary notes', type: 'text', max: 100 },
-      { key: 'inclusion', label: 'Cost', type: 'seg', options: INCLUSION },
-    ],
-    onSave,
-  });
-}
-
-function noteForm(existing, onSave) {
-  const n = existing || { id: M.newId('n'), text: '', visible: true };
-  openForm({
-    title: existing ? 'Edit note' : 'Add note',
-    values: n,
-    fields: [
-      { key: 'text', label: 'Note', type: 'textarea', required: true, max: 500, placeholder: 'Write a note for this day' },
-      { key: 'visible', label: 'Who can see it', type: 'switch', text: 'Visible to customer (off = staff only)' },
-    ],
-    onSave,
-  });
-}
 
 /* ------------------------------------------------------------------------------------------------
    The builder
@@ -320,9 +138,9 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
   }
 
   const rows = {
-    hotel: (s, run) => ({ id: s.id, title: s.name, sub: [s.city, `${run?.nights || 1} night${(run?.nights || 1) === 1 ? '' : 's'} · ${M.planLabel(s)}`].filter(Boolean).join(' · ') }),
-    transport: (t) => ({ id: t.id, title: t.title || `${t.from || 'Start'} to ${t.to || 'Destination'}`, sub: [t.mode, t.vehicle, t.dep ? M.to12h(t.dep) : ''].filter(Boolean).join(' · '), notIncluded: t.arrangedBy === 'customer' }),
-    activity: (a) => ({ id: a.id, title: a.title, sub: [a.time ? M.to12h(a.time) : '', a.place, a.duration].filter(Boolean).join(' · '), notIncluded: a.inclusion === 'paid_extra', pillText: 'Paid extra' }),
+    hotel: (s, run) => ({ id: s.id, title: s.name, sub: withTotal([s.city, `${run?.nights || 1} night${(run?.nights || 1) === 1 ? '' : 's'} · ${M.planLabel(s)}`], s.price != null ? s.price * (Number(s.rooms) || 1) * (run?.nights || 1) : null) }),
+    transport: (t) => ({ id: t.id, title: t.title || `${t.from || 'Start'} to ${t.to || 'Destination'}`, sub: withTotal([t.vehicle || t.mode, t.dep ? M.to12h(t.dep) : ''], t.arrangedBy === 'customer' ? null : t.totalPrice), notIncluded: t.arrangedBy === 'customer' }),
+    activity: (a) => ({ id: a.id, title: a.title, sub: withTotal([a.time ? M.to12h(a.time) : '', a.place, a.duration], a.totalPrice), notIncluded: a.inclusion === 'paid_extra', pillText: 'Paid extra' }),
     meal: (m) => ({ id: m.id, title: `${m.kind}${m.atHotel ? ' at hotel' : m.place ? `: ${m.place}` : ''}`, sub: [m.time ? M.to12h(m.time) : '', m.diet].filter(Boolean).join(' · '), notIncluded: m.inclusion === 'paid_extra', pillText: 'Paid extra' }),
     note: (n) => ({ id: n.id, title: n.text, sub: n.visible === false ? 'Staff only' : 'Visible to customer', lock: n.visible === false }),
     legacy: (x) => ({ id: x.id, title: x.title, sub: x.subtitle || '', notIncluded: x.inclusion === 'not_included' }),
@@ -342,7 +160,7 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
 
   const sectionHead = (key, label, addLabel, ico) => `
     <div class="bld-sec-head"><span class="bld-sec-title"><span class="bld-ico item-icon-box item-icon-${SECTION_TILE[key]}">${icon(ico, { size: 18 })}</span>${label}</span>
-      ${addLabel ? `<button type="button" class="bld-add" data-add="${key}">${icon('plus', { size: 14, stroke: 2.5 })}${addLabel}</button>` : ''}</div>`;
+      ${addLabel ? `<button type="button" class="bld-add" data-add="${key}" aria-label="Add ${esc(label)}">${icon('plus', { size: 14, stroke: 2.5 })}Add</button>` : ''}</div>`;
 
   function dayBody(i) {
     const d = model.days[i];
@@ -381,9 +199,9 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
       ${d.transport.mode === 'same' && i > 0 ? `<p class="bld-note-line">${prevHasTransport ? 'The same vehicle continues from the previous day.' : 'No transport set on the previous day.'}</p>` : ''}${tRows}</div>`;
 
     const lists = {
-      activity: `<div class="bld-sec">${sectionHead('activity', 'Activities', 'Add Activity', 'camera')}${d.activities.map((a) => rowHtml('activity', rows.activity(a))).join('')}</div>`,
-      meal: `<div class="bld-sec">${sectionHead('meal', 'Meals', 'Add Meal', 'utensils')}${d.meals.map((m) => rowHtml('meal', rows.meal(m))).join('')}</div>`,
-      note: `<div class="bld-sec">${sectionHead('note', 'Notes', 'Add Note', 'note')}${d.notes.map((n) => rowHtml('note', rows.note(n))).join('')}</div>`,
+      activity: `<div class="bld-sec">${sectionHead('activity', 'Activities', 'Add', 'camera')}${d.activities.map((a) => rowHtml('activity', rows.activity(a))).join('')}</div>`,
+      meal: `<div class="bld-sec">${sectionHead('meal', 'Meals', 'Add', 'utensils')}${d.meals.map((m) => rowHtml('meal', rows.meal(m))).join('')}</div>`,
+      note: `<div class="bld-sec">${sectionHead('note', 'Notes', 'Add', 'note')}${d.notes.map((n) => rowHtml('note', rows.note(n))).join('')}</div>`,
     };
     const legacy = d.legacy.length ? `<div class="bld-sec">${sectionHead('legacy', 'Other events', '', 'clock')}${d.legacy.map((x) => rowHtml('legacy', rows.legacy(x), { edit: false })).join('')}</div>` : '';
     const helpers = `<div class="bld-helpers">
@@ -464,16 +282,45 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
     if (after && after.hotel.mode === 'same') after.hotel = { mode: 'different', stay: null };
   }
 
+  /** Where focus goes when the small dialog closes: the "+ Add" button (or the row's Edit link) that opened it. */
+  const focusTarget = (section, id) => (id ? bodyEl.querySelector(`[data-edit="${section}:${id}"]`) : null)
+    || bodyEl.querySelector(`[data-add="${section}"]`) || bodyEl.querySelector(`[data-edit^="${section}:"]`);
+
   function addOrEdit(section, id) {
     const i = openDay;
     const d = model.days[i];
     const existing = id ? find(section, id) : null;
-    const done = () => refresh();
-    if (section === 'hotel') hotelForm(model, i, existing, (stay, nights) => { applyHotel(i, stay, nights); done(); });
-    else if (section === 'transport') transportForm(model, i, existing, (t) => { if (existing) Object.assign(existing, t); else { d.transport.items.push(t); d.transport.mode = 'different'; } done(); });
-    else if (section === 'activity') activityForm(existing, (a) => { if (existing) Object.assign(existing, a); else d.activities.push(a); done(); });
-    else if (section === 'meal') mealForm(existing, (m) => { if (existing) Object.assign(existing, m); else d.meals.push(m); done(); });
-    else if (section === 'note') noteForm(existing, (n) => { if (existing) Object.assign(existing, n); else d.notes.push(n); done(); });
+    const returnFocus = () => focusTarget(section, id);
+    // The dialog closes first, then the plan re-renders; put focus back on the button once the new markup is there.
+    const done = () => { refresh(); requestAnimationFrame(() => returnFocus()?.focus?.({ preventScroll: true })); };
+    const base = { model, i, existing, returnFocus };
+    if (section === 'hotel') hotelForm({ ...base, onSave: (stay, nights) => { applyHotel(i, stay, nights); done(); } });
+    else if (section === 'transport') {
+      transportForm({
+        ...base,
+        assigneeFor: (tid) => model.keep[tid]?.assigned ?? null,
+        onSave: (t, move) => {
+          if (move) { d.locationMode = move.locationMode; d.to = move.to; } // the day's destination: one source of truth
+          if (existing) Object.assign(existing, t); else { d.transport.items.push(t); d.transport.mode = 'different'; }
+          done();
+        },
+      });
+    } else if (section === 'activity') {
+      activityForm({
+        ...base,
+        onSave: (a) => {
+          const target = a.date && a.date !== d.iso ? model.days.findIndex((x) => x.iso === a.date) : -1;
+          if (existing && target < 0) Object.assign(existing, a);
+          else {
+            if (existing) d.activities.splice(d.activities.indexOf(existing), 1);
+            model.days[target >= 0 ? target : i].activities.push(a);
+          }
+          if (target >= 0) toast(`Moved to Day ${target + 1}`, 'success');
+          done();
+        },
+      });
+    } else if (section === 'meal') mealForm({ ...base, onSave: (m) => { if (existing) Object.assign(existing, m); else d.meals.push(m); done(); } });
+    else if (section === 'note') noteForm({ ...base, onSave: (n) => { if (existing) Object.assign(existing, n); else d.notes.push(n); done(); } });
   }
 
   function removeItem(section, id) {

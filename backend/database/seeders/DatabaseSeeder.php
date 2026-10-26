@@ -110,5 +110,8 @@ class DatabaseSeeder extends Seeder
                 Inquiry::create($item);
             }
         }
+
+        // 6. Vehicle catalogue for the transport form (placeholder daily rates)
+        $this->call(VehicleTypeSeeder::class);
     }
 }

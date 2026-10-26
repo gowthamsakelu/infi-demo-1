@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Itinerary extends Model
 {
-    protected $fillable = ['itineraryable_type', 'itineraryable_id', 'origin', 'destination', 'stops', 'start_date', 'end_date'];
+    protected $fillable = ['itineraryable_type', 'itineraryable_id', 'origin', 'destination', 'stops', 'start_date', 'end_date', 'show_prices_to_customer'];
 
-    protected $casts = ['stops' => 'array', 'start_date' => 'date:Y-m-d', 'end_date' => 'date:Y-m-d'];
+    protected $casts = ['stops' => 'array', 'start_date' => 'date:Y-m-d', 'end_date' => 'date:Y-m-d', 'show_prices_to_customer' => 'boolean'];
 
     public function days(): HasMany
     {
@@ -25,6 +25,7 @@ class Itinerary extends Model
             'stops' => $this->stops ?? [],
             'startDate' => $this->start_date?->toDateString(),
             'endDate' => $this->end_date?->toDateString(),
+            'showPrices' => (bool) $this->show_prices_to_customer,
         ];
     }
 }

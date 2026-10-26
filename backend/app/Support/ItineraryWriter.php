@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Itinerary;
 use App\Models\ItineraryDay;
 use App\Models\ItineraryItem;
+use App\Models\Staff;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -33,7 +34,8 @@ class ItineraryWriter
     }
 
     /** Keys stored in their own columns; anything else an event carries goes into `details`. */
-    private const COLUMN_KEYS = ['id', 'type', 'icon', 'title', 'subtitle', 'time', 'endTime', 'location', 'inclusion', 'mealPlan', 'details', 'visibleToCustomer', 'assigned', 'completed'];
+    private const COLUMN_KEYS = ['id', 'type', 'icon', 'title', 'subtitle', 'time', 'endTime', 'location', 'inclusion', 'mealPlan', 'details', 'visibleToCustomer', 'assigned', 'completed',
+        'price', 'quantity', 'totalPrice', 'priceOverridden', 'currency', 'vehicleTypeId', 'placeId', 'assignedStaffId'];
 
     /**
      * @param  string  $type  booking | inquiry
@@ -46,6 +48,7 @@ class ItineraryWriter
 
             if ($meta !== null) {
                 $itinerary->fill([
+                    'show_prices_to_customer' => (bool) ($meta['showPrices'] ?? $itinerary->show_prices_to_customer),
                     'origin' => $meta['origin'] ?? null,
                     'destination' => $meta['destination'] ?? null,
                     'stops' => array_values($meta['stops'] ?? []),
@@ -55,6 +58,7 @@ class ItineraryWriter
             }
             $start = $itinerary->start_date ? CarbonImmutable::parse($itinerary->start_date) : $tripStart;
 
+            $staffIds = Staff::pluck('id')->flip(); // one query for the whole save, not one per event
             $itinerary->days()->delete(); // items go with their day
             foreach (array_values($days) as $i => $day) {
                 $row = $itinerary->days()->create([
@@ -65,7 +69,7 @@ class ItineraryWriter
                     'location_mode' => ($day['locationMode'] ?? 'same') === 'transit' ? 'transit' : 'same',
                 ]);
                 foreach (array_values($day['items'] ?? []) as $j => $item) {
-                    self::item($row, $j, $item);
+                    self::item($row, $j, $item, $staffIds);
                 }
             }
             $itinerary->touch();
@@ -83,12 +87,31 @@ class ItineraryWriter
         return $start?->addDays($index)->toDateString();
     }
 
-    private static function item(ItineraryDay $day, int $position, array $item): ItineraryItem
+    /** What an event costs: the price per unit times the quantity, unless staff typed a total of their own. */
+    public static function total(?float $price, int $quantity, ?float $typedTotal = null): ?float
+    {
+        if ($typedTotal !== null) {
+            return round($typedTotal, 2);
+        }
+
+        return $price === null ? null : round($price * max(1, $quantity), 2);
+    }
+
+    private static function number(mixed $v): ?float
+    {
+        return is_numeric($v) ? (float) $v : null;
+    }
+
+    private static function item(ItineraryDay $day, int $position, array $item, \Illuminate\Support\Collection $staffIds): ItineraryItem
     {
         [$type, $defaultIcon] = self::TYPE_MAP[$item['type'] ?? 'activity'] ?? self::TYPE_MAP['activity'];
         $subtitle = trim((string) ($item['subtitle'] ?? ''));
         $time = $item['time'] ?? (preg_match('/^\d{1,2}:\d{2}\s*[AP]M/i', $subtitle, $m) ? $m[0] : null);
         $inclusion = in_array($item['inclusion'] ?? 'included', ['included', 'not_included', 'paid_extra'], true) ? ($item['inclusion'] ?? 'included') : 'included';
+
+        $price = self::number($item['price'] ?? null);
+        $quantity = max(1, (int) ($item['quantity'] ?? 1));
+        $staffId = $item['assignedStaffId'] ?? null;
 
         return $day->items()->create([
             'uid' => (string) ($item['id'] ?? uniqid('IT-', true)),
@@ -107,6 +130,14 @@ class ItineraryWriter
             'visible_to_customer' => (bool) ($item['visibleToCustomer'] ?? true),
             'assigned_to' => $item['assigned'] ?? null,
             'completed' => (bool) ($item['completed'] ?? false),
+            'price' => $price,
+            'quantity' => $quantity,
+            'total_price' => self::total($price, $quantity, self::number($item['totalPrice'] ?? null)),
+            'price_overridden' => (bool) ($item['priceOverridden'] ?? false),
+            'currency' => strtoupper((string) ($item['currency'] ?? 'INR')),
+            'vehicle_type_id' => $item['vehicleTypeId'] ?? null,
+            'place_id' => $item['placeId'] ?? null,
+            'assigned_staff_id' => $staffId !== null && $staffIds->has($staffId) ? $staffId : null,
         ]);
     }
 }

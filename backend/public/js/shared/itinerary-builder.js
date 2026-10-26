@@ -4,7 +4,7 @@
 import { tripRange, daysOf } from './itinerary.js';
 
 export const MEAL_PLANS = [
-  { key: 'stay', label: 'Only stay (no meals)', short: 'Stay only' },
+  { key: 'stay', label: 'Only stay', short: 'Stay only' },
   { key: 'bb', label: 'Stay + Breakfast', short: 'Breakfast' },
   { key: 'map', label: 'Stay + Breakfast & Dinner', short: 'MAP' },
   { key: 'all', label: 'Stay + all meals', short: 'All meals' },
@@ -186,12 +186,15 @@ export function warnings(model) {
 const clip = (s, n) => (String(s || '').length > n ? `${String(s).slice(0, n - 1)}…` : String(s || ''));
 const joinDot = (...parts) => parts.filter(Boolean).join(' • ');
 
+/** Assignment and completion made on the timeline are kept, unless the form just set them on the event itself. */
 function withKeep(model, item) {
   const k = model.keep[item.id];
-  if (k?.assigned !== undefined) item.assigned = k.assigned;
-  if (k?.completed !== undefined) item.completed = k.completed;
-  return item;
+  const out = { assigned: null, completed: false, ...item };
+  if (!('assigned' in item) && k?.assigned !== undefined) out.assigned = k.assigned;
+  if (!('completed' in item) && k?.completed !== undefined) out.completed = k.completed;
+  return out;
 }
+const priced = (price, quantity, total) => (price == null ? { price: null, quantity, totalPrice: total ?? null } : { price, quantity, totalPrice: total ?? Math.round(price * quantity * 100) / 100 });
 
 export function toDays(model) {
   const runs = stayRuns(model);
@@ -203,7 +206,8 @@ export function toDays(model) {
       items.push({
         id: s.id, type: 'stay', icon: 'bed', title: `Check-in: ${s.name}`,
         subtitle: joinDot(to12h(s.checkInTime), `${s.city || ''}${s.city ? ' ' : ''}(${planLabel(s)})`.trim()),
-        time: to12h(s.checkInTime) || null, location: s.city || null,
+        time: to12h(s.checkInTime) || null, location: s.city || null, inclusion: s.inclusion === 'paid_extra' ? 'paid_extra' : 'included',
+        ...priced(s.price ?? null, (Number(s.rooms) || 1) * run.nights, null), priceOverridden: false, currency: 'INR', placeId: s.placeId || null,
         details: { b: { role: 'check_in', ...s, nights: run.nights } },
       });
     } else if (run) {
@@ -234,6 +238,8 @@ export function toDays(model) {
         id: t.id, type: 'transport', icon: 'bus', title: t.title || `${t.from || 'Start'} to ${t.to || 'Destination'}`,
         subtitle: joinDot(to12h(t.dep), joinDot(t.vehicle || t.mode, t.driver)), time: to12h(t.dep) || null, endTime: to12h(t.arr) || null,
         inclusion: t.arrangedBy === 'customer' ? 'not_included' : 'included',
+        ...priced(t.price ?? null, Number(t.days) || 1, t.totalPrice ?? null), priceOverridden: !!t.priceOverridden, currency: 'INR',
+        vehicleTypeId: t.vehicleTypeId ?? null, assignedStaffId: t.assignedStaffId ?? null, ...('assigned' in t ? { assigned: t.assigned } : {}),
         details: { b: { role: 'transport', ...t } },
       });
     });
@@ -241,6 +247,7 @@ export function toDays(model) {
       items.push({
         id: a.id, type: 'activity', icon: 'camera', title: a.title, subtitle: joinDot(to12h(a.time), a.place, a.duration),
         time: to12h(a.time) || null, location: a.place || null, inclusion: a.inclusion || 'included',
+        ...priced(a.price ?? null, Number(a.tickets) || 1, null), priceOverridden: false, currency: 'INR', placeId: a.placeId || null,
         details: { b: { role: 'activity', ...a } },
       });
     });
@@ -262,7 +269,7 @@ export function toDays(model) {
     return {
       day: `Day ${i + 1}`, date: d.iso ? fmtShort(d.iso) : 'TBD', isoDate: d.iso || null, title: d.title || null,
       location: d.locationMode === 'transit' ? d.to || null : (locationBefore(model, i) || null), locationMode: d.locationMode,
-      items: items.map((it) => withKeep(model, { assigned: null, completed: false, ...it })),
+      items: items.map((it) => withKeep(model, it)),
     };
   });
   return days;
@@ -289,7 +296,7 @@ function fromDays(model, days) {
       if (role === 'check_in') { d.hotel.mode = 'different'; d.hotel.stay = { ...rest, id: it.id }; }
       else if (role === 'continues' && it.type === 'stay') d.hotel.mode = 'same';
       else if (role === 'continues' && it.type === 'transport') d.transport.mode = 'same';
-      else if (role === 'transport') { d.transport.mode = 'different'; d.transport.items.push({ ...rest, id: it.id }); }
+      else if (role === 'transport') { d.transport.mode = 'different'; d.transport.items.push({ ...rest, id: it.id, assigned: it.assigned ?? null }); }
       else if (role === 'activity') d.activities.push({ ...rest, id: it.id });
       else if (role === 'meal') d.meals.push({ ...rest, id: it.id });
       else if (role === 'note') d.notes.push({ ...rest, id: it.id });
