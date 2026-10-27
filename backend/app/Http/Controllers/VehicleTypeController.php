@@ -10,6 +10,6 @@ class VehicleTypeController extends Controller
     /** The active vehicles, most popular first, with their default daily rate. */
     public function index(): JsonResponse
     {
-        return response()->json(['success' => true, 'data' => VehicleType::query()->where('active', true)->orderBy('popularity_rank')->get()->map->toApi()]);
+        return response()->json(['success' => true, 'data' => VehicleType::query()->where('active', true)->where('show_in_builder', true)->orderByDesc('most_popular')->orderBy('popularity_rank')->get()->map->toApi()]);
     }
 }

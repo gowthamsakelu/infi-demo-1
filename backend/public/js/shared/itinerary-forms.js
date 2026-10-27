@@ -11,11 +11,11 @@ import * as P from './places-client.js';
 
 export const ROOM_TYPE_OPTIONS = ['Standard', 'Deluxe', 'Premium', 'Suite', 'Cottage', 'Dormitory', 'Other'];
 const INCLUSION = [{ value: 'included', label: 'Included in package' }, { value: 'paid_extra', label: 'Paid extra' }];
-const TRANSIENT = new Set(['tab', 'editRate', 'showMore', 'picked', 'touched', 'q', 'moveTouched', 'dropTouched']);
 
 const rupee = (n) => `₹${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 const num = (x) => { const n = Number(x); return x === '' || x === null || x === undefined || !Number.isFinite(n) ? null : n; };
 const round2 = (n) => Math.round(n * 100) / 100;
+const durationText = (min) => (min < 60 ? `${min} min` : `${Math.floor(min / 60)} hr${min % 60 ? ` ${min % 60} min` : ''}`);
 
 /* ------------------------------------------------------------------------------------------------
    Field pieces (all return markup; every input carries data-field so the engine can read it)
@@ -58,14 +58,17 @@ const tabs = (v, list) => `<div class="sheet-tabs-nav item-dialog-tabs" role="ta
    ------------------------------------------------------------------------------------------------ */
 
 /**
- * @param {{ title: string, saveLabel: string, values: object, returnFocus?: () => Element|null,
+ * `track` names the values the user can change; the dialog is "dirty" only when one of them differs from what it opened with
+ * (prefilled and default values are the starting point, not input). Every way out goes through openSheet's one request path.
+ * @param {{ title: string, saveLabel: string, values: object, track: string[], returnFocus?: () => Element|null,
  *           render: (v: object, ctx: object) => string, validate?: (v: object) => Record<string,string>,
  *           onInput?: (e: Event, ctx: object) => void, onClick?: (e: Event, ctx: object) => void, onChange?: (key: string, ctx: object) => void,
  *           onClose?: () => void, onSave: (v: object) => void }} cfg
  */
-function openItemDialog({ title, saveLabel, values, returnFocus, render, validate, onInput, onClick, onChange, afterRender, onClose, onSave }) {
+function openItemDialog({ title, saveLabel, values, track, returnFocus, render, validate, onInput, onClick, onChange, afterRender, onClose, onSave }) {
   const v = values; // the form's own object: its render() and handlers read the same state the engine edits
-  const snap = () => JSON.stringify(v, (k, val) => (TRANSIENT.has(k) ? undefined : val));
+  const norm = (x) => (x && typeof x === 'object' ? JSON.stringify(x) : typeof x === 'string' ? x.trim() : x === null || x === undefined ? '' : String(x));
+  const snap = () => JSON.stringify(track.map((k) => norm(v[k])));
   let initial = snap();
 
   const dlg = openSheet({
@@ -74,8 +77,7 @@ function openItemDialog({ title, saveLabel, values, returnFocus, render, validat
     cls: 'item-dialog-card',
     returnFocus,
     onClose,
-    beforeClose: async () => (snap() === initial
-      || confirmDialog({ title: 'Discard this entry?', text: 'What you entered here has not been added yet.', confirm: 'Discard', cancel: 'Keep editing', danger: true })),
+    beforeClose: () => snap() === initial || confirmDialog({ title: 'Discard this entry?', text: 'What you entered here has not been added yet.', confirm: 'Discard', cancel: 'Keep editing', danger: true }),
     html: `<header class="modal-header item-dialog-head">
         <button type="button" class="dialog-back" data-sheet-close aria-label="Back">${icon('arrowLeft', { size: 20, stroke: 2.2 })}</button>
         <h3 data-dialog-title tabindex="-1">${esc(title)}</h3>
@@ -167,27 +169,33 @@ function placeThumb(photo, ico) {
 const ratingText = (p) => (p.rating ? `★ ${Number(p.rating).toFixed(1)}` : '');
 
 /** The search side of a "Search | Add manually" dialog: box, recent places, results, and the chosen-place card. */
-function placeSearch({ kind, noun, thumbIcon, v, ctx0, getLocation }) {
-  const S = { enabled: null, status: 'idle', results: [], message: '', recent: [], loadingId: '' };
+function placeSearch({ kind, noun, plural, thumbIcon, v, ctx0, getLocation }) {
+  const S = { enabled: null, provider: '', status: 'idle', popular: false, results: [], message: '', recent: [], loadingId: '' };
   const savedKind = kind === 'hotel' ? 'hotels' : 'activities';
-  const searcher = P.createSearcher({ kind, getLocation, onState: (st) => { S.status = st.status; S.results = st.results; S.message = st.message || ''; if (st.status === 'off') S.enabled = false; paint(); } });
+  const searcher = P.createSearcher({ kind, getLocation, popularWhenEmpty: () => S.provider === 'demo', onState: (st) => { S.status = st.status; S.results = st.results; S.popular = !!st.popular; S.message = st.message || ''; if (st.status === 'off') S.enabled = false; paint(); } });
   let ctx = ctx0;
 
   const resultRow = (p, i, from) => `<button type="button" class="place-row" data-pick="${from}:${i}" ${S.loadingId === `${from}:${i}` ? 'aria-busy="true"' : ''}>
       ${placeThumb(p.photo, thumbIcon)}
-      <span class="place-text"><b>${esc(p.name)}</b><small>${esc([ratingText(p), p.area ?? [p.city, p.address].filter(Boolean).join(', ')].filter(Boolean).join(' · '))}</small></span>
+      <span class="place-text"><b>${esc(p.name)}</b><small>${esc([ratingText(p), p.area ?? [p.city, p.address].filter(Boolean).join(', '), p.price != null ? `${rupee(p.price)}${kind === 'hotel' ? ' / night' : ' / person'}` : ''].filter(Boolean).join(' · '))}</small></span>
     </button>`;
 
+  const list = (rows, from) => `<div class="place-list" role="list">${rows.map((p, i) => resultRow(p, i, from)).join('')}</div>`;
+  const recentHtml = (limit) => (S.recent.length ? `<p class="places-head">Recently used</p>${list(S.recent.slice(0, limit), 'h')}` : '');
+  const emptyHtml = () => `<p class="places-note">No ${plural} found, try <button type="button" class="bld-link" data-tab="manual">Add manually</button></p>`;
+
+  // The search tab always shows something: popular places, results, recent places, a loading state or an empty message.
   function resultsHtml() {
     if (S.status === 'loading') return '<div class="place-skel" aria-hidden="true"><i></i><i></i><i></i></div><p class="places-note" role="status">Searching…</p>';
     if (S.status === 'error') return `<p class="places-note is-error" role="alert">${esc(S.message)}</p><button type="button" class="bld-link" data-tab="manual">Add manually</button>`;
-    if (S.status === 'ok') {
-      return S.results.length
-        ? `<div class="place-list" role="list">${S.results.map((p, i) => resultRow(p, i, 'r')).join('')}</div><p class="places-attrib">Powered by Google</p>`
-        : `<p class="places-note">No ${noun}s found. Try another name, or </p><button type="button" class="bld-link" data-tab="manual">add it manually</button>`;
+    const credit = S.provider === 'google' ? '<p class="places-attrib">Powered by Google</p>' : '';
+    if (S.status === 'ok' && S.popular) {
+      const where = getLocation?.();
+      return `${recentHtml(3)}<p class="places-head">Popular${where ? ` in ${esc(where)}` : ''}</p>${S.results.length ? list(S.results, 'r') : emptyHtml()}`;
     }
-    if (S.recent.length) return `<p class="places-head">Recently used</p><div class="place-list" role="list">${S.recent.map((p, i) => resultRow(p, i, 'h')).join('')}</div>`;
-    return `<p class="places-note">Type at least two letters to search ${noun}s.</p>`;
+    if (S.status === 'ok') return `${S.results.length ? list(S.results, 'r') : emptyHtml()}${credit}`;
+    if (S.recent.length) return recentHtml(8);
+    return `<p class="places-note">Type at least two letters to search ${plural}.</p>`;
   }
   function paint() { const box = ctx?.$('[data-results]'); if (box) box.innerHTML = resultsHtml(); }
 
@@ -195,9 +203,11 @@ function placeSearch({ kind, noun, thumbIcon, v, ctx0, getLocation }) {
     S,
     bind(c) {
       ctx = c;
-      P.placesEnabled().then((on) => {
-        S.enabled = on;
-        if (!on && v.tab === 'search' && !v.touched) v.tab = 'manual';
+      P.placesStatus().then((st) => {
+        S.enabled = st.enabled;
+        S.provider = st.provider;
+        if (!st.enabled && v.tab === 'search' && !v.touched) v.tab = 'manual';
+        if (st.enabled && st.provider === 'demo') searcher.query(''); // popular places for the day's location, before anything is typed
         ctx.rerender();
       });
       P.loadRecent(savedKind).then((list) => { S.recent = list; paint(); });
@@ -209,7 +219,7 @@ function placeSearch({ kind, noun, thumbIcon, v, ctx0, getLocation }) {
         const p = v.picked;
         return `<div class="place-card">${placeThumb(p.photo, thumbIcon)}<span class="place-text"><b>${esc(p.name)}</b><small>${esc([ratingText(p), p.address || p.city].filter(Boolean).join(' · '))}</small></span><button type="button" class="bld-link" data-change-place>Change</button></div>${p.fromGoogle ? `<p class="places-attrib">Powered by Google${p.photoCredit ? ` · Photo: ${esc(p.photoCredit)}` : ''}</p>` : ''}`;
       }
-      return `<div class="bld-input places-box">${icon('search', { size: 17 })}<input type="search" data-search placeholder="${esc(placeholder)}" maxlength="100" autocomplete="off" aria-label="${esc(placeholder)}" value="${esc(v.q || '')}"></div><div class="places-results" data-results>${resultsHtml()}</div>`;
+      return `<div class="bld-input places-box">${icon('search', { size: 17 })}<input type="search" data-search placeholder="${esc(placeholder)}" maxlength="100" autocomplete="off" aria-label="${esc(placeholder)}" value="${esc(v.q || '')}"></div>${S.provider === 'demo' ? `<p class="places-info">${icon('info', { size: 15 })}<span>Showing demo results. Connect Google Places for live search.</span></p>` : ''}<div class="places-results" data-results>${resultsHtml()}</div>`;
     },
     onInput(e) { if (e.target.matches('[data-search]')) { v.q = e.target.value; searcher.query(e.target.value); } },
     async onClick(e, apply) {
@@ -223,7 +233,7 @@ function placeSearch({ kind, noun, thumbIcon, v, ctx0, getLocation }) {
         catch (err) { S.loadingId = ''; S.status = 'error'; S.message = err.message; paint(); }
         return true;
       }
-      if (e.target.closest('[data-change-place]')) { v.picked = null; v.q = ''; S.status = 'idle'; S.results = []; ctx.rerender(); return true; }
+      if (e.target.closest('[data-change-place]')) { v.picked = null; v.q = ''; S.status = 'idle'; S.results = []; searcher.query(''); ctx.rerender(); return true; }
       return false;
     },
     cancel: () => searcher.cancel(),
@@ -258,7 +268,7 @@ export function hotelForm({ model, i, existing, returnFocus, onSave }) {
   };
   const nightsHint = () => (v.checkIn && v.checkOut ? (v.checkOut > v.checkIn ? `${nights()} night${nights() === 1 ? '' : 's'}` : 'Check-out is before check-in, so one night is used.') : '');
 
-  const search = placeSearch({ kind: 'hotel', noun: 'hotel', thumbIcon: 'bed', v, getLocation: () => here });
+  const search = placeSearch({ kind: 'hotel', noun: 'hotel', plural: 'hotels', thumbIcon: 'bed', v, getLocation: () => here });
 
   const details = () => `${sectionTitle('Stay details')}
     <div class="fu-row">${dateField(v, 'checkIn', 'Check-in date')}${timeField(v, 'checkInTime', 'Check-in time')}</div>
@@ -279,6 +289,7 @@ export function hotelForm({ model, i, existing, returnFocus, onSave }) {
 
   const apply = (p) => {
     Object.assign(v, { picked: p, name: p.name, city: p.city || v.city, address: p.address || '', phone: p.phone || '', placeId: p.placeId || '', touched: true });
+    if (p.price != null && !String(v.price).trim()) v.price = String(p.price); // demo default, editable
     dlg.rerender();
   };
 
@@ -286,6 +297,7 @@ export function hotelForm({ model, i, existing, returnFocus, onSave }) {
     title: existing ? 'Edit Hotel Stay' : 'Add Hotel Stay',
     saveLabel: existing ? 'Save changes' : `Add to Day ${i + 1}`,
     values: v,
+    track: ['name', 'city', 'address', 'phone', 'placeId', 'saveForLater', 'checkIn', 'checkInTime', 'checkOut', 'checkOutTime', 'rooms', 'roomType', 'plan', 'planOther', 'price', 'inclusion', 'notes'],
     returnFocus,
     onClose: () => search.cancel(),
     render: () => `${search.notice()}${tabs(v, [['search', 'Search'], ['manual', 'Add manually']])}
@@ -339,7 +351,7 @@ export function activityForm({ model, i, existing, returnFocus, onSave }) {
     const price = num(v.price);
     return price === null ? 'Add a price to see the total.' : `${rupee(price * (Number(v.tickets) || 1))} · ${Number(v.tickets) || 1} guest${Number(v.tickets) === 1 ? '' : 's'} × ${rupee(price)}`;
   };
-  const search = placeSearch({ kind: 'activity', noun: 'activity', thumbIcon: 'camera', v, getLocation: () => here });
+  const search = placeSearch({ kind: 'activity', noun: 'activity', plural: 'activities', thumbIcon: 'camera', v, getLocation: () => here });
 
   const details = () => `${sectionTitle('Activity details')}
     ${dateField(v, 'date', 'Date', { min: model.meta.start || '', max: model.meta.end || '' })}
@@ -356,6 +368,8 @@ export function activityForm({ model, i, existing, returnFocus, onSave }) {
 
   const apply = (p) => {
     Object.assign(v, { picked: p, title: p.name, place: p.city || p.address || v.place, placeId: p.placeId || '', meetingPoint: p.meetingPoint || v.meetingPoint, touched: true });
+    if (p.price != null && !String(v.price).trim()) v.price = String(p.price); // demo default, editable
+    if (p.durationMinutes && !String(v.duration).trim()) v.duration = durationText(p.durationMinutes);
     dlg.rerender();
   };
 
@@ -363,6 +377,7 @@ export function activityForm({ model, i, existing, returnFocus, onSave }) {
     title: existing ? 'Edit Activity' : 'Add Activity',
     saveLabel: existing ? 'Save changes' : `Add to Day ${i + 1}`,
     values: v,
+    track: ['title', 'place', 'meetingPoint', 'placeId', 'saveForLater', 'date', 'time', 'duration', 'tickets', 'price', 'inclusion', 'notes'],
     returnFocus,
     onClose: () => search.cancel(),
     render: () => `${search.notice()}${tabs(v, [['search', 'Search'], ['manual', 'Add manually']])}
@@ -468,6 +483,7 @@ export function transportForm({ model, i, existing, returnFocus, assigneeFor, on
     title: 'Travelling',
     saveLabel: existing ? 'Save changes' : `Add to Day ${i + 1}`,
     values: v,
+    track: ['dep', 'arr', 'plusDay', 'moveMode', 'dest', 'vehicleKey', 'vehicle', 'rate', 'days', 'totalPrice', 'pickupTime', 'pickupPoint', 'drop', 'driver', 'driverPhone', 'vehicleNumber', 'arrangedBy', 'assigned', 'notes'],
     returnFocus,
     render: () => `
       <div class="fu-row">${timeField(v, 'dep', 'Departs')}${timeField(v, 'arr', 'Arrives')}</div>
@@ -484,7 +500,7 @@ export function transportForm({ model, i, existing, returnFocus, assigneeFor, on
       ${textField(v, 'driver', 'Driver name', { max: 80, optional: true })}
       <div class="fu-row">${textField(v, 'driverPhone', 'Driver phone', { max: 30, type: 'tel', optional: true })}${textField(v, 'vehicleNumber', 'Vehicle number', { max: 20, optional: true, ph: 'e.g. UK 07 AB 1234' })}</div>
       ${segField(v, 'arrangedBy', 'Who arranges and pays?', [{ value: 'package', label: 'Included in package' }, { value: 'customer', label: 'Customer arranges (not included)' }], { stack: true })}
-      ${group('Assign to', `<div class="assign-field">${assignedLine()}<button type="button" class="btn-secondary-desktop btn-compact" data-assign>${v.assigned?.name ? 'Change' : 'Assign'}</button>${v.assigned?.name ? `<button type="button" class="bld-link" data-unassign>Remove</button>` : ''}</div>`, { optional: true })}
+      ${group('Assign to', `<div class="assign-field">${assignedLine()}<button type="button" class="btn-secondary-desktop btn-sm" data-assign>${v.assigned?.name ? 'Change' : 'Assign'}</button>${v.assigned?.name ? `<button type="button" class="bld-link" data-unassign>Remove</button>` : ''}</div>`, { optional: true })}
       ${areaField(v, 'notes', 'Notes', { max: 300 })}`,
     onInput: (e, ctx) => {
       if (e.target.matches('[data-rate-input]')) {
@@ -580,6 +596,7 @@ export function mealForm({ model, i, existing, returnFocus, onSave }) {
     title: existing ? 'Edit Meal' : 'Add Meal',
     saveLabel: existing ? 'Save changes' : `Add to Day ${i + 1}`,
     values: v,
+    track: ['kind', 'time', 'atHotel', 'place', 'diet', 'inclusion'],
     returnFocus,
     render: () => `${chipsField(v, 'kind', 'Meal', M.MEAL_KINDS.map((k) => ({ value: k, label: k })))}
       ${timeField(v, 'time', 'Time')}
@@ -598,6 +615,7 @@ export function noteForm({ model, i, existing, returnFocus, onSave }) {
     title: existing ? 'Edit Note' : 'Add Note',
     saveLabel: existing ? 'Save changes' : `Add to Day ${i + 1}`,
     values: v,
+    track: ['text', 'visible'],
     returnFocus,
     render: () => `${areaField(v, 'text', 'Note', { ph: 'Write a note for this day', max: 500, optional: false }).replace('rows="3"', 'rows="5"')}
       ${switchField(v, 'visible', 'Who can see it', 'Visible to customer (off = staff only)')}`,

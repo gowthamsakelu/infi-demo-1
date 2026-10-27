@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Support;
+namespace App\Support\Places;
 
+use App\Support\PlacesException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
@@ -10,11 +11,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 /**
- * Google Places API (New): Autocomplete for suggestions, Place Details for the chosen place. This is the only code that
+ * The Google provider. Google Places API (New): Autocomplete for suggestions, Place Details for the chosen place. This is the only code that
  * knows the API key; the browser talks to our own /api/places endpoints. Results are cached briefly, and only the place id,
  * name, address and phone are ever stored (see SavedPlaceController).
  */
-class GooglePlaces
+class GooglePlacesProvider implements PlacesProvider
 {
     /** Place types Autocomplete is limited to, per kind of place. */
     public const TYPES = [
@@ -27,6 +28,11 @@ class GooglePlaces
     private const GEOCODE_TTL = 604800;
     private const ENRICH_LIMIT = 5;       // suggestions that get a rating and photo
 
+    public function name(): string
+    {
+        return 'google';
+    }
+
     public function configured(): bool
     {
         return filled(config('services.google_places.key'));
@@ -35,6 +41,9 @@ class GooglePlaces
     /** @return list<array{placeId:string,name:string,area:string,rating:?float,ratingCount:?int,photo:?string}> */
     public function search(string $query, string $kind, ?string $location, ?string $session): array
     {
+        if (trim($query) === '') {
+            return []; // no billed call for an empty box
+        }
         $key = 'places:search:'.md5(implode('|', [$kind, mb_strtolower((string) $location), mb_strtolower($query)]));
         $predictions = Cache::remember($key, self::SEARCH_TTL, function () use ($query, $kind, $location, $session) {
             $body = ['input' => $query, 'includedPrimaryTypes' => self::TYPES[$kind], 'languageCode' => 'en'];

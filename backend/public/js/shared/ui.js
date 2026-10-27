@@ -44,11 +44,19 @@ export function lockScroll() {
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-export function toast(message, type = 'info') {
-  window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type } }));
+/** `action` ({ label, onClick }) adds a link to the toast, e.g. "View". */
+export function toast(message, type = 'info', action = null) {
+  window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type, action } }));
 }
 
+/** Text that is safe inside an HTML attribute and inside a quoted string of an inline handler (quotes and backslashes dropped). */
+export const jsq = (v) => esc(String(v ?? '').replace(/[\\'"`$<>\r\n]/g, ' '));
+
+/** What an inquiry saved without a name is called everywhere. */
+export const UNNAMED_LEAD = 'Unnamed lead';
+
 export function initials(name) {
+  if (name === UNNAMED_LEAD) return '?';
   return (String(name || '').replace(/^(mr|mrs|ms|dr)\.?\s+/i, '').split(/\s+/).filter(Boolean).slice(0, 2).map((n) => n[0]).join('') || 'CU').toUpperCase();
 }
 

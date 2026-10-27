@@ -4,7 +4,7 @@ import { createMobileCalendar } from './calendar-mobile.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, esc, skeletonCards, errorState } from './shared/ui.js';
+import { searchBox, emptyState, toast, openRowMenu, esc, jsq, skeletonCards, errorState } from './shared/ui.js';
 import { renderTabs, bindQuickNotes, rowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
@@ -13,7 +13,11 @@ import { openAssign } from './shared/assign-sheet.js';
 import { openDayDialog, commit } from './shared/itinerary-dialog.js';
 import { daysOf, persist, renumber, eventKind, itemIconHtml, itemPills } from './shared/itinerary.js';
 import { openItineraryBuilder } from './shared/itinerary-builder-ui.js';
+import { scheduleHtml } from './shared/schedule.js';
+import { openMoreSheet } from './shared/nav-ui.js';
+import { goToPage } from './shared/page-host.js';
 import { matchesCategory } from './shared/booking-filters.js';
+import { openAddInquiry } from './shared/add-inquiry.js';
 
 export function createMobileView(container, options = {}) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -74,7 +78,7 @@ export function createMobileView(container, options = {}) {
               </svg>
               <span class="bell-dot" id="mobile-bell-dot"></span>
             </button>
-            <div class="ks-avatar-badge" title="Karan Sapalia">KS</div>
+            <button type="button" class="ks-avatar-badge" title="Karan Sapalia" aria-haspopup="menu" aria-label="Account menu">KS</button>
           </div>
         </div>
 
@@ -96,13 +100,19 @@ export function createMobileView(container, options = {}) {
         <div id="mobile-calendar-page" hidden></div>
       </div>
 
+      <div id="mobile-page-host" class="mobile-screen-content"></div>
+      <button type="button" class="add-inquiry-fab" id="mobile-page-add" hidden>${icon('plus', { size: 20, stroke: 2.5 })}<span class="sp-add-label"></span></button>
+
       <!-- Notifications: the same panel as on PC, across the screen under the header -->
       <div class="notif-backdrop" id="mobile-notif-backdrop" hidden></div>
       <div class="notifications-panel mobile-notifications" id="mobile-notifications" role="dialog" aria-label="Notifications" hidden>${notificationsHtml()}</div>
 
+      <!-- Add Inquiry (Inquiries page only) -->
+      <button type="button" class="add-inquiry-fab" id="mobile-add-inquiry" data-add-inquiry ${currentPage() === 'inquiries' ? '' : 'hidden'}>${icon('plus', { size: 20, stroke: 2.5 })}<span>Add Inquiry</span></button>
+
       <!-- Bottom Navigation Bar (Fixed) -->
       <div class="mobile-bottom-nav">
-        <button class="nav-item">
+        <button class="nav-item ${currentPage() === 'dashboard' ? 'active' : ''}" data-route="dashboard">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect width="7" height="9" x="3" y="3" rx="1"/>
             <rect width="7" height="5" x="14" y="3" rx="1"/>
@@ -133,7 +143,7 @@ export function createMobileView(container, options = {}) {
           </svg>
           Calendar
         </button>
-        <button class="nav-item">
+        <button class="nav-item" id="mobile-more-btn" data-more aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect width="7" height="7" x="3" y="3" rx="1"/>
             <rect width="7" height="7" x="14" y="3" rx="1"/>
@@ -513,16 +523,16 @@ export function createMobileView(container, options = {}) {
         <div class="sheet-handle"></div>
       </div>
       <div class="sheet-customer-header">
-        <div class="customer-avatar-badge">${initials}</div>
+        <div class="customer-avatar-badge">${esc(initials)}</div>
         <div class="customer-header-info">
           <div class="customer-title-row">
-            <h2 class="customer-name-title">${custName}</h2>
+            <h2 class="customer-name-title">${esc(custName)}</h2>
             <span class="status-pill ${b.statusClass}">
               <span class="dot"></span>
               ${b.status}
             </span>
           </div>
-          <p class="customer-trip-subtitle">${b.title}</p>
+          <p class="customer-trip-subtitle">${esc(b.title)}</p>
           <div class="customer-meta-chips">
             <span class="meta-chip">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -537,7 +547,7 @@ export function createMobileView(container, options = {}) {
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
-              ${b.duration}
+              ${esc(b.duration || '—')}
             </span>
             <span class="meta-dot">•</span>
             <span class="meta-chip">
@@ -620,14 +630,14 @@ export function createMobileView(container, options = {}) {
               <!-- Left Column: Row 1 -->
               <div class="info-cell">
                 <span class="info-label">Customer Name</span>
-                <span class="info-value-bold">${c.name}</span>
+                <span class="info-value-bold">${esc(c.name)}</span>
               </div>
               <!-- Right Column: Row 1 -->
               <div class="info-cell info-cell-email">
                 <span class="info-label">Email</span>
                 <div class="contact-value-row">
-                  <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
-                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
+                  <span class="info-value-text email-text-val" title="${esc(c.email)}">${esc(c.email)}</span>
+                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${jsq(c.email)}...', type: 'info' }}))">
                     ${icon('mail', { size: 12 })}
                   </button>
                 </div>
@@ -637,12 +647,12 @@ export function createMobileView(container, options = {}) {
               <div class="info-cell info-cell-contact">
                 <span class="info-label">Primary Contact</span>
                 <div class="contact-value-row">
-                  <span class="info-value-bold phone-number-val">${c.phone}</span>
+                  <span class="info-value-bold phone-number-val">${esc(c.phone)}</span>
                   <div class="contact-action-btns">
-                    <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
+                    <button class="mini-icon-btn btn-call-green" title="Call ${jsq(c.phone)}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${jsq(c.name)} (${jsq(c.phone)})...', type: 'info' }}))">
                       ${icon('phone', { size: 12, stroke: 2.5 })}
                     </button>
-                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
+                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${jsq(c.name)}...', type: 'success' }}))">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.892.524 3.662 1.435 5.176L2.05 21.95a.6.6 0 0 0 .736.736l4.774-1.385A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Zm3.906 14.153c-.225.63-1.127 1.196-1.55 1.258-.42.062-.958.088-1.55-.102-.38-.122-.87-.282-1.49-.55-2.617-1.13-4.326-3.79-4.457-3.963-.13-.174-1.065-1.417-1.065-2.702 0-1.286.674-1.92.913-2.18.239-.261.52-.326.695-.326.174 0 .348.002.5.01.16.007.375-.06.587.447.218.522.74 1.804.805 1.935.066.13.11.283.022.457-.087.174-.13.283-.26.435-.13.152-.273.34-.39.456-.13.13-.265.272-.114.533.152.261.674 1.11 1.447 1.8 1 .892 1.84 1.168 2.1 1.3.26.13.413.11.565-.065.152-.174.652-.761.826-1.022.174-.26.348-.217.587-.13.239.087 1.522.717 1.783.848.26.13.435.195.5.304.065.109.065.63-.16 1.26Z" fill="#16A34A"/>
                       </svg>
@@ -653,29 +663,29 @@ export function createMobileView(container, options = {}) {
               <!-- Right Column: Row 2 -->
               <div class="info-cell">
                 <span class="info-label">Lead Source</span>
-                <span class="info-value-text">${c.leadSource || 'Website'}</span>
+                <span class="info-value-text">${esc(c.leadSource || 'Website')}</span>
               </div>
 
               <!-- Left Column: Row 3 -->
               <div class="info-cell">
                 <span class="info-label">Travel Dates</span>
-                <span class="info-value-text">${c.travelDates || b.dates}</span>
+                <span class="info-value-text">${esc(c.travelDates || b.dates)}</span>
               </div>
               <!-- Right Column: Row 3 -->
               <div class="info-cell">
                 <span class="info-label">Location</span>
-                <span class="info-value-text">${c.location || 'New Delhi, Delhi'}</span>
+                <span class="info-value-text">${esc(c.location || 'New Delhi, Delhi')}</span>
               </div>
 
               <!-- Left Column: Row 4 -->
               <div class="info-cell">
                 <span class="info-label">Preferred Destination</span>
-                <span class="info-value-text">${c.preferredDestination || b.destination}</span>
+                <span class="info-value-text">${esc(c.preferredDestination || b.destination)}</span>
               </div>
               <!-- Right Column: Row 4 -->
               <div class="info-cell">
                 <span class="info-label">Budget (Est.)</span>
-                <span class="info-value-bold" style="color: #0F172A;">${c.budgetEst || b.price}</span>
+                <span class="info-value-bold" style="color: #0F172A;">${esc(c.budgetEst || b.price)}</span>
               </div>
 
               <!-- Left Column: Row 5 -->
@@ -707,7 +717,7 @@ export function createMobileView(container, options = {}) {
                 </svg>
                 <span>Short Details</span>
               </div>
-              <p class="short-details-text">${c.shortDetails || b.notes || 'Trip details logged into operations queue.'}</p>
+              <p class="short-details-text">${esc(c.shortDetails || b.notes || 'Trip details logged into operations queue.')}</p>
             </div>
           </div>
 
@@ -800,15 +810,15 @@ export function createMobileView(container, options = {}) {
               <div class="guest-left-info">
                 <div class="guest-num-badge">${g.id}</div>
                 <div class="guest-name-col">
-                  <h4>${g.name}</h4>
-                  <p>Age ${g.age} ${g.role ? `• ${g.role}` : ''}</p>
+                  <h4>${esc(g.name)}</h4>
+                  <p>${g.age !== '' && g.age != null ? `Age ${esc(g.age)}` : 'Age not added'}${g.role ? ` • ${esc(g.role)}` : ''}</p>
                 </div>
               </div>
               <div class="guest-right-actions">
-                <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${g.name} (${g.phone})...', type: 'info' }}))">
+                <button class="circle-action-btn btn-phone" title="Call ${jsq(g.name)}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${jsq(g.name)} (${jsq(g.phone)})...', type: 'info' }}))">
                   ${icon('phone', { size: 14, stroke: 2.5 })}
                 </button>
-                <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${g.name}" aria-label="More options" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Guest options for ${g.name}: ID verified and travel pass issued.', type: 'info' }}))">
+                <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${jsq(g.name)}" aria-label="More options" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Guest options for ${jsq(g.name)}: ID verified and travel pass issued.', type: 'info' }}))">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="1.5"/>
                     <circle cx="12" cy="5" r="1.5"/>
@@ -832,136 +842,7 @@ export function createMobileView(container, options = {}) {
     }
     // Itinerary Tab (Screens 1, 2, 4 from reference with Details, Edit, Mark Complete, Add Event)
     else if (activeModalTab === 'itinerary') {
-      const days = b.itineraryDays || [];
-
-      bodyEl.innerHTML = `
-        <div class="itinerary-tab-content">
-          <div class="itinerary-section-header-bar">
-            <div class="section-header-left" style="display: flex; align-items: center; gap: 8px;">
-              <div class="section-icon-circle blue-circle" style="width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; color: #2563EB;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                  <line x1="16" x2="16" y1="2" y2="6"/>
-                  <line x1="8" x2="8" y1="2" y2="6"/>
-                  <line x1="3" x2="21" y1="10" y2="10"/>
-                </svg>
-              </div>
-              <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
-            </div>
-            <div class="itin-actions"><button class="btn-add-event-pill" id="mobile-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
-          </div>
-
-          <div class="itinerary-v2-container">
-          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Use Add Event to create the first day.</p></div>` : ''}
-          ${days.map((dayGroup, dayIdx) => `
-            <div class="itinerary-day-section">
-              <!-- Left Day & Date Label -->
-              <div class="timeline-day-col">
-                <div class="day-head"><span class="day-badge-text">${dayGroup.day}</span><button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button></div><span class="day-date-sub">${dayGroup.date}</span>${dayGroup.title ? `<span class="day-title-sub">${esc(dayGroup.title)}</span>` : ''}
-              </div>
-
-              <!-- Continuous Line & Dot Node -->
-              <div class="timeline-track-col">
-                <div class="timeline-line-track"></div>
-                <div class="timeline-dot-node"></div>
-              </div>
-
-              <!-- Activity Items for this day -->
-              <div class="timeline-items-col">
-                ${dayGroup.items.length ? '' : '<p class="day-empty">No events yet</p>'}
-                ${dayGroup.items.map(item => `
-                  <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-itinerary-item-id="${item.id}">
-                    <div class="item-left-content">
-                      ${itemIconHtml(item, 20)}
-                      <div class="item-text-info">
-                        <h4 class="item-text-title">${esc(item.title)}</h4>
-                        <p class="item-text-sub">${esc(item.subtitle)}</p>
-                      </div>
-                    </div>
-
-                    <div class="item-right-content">
-                      ${itemPills(item)}
-                      <!-- Completed Pill Badge -->
-                      ${item.completed ? `
-                        <span class="completed-pill-badge" title="Completed">
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                          Completed
-                        </span>
-                      ` : ''}
-
-                      <!-- Assigned Badge & Avatar (Screen 4) -->
-                      ${item.assigned && item.assigned.isAssigned ? `
-                        <span class="assigned-pill-badge">Assigned</span>
-                        <img src="${item.assigned.avatar}" class="assigned-avatar-mini" alt="${item.assigned.name}" />
-                      ` : ''}
-
-                      <!-- Three Dots Menu Button -->
-                      <button class="item-menu-btn" data-trigger-item-menu="${item.id}" title="Item options">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="12" cy="12" r="1"/>
-                          <circle cx="12" cy="5" r="1"/>
-                          <circle cx="12" cy="19" r="1"/>
-                        </svg>
-                      </button>
-
-                      <!-- Action Context Menu (Screen 2) -->
-                      ${openDropdownItemId === item.id ? `
-                        <div class="item-dropdown-menu" id="active-item-dropdown">
-                          <button class="dropdown-item-btn" data-dropdown-act="assign" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                              <circle cx="9" cy="7" r="4"/>
-                              <line x1="19" x2="19" y1="8" y2="14"/>
-                              <line x1="22" x2="16" y1="11" y2="11"/>
-                            </svg>
-                            <span>Assign</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-dropdown-act="details" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                              <polyline points="14 2 14 8 20 8"/>
-                              <line x1="16" x2="8" y1="13" y2="13"/>
-                              <line x1="16" x2="8" y1="17" y2="17"/>
-                              <polyline points="10 9 9 9 8 9"/>
-                            </svg>
-                            <span>View Details</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-dropdown-act="edit" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-                              <path d="m15 5 4 4"/>
-                            </svg>
-                            <span>Edit</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-dropdown-act="complete" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <rect width="18" height="18" x="3" y="3" rx="2"/>
-                              <polyline points="9 12 11 14 15 10"/>
-                            </svg>
-                            <span>${item.completed ? 'Mark as Incomplete' : 'Mark Complete'}</span>
-                          </button>
-                          <button class="dropdown-item-btn item-remove" data-dropdown-act="remove" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <polyline points="3 6 5 6 21 6"/>
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                              <line x1="10" x2="10" y1="11" y2="17"/>
-                              <line x1="14" x2="14" y1="11" y2="17"/>
-                            </svg>
-                            <span>Remove</span>
-                          </button>
-                        </div>
-                      ` : ''}
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
-          </div>
-        </div>
-      `;
+      bodyEl.innerHTML = scheduleHtml(b.itineraryDays || [], { side: 'mobile', openItemId: openDropdownItemId });
     }
     // Updates Tab
     else if (activeModalTab === 'updates') {
@@ -1053,7 +934,7 @@ export function createMobileView(container, options = {}) {
                 <p>${v.service ? `${v.service} • ` : ''}${v.phone}</p>
               </div>
             </div>
-            <button class="item-menu-btn" onclick="event.stopPropagation(); window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Vendor options for ${v.name}: Active provider on record.', type: 'info' }}))" title="Vendor options">
+            <button class="item-menu-btn" onclick="event.stopPropagation(); window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Vendor options for ${jsq(v.name)}: Active provider on record.', type: 'info' }}))" title="Vendor options">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <circle cx="12" cy="12" r="1"/>
                 <circle cx="12" cy="5" r="1"/>
@@ -1087,14 +968,14 @@ export function createMobileView(container, options = {}) {
                   </svg>
                 ` : ''}
               </div>
-              <img src="${c.avatar}" class="vendor-avatar" style="border-radius: 50%;" alt="${c.name}" />
+              <img src="${c.avatar}" class="vendor-avatar" style="border-radius: 50%;" alt="${esc(c.name)}" />
               <div class="vendor-info">
-                <h4>${c.name}</h4>
-                <p>${c.role} • ${c.phone}</p>
+                <h4>${esc(c.name)}</h4>
+                <p>${c.role} • ${esc(c.phone)}</p>
                 ${c.details ? `<span style="font-size: 11px; color: #94A3B8; display: block; margin-top: 1px;">${c.details}</span>` : ''}
               </div>
             </div>
-            <a href="tel:${c.phone}" class="circle-action-btn btn-phone" style="width: 30px; height: 30px; flex-shrink: 0;" onclick="event.stopPropagation();" title="Call ${c.name}">
+            <a href="tel:${jsq(c.phone)}" class="circle-action-btn btn-phone" style="width: 30px; height: 30px; flex-shrink: 0;" onclick="event.stopPropagation();" title="Call ${jsq(c.name)}">
               ${icon('phone', { size: 14, stroke: 2.2 })}
             </a>
           </div>
@@ -1486,6 +1367,7 @@ export function createMobileView(container, options = {}) {
         needRestore = true;
       }
       container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
+      container.querySelector('#mobile-add-inquiry').hidden = page !== 'inquiries';
       container.querySelector('#mobile-bookings-page').hidden = page === 'calendar';
       container.querySelector('#mobile-calendar-page').hidden = page !== 'calendar';
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
@@ -1513,15 +1395,21 @@ export function createMobileView(container, options = {}) {
     loadInquiries();
     syncBookingPayments().then(() => renderCards());
     container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach((b) => {
-      b.addEventListener('click', () => navigate(b.dataset.route));
+      b.addEventListener('click', () => goToPage(b.dataset.route));
     });
     route();
 
-    // Pages that are not built yet: stay on the current page and say so
-    container.querySelectorAll('.mobile-bottom-nav .nav-item:not([data-route])').forEach((b) => {
-      b.addEventListener('click', () => toast(`${b.textContent.trim()} is coming soon.`, 'info'));
-    });
+    container.querySelector('#mobile-more-btn').addEventListener('click', (e) => openMoreSheet({ returnFocus: () => e.currentTarget }));
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries')) loadInquiries(); });
+
+    // Add Inquiry: the one wizard. After a save the list shows everything again and scrolls to the top, where the new row is.
+    function showNewInquiry(row) {
+      setParams({ q: null, tab: null, category: null }, { push: false });
+      requestAnimationFrame(() => container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
+    }
+    container.querySelector('#mobile-add-inquiry').addEventListener('click', () => {
+      openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-add-inquiry') });
+    });
 
     // Bulk bar: select all / clear / search / filter / Assign
     bindBulkBar(container, 'mobile', {
@@ -1874,7 +1762,7 @@ export function createMobileView(container, options = {}) {
     }
 
     // Bottom sheet: Esc and swipe-down on the handle/header close it
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isModalOpen && !document.querySelector('.asg-overlay, .fu-overlay, .row-floating-menu')) closeModal(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isModalOpen && !document.querySelector('.asg-overlay, .fu-overlay, .row-floating-menu, .sheet-overlay')) closeModal(); });
     (() => {
       const sheetEl = container.querySelector('#mobile-bottom-sheet');
       let startY = null;

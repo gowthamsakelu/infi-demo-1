@@ -14,9 +14,18 @@ class SaveItineraryRequest extends FormRequest
 
     public function rules(): array
     {
+        return self::itineraryRules();
+    }
+
+    /**
+     * The shape of an itinerary payload (`days` and `meta`). `$prefix` lets another request validate the same payload
+     * nested under a key, e.g. `itinerary.` when an inquiry is created together with its itinerary.
+     */
+    public static function itineraryRules(string $prefix = ''): array
+    {
         $types = implode(',', ItineraryWriter::knownTypes());
 
-        return [
+        $rules = [
             'days' => ['present', 'array', 'max:60'],
             'days.*.day' => ['required', 'string', 'max:40'],
             'days.*.date' => ['nullable', 'string', 'max:30'],
@@ -56,7 +65,14 @@ class SaveItineraryRequest extends FormRequest
             'meta.stops' => ['nullable', 'array', 'max:20'],
             'meta.stops.*' => ['string', 'max:160'],
             'meta.startDate' => ['nullable', 'date_format:Y-m-d'],
-            'meta.endDate' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:meta.startDate'],
+            'meta.endDate' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:'.$prefix.'meta.startDate'],
         ];
+
+        $out = [];
+        foreach ($rules as $key => $rule) {
+            $out[$prefix.$key] = $rule;
+        }
+
+        return $out;
     }
 }

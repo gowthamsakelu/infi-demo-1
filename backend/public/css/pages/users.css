@@ -1,0 +1,39 @@
+/* Users & Permissions: avatars, the module access matrix and the three-button footer. */
+
+/* ---- avatars: soft tinted squares in the list and in the detail head ---- */
+.us-av { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 15px; font-weight: 800; letter-spacing: 0.2px; }
+.us-head-av .us-av { font-size: 19px; }
+.us-t0 { background: #DBEAFE; color: #1D4ED8; }
+.us-t1 { background: #F3E8FF; color: #7E22CE; }
+.us-t2 { background: #CCFBF1; color: #0F766E; }
+.us-t3 { background: #FEF3C7; color: #B45309; }
+.us-t4 { background: #E0E7FF; color: #4338CA; }
+.us-t5 { background: #FFE4E6; color: #BE123C; }
+
+/* ---- the matrix: module name, then View / Edit / Delete ---- */
+.us-matrix { flex: none; border: 1px solid #E2E8F0; border-radius: 16px; background: #FFFFFF; overflow: hidden; }
+.us-matrix-head { padding: 14px 16px 12px; min-width: 0; }
+.us-matrix-head h4 { margin: 0; font-size: 16px; font-weight: 800; color: #0F172A; }
+.us-matrix-head p { margin: 2px 0 0; font-size: 13px; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.us-row { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 64px); align-items: center; min-height: 56px; padding: 0 12px 0 16px; border-top: 1px solid #F1F5F9; }
+.us-cols { min-height: 36px; background: #F8FAFC; font-size: 11.5px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: #64748B; }
+.us-cols span + span { text-align: center; }
+.us-mod { min-width: 0; padding-right: 8px; font-size: 14.5px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.us-cell { display: flex; justify-content: center; }
+.us-switch.is-locked { opacity: 0.55; cursor: default; }
+
+/* ---- footer: Deactivate (red outline) / Reset password / Save changes ---- */
+.us-danger { color: #DC2626; border-color: #FCA5A5; }
+.us-danger:hover:not(:disabled) { background: #FEF2F2; border-color: #F87171; }
+[data-sp="users"] .sp-foot-btn:disabled { opacity: 0.5; cursor: default; }
+[data-sp="users"] .sp-detail-foot { gap: 10px; }
+
+:where(html[data-layout="mobile"]) .us-row { grid-template-columns: minmax(0, 1fr) repeat(3, 56px); padding: 0 8px 0 14px; }
+:where(html[data-layout="mobile"]) [data-sp="users"] .sp-detail-foot { flex-wrap: wrap; }
+:where(html[data-layout="mobile"]) [data-sp="users"] .sp-foot-btn[data-sp-act="save"] { flex: 1 1 100%; order: -1; }
+
+/* ---- three stat cards across (the shared grid is two or four) ---- */
+[data-sp="users"] .sp-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@container (max-width: 520px) { [data-sp="users"] .sp-stat-ico { display: none; } [data-sp="users"] .sp-stat { padding: 10px 12px; } }
+
+:where(html[data-layout="mobile"]) [data-sp="users"] .sp-head-actions { display: none; } /* the dead Edit / More buttons would squeeze the name on a phone */

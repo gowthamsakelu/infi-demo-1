@@ -1,0 +1,66 @@
+/* Banners: the card grid and the order list. Built on the shared page frame (css/pages.css). */
+.sp[data-sp="banners"] .sp-body { flex-direction: column; gap: 14px; overflow-y: auto; overscroll-behavior: contain; padding: 2px; }
+.bn-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: 0 0 auto; min-width: 0; }
+.bn-tabs { flex: 1 1 auto; min-width: 0; }
+.bn-tools { display: flex; align-items: center; gap: 10px; flex: none; }
+.bn-preview { white-space: nowrap; }
+.bn-seg { display: inline-flex; flex: none; padding: 3px; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF; }
+.bn-seg button { height: 34px; padding: 0 18px; border: 0; border-radius: 9px; background: transparent; font: inherit; font-size: 14px; font-weight: 700; color: #475569; cursor: pointer; white-space: nowrap; transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
+.bn-seg button.active { background: var(--primary); color: #FFFFFF; }
+.bn-seg button:focus-visible { outline: 2px solid #2563EB; outline-offset: 2px; }
+
+.bn-content { flex: 1 1 auto; min-width: 0; }
+.bn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(250px, calc((100% - 32px) / 3)), 1fr)); gap: 16px; align-items: start; }
+.bn-card { min-width: 0; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; box-shadow: var(--shadow-sm); }
+
+/* the picture: a fixed shape so cards never jump while images load; the gradient is also the fallback when there is no file */
+.bn-hero { position: relative; aspect-ratio: 215 / 100; overflow: hidden; color: #FFFFFF; background: linear-gradient(135deg, #1E3A8A, #3B82F6); }
+.bn-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.bn-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15, 23, 42, 0.28) 0%, rgba(15, 23, 42, 0.05) 38%, rgba(15, 23, 42, 0.72) 100%); }
+.bn-tone-blue { background: linear-gradient(135deg, #1E3A8A, #3B82F6); }
+.bn-tone-teal { background: linear-gradient(135deg, #0F766E, #2DD4BF); }
+.bn-tone-indigo { background: linear-gradient(135deg, #4338CA, #818CF8); }
+.bn-tone-amber { background: linear-gradient(135deg, #B45309, #F59E0B); }
+.bn-tone-rose { background: linear-gradient(135deg, #9D174D, #F472B6); }
+.bn-tone-green { background: linear-gradient(135deg, #166534, #4ADE80); }
+.bn-tone-sky { background: linear-gradient(135deg, #0369A1, #38BDF8); }
+.bn-tone-violet { background: linear-gradient(135deg, #6D28D9, #A78BFA); }
+.bn-pill { position: absolute; top: 12px; left: 12px; max-width: calc(100% - 72px); }
+.bn-pill .status-pill { white-space: nowrap; }
+.bn-more { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.92); color: #334155; cursor: pointer; }
+.bn-more:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.bn-copy { position: absolute; left: 16px; right: 16px; bottom: 12px; min-width: 0; }
+.bn-copy h3 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.2px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35); }
+.bn-copy p { margin: 2px 0 0; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); }
+
+.bn-info { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.bn-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.bn-row .bld-switch { height: 32px; padding: 0; border: 0; background: transparent; flex: none; }
+.bn-name { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.bn-name b, .bn-name small, .bn-order-text b, .bn-order-text small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bn-name b { font-size: 16px; font-weight: 800; color: #0F172A; }
+.bn-name small, .bn-order-text small { font-size: 13px; color: #64748B; }
+.bn-stats { display: flex; flex-wrap: nowrap; gap: 14px; font-size: 13.5px; color: #64748B; min-width: 0; overflow: hidden; }
+.bn-stats span { white-space: nowrap; }
+.bn-stats b { font-size: 16px; font-weight: 800; color: #0F172A; }
+
+/* order view */
+.bn-order { display: flex; flex-direction: column; gap: 10px; }
+.bn-order-row { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 12px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; }
+.bn-order-no { flex: none; width: 24px; text-align: center; font-size: 14px; font-weight: 800; color: #64748B; }
+.bn-thumb { flex: none; width: 96px; aspect-ratio: 215 / 100; border-radius: 10px; }
+.bn-order-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.bn-order-text b { font-size: 15px; font-weight: 700; color: #0F172A; }
+.bn-order-row .status-pill { flex: none; white-space: nowrap; }
+.bn-order-btns { flex: none; display: flex; gap: 6px; }
+.bn-order-btns .sp-icon-btn:disabled { opacity: 0.4; cursor: default; }
+.bn-up svg { transform: rotate(180deg); }
+
+:where(html[data-layout="mobile"]) .sp[data-sp="banners"] .sp-body { overflow: visible; padding: 12px 16px calc(var(--safe-bottom) + 140px); }
+:where(html[data-layout="mobile"]) .bn-grid { grid-template-columns: minmax(0, 1fr); }
+:where(html[data-layout="mobile"]) .bn-bar { flex-direction: column; align-items: stretch; }
+:where(html[data-layout="mobile"]) .bn-tools { justify-content: space-between; }
+:where(html[data-layout="mobile"]) .bn-preview { display: none; }
+:where(html[data-layout="mobile"]) .bn-thumb { width: 72px; }
+:where(html[data-layout="mobile"]) .bn-order-row .status-pill { display: none; }
+

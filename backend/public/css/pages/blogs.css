@@ -1,0 +1,52 @@
+/* Blogs: stat cards, tabs + search, and a table that turns into cards when it is narrow (phone, or a tablet next to the sidebar). */
+.sp[data-sp="blogs"] .sp-body { flex-direction: column; gap: 14px; overflow-y: auto; overscroll-behavior: contain; padding: 2px; container-type: inline-size; }
+.bg-stats .sp-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.bg-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.bg-tabs { flex: 1 1 auto; min-width: 0; }
+.bg-search { flex: 0 1 300px; min-width: 0; }
+.bg-categories { flex: none; white-space: nowrap; }
+.bg-search .table-toolbar-search-box { width: 100%; }
+
+.bg-table { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; overflow: hidden; }
+.bg-table.is-plain .bg-head { display: none; }
+.bg-head, .bg-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) 150px 100px 80px 64px 128px 44px; align-items: center; gap: 12px; padding: 12px 16px; min-width: 0; }
+.bg-head { padding-top: 14px; padding-bottom: 12px; border-bottom: 1px solid #F1F5F9; font-size: 12px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: #64748B; }
+.bg-head span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bg-row + .bg-row { border-top: 1px solid #F1F5F9; }
+.bg-row:hover { background: #F8FAFC; }
+.bg-art { min-width: 0; display: flex; flex-direction: column; }
+.bg-art b, .bg-art small, .bg-author { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bg-art b { font-size: 15px; font-weight: 700; color: #0F172A; }
+.bg-art small { font-size: 12.5px; color: #64748B; }
+.bg-author { font-size: 14.5px; color: #0F172A; min-width: 0; }
+.bg-cat, .bg-status { min-width: 0; display: flex; }
+.bg-cat .card-type-badge, .bg-status .status-pill { white-space: nowrap; }
+.bg-nums { display: contents; }
+.bg-views { font-size: 14.5px; color: #0F172A; }
+.bg-leads { font-size: 14.5px; font-weight: 800; color: #0F172A; }
+.bg-menu { justify-self: end; }
+.bg-list > .state-box, .bg-list > div:not(.bg-row) { min-width: 0; }
+
+/* narrow: each article is a card */
+@container (max-width: 760px) {
+  .bg-stats .sp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bg-bar { flex-direction: column; align-items: stretch; }
+  .bg-categories { display: none; }
+  .bg-search { order: -1; flex: none; }
+  .bg-head { display: none; }
+  .bg-table { background: transparent; border: 0; border-radius: 0; overflow: visible; }
+  .bg-list { display: flex; flex-direction: column; gap: 12px; }
+  .bg-row { grid-template-columns: 44px minmax(0, 1fr) auto auto; grid-template-areas: "tile art status menu" "tile author author author" "tile cat nums nums"; gap: 4px 10px; padding: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; }
+  .bg-row + .bg-row { border-top: 1px solid #E2E8F0; }
+  .bg-tile { grid-area: tile; align-self: start; width: 44px; height: 44px; }
+  .bg-art { grid-area: art; }
+  .bg-art small { display: none; }
+  .bg-status { grid-area: status; }
+  .bg-menu { grid-area: menu; width: 32px; height: 32px; }
+  .bg-author { grid-area: author; font-size: 13.5px; color: #64748B; }
+  .bg-cat { grid-area: cat; }
+  .bg-nums { grid-area: nums; display: flex; gap: 12px; align-items: center; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .bg-views::after, .bg-leads::after { content: " " attr(data-unit); font-weight: 400; color: #64748B; }
+}
+:where(html[data-layout="mobile"]) .sp[data-sp="blogs"] .sp-body { overflow: visible; padding: 12px 16px calc(var(--safe-bottom) + 140px); }
+

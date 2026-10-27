@@ -21,6 +21,7 @@ Route::prefix('bookings')->group(function () {
 Route::get('/metadata', [BookingController::class, 'metadata']);
 
 Route::get('/inquiries', [InquiryController::class, 'index']);
+Route::post('/inquiries', [InquiryController::class, 'store']);
 Route::post('/inquiries/assign', [InquiryController::class, 'assign']);
 Route::post('/inquiries/{inquiry}/follow-ups', [InquiryController::class, 'storeFollowUp']);
 Route::post('/inquiries/{inquiry}/notes', [InquiryController::class, 'storeNote']);
@@ -44,4 +45,12 @@ Route::prefix('places')->middleware('throttle:places')->group(function () {
     Route::get('/search', [PlacesController::class, 'search']);
     Route::get('/photo', [PlacesController::class, 'photo']);
     Route::get('/{placeId}', [PlacesController::class, 'show']);
+});
+
+// One routes file per CRM page (Destinations, Tour Packages ...): routes/pages/<page>.php, loaded here so they are under /api.
+// These routes need a signed-in user (session cookie) and, for writes, the CSRF token the page sends (see public/js/shared/http.js).
+Route::middleware(['web', 'auth'])->group(function () {
+    foreach (glob(__DIR__.'/pages/*.php') as $pageRoutes) {
+        require $pageRoutes;
+    }
 });

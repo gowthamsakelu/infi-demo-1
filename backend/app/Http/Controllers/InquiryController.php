@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreFollowUpRequest;
+use App\Http\Requests\StoreInquiryRequest;
 use App\Models\FollowUp;
 use App\Models\Inquiry;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
+use App\Support\ItineraryWriter;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InquiryController extends Controller
 {
@@ -40,9 +44,91 @@ class InquiryController extends Controller
             });
         }
 
-        $inquiries = $query->orderBy('id')->get()->map(fn (Inquiry $i) => $this->present($i));
+        $inquiries = $query->orderByDesc('created_at')->orderBy('id')->get()->map(fn (Inquiry $i) => $this->present($i));
 
         return response()->json(['success' => true, 'data' => $inquiries]);
+    }
+
+    /**
+     * Add Inquiry wizard: the inquiry, its guests and (when sent) its itinerary are saved together or not at all.
+     * Everything is optional. Pax is the number of guests; nights and travel date come from the itinerary dates.
+     */
+    public function store(StoreInquiryRequest $request): JsonResponse
+    {
+        $staff = $request->actingStaff();
+        $itinerary = $request->input('itinerary');
+        $days = is_array($itinerary) ? array_values($itinerary['days'] ?? []) : null;
+        $meta = is_array($itinerary) ? ($itinerary['meta'] ?? null) : null;
+        [$start, $nights] = $days === null ? [null, null] : $this->tripOf($days, $meta);
+        $guests = $this->guestsOf($request);
+
+        $inquiry = DB::transaction(function () use ($request, $staff, $days, $meta, $start, $nights, $guests) {
+            $inquiry = Inquiry::create([
+                'id' => Inquiry::nextId(),
+                'customer_name' => $request->input('name'),
+                'customer_phone' => $request->input('phone'),
+                'customer_email' => $request->input('email'),
+                'location' => $request->input('city'),
+                'trip' => $request->input('destination'),
+                'budget' => $request->input('budget'),
+                'notes' => $request->input('comment'),
+                'pax' => count($guests),
+                'nights' => $nights,
+                'travel_date' => $start?->toDateString(),
+                'status' => 'new',
+                'assigned_to_id' => $staff->id,
+                'assigned_to_name' => $staff->name,
+                'guests' => $guests,
+            ]);
+            if ($days !== null) {
+                ItineraryWriter::write($inquiry->itineraryKind(), $inquiry->getKey(), $days, $meta, $start);
+            }
+
+            return $inquiry;
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Inquiry saved',
+            'data' => $this->present($inquiry->fresh(['followUps'])),
+            'meta' => $inquiry->fresh()->itinerary?->meta(),
+        ], 201);
+    }
+
+    /** First day and number of nights of the trip, from the itinerary's own dates (or its day list). */
+    private function tripOf(array $days, ?array $meta): array
+    {
+        $start = $meta['startDate'] ?? ($days[0]['isoDate'] ?? null);
+        $end = $meta['endDate'] ?? null;
+        if (! $start) {
+            return [null, null];
+        }
+        $start = CarbonImmutable::parse($start);
+        $nights = $end ? $start->diffInDays(CarbonImmutable::parse($end)) : max(0, count($days) - 1);
+
+        return [$start, (int) $nights];
+    }
+
+    /** Guest 1 is the customer (name and phone follow the inquiry); the rest carry a name and an age only. */
+    private function guestsOf(StoreInquiryRequest $request): array
+    {
+        $sent = array_values($request->input('guests', []) ?: []);
+        $count = max(1, min(StoreInquiryRequest::MAX_GUESTS, count($sent)));
+        $out = [];
+        for ($i = 0; $i < $count; $i++) {
+            $g = $sent[$i] ?? [];
+            $name = $g['name'] ?? null;
+            $out[] = [
+                'id' => $i + 1,
+                'name' => $i === 0 ? ($name ?: $request->input('name')) : $name,
+                'age' => isset($g['age']) && $g['age'] !== '' ? (int) $g['age'] : null,
+                'role' => $i === 0 ? 'Primary Contact' : null,
+                'phone' => $i === 0 ? $request->input('phone') : null,
+                'isPrimary' => $i === 0,
+            ];
+        }
+
+        return $out;
     }
 
     public function storeFollowUp(StoreFollowUpRequest $request, Inquiry $inquiry): JsonResponse
@@ -157,6 +243,8 @@ class InquiryController extends Controller
             'assigned_to_id' => $i->assigned_to_id,
             'assigned_to_name' => $i->assigned_to_name,
             'notes' => $i->notes,
+            'budget' => $i->budget,
+            'guests' => $i->guests ?? [],
             'itinerary_days' => $i->itinerary_days ?? [],
             'follow_up_count' => $i->followUps->count(),
             'last_follow_up' => $last ? $this->presentFollowUp($last) : null,

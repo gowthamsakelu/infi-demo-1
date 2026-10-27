@@ -2,7 +2,7 @@
 // Step 1 sets the route and dates, step 2 builds each day. "Done" saves everything and the Day-wise Schedule shows it.
 import { icon } from './icons.js';
 import { esc, toast, openRowMenu } from './ui.js';
-import { openSheet, confirmDialog } from './sheet.js';
+import { openSheet, confirmDialog, swallowNextPop, hasOpenLayer } from './sheet.js';
 import { kindOf, daysOf, markSaved, snapshot, saveItinerary } from './itinerary.js';
 import * as M from './itinerary-builder.js';
 import { hotelForm, transportForm, activityForm, mealForm, noteForm } from './itinerary-forms.js';
@@ -19,7 +19,8 @@ const withTotal = (parts, total) => [...parts, total ? rupee(total) : ''].filter
 const SECTION_TILE = { hotel: 'bed', transport: 'bus', activity: 'camera', meal: 'restaurant', note: 'note', legacy: 'camera', pin: 'bed' };
 
 /* ------------------------------------------------------------------------------------------------
-   The builder
+   The builder: one component, two homes. `openItineraryBuilder` shows it as a dialog / bottom sheet for a saved booking or
+   inquiry; `mountBuilder` renders the same steps inline (the Add Inquiry wizard) for a parent that does not exist yet.
    ------------------------------------------------------------------------------------------------ */
 
 async function fetchSaved(b) {
@@ -31,78 +32,64 @@ async function fetchSaved(b) {
   } catch { return null; }
 }
 
+/** Steps indicator, the plan, and the Back / Next buttons. The popup wraps it in a sheet; the wizard places it in a pane. */
+export const builderShell = ({ embedded = false } = {}) => `
+  <ol class="bld-stepper" id="bld-stepper" aria-label="Steps"></ol>
+  <div class="bld-body" id="bld-body"></div>
+  <footer class="${embedded ? 'bld-embed-footer' : 'fu-footer itin-footer bld-footer'}">
+    <button type="button" class="btn-secondary-desktop" id="bld-back" data-bld="back"></button>
+    <span class="bld-draft" id="bld-draft" aria-live="polite"></span>
+    <button type="button" class="btn-primary-desktop" id="bld-next" data-bld="next"></button>
+  </footer>`;
+
+/** The plan the builder edits, ready to start from `parent` (a booking, an inquiry, or the not-yet-saved draft of one). */
+export function newBuilderState(parent, saved, { step = null, day = null } = {}) {
+  const model = M.createModel(parent, saved);
+  const hasSaved = daysOf(parent).length > 0;
+  return { model, baseSig: M.signature(model), current: step || (hasSaved ? 2 : 1), openDay: Math.min(day ?? 0, Math.max(0, model.days.length - 1)) };
+}
+
 /**
- * @param {object} b  booking or inquiry (as the list views hold it)
- * @param {{ day?: number|null, step?: 1|2|null, onChange: () => void }} opts  day = day index to open (0-based)
+ * Render the builder into `root` and handle everything the user does in it. `state` (see newBuilderState) holds the plan and the
+ * step, so a host can unmount and mount again without losing anything.
+ * @param {HTMLElement} root  contains the markup of builderShell()
+ * @param {{ model: object, baseSig: string, current: 1|2, openDay: number }} state
+ * @param {{ embedded?: boolean, scroller?: HTMLElement, subtitle?: () => string, onChange?: () => void,
+ *           onDone: (days: object[], meta: object) => void }} hooks
+ * @returns {{ isDirty: () => boolean, done: () => boolean, destroy: () => void }}
  */
-export async function openItineraryBuilder(b, { day = null, step = null, onChange }) {
-  const saved = await fetchSaved(b);
-  let model = M.createModel(b, saved);
-  const baseSig = M.signature(model);
-  const draft = readDraft(b);
-  if (draft && draft.base === baseSig && draft.model) model = draft.model;
-
-  const hasSaved = daysOf(b).length > 0;
-  let current = step || (hasSaved ? 2 : 1);
-  let openDay = Math.min(day ?? 0, Math.max(0, model.days.length - 1));
-  let draftTimer = null;
-  let savedLabelTimer = null;
-
-  const isDirty = () => M.signature(model) !== baseSig;
-  const subtitle = () => {
-    const range = model.meta.start && model.meta.end ? M.fmtRange(model.meta.start, model.meta.end) : (b.dates || '');
-    return `${b.title} · ${range} · ${b.pax} pax`;
-  };
-
-  const dlg = openSheet({
-    label: 'Add itinerary',
-    cls: 'bld-sheet',
-    returnFocus: () => document.querySelector('#desktop-add-event-btn, #mobile-add-event-btn'),
-    beforeClose: async () => {
-      if (!isDirty()) { clearDraft(b); return true; }
-      const ok = await confirmDialog({ title: 'Discard changes?', text: 'Your itinerary changes have not been saved.', confirm: 'Discard', cancel: 'Keep editing', danger: true });
-      if (ok) clearDraft(b);
-      return ok;
-    },
-    html: `<header class="asg-header bld-header">
-        <div class="bld-title"><h3>Add Itinerary</h3><p class="bld-sub" id="bld-sub"></p></div>
-        <button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button>
-      </header>
-      <ol class="bld-stepper" id="bld-stepper" aria-label="Steps"></ol>
-      <div class="bld-body" id="bld-body"></div>
-      <footer class="fu-footer itin-footer bld-footer">
-        <button type="button" class="btn-cancel-assign" id="bld-back" data-bld="back"></button>
-        <span class="bld-draft" id="bld-draft" aria-live="polite"></span>
-        <button type="button" class="btn-primary-desktop" id="bld-next" data-bld="next"></button>
-      </footer>`,
-  });
-  const $ = dlg.$;
+export function mountBuilder(root, state, { embedded = false, scroller = null, subtitle = null, onChange = null, onDone }) {
+  const abort = new AbortController();
+  const on = (type, fn) => root.addEventListener(type, fn, { signal: abort.signal });
+  const $ = (s) => root.querySelector(s);
+  const model = state.model;
   const bodyEl = $('#bld-body');
+  const scrollBox = scroller || bodyEl;
+  let current = state.current;
+  let openDay = state.openDay;
+  let changeTimer = null;
 
-  /* ---------- drafts ---------- */
+  const isDirty = () => M.signature(model) !== state.baseSig;
+
+  /* ---------- change notifications (drafts in the popup, the live preview in the wizard) ---------- */
   function touch() {
-    clearTimeout(draftTimer);
-    draftTimer = setTimeout(() => {
-      if (!isDirty()) return;
-      writeDraft(b, { base: baseSig, model });
-      const el = $('#bld-draft');
-      if (!el) return;
-      el.textContent = 'Draft saved';
-      clearTimeout(savedLabelTimer);
-      savedLabelTimer = setTimeout(() => { el.textContent = ''; }, 1800);
-    }, 300);
+    clearTimeout(changeTimer);
+    changeTimer = setTimeout(() => onChange?.(), 300);
   }
 
   /* ---------- rendering ---------- */
+  const paintSubtitle = () => { const el = $('#bld-sub'); if (el && subtitle) el.textContent = subtitle(); };
+
   function renderChrome() {
-    $('#bld-sub').textContent = subtitle();
+    paintSubtitle();
     $('#bld-stepper').innerHTML = [['Route & Dates', 1], ['Itinerary', 2]].map(([label, n]) => `
       <li class="bld-step-item ${current === n ? 'is-current' : ''} ${current > n ? 'is-done' : ''}" ${current === n ? 'aria-current="step"' : ''}>
         <span class="bld-step-dot">${current > n ? icon('check', { size: 14, stroke: 3 }) : n}</span><span class="bld-step-label">${label}</span>
       </li>`).join('<li class="bld-step-line" aria-hidden="true"></li>');
     const back = $('#bld-back');
     back.textContent = current === 1 ? 'Cancel' : 'Back';
-    if (current === 1) back.setAttribute('data-sheet-close', ''); else back.removeAttribute('data-sheet-close');
+    back.hidden = embedded && current === 1; // the wizard has its own Back
+    if (current === 1 && !embedded) back.setAttribute('data-sheet-close', ''); else back.removeAttribute('data-sheet-close');
     $('#bld-next').innerHTML = current === 1 ? `Next: Itinerary ${icon('arrowLeft', { size: 16, stroke: 2.4, cls: 'bld-arrow-r' })}` : 'Done';
   }
 
@@ -160,7 +147,7 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
 
   const sectionHead = (key, label, addLabel, ico) => `
     <div class="bld-sec-head"><span class="bld-sec-title"><span class="bld-ico item-icon-box item-icon-${SECTION_TILE[key]}">${icon(ico, { size: 18 })}</span>${label}</span>
-      ${addLabel ? `<button type="button" class="bld-add" data-add="${key}" aria-label="Add ${esc(label)}">${icon('plus', { size: 14, stroke: 2.5 })}Add</button>` : ''}</div>`;
+      ${addLabel ? `<button type="button" class="btn-secondary-desktop btn-sm bld-add" data-add="${key}" aria-label="Add ${esc(label)}">${icon('plus', { size: 14, stroke: 2.5 })}Add</button>` : ''}</div>`;
 
   function dayBody(i) {
     const d = model.days[i];
@@ -233,10 +220,12 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
   }
 
   function render({ keepScroll = true } = {}) {
-    const y = keepScroll ? bodyEl.scrollTop : 0;
+    const y = keepScroll ? scrollBox.scrollTop : 0;
+    state.current = current;
+    state.openDay = openDay;
     renderChrome();
     bodyEl.innerHTML = current === 1 ? step1Html() : step2Html();
-    bodyEl.scrollTop = y;
+    scrollBox.scrollTop = y;
     if (current === 2) {
       const chip = bodyEl.querySelector('.bld-daychip.is-on');
       chip?.scrollIntoView({ block: 'nearest', inline: 'center' });
@@ -370,24 +359,16 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
     return true;
   }
 
-  async function finish() {
+  /** Validate the dates and hand the finished plan to the host. Returns false when the dates need fixing first. */
+  function finish() {
     const { start, end } = model.meta;
-    if (start && end && end < start) { current = 1; render(); $('#bld-date-error').hidden = false; return; }
-    const days = M.toDays(model);
-    const meta = M.toMeta(model);
-    const before = snapshot(b);
-    b.itineraryDays = days;
-    b.itineraryMeta = meta;
-    clearDraft(b);
-    dlg.close();
-    onChange();
-    requestAnimationFrame(() => document.querySelectorAll('#desktop-sheet-body, #sheet-body-content').forEach((el) => el.scrollTo({ top: 0 })));
-    const ok = await saveItinerary(b, before, { meta, onRollback: onChange });
-    if (ok) { markSaved(b); toast('Itinerary saved', 'success'); }
+    if (start && end && end < start) { current = 1; render(); $('#bld-date-error').hidden = false; return false; }
+    onDone(M.toDays(model), M.toMeta(model));
+    return true;
   }
 
   /* ---------- events ---------- */
-  dlg.ov.addEventListener('click', async (e) => {
+  on('click', async (e) => {
     const t = (s) => e.target.closest(s);
     if (t('[data-bld="next"]')) {
       if (current === 1) {
@@ -431,25 +412,25 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
     }
   });
 
-  dlg.ov.addEventListener('input', (e) => {
+  on('input', (e) => {
     const el = e.target.closest('[data-meta]');
     if (el && (el.dataset.meta === 'origin' || el.dataset.meta === 'destination')) {
       model.meta[el.dataset.meta] = el.value;
       const clear = bodyEl.querySelector(`[data-clear="${el.dataset.meta}"]`);
       if (clear) clear.hidden = !el.value;
-      $('#bld-sub').textContent = subtitle();
+      paintSubtitle();
       touch();
       return;
     }
     const title = e.target.closest('[data-day-title]');
     if (title) { model.days[openDay].title = title.value; touch(); }
   });
-  dlg.ov.addEventListener('keydown', (e) => {
+  on('keydown', (e) => {
     if (e.key !== 'Enter') return;
     if (e.target.matches('#bld-stop-text')) { e.preventDefault(); bodyEl.querySelector('[data-stop-save]').click(); }
     if (e.target.matches('[data-place-text]')) { e.preventDefault(); bodyEl.querySelector('[data-place-save]').click(); }
   });
-  dlg.ov.addEventListener('change', async (e) => {
+  on('change', async (e) => {
     const el = e.target.closest('input[type="date"][data-meta]');
     if (!el) return;
     const key = el.dataset.meta;
@@ -462,4 +443,188 @@ export async function openItineraryBuilder(b, { day = null, step = null, onChang
 
   render({ keepScroll: false });
   if (current === 2) setOpen(openDay, { scroll: false });
+  return { isDirty, done: finish, destroy: () => { clearTimeout(changeTimer); abort.abort(); } };
+}
+
+/** The plan for a saved booking or inquiry: its state, drafts kept in the browser, and what "Done" does. Both homes below use it. */
+async function builderSession(b, { day, step, onChange, leave, afterSave }) {
+  const saved = await fetchSaved(b);
+  const state = newBuilderState(b, saved, { day, step });
+  const draft = readDraft(b);
+  if (draft && draft.base === state.baseSig && draft.model) {
+    state.model = draft.model;
+    state.openDay = Math.min(state.openDay, Math.max(0, state.model.days.length - 1));
+  }
+  let builder = null;
+  let draftTimer = null;
+  const subtitle = () => {
+    const range = state.model.meta.start && state.model.meta.end ? M.fmtRange(state.model.meta.start, state.model.meta.end) : (b.dates || '');
+    return [b.title, range, `${b.pax} pax`].filter((x) => x && x !== '—').join(' · ');
+  };
+  return {
+    state,
+    subtitle,
+    /** Mount into `root`; `host` says where it lives (`embedded` hides the step-1 Back button, the header has its own). */
+    mount(root, host = {}) {
+      builder = mountBuilder(root, state, {
+        embedded: !!host.embedded,
+        subtitle,
+        onChange: () => {
+          if (!builder.isDirty()) return;
+          writeDraft(b, { base: state.baseSig, model: state.model });
+          const el = root.querySelector('#bld-draft');
+          if (!el) return;
+          el.textContent = 'Draft saved';
+          clearTimeout(draftTimer);
+          draftTimer = setTimeout(() => { el.textContent = ''; }, 1800);
+        },
+        onDone: async (days, meta) => {
+          const before = snapshot(b);
+          const knownIds = new Set(before.flatMap((d) => (d.items || []).map((i) => i.id)));
+          b.itineraryDays = days;
+          b.itineraryMeta = meta;
+          clearDraft(b);
+          leave();
+          const added = days.flatMap((d) => d.items || []).filter((i) => !knownIds.has(i.id)).map((i) => i.id);
+          onChange(added);
+          const ok = await saveItinerary(b, before, { meta, onRollback: onChange });
+          if (ok) { markSaved(b); afterSave?.(added); }
+        },
+      });
+      return builder;
+    },
+    /** True when it is fine to leave: nothing changed, or the user chose to discard. */
+    async mayLeave() {
+      if (!builder.isDirty()) { clearDraft(b); return true; }
+      const ok = await confirmDialog({ title: 'Discard changes?', text: 'Your itinerary changes have not been saved.', confirm: 'Discard', cancel: 'Keep editing', danger: true });
+      if (ok) clearDraft(b);
+      return ok;
+    },
+  };
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Home 1: a centred dialog (PC) from a page or a pane
+   ------------------------------------------------------------------------------------------------ */
+async function openAsDialog(b, { day, step, onChange }) {
+  let dlg = null;
+  const session = await builderSession(b, {
+    day, step,
+    onChange: () => { onChange(); requestAnimationFrame(() => document.querySelectorAll('#desktop-sheet-body, #sheet-body-content').forEach((el) => el.scrollTo({ top: 0 }))); },
+    leave: () => dlg.close(),
+    afterSave: () => toast('Itinerary saved', 'success'),
+  });
+  dlg = openSheet({
+    label: 'Add itinerary',
+    cls: 'bld-sheet',
+    returnFocus: () => document.querySelector('#desktop-add-event-btn, #mobile-add-event-btn'),
+    beforeClose: () => session.mayLeave(),
+    html: `<header class="asg-header bld-header">
+        <div class="bld-title"><h3>Add Itinerary</h3><p class="bld-sub" id="bld-sub"></p></div>
+        <button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button>
+      </header>${builderShell()}`,
+  });
+  session.mount(dlg.ov);
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Home 2: in place, inside a bottom sheet that is already open (a phone's detail sheet). The sheet shows the builder on a layer
+   that fades in over its own content, so there is no second popup, the sheet keeps its height and the tab underneath is left
+   exactly as it was (scroll position included).
+   ------------------------------------------------------------------------------------------------ */
+async function openInPlace(b, { sheet, day, step, onChange }) {
+  const view = document.createElement('section');
+  view.className = 'bld-inplace';
+  view.setAttribute('aria-label', 'Add itinerary');
+  const underneath = [...sheet.children];
+  let closed = false;
+  let historyOpen = false;
+  let opener = null;
+  const tabBody = sheet.querySelector('#sheet-body-content');
+  const scrollTop = tabBody ? tabBody.scrollTop : 0;
+
+  const exit = ({ restoreScroll = true } = {}) => {
+    if (closed) return;
+    closed = true;
+    window.removeEventListener('keydown', onKey, true);
+    window.removeEventListener('popstate', onPop, true);
+    if (historyOpen && history.state?.ruyiInPlace) { swallowNextPop(); history.back(); }
+    historyOpen = false;
+    view.classList.remove('in');
+    const done = () => {
+      view.remove();
+      underneath.forEach((el) => el.removeAttribute('inert'));
+      sheet.classList.remove('is-building');
+      if (restoreScroll) { const body = sheet.querySelector('#sheet-body-content'); if (body) body.scrollTop = scrollTop; }
+      (document.querySelector('#mobile-add-event-btn') || opener)?.focus?.({ preventScroll: true });
+    };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) done(); else setTimeout(done, 220);
+  };
+
+  const session = await builderSession(b, {
+    day, step,
+    onChange: (added) => {
+      const body = sheet.querySelector('#sheet-body-content');
+      const y = body ? body.scrollTop : 0;
+      onChange();
+      const fresh = sheet.querySelector('#sheet-body-content');
+      if (fresh) fresh.scrollTop = y;
+      // a short highlight on what was just added
+      (added || []).forEach((id, i) => {
+        const card = sheet.querySelector(`[data-itinerary-item-id="${CSS.escape(id)}"]`);
+        if (!card) return;
+        card.classList.add('just-added');
+        if (i === 0) card.scrollIntoView({ block: 'nearest' });
+        setTimeout(() => card.classList.remove('just-added'), 2400);
+      });
+    },
+    leave: () => exit({ restoreScroll: false }),
+    afterSave: (added) => toast(added.length ? 'Event added' : 'Itinerary saved', 'success'),
+  });
+
+  async function request() {
+    if (closed || hasOpenLayer()) return;
+    if (await session.mayLeave()) exit();
+    else if (!historyOpen) { history.pushState({ ruyiInPlace: true }, ''); historyOpen = true; }
+  }
+  // Capture phase, so the phone sheet's own Esc handler (which would close the whole sheet) never sees this key press.
+  const onKey = (e) => { if (e.key === 'Escape' && !hasOpenLayer()) { e.preventDefault(); e.stopPropagation(); request(); } };
+  function onPop(e) {
+    if (closed || hasOpenLayer()) return;
+    e.stopImmediatePropagation();
+    historyOpen = false;
+    request();
+  }
+
+  opener = document.activeElement;
+  view.innerHTML = `<header class="bld-inplace-head">
+      <button type="button" class="dialog-back" data-bld-exit aria-label="Back to the itinerary">${icon('arrowLeft', { size: 20, stroke: 2.2 })}</button>
+      <div class="bld-title"><h3 data-dialog-title tabindex="-1">Add itinerary</h3><p class="bld-sub" id="bld-sub"></p></div>
+    </header>${builderShell()}
+    <p class="sr-only" role="status" id="bld-inplace-live">Add itinerary opened. Use the back arrow to return to the itinerary.</p>`;
+  sheet.appendChild(view);
+  sheet.classList.add('is-building');
+  underneath.forEach((el) => el.setAttribute('inert', ''));
+  session.mount(view, { embedded: true });
+  view.addEventListener('click', (e) => { if (e.target.closest('[data-bld-exit]')) request(); });
+  history.pushState({ ruyiInPlace: true }, '');
+  historyOpen = true;
+  window.addEventListener('keydown', onKey, true);
+  window.addEventListener('popstate', onPop, true);
+  requestAnimationFrame(() => {
+    view.classList.add('in');
+    view.querySelector('[data-dialog-title]').focus({ preventScroll: true }); // the title, never a field
+  });
+}
+
+/**
+ * Open the builder for a saved booking or inquiry. Where it opens depends on where the user is: inside an open phone detail sheet it
+ * replaces the sheet's content in place; anywhere else it is the one centred dialog. Never a popup on top of a popup.
+ * @param {object} b  booking or inquiry (as the list views hold it)
+ * @param {{ day?: number|null, step?: 1|2|null, onChange: () => void }} opts  day = day index to open (0-based)
+ */
+export async function openItineraryBuilder(b, { day = null, step = null, onChange }) {
+  const sheet = document.documentElement.dataset.layout === 'mobile' ? document.querySelector('#mobile-bottom-sheet.open') : null;
+  if (sheet) return openInPlace(b, { sheet, day, step, onChange });
+  return openAsDialog(b, { day, step, onChange });
 }

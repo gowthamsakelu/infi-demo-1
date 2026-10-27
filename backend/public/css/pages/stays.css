@@ -1,0 +1,13 @@
+/* Stays: rooms and rates as cards (they read the same on a phone and in the wide pane). */
+.st-about { margin: 0; font-size: 14px; line-height: 1.5; color: #475569; }
+.st-room { border: 1px solid #E2E8F0; border-radius: 14px; background: #FFFFFF; padding: 12px 14px; margin-bottom: 10px; }
+.st-room-head { display: flex; align-items: baseline; gap: 10px; min-width: 0; margin-bottom: 8px; }
+.st-room-head b { font-size: 15px; font-weight: 800; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.st-room-head small { font-size: 12.5px; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.st-rates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+.st-rates div { display: flex; flex-direction: column; min-width: 0; }
+.st-rates small { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-rates b { font-size: 15.5px; font-weight: 700; color: #0F172A; white-space: nowrap; }
+@container (min-width: 560px) { .st-rates { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.st-note { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 0; padding: 12px 14px; border-radius: 12px; background: #F1F5F9; color: #475569; font-size: 13px; line-height: 1.45; }
+.st-note svg { flex: none; margin-top: 2px; color: #2563EB; }

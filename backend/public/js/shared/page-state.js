@@ -4,7 +4,9 @@
 const listeners = new Set();
 const notify = () => listeners.forEach((fn) => fn());
 
-const PAGES = ['bookings', 'inquiries', 'calendar'];
+import { NAV_ITEMS } from './nav.js';
+
+const PAGES = NAV_ITEMS.map((i) => i.key);
 const ALIASES = { enquiries: 'inquiries', enquiry: 'inquiries', inquiry: 'inquiries' };
 
 export function currentPage() {

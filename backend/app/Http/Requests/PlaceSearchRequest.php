@@ -14,7 +14,7 @@ class PlaceSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'q' => ['required', 'string', 'min:2', 'max:100'],
+            'q' => ['nullable', 'string', 'min:2', 'max:100'], // empty = popular places (demo provider)
             'kind' => ['required', 'in:hotel,activity'],
             'location' => ['nullable', 'string', 'max:120'],
             'session' => ['nullable', 'string', 'max:64', 'regex:/^[A-Za-z0-9_-]+$/'],

@@ -1,0 +1,18 @@
+/* Tour Packages: only what the shared split page does not already draw. */
+.sp-hint { font-size: 12.5px; color: #64748B; white-space: nowrap; }
+.tp-about { margin: 12px 0 0; font-size: 14px; line-height: 1.5; color: #475569; }
+.tp-day-title { margin: 0; font-size: 12.5px; font-weight: 700; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-timeline { padding-bottom: 0; }
+.tp-timeline .itinerary-card-item { cursor: default; }
+.tp-timeline .item-text-title, .tp-timeline .item-text-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.tp-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #334155; min-width: 0; }
+.tp-list li span:last-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-list-ico { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; }
+.tp-list-ico.check { background: #DCFCE7; color: #166534; }
+.tp-list-ico.no { background: #F1F5F9; color: #64748B; }
+.tp-chooser-body { padding: 4px 20px 20px; overflow-y: auto; min-height: 120px; }
+.tp-pick { width: 100%; border: 0; background: #FFFFFF; text-align: left; cursor: pointer; font: inherit; }
+.tp-pick:hover { background: var(--bg-hover); }
+.tp-pick:focus-visible { outline: 2px solid #2563EB; outline-offset: -2px; }
+.tp-has { flex: none; height: 26px; padding: 0 10px; font-size: 12px; }

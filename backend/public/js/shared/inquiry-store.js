@@ -1,7 +1,7 @@
 // Inquiries data + the adapter that lets the Bookings list, split view and detail pane render them.
 import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST } from '../data.js';
 import { phoneKey, addFollowUpLocal } from './followups.js';
-import { toast } from './ui.js';
+import { toast, UNNAMED_LEAD } from './ui.js';
 import { markSaved } from './itinerary.js';
 
 export const INQUIRY_TABS = [
@@ -35,47 +35,54 @@ function baselineFlow(phone) {
 /** Inquiry -> the booking-shaped object the shared list / detail code understands. */
 export function inquiryToBooking(i, prev) {
   const staff = [...STAFF_MEMBERS, ...VENDORS_LIST.map((v) => ({ ...v, avatar: v.image })), ...CONTACTS_LIST].find((s) => s.id === i.assigned_to_id);
-  const initialsOf = i.customer_name.split(/\s+/).map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+  // Name, phone, trip and nights are optional on a new inquiry: an inquiry without a name is an "Unnamed lead".
+  const name = i.customer_name || UNNAMED_LEAD;
+  const initialsOf = i.customer_name ? i.customer_name.split(/\s+/).map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '?';
+  const trip = i.trip || '';
+  const nights = i.nights == null ? null : Number(i.nights);
+  const budget = i.budget == null ? '—' : `₹${Number(i.budget).toLocaleString('en-IN')}`;
+  const guests = (i.guests?.length ? i.guests : [{ id: 1, name: i.customer_name, role: 'Primary Contact', phone: i.customer_phone, isPrimary: true }])
+    .map((g, k) => ({ id: g.id ?? k + 1, name: g.name || (k === 0 ? name : `Guest ${k + 1}`), age: g.age ?? '', role: g.role || '', phone: g.phone || '', isPrimary: !!g.isPrimary }));
   return {
     kind: 'inquiry',
     id: i.id,
     raw: i,
-    title: i.trip,
+    title: trip || '—',
     type: i.category,
     typeClass: BADGE[i.category] || 'badge-tour',
     pax: i.pax,
-    duration: `${i.nights} Night${i.nights === 1 ? '' : 's'}`,
+    duration: nights == null ? '' : `${nights} Night${nights === 1 ? '' : 's'}`,
     dates: fmtDate(i.travel_date),
     travelDateFull: fmtDate(i.travel_date),
     status: STATUS_LABEL[i.status] || i.status,
     statusClass: `status-inq-${i.status}`,
     category: i.status, // drives the status tabs
     price: '—',
-    destination: i.trip,
+    destination: trip,
     notes: i.notes || '',
     selected: prev?.selected || false,
-    guest: { name: i.customer_name, phone: i.customer_phone, email: i.customer_email || '', isPrimary: true },
+    guest: { name, phone: i.customer_phone || '', email: i.customer_email || '', isPrimary: true },
     customer: {
-      name: i.customer_name,
+      name,
       initials: initialsOf,
-      phone: i.customer_phone,
+      phone: i.customer_phone || '—',
       email: i.customer_email || '—',
       location: i.location || '—',
       leadSource: i.lead_source || '—',
-      preferredDestination: i.trip,
+      preferredDestination: trip || '—',
       travelDates: fmtDate(i.travel_date),
       customerType: `${i.pax > 2 ? 'Group' : 'Couple / Solo'} (${i.pax} Pax)`,
-      budgetEst: '—',
+      budgetEst: budget,
       status: STATUS_LABEL[i.status] || i.status,
       shortDetails: i.notes || 'No additional details recorded for this inquiry.',
       leadFlow: baselineFlow(i.customer_phone),
     },
     assignedTo: { name: staff?.name || i.assigned_to_name || 'Unassigned', avatar: staff?.avatar || '' },
     assignedStatus: i.assigned_to_id ? 'Assigned' : 'Unassigned',
-    guests: [{ id: 1, name: i.customer_name, age: '', role: 'Primary Contact', phone: i.customer_phone, isPrimary: true }],
+    guests,
     itineraryDays: prev?.itineraryDays ?? JSON.parse(JSON.stringify(i.itinerary_days || [])),
     specialRequirements: [],
-    updates: [{ title: 'Inquiry received', time: '', desc: `${i.customer_name} inquired about ${i.trip}${i.lead_source ? ` via ${i.lead_source}` : ''}.`, user: 'Ruyi Admin' }],
+    updates: [{ title: 'Inquiry received', time: '', desc: `${i.customer_name || 'A new lead'} inquired${trip ? ` about ${trip}` : ''}${i.lead_source ? ` via ${i.lead_source}` : ''}.`, user: 'Ruyi Admin' }],
   };
 }
 
@@ -110,6 +117,42 @@ export function applyInquiryUpdates(rows) {
   });
   rebuild();
   notify(rows.map((r) => r.id));
+}
+
+const JUST_ADDED_MS = 6000;
+let freshTimer = null;
+
+/** Highlight a row as "JUST ADDED" for about six seconds. */
+export function markJustAdded(id) {
+  const keep = state.list.filter((b) => b.justAdded);
+  keep.forEach((b) => { b.justAdded = false; });
+  const row = state.list.find((b) => b.id === id);
+  if (row) row.justAdded = true;
+  notify([...keep.map((b) => b.id), id]);
+  clearTimeout(freshTimer);
+  freshTimer = setTimeout(() => {
+    const cur = state.list.find((b) => b.id === id);
+    if (cur?.justAdded) { cur.justAdded = false; notify([id]); }
+  }, JUST_ADDED_MS);
+}
+
+/**
+ * Save a new inquiry (the Add Inquiry wizard): the inquiry, its guests and its itinerary in one request.
+ * Resolves to the new row; throws an Error with a readable message when the server refuses.
+ */
+export async function createInquiry(payload) {
+  let res;
+  try {
+    res = await fetch('/api/inquiries', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
+  } catch { throw new Error('Could not reach the server. Check your connection and try again.'); }
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(Object.values(body.errors || {}).flat()[0] || body.message || `Could not save the inquiry (${res.status}).`);
+  state.raw = [body.data, ...state.raw.filter((x) => x.id !== body.data.id)];
+  state.loaded = true;
+  state.failed = false;
+  rebuild();
+  notify();
+  return state.list.find((b) => b.id === body.data.id);
 }
 
 /** Quick note: validates, saves, and returns true on success. */

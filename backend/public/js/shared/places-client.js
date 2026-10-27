@@ -3,9 +3,9 @@
 const JSON_HEADERS = { Accept: 'application/json' };
 
 let statusCache = null;
-/** Is Google search set up on the server? Asked once per page load. */
-export function placesEnabled() {
-  statusCache ??= fetch('/api/places/status', { headers: JSON_HEADERS }).then((r) => r.json()).then((j) => !!j.enabled).catch(() => false);
+/** What answers search on the server: { enabled, provider: 'google' | 'demo' }. Asked once per page load. */
+export function placesStatus() {
+  statusCache ??= fetch('/api/places/status', { headers: JSON_HEADERS }).then((r) => r.json()).then((j) => ({ enabled: !!j.enabled, provider: j.provider || '' })).catch(() => ({ enabled: false, provider: '' }));
   return statusCache;
 }
 
@@ -17,9 +17,10 @@ export function newSession() {
 
 /**
  * A search box's brain: waits 300ms after typing stops, drops answers to older queries and cancels the request in flight.
- * `onState` gets { status: 'idle' | 'loading' | 'ok' | 'error' | 'off', results, message }.
+ * `onState` gets { status: 'idle' | 'loading' | 'ok' | 'error' | 'off', results, popular, message }; `popular` = the results answer an empty box.
+ * With `popularWhenEmpty()` true an empty box asks for popular places instead of staying idle.
  */
-export function createSearcher({ kind, getLocation, onState, wait = 300 }) {
+export function createSearcher({ kind, getLocation, onState, popularWhenEmpty = () => false, wait = 300 }) {
   let timer = null;
   let controller = null;
   let session = newSession();
@@ -30,7 +31,8 @@ export function createSearcher({ kind, getLocation, onState, wait = 300 }) {
     const mine = controller;
     onState({ status: 'loading', results: [] });
     try {
-      const params = new URLSearchParams({ q, kind, session });
+      const params = new URLSearchParams({ kind, session });
+      if (q) params.set('q', q);
       const loc = getLocation?.();
       if (loc) params.set('location', loc);
       const res = await fetch(`/api/places/search?${params}`, { headers: JSON_HEADERS, signal: mine.signal });
@@ -40,7 +42,7 @@ export function createSearcher({ kind, getLocation, onState, wait = 300 }) {
         onState({ status: body.reason === 'not_configured' ? 'off' : 'error', results: [], message: body.message || 'Search is not available right now.' });
         return;
       }
-      onState({ status: 'ok', results: body.data || [] });
+      onState({ status: 'ok', results: body.data || [], popular: !!body.popular });
     } catch (err) {
       if (err?.name === 'AbortError') return;
       onState({ status: 'error', results: [], message: 'Could not reach search. Check your connection, or add the place by hand.' });
@@ -51,8 +53,9 @@ export function createSearcher({ kind, getLocation, onState, wait = 300 }) {
     query(text) {
       clearTimeout(timer);
       const q = text.trim();
-      if (q.length < 2) { controller?.abort(); onState({ status: 'idle', results: [] }); return; }
-      timer = setTimeout(() => run(q), wait);
+      if (q.length === 1) return; // a single letter changes nothing
+      if (q.length === 0 && !popularWhenEmpty()) { controller?.abort(); onState({ status: 'idle', results: [] }); return; }
+      timer = setTimeout(() => run(q), q ? wait : 0);
     },
     /** Place Details for the chosen result; closes out the billing session and starts a fresh one. */
     async pick(placeId) {

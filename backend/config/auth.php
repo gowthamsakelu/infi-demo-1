@@ -114,4 +114,18 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | One-press demo login
+    |--------------------------------------------------------------------------
+    |
+    | While DEMO_LOGIN is true the sign-in page offers a "Press to log in" button that signs in as the person below, with no
+    | password. Set DEMO_LOGIN=false once everyone has their own account.
+    |
+    */
+
+    'demo_login' => (bool) env('DEMO_LOGIN', true),
+    'demo_email' => env('DEMO_LOGIN_EMAIL', 'karan@ruyi.test'),
+    'demo_name' => env('DEMO_LOGIN_NAME', 'Karan Sapalia'),
+
 ];

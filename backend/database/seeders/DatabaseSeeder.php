@@ -111,7 +111,17 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // 6. Vehicle catalogue for the transport form (placeholder daily rates)
+        // 6. A real account, only when ADMIN_EMAIL and ADMIN_PASSWORD are set in .env
+        if (filled(env('ADMIN_EMAIL')) && filled(env('ADMIN_PASSWORD'))) {
+            \App\Models\User::updateOrCreate(['email' => env('ADMIN_EMAIL')], ['name' => config('auth.demo_name'), 'password' => env('ADMIN_PASSWORD')]);
+        }
+
+        // 7. The CRM pages (Destinations, Tour Packages ...): one seeder each in database/seeders/Pages, run in file-name order
+        foreach (glob(__DIR__.'/Pages/*Seeder.php') as $file) {
+            $this->call('Database\\Seeders\\Pages\\'.basename($file, '.php'));
+        }
+
+        // 8. Vehicle catalogue for the transport form (placeholder daily rates)
         $this->call(VehicleTypeSeeder::class);
     }
 }

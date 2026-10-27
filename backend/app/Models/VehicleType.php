@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /** A vehicle (or ticketed mode) staff can pick on a transport event, with its default daily rate. */
 class VehicleType extends Model
 {
-    protected $fillable = ['key', 'name', 'icon', 'seats', 'ac', 'category', 'base_rate', 'rate_unit', 'popularity_rank', 'active'];
+    use HasFactory;
 
-    protected $casts = ['ac' => 'boolean', 'active' => 'boolean', 'base_rate' => 'float', 'seats' => 'integer', 'popularity_rank' => 'integer'];
+    protected $fillable = ['key', 'name', 'icon', 'seats', 'ac', 'category', 'base_rate', 'rate_unit', 'popularity_rank', 'active',
+        'most_popular', 'show_in_builder', 'description', 'rate_card', 'trips_count', 'avg_days'];
+
+    protected $casts = ['ac' => 'boolean', 'active' => 'boolean', 'base_rate' => 'float', 'seats' => 'integer', 'popularity_rank' => 'integer',
+        'most_popular' => 'boolean', 'show_in_builder' => 'boolean', 'rate_card' => 'array', 'trips_count' => 'integer', 'avg_days' => 'float'];
 
     public function toApi(): array
     {

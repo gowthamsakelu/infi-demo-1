@@ -10,6 +10,7 @@ Ruyi Admin is a travel operations admin panel for managing bookings and inquirie
 
 - **Bookings** – list, search, category filter, status tabs, bulk select, Assign, and Mark as Paid / Unpaid (saved to the database).
 - **Inquiries** – lead list with status tabs (New, Ongoing, Warm, Hot), search, category filter, and bulk Assign.
+- **Add Inquiry** – the "Add Inquiry" button (top right on the PC layout, a floating button on phones) opens one three-step wizard: Customer & trip, Itinerary (the itinerary builder, embedded) and Guests. Every field is optional and staff can save at any step with "Save with what I have". A lead without a name is shown as "Unnamed lead". The inquiry, its guests and its itinerary are saved together, assigned to the signed-in staff member (ST-05 until there is a login), with Pax set to the number of guests and nights and travel date taken from the itinerary dates. After saving, the new row is highlighted with "JUST ADDED" for about six seconds.
 - **Follow-ups and notes** – schedule a follow-up (Follow-up, Called with outcome, CC) from the ⋮ menu, and add quick notes inline. Both appear in the customer's Lead Flow / Journey.
 - **Details view** – Outlook-style split view on desktop, and a bottom sheet on phones. Same content for Bookings and Inquiries.
 - **Assign flow** – one shared sheet for team members, vendors and contacts, from the ⋮ menu or the bulk bar.
@@ -83,7 +84,7 @@ Copy `backend/.env.example` to `backend/.env`. These are the ones that matter:
 backend/
 ├── app/
 │   ├── Http/Controllers/    BookingController, InquiryController
-│   ├── Http/Requests/       StoreFollowUpRequest
+│   ├── Http/Requests/       StoreInquiryRequest, SaveItineraryRequest, StoreFollowUpRequest
 │   ├── Livewire/            BookingsManager (the /livewire page)
 │   ├── Models/              Booking, Inquiry, Itinerary (+ Day, Item), FollowUp, Staff, Vendor, Contact
 │   └── Support/             TripDates, ItineraryWriter
@@ -99,7 +100,8 @@ backend/
 │       ├── desktop.js       Desktop layout (also used on tablets)
 │       ├── mobile.js        Phone view
 │       ├── calendar-desktop.js, calendar-mobile.js   Calendar page for each layout
-│       ├── shared/itinerary-builder.js, itinerary-builder-ui.js   Itinerary builder (plan model and dialog)
+│       ├── shared/itinerary-builder.js, itinerary-builder-ui.js   Itinerary builder (plan model, and one component shown as a popup or inline)
+│       ├── shared/add-inquiry.js   The Add Inquiry wizard (embeds the builder in step 2)
 │       ├── shared/notifications.js   Notification panel behind the bell (PC dropdown, phone card)
 │       └── shared/          Components used by both views (calendar-store.js holds the calendar data)
 ├── routes/                  web.php, api.php
@@ -132,6 +134,7 @@ The UI is a single page that switches by URL hash.
 | POST | `/api/bookings/{id}/guests` | Add a guest |
 | PUT | `/api/bookings/{id}/special-requirements` | Update special requirements |
 | GET | `/api/inquiries` | List inquiries (`status`, `category`, `search`, `from`, `to`) |
+| POST | `/api/inquiries` | Add an inquiry (`name`, `phone`, `email`, `city`, `destination`, `budget`, `comment`, `guests` as name and age, optional `itinerary` with `days` and `meta`). Everything is optional; saved in one transaction |
 | POST | `/api/inquiries/assign` | Assign inquiries |
 | POST | `/api/inquiries/{id}/follow-ups` | Save a follow-up (`type`, `date`, `time`, `comment`) |
 | POST | `/api/inquiries/{id}/notes` | Save a quick note (`comment`, max 500 characters) |

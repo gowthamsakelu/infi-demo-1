@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PlaceSearchRequest;
-use App\Support\GooglePlaces;
+use App\Support\Places\PlacesProvider;
 use App\Support\PlacesException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,18 +12,24 @@ use Illuminate\Http\Response;
 /** Our own front for Google Places: the browser never sees the API key, and every call is rate limited (throttle:places). */
 class PlacesController extends Controller
 {
-    public function __construct(private readonly GooglePlaces $places) {}
+    /** Resolved per call, so a changed config (or a test) is honoured even when the controller instance is reused. */
+    private function places(): PlacesProvider
+    {
+        return app(PlacesProvider::class);
+    }
 
     public function status(): JsonResponse
     {
-        return response()->json(['enabled' => $this->places->configured()]);
+        return response()->json(['enabled' => $this->places()->configured(), 'provider' => $this->places()->name()]);
     }
 
     public function search(PlaceSearchRequest $request): JsonResponse
     {
         return $this->guard(fn () => [
             'success' => true,
-            'data' => $this->places->search($request->string('q')->toString(), $request->string('kind')->toString(), $request->input('location'), $request->input('session')),
+            'provider' => $this->places()->name(),
+            'popular' => trim($request->string('q')->toString()) === '',
+            'data' => $this->places()->search($request->string('q')->toString(), $request->string('kind')->toString(), $request->input('location'), $request->input('session')),
         ]);
     }
 
@@ -34,7 +40,8 @@ class PlacesController extends Controller
 
         return $this->guard(fn () => [
             'success' => true,
-            'data' => $this->places->details($placeId, is_string($session) && preg_match('/^[A-Za-z0-9_-]{1,64}$/', $session) ? $session : null),
+            'provider' => $this->places()->name(),
+            'data' => $this->places()->details($placeId, is_string($session) && preg_match('/^[A-Za-z0-9_-]{1,64}$/', $session) ? $session : null),
         ]);
     }
 
@@ -46,7 +53,7 @@ class PlacesController extends Controller
         ]);
 
         try {
-            $photo = $this->places->photo($data['ref'], (int) ($data['w'] ?? 160));
+            $photo = $this->places()->photo($data['ref'], (int) ($data['w'] ?? 160));
         } catch (PlacesException $e) {
             return $this->fail($e);
         }

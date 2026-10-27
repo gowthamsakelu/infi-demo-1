@@ -9,6 +9,11 @@ import { enhanceSelects } from './shared/dropdown-filter.js';
 import { closeRowMenu } from './shared/ui.js';
 import { closeAssign } from './shared/assign-sheet.js';
 import { closeFollowUpModal } from './shared/followup-modal.js';
+import { initAccountMenu } from './shared/account-menu.js';
+import { isHostedPage } from './shared/nav.js';
+import { mountPage, unmountPage } from './shared/page-host.js';
+import { syncNavActive } from './shared/nav-ui.js';
+import { currentPage, subscribe as subscribePage } from './shared/page-state.js';
 
 // Wait (briefly) for the web fonts before the first render, so text never reflows when they arrive.
 // The boot skeleton stays on screen meanwhile; after 1.5s we render with the fallback anyway.
@@ -39,8 +44,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Global Toast Dispatcher
   window.addEventListener('show-toast', (e) => {
-    const { message, type } = e.detail;
-    showToast(message, type);
+    const { message, type, action } = e.detail;
+    showToast(message, type, action);
   });
 
   // Modal State
@@ -118,12 +123,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('boot')?.remove();
   initKeyboard();
+  initAccountMenu();
   const desktopSlot = document.getElementById('desktop-view-slot');
   const mobileSlot = document.getElementById('mobile-view-slot');
 
   // Initialize Views
   const mobileView = createMobileView(mobileSlot);
   const desktopView = createDesktopView(desktopSlot);
+
+  // Pages outside Bookings / Inquiries / Calendar live in a host: the PC one beside the sidebar, the phone one under the header.
+  function syncHostedPage() {
+    const key = currentPage();
+    const hosted = isHostedPage(key);
+    const phone = document.documentElement.dataset.layout === 'mobile';
+    document.querySelector('.desktop-content-col')?.classList.toggle('page-mode', hosted && !phone);
+    document.querySelector('.phone-device')?.classList.toggle('page-mode', hosted && phone);
+    if (hosted) mountPage(key, document.querySelector(phone ? '#mobile-page-host' : '#desktop-page-host'));
+    else unmountPage();
+    syncNavActive(key);
+  }
+  subscribePage(syncHostedPage);
+  window.addEventListener('layout-changed', syncHostedPage);
+  syncHostedPage();
 
   enhanceSelects(document); // no unstyled OS lists: every <select> uses the shared dropdown
 
@@ -175,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Toast Helper
-  function showToast(msg, type = 'info') {
+  function showToast(msg, type = 'info', action = null) {
     const container = document.getElementById('toast-container');
     if (!container) return;
     const toast = document.createElement('div');
@@ -185,13 +206,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         ${type === 'success' ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>' : '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>'}
       </svg>
       <span>${msg}</span>
+      ${action ? '<button type="button" class="toast-action"></button>' : ''}
     `;
+    if (action) {
+      const link = toast.querySelector('.toast-action');
+      link.textContent = action.label;
+      link.addEventListener('click', () => { action.onClick?.(); toast.remove(); });
+    }
     container.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(10px)';
       toast.style.transition = 'all 0.3s ease';
       setTimeout(() => toast.remove(), 300);
-    }, 3200);
+    }, action ? 6000 : 3200);
   }
 });

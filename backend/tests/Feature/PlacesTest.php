@@ -37,19 +37,31 @@ class PlacesTest extends TestCase
         ]);
     }
 
-    public function test_status_says_whether_search_is_set_up_and_never_returns_the_key(): void
+    public function test_status_names_the_provider_and_never_returns_the_key(): void
     {
-        $this->getJson('/api/places/status')->assertOk()->assertExactJson(['enabled' => false]);
+        $this->getJson('/api/places/status')->assertOk()->assertExactJson(['enabled' => true, 'provider' => 'demo']);
 
         $this->withKey();
-        $res = $this->getJson('/api/places/status')->assertOk()->assertExactJson(['enabled' => true]);
+        $res = $this->getJson('/api/places/status')->assertOk()->assertExactJson(['enabled' => true, 'provider' => 'google']);
         $this->assertStringNotContainsString('server-side-key', $res->getContent());
     }
 
-    public function test_search_without_a_key_fails_cleanly_and_does_not_call_google(): void
+    public function test_forcing_google_without_a_key_fails_cleanly_and_does_not_call_google(): void
     {
+        config(['services.places.provider' => 'google']);
         Http::fake();
+
+        $this->getJson('/api/places/status')->assertExactJson(['enabled' => false, 'provider' => 'google']);
         $this->getJson('/api/places/search?q=ganga&kind=hotel')->assertStatus(503)->assertJson(['success' => false, 'reason' => 'not_configured']);
+        Http::assertNothingSent();
+    }
+
+    public function test_google_returns_nothing_for_an_empty_box_without_a_billed_call(): void
+    {
+        $this->withKey();
+        Http::fake();
+
+        $this->getJson('/api/places/search?kind=hotel')->assertOk()->assertJsonPath('data', [])->assertJsonPath('popular', true);
         Http::assertNothingSent();
     }
 

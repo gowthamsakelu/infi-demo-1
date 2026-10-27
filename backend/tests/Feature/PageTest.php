@@ -2,13 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class PageTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_home_serves_the_shell_with_versioned_assets_and_no_stale_cache(): void
     {
-        $response = $this->get('/');
+        $response = $this->actingAs(User::demo())->get('/');
 
         $response->assertOk();
         $response->assertHeader('Cache-Control');

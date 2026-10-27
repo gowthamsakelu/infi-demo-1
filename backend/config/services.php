@@ -18,6 +18,12 @@ return [
         'key' => env('POSTMARK_API_KEY'),
     ],
 
+    // Which source answers /api/places/*: auto = Google when GOOGLE_PLACES_API_KEY is set, otherwise the demo data; google; demo.
+    'places' => [
+        'provider' => env('PLACES_PROVIDER', 'auto'),
+        'demo_file' => database_path('data/demo-places.json'),
+    ],
+
     // Google Places API (New). The key stays on the server: the browser only talks to /api/places/*.
     'google_places' => [
         'key' => env('GOOGLE_PLACES_API_KEY'),

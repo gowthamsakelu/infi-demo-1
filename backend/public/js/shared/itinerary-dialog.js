@@ -33,7 +33,7 @@ export function openDayDialog(b, { index, onChange }) {
         <div class="fu-field"><label for="itin-day-title">Day title (optional)</label><input id="itin-day-title" type="text" maxlength="80" placeholder="e.g. Arrival in Rishikesh" value="${esc(existing.title || '')}" /></div>
       </div>
       <footer class="fu-footer itin-footer">
-        <button type="button" class="btn-cancel-assign" data-sheet-close>Cancel</button>
+        <button type="button" class="btn-secondary-desktop" data-sheet-close>Cancel</button>
         <button type="button" class="btn-primary-desktop" data-itin-save>Save</button>
       </footer>`,
   });
