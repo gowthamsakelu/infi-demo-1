@@ -46,8 +46,9 @@ class UsersTest extends TestCase
 
         $rows = collect($this->getJson('/api/users')->assertOk()->json('data'));
         $this->assertCount(6, $rows);
-        $this->assertSame(['admin' => 1, 'sales' => 3, 'operations' => 2], $rows->countBy('role')->all());
-        $this->assertSame('pending', $rows->firstWhere('name', 'Pooja Nair')['status']);
+        $this->assertEquals(['admin' => 1, 'sales' => 3, 'operations' => 2], $rows->countBy('role')->all());
+        $pending = $rows->firstWhere('name', 'Deepak Chopra') ?? $rows->firstWhere('name', 'Pooja Nair');
+        $this->assertSame('pending', $pending['status']);
         $this->assertArrayNotHasKey('password', $rows[0]);
     }
 

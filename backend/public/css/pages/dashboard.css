@@ -1,0 +1,631 @@
+/* ==========================================================================
+   Dashboard Page — Ruyi Admin Travel Operations CRM
+   Matching Reference KPI Cards & Executive Management UI
+   ========================================================================== */
+
+.dash-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  background: #F8FAFC;
+}
+
+.dash-scroll-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 28px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --------------------------------------------------------------------------
+   1. Welcome & Executive Action Header
+   -------------------------------------------------------------------------- */
+.dash-welcome-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.dash-welcome-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dash-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #EFF6FF;
+  border: 1px solid #DBEAFE;
+  color: #2563EB;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  width: fit-content;
+  margin-bottom: 4px;
+}
+
+.dash-badge-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2563EB;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+  animation: dashPulse 2s infinite;
+}
+
+@keyframes dashPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(37, 99, 235, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+.dash-welcome-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.02em;
+}
+
+.dash-welcome-subtitle {
+  margin: 0;
+  font-size: 13.5px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.dash-welcome-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* --------------------------------------------------------------------------
+   2. The Six Reference KPI Cards (Exact Preservation of 2-Col Grid)
+   -------------------------------------------------------------------------- */
+.dash-cards-section {
+  width: 100%;
+}
+
+.dash-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.dash-kpi-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 16px 20px 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  cursor: pointer;
+}
+
+.dash-kpi-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+  transform: translateY(-2px);
+}
+
+.dash-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dash-kpi-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dash-kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.dash-ico-indigo  { background: #EEF2FF; color: #4F46E5; }
+.dash-ico-cyan    { background: #E0F2FE; color: #0284C7; }
+.dash-ico-emerald { background: #ECFDF5; color: #059669; }
+.dash-ico-violet  { background: #F3E8FF; color: #7C3AED; }
+.dash-ico-amber   { background: #FEF3C7; color: #D97706; }
+.dash-ico-teal    { background: #E0E7FF; color: #2563EB; }
+
+.dash-kpi-title-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-kpi-title {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #0F172A;
+  letter-spacing: -0.01em;
+}
+
+.dash-kpi-subtitle {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #64748B;
+  margin-top: 1px;
+}
+
+.dash-kpi-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-kpi-val {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.dash-kpi-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #94A3B8;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.dash-kpi-card:hover .dash-kpi-arrow {
+  transform: translateX(4px);
+  color: #2563EB;
+}
+
+.dash-kpi-divider {
+  height: 1px;
+  background: #F1F5F9;
+  margin: 12px 0 10px;
+  width: 100%;
+}
+
+.dash-kpi-bottom {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dash-kpi-indicator {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.dash-kpi-indicator:hover {
+  background: #F8FAFC;
+}
+
+.dash-status-dot {
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.dot-orange { background: #F97316; }
+.dot-blue   { background: #3B82F6; }
+.dot-green  { background: #10B981; }
+
+.dash-ind-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748B;
+  white-space: nowrap;
+}
+
+.dash-ind-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+  margin-left: auto;
+}
+
+/* --------------------------------------------------------------------------
+   3. Priority Action Center: Needs Attention
+   -------------------------------------------------------------------------- */
+.dash-attention-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dash-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dash-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-section-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.orange-tint { background: #FFF7ED; color: #EA580C; }
+.blue-tint   { background: #EFF6FF; color: #2563EB; }
+
+.dash-section-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.01em;
+}
+
+.dash-section-sub {
+  margin: 1px 0 0;
+  font-size: 12.5px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.dash-alert-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #FEF2F2;
+  border: 1px solid #FEE2E2;
+  color: #DC2626;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dash-attention-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dash-attention-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dash-attention-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+}
+
+.dash-attention-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dash-att-icon-pill {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.red-pill   { background: #FEF2F2; color: #DC2626; }
+.blue-pill  { background: #EFF6FF; color: #2563EB; }
+.green-pill { background: #ECFDF5; color: #059669; }
+
+.dash-att-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.dash-att-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.dash-att-desc {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  color: #64748B;
+  line-height: 1.45;
+  flex: 1;
+}
+
+.dash-att-footer {
+  margin-top: auto;
+}
+
+.dash-att-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #2563EB;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s ease;
+}
+
+.dash-att-btn:hover {
+  color: #1D4ED8;
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   4. Upcoming Trips & Departures Schedule Table
+   -------------------------------------------------------------------------- */
+.dash-trips-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dash-link-btn {
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2563EB;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.dash-link-btn:hover {
+  background: #EFF6FF;
+}
+
+.dash-table-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.dash-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.dash-table th {
+  background: #F8FAFC;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid #E2E8F0;
+  white-space: nowrap;
+}
+
+.dash-table td {
+  padding: 13px 16px;
+  font-size: 13px;
+  color: #334155;
+  border-bottom: 1px solid #F1F5F9;
+  vertical-align: middle;
+}
+
+.dash-table-row {
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.dash-table-row:hover {
+  background: #F8FAFC;
+}
+
+.dash-booking-id {
+  font-weight: 700;
+  color: #2563EB;
+  font-size: 12.5px;
+}
+
+.dash-trip-cell, .dash-guest-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-trip-title, .dash-guest-name {
+  font-weight: 700;
+  color: #0F172A;
+  font-size: 13.5px;
+}
+
+.dash-trip-dest, .dash-guest-phone {
+  font-size: 12px;
+  color: #64748B;
+}
+
+.dash-date-text {
+  font-size: 12.5px;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.dash-pax-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  background: #F1F5F9;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.dash-amount-val {
+  font-weight: 700;
+  color: #0F172A;
+  font-size: 13.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Loading Skeleton & Error State
+   -------------------------------------------------------------------------- */
+.dash-skeleton-wrapper {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dash-skel-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dash-skel-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-skel-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dash-skel-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #F1F5F9;
+  animation: dashPulse 1.5s infinite;
+}
+
+.dash-skel-line {
+  background: #F1F5F9;
+  border-radius: 6px;
+  animation: dashPulse 1.5s infinite;
+}
+
+.dash-skel-divider {
+  height: 1px;
+  background: #F1F5F9;
+  margin: 16px 0 12px;
+}
+
+.w-20 { width: 20%; }
+.w-25 { width: 25%; }
+.w-30 { width: 30%; }
+.w-40 { width: 40%; }
+.w-60 { width: 60%; }
+.h-14 { height: 14px; }
+.h-16 { height: 16px; }
+.h-20 { height: 20px; }
+.h-28 { height: 28px; }
+.ml-auto { margin-left: auto; }
+
+.dash-error-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  gap: 12px;
+}
+
+.dash-error-icon {
+  color: #DC2626;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Rules
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .dash-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .dash-attention-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+:where(html[data-layout="mobile"]) .dash-scroll-page {
+  padding: 16px 14px 28px;
+  gap: 16px;
+}
+
+:where(html[data-layout="mobile"]) .dash-cards-grid {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+:where(html[data-layout="mobile"]) .dash-attention-grid {
+  grid-template-columns: 1fr;
+}
+
+:where(html[data-layout="mobile"]) .dash-welcome-header {
+  flex-direction: column;
+  align-items: flex-start;
+}

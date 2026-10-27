@@ -13,13 +13,21 @@ class UserSeeder extends Seeder
         $now = now();
         // name, email, role, title, status, last active
         $team = [
-            ['Riya Sharma', 'riya@ruyitravels.com', 'sales', 'Sales Executive', 'active', $now->copy()->subMinutes(5)],
-            [config('auth.demo_name'), config('auth.demo_email'), 'admin', 'Owner', 'active', $now->copy()],
-            ['Aman Joshi', 'aman@ruyitravels.com', 'sales', 'Sales Executive', 'active', $now->copy()->subHour()],
-            ['Neha Gupta', 'neha@ruyitravels.com', 'operations', 'Operations Executive', 'active', $now->copy()->subDay()],
-            ['Vikas Rao', 'vikas@ruyitravels.com', 'operations', 'Operations Executive', 'active', $now->copy()->subDays(3)],
-            ['Pooja Nair', 'pooja@ruyitravels.com', 'sales', 'Sales Executive', 'pending', null],
+            ['Rahul Mehta', 'rahul.mehta@ruyitra.com', 'operations', 'Tour Operations Manager', 'active', $now->copy()],
+            ['Priya Sharma', 'priya.sharma@ruyitra.com', 'operations', 'Trip Coordinator', 'active', $now->copy()->subMinutes(5)],
+            ['Amit Patel', 'amit.patel@ruyitra.com', 'sales', 'Senior Dispatch Lead', 'active', $now->copy()->subHour()],
+            ['Vikram Sethi', 'vikram.sethi@ruyitra.com', 'sales', 'Fleet & Logistics Lead', 'active', $now->copy()->subDay()],
+            ['Karan Sapalia', config('auth.demo_email') ?: 'karan.sapalia@ruyitra.com', 'admin', 'Head of Operations', 'active', $now->copy()->subDays(2)],
+            ['Deepak Chopra', 'deepak.chopra@ruyitra.com', 'sales', 'Sales Executive', 'pending', null],
         ];
+
+        foreach ($team as [$name, $email, $role, $title, $status, $last]) {
+            $user = User::firstOrNew(['email' => $email]);
+            if (!$user->exists) {
+                $user->password = str()->random(40);
+            }
+            $user->fill(['name' => $name, 'role' => $role, 'title' => $title, 'status' => $status, 'last_active_at' => $last])->save();
+        }
 
         foreach ($team as [$name, $email, $role, $title, $status, $last]) {
             $user = User::firstOrNew(['email' => $email]);

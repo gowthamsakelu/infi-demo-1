@@ -15,12 +15,17 @@ class UpdateUserPermissionsRequest extends FormRequest
 
     public function rules(): array
     {
-        $rules = ['permissions' => ['required', 'array']];
+        $rules = [
+            'permissions' => ['required', 'array'],
+            'features' => ['nullable', 'array'],
+        ];
         foreach (array_keys(Permissions::MODULES) as $module) {
             $rules["permissions.$module"] = ['required', 'array'];
             foreach (Permissions::ACTIONS as $action) {
                 $rules["permissions.$module.$action"] = ['required', 'boolean'];
             }
+            $rules["permissions.$module.add"] = ['nullable', 'boolean'];
+            $rules["permissions.$module.download"] = ['nullable', 'boolean'];
         }
 
         return $rules;
