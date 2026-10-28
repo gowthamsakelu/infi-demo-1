@@ -3,7 +3,7 @@
 import { placeAsPushed } from './push.js';
 import { STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST } from '../data.js';
 import { icon } from './icons.js';
-import { esc, toast, initials, dismissOnOutside, openWhatsApp, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
+import { esc, toast, initials, dismissOnOutside, backdropDismiss, fromRowMenu, openWhatsApp, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { applyInquiryUpdates } from './inquiry-store.js';
 
@@ -51,7 +51,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
   const noun = kind === 'inquiry' ? 'Inquiries' : kind === 'itinerary' ? 'Events' : 'Bookings';
   const first = items[0];
   const ov = document.createElement('div');
-  ov.className = 'asg-overlay';
+  ov.className = `asg-overlay${fromRowMenu() ? ' from-menu' : ''}`; // from a row's ⋮ menu: a full-height screen from the right
   ov.innerHTML = `
     <div class="asg-sheet" role="dialog" aria-modal="true" aria-labelledby="asg-title">
       <div class="filter-handle" aria-hidden="true"></div>
@@ -119,10 +119,11 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
 
   const stopOutside = dismissOnOutside($('.asg-sheet'), closeAssign);
   const stopSheet = bindSheet(ov, $('.asg-sheet'), closeAssign);
-  const stop = () => { stopOutside(); stopSheet(); };
+  const stopBackdrop = backdropDismiss(ov, closeAssign);
+  const stop = () => { stopOutside(); stopSheet(); stopBackdrop(); };
 
   ov.addEventListener('click', (e) => {
-    if (e.target === ov || e.target.closest('[data-asg-close]')) return closeAssign();
+    if (e.target.closest('[data-asg-close]')) return closeAssign();
     const t = e.target.closest('[data-asg-tab]');
     if (t) {
       tab = t.dataset.asgTab; query = ''; filter = ''; $('#asg-search').value = '';

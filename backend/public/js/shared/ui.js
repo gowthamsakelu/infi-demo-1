@@ -151,9 +151,17 @@ export function checkbox({ checked, attr, id, label }) {
 }
 
 /** Close `el` on outside click or Esc. Returns a disposer. */
+/** A layer opened by a tap ignores outside presses for this long, so the tap (or its ghost click) that opened it cannot close it. */
+export const OPEN_GUARD_MS = 350;
+export function armedAfterOpen() {
+  const opened = performance.now();
+  return () => performance.now() - opened > OPEN_GUARD_MS;
+}
+
 export function dismissOnOutside(el, onClose, ignore = []) {
+  const armed = armedAfterOpen();
   const down = (e) => {
-    if (el.contains(e.target) || ignore.some((n) => n && n.contains(e.target))) return;
+    if (!armed() || el.contains(e.target) || ignore.some((n) => n && n.contains(e.target))) return;
     onClose();
   };
   // Esc is used up by the open overlay, so nothing behind it (such as the detail pane) reacts to the same key press.
@@ -167,6 +175,28 @@ export function dismissOnOutside(el, onClose, ignore = []) {
     document.removeEventListener('keydown', key);
   };
 }
+
+/**
+ * Backdrop press-to-close: only when the press AND the click both began on the backdrop itself, and not during OPEN_GUARD_MS after opening.
+ * A drag that starts inside the sheet and ends on the backdrop, or the tap that opened the layer, does not close it.
+ */
+export function backdropDismiss(overlay, onClose) {
+  const armed = armedAfterOpen();
+  let pressedOnBackdrop = false;
+  const down = (e) => { pressedOnBackdrop = e.target === overlay; };
+  const click = (e) => {
+    const start = pressedOnBackdrop;
+    pressedOnBackdrop = false;
+    if (start && armed() && e.target === overlay) onClose();
+  };
+  overlay.addEventListener('pointerdown', down);
+  overlay.addEventListener('click', click);
+  return () => { overlay.removeEventListener('pointerdown', down); overlay.removeEventListener('click', click); };
+}
+
+/** True while an action chosen from a row's ⋮ menu runs: the screen it opens comes in from the right (see .from-menu in ui-standard.css). */
+let inRowMenu = false;
+export const fromRowMenu = () => inRowMenu;
 
 /**
  * Floating menu anchored to a trigger. Fixed-positioned so scroll containers never clip it.
@@ -220,8 +250,10 @@ export function openRowMenu(trigger, items, onSelect) {
   menu.addEventListener('click', (e) => {
     const b = e.target.closest('[data-menu-key]');
     if (!b) return;
+    e.stopPropagation(); // the tap that picks an item is not a tap on anything under the menu
     close();
-    onSelect(b.dataset.menuKey);
+    inRowMenu = true;
+    try { onSelect(b.dataset.menuKey); } finally { inRowMenu = false; }
   });
   menu.addEventListener('keydown', (e) => {
     const btns = [...menu.querySelectorAll('button')];

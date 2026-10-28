@@ -5,7 +5,7 @@ import { createMobileTeam } from './team-mobile.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, esc, jsq, skeletonCards, errorState } from './shared/ui.js';
+import { searchBox, emptyState, toast, openRowMenu, fromRowMenu, esc, jsq, skeletonCards, errorState } from './shared/ui.js';
 import { renderTabs, bindQuickNotes, rowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal, openBookingFollowUp } from './shared/followup-modal.js';
@@ -962,8 +962,10 @@ export function createMobileView(container, options = {}) {
 
     const backdrop = container.querySelector('#mobile-sheet-backdrop');
     const sheet = container.querySelector('#mobile-bottom-sheet');
-    if (backdrop) backdrop.classList.add('open');
-    if (sheet) sheet.classList.add('open');
+    // Opened from a row's ⋮ menu: a full-height screen that slides in from the right, with no dimmed backdrop
+    const fromMenu = fromRowMenu();
+    if (backdrop) backdrop.classList.toggle('open', !fromMenu);
+    if (sheet) { sheet.classList.toggle('from-menu', fromMenu); sheet.classList.add('open'); }
 
     // Ensure bottom nav is hidden so it never peeks beneath sheet
     const bottomNav = container.querySelector('.mobile-bottom-nav');

@@ -1,7 +1,7 @@
 // Generic sheet/dialog built on the shared overlay (same motion, scroll lock, keyboard handling as Assign and Follow-up).
 // Phones: bottom sheet. Larger screens: centered dialog. Nothing is focused on open.
 // Sheets stack: only the top one reacts to Esc, outside clicks and swipes, and Tab stays inside it.
-import { esc, dismissOnOutside, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
+import { esc, dismissOnOutside, bindSheet, backdropDismiss, fromRowMenu, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { icon } from './icons.js';
 import { placeAsPushed, closeFlow } from './push.js';
 
@@ -41,6 +41,7 @@ export function openSheet({ html, cls = '', label = 'Dialog', beforeClose = null
   ov.innerHTML = modal
     ? `<div class="modal-card ${cardCls} ${cls}" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1">${html}</div>`
     : `<div class="asg-sheet ${cls}" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1"><div class="filter-handle" aria-hidden="true"></div>${html}</div>`;
+  if (!modal && fromRowMenu()) ov.classList.add('from-menu'); // opened from a row's ⋮ menu: a full-height screen from the right
   document.body.appendChild(ov);
   if (!modal) placeAsPushed(ov);
   const sheet = ov.querySelector(modal ? '.modal-card' : '.asg-sheet');
@@ -82,7 +83,8 @@ export function openSheet({ html, cls = '', label = 'Dialog', beforeClose = null
   // A press inside another layer (the Assign sheet, a confirm that is closing) is not a press outside this one.
   const stopOutside = dismissOnOutside(sheet, request, [{ contains: (t) => { const layer = t.closest?.('.sheet-overlay, .asg-overlay'); return !!layer && layer !== ov; } }]);
   const stopSheet = modal ? () => {} : bindSheet(ov, sheet, request);
-  ov.addEventListener('click', (e) => { if (e.target === ov || e.target.closest('[data-sheet-close]')) request(); });
+  const stopBackdrop = modal ? () => {} : backdropDismiss(ov, request);
+  ov.addEventListener('click', (e) => { if (e.target.closest('[data-sheet-close]')) request(); });
   ov.addEventListener('keydown', (e) => {
     if (e.key !== 'Tab' || !isTop()) return;
     const items = [...sheet.querySelectorAll(FOCUSABLE)].filter((el) => el.getClientRects().length);

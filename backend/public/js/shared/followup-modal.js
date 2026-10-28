@@ -1,7 +1,7 @@
 // Schedule / Follow-up: the same shared sheet as Assign (bottom sheet below 1100px, centered modal above).
 import { placeAsPushed } from './push.js';
 import { icon } from './icons.js';
-import { esc, toast, dismissOnOutside, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
+import { esc, toast, dismissOnOutside, backdropDismiss, bindSheet, fromRowMenu, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { addFollowUpLocal } from './followups.js';
 
@@ -41,21 +41,22 @@ export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
   const defTime = `${pad(when.getHours())}:00`;
 
   overlay = document.createElement('div');
-  overlay.className = 'fu-overlay asg-overlay';
+  overlay.className = `fu-overlay asg-overlay${fromRowMenu() ? ' from-menu' : ''}`; // from a row's ⋮ menu: a full-height screen from the right
   overlay.innerHTML = `
     <div class="fu-card asg-sheet" role="dialog" aria-modal="true" aria-labelledby="fu-title">
       <div class="filter-handle" aria-hidden="true"></div>
       <header class="fu-header">
-        <div style="min-width:0;">
+        <button type="button" class="dialog-back" data-fu-close aria-label="Back">${icon('arrowLeft', { size: 20, stroke: 2.2 })}</button>
+        <div class="fu-title-col">
           <h3 id="fu-title">Schedule / Follow-up</h3>
-          <p class="fu-sub">${esc(inquiry.customer_name)} • ${esc(inquiry.trip)}</p>
+          <p class="fu-sub">${esc(`${inquiry.customer_name} • ${inquiry.trip}`)}</p>
         </div>
         <button type="button" class="sheet-close-btn" data-fu-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button>
       </header>
       <form class="fu-body" novalidate>
         <div class="fu-toggle" role="radiogroup" aria-label="Entry type">
           <button type="button" role="radio" aria-checked="true" class="active" data-fu-type="follow_up">Follow-up</button>
-          <button type="button" role="radio" aria-checked="false" data-fu-type="called">Called ${icon('chevronDown', { size: 14, stroke: 2.5 })}</button>
+          <button type="button" role="radio" aria-checked="false" data-fu-type="called">Called</button>
           <button type="button" role="radio" aria-checked="false" data-fu-type="cc">CC</button>
         </div>
         <div class="fu-field" data-fu-outcome-row hidden>
@@ -82,6 +83,7 @@ export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
       </form>
       <footer class="fu-footer">
         <button type="button" class="btn-primary-desktop fu-save" data-fu-save>Save Follow-up</button>
+        <button type="button" class="btn-secondary-desktop fu-cancel" data-fu-close>Cancel</button>
       </footer>
     </div>`;
   document.body.appendChild(overlay);
@@ -114,7 +116,7 @@ export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
   outcome.setValue(OUTCOMES[0]);
 
   overlay.addEventListener('click', async (e) => {
-    if (e.target === overlay || e.target.closest('[data-fu-close]')) return closeFollowUpModal();
+    if (e.target.closest('[data-fu-close]')) return closeFollowUpModal();
 
     const t = e.target.closest('[data-fu-type]');
     if (t) {
@@ -134,7 +136,8 @@ export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
   overlay.addEventListener('keydown', trapTab);
   const stopOutside = dismissOnOutside($('.fu-card'), closeFollowUpModal);
   const stopSheet = bindSheet(overlay, $('.fu-card'), closeFollowUpModal);
-  dispose = () => { stopOutside(); stopSheet(); outcome.close(); };
+  const stopBackdrop = backdropDismiss(overlay, closeFollowUpModal);
+  dispose = () => { stopOutside(); stopSheet(); stopBackdrop(); outcome.close(); };
   $('.fu-card').tabIndex = -1;
   $('.fu-card').focus({ preventScroll: true }); // the dialog, not a field
 
