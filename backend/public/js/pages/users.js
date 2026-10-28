@@ -9,6 +9,15 @@ import { esc, toast, initials } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { confirmDialog } from '../shared/sheet.js';
 import { detailGrid, rowGroup, linkRow } from '../shared/page-ui.js';
+import { OPERATIONS_TEAM_MEMBERS } from '../shared/team-data.js';
+
+function formatCardLocation(loc) {
+  if (!loc) return 'Mumbai HQ';
+  const main = loc.split('—')[0].trim();
+  return main
+    .replace(/\s+Logistics\s+Hub/i, ' Hub')
+    .replace(/\s+Ops\s+Base/i, ' Base');
+}
 
 const ACTIONS = ['view', 'add', 'edit', 'delete', 'download'];
 const ACTION_LABELS = { view: 'VIEW', add: 'ADD', edit: 'EDIT', delete: 'DELETE', download: 'DOWNLOAD' };
@@ -250,25 +259,85 @@ export default {
       if (page && page.api.current()?.id === item.id) page.api.refresh();
     }
 
-    /* ---------- Left User List Row Card ---------- */
+    /* ---------- Left User List Row Card (Operation Team Design & Components) ---------- */
     function renderUserRow(u) {
       const sKey = statusKey(u);
       const isDc = u.name === 'Deepak Chopra' || !u.avatar;
-      const avHtml = u.avatar && !isDc
-        ? `<div class="us-card-av-box"><img src="${esc(u.avatar)}" alt="${esc(u.name)}" class="us-card-avatar-img" /><span class="us-card-dot is-${sKey}"></span></div>`
-        : `<div class="us-card-av-box"><span class="us-card-initials-avatar">${esc(initials(u.name))}</span><span class="us-card-dot is-${sKey}"></span></div>`;
+      const inits = initials(u.name);
+      const tm = OPERATIONS_TEAM_MEMBERS.find((m) => m.name.toLowerCase() === u.name.toLowerCase()) || null;
 
+      const empId = tm?.employeeId || (u.id ? `EMP-${String(u.id).padStart(3, '0')}` : 'EMP-2024-001');
       const roleClass = roleBadgeClass(u.roleLabel);
-      const statusLabel = u.displayStatus || STATUS_NAMES[u.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : 'Active'));
+
+      let dotClass = 'available';
+      if (sKey === 'transit') dotClass = 'in-transit';
+      else if (sKey === 'pending' || sKey === 'inactive') dotClass = 'on-leave';
+
+      const statusLabel = u.displayStatus || STATUS_NAMES[u.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : (sKey === 'inactive' ? 'Inactive' : 'Available')));
       const pillCls = statusPillClass(sKey);
 
+      const jobRole = tm?.role || u.title || `${u.roleLabel} • Operations`;
+      const tripsCount = tm?.metrics?.activeTrips ?? (sKey === 'pending' ? 1 : 4);
+      const locFull = tm?.officeLocation || 'Mumbai HQ — Operations Wing';
+      const locShort = formatCardLocation(locFull);
+      const exp = tm?.experience || '3.5 Years';
+      const phone = tm?.phone || u.phone || '+91 98765 00111';
+      const email = u.email || tm?.email || 'user@ruyitra.com';
+
+      const avHtml = u.avatar && !isDc
+        ? `<img src="${esc(u.avatar)}" alt="${esc(u.name)}" class="team-avatar-img" />`
+        : `<div class="team-avatar-initials">${esc(inits)}</div>`;
+
+      const customHtml = `
+        <div class="team-card-left">
+          <div class="team-avatar-container">
+            ${avHtml}
+            <span class="team-avatar-dot ${dotClass}"></span>
+          </div>
+          <div class="team-card-info">
+            <div class="team-card-title-line">
+              <span class="team-card-name card-title">${esc(u.name)}</span>
+              <span class="team-emp-tag">${esc(empId)}</span>
+              <span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>
+            </div>
+            <div class="team-card-status-line">
+              <span class="status-pill is-${sKey} ${pillCls}">
+                <span class="dot"></span>
+                ${esc(statusLabel)}
+              </span>
+            </div>
+            <p class="team-card-role">${esc(jobRole)}</p>
+            <div class="team-card-meta-line">
+              <span class="badge-trips-pill">${tripsCount} Trips</span>
+              <span class="team-meta-dot">•</span>
+              <span class="team-meta-loc" title="${esc(locFull)}">${esc(locShort)}</span>
+              <span class="team-meta-dot">•</span>
+              <span class="team-meta-exp">${esc(exp)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card-actions">
+          <button type="button" class="circle-action-btn" data-action-call="${esc(phone)}" title="Call ${esc(u.name)}" aria-label="Call ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='tel:${esc(phone)}';">
+            ${icon('phone', { size: 14, stroke: 2.2 })}
+          </button>
+          <button type="button" class="circle-action-btn" data-action-mail="${esc(email)}" title="Email ${esc(u.name)}" aria-label="Email ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='mailto:${esc(email)}';">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </button>
+          <span class="circle-action-btn is-chevron" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </div>
+      `;
+
       return {
+        custom: customHtml,
         raw: true,
         tile: avHtml,
         name: u.name,
         pill: `<span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>`,
-        sub: `<span class="us-card-email">${esc(u.email)}</span>`,
-        meta: `<span class="us-card-status is-${sKey} status-pill ${pillCls}"><span class="us-card-status-dot dot"></span>${esc(statusLabel)}</span><span class="us-card-chevron">${icon('chevronRight', { size: 14, stroke: 2.2 })}</span>`,
+        sub: `<span class="us-card-email">${esc(email)}</span>`,
+        meta: `<span class="us-card-status is-${sKey} status-pill ${pillCls}"><span class="us-card-status-dot dot"></span>${esc(statusLabel)}</span>`,
       };
     }
 

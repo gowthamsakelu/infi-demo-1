@@ -219,6 +219,11 @@ export function createSplitPage(host, ctx, cfg) {
     listEl.innerHTML = rows.map((item) => {
       const r = cfg.row(item);
       const on = String(item.id) === String(state.selected) && !phone;
+      if (r.custom) {
+        return `<div class="booking-card list-row-card sp-row ${on ? 'active' : ''}" role="option" id="sp-opt-${esc(item.id)}" aria-selected="${on}" data-sp-id="${esc(item.id)}">
+          ${r.custom}
+        </div>`;
+      }
       return `<div class="booking-card list-row-card sp-row ${on ? 'active' : ''}" role="option" id="sp-opt-${esc(item.id)}" aria-selected="${on}" data-sp-id="${esc(item.id)}">
         <div class="row-lead-col"><div class="row-avatar" aria-hidden="true">${r.tile}</div></div>
         <div class="card-info-col">
