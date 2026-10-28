@@ -9877,3 +9877,306 @@ body,
     gap: 14px;
   }
 }
+
+/* Mobile Operations Team Roster & Cards (Matching Mobile Design Spec) */
+.mobile-team-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.mobile-team-page .team-roster-header {
+  padding: 12px 0 8px 0;
+  background: transparent;
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobile-team-page .compact-search-bar {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  height: 38px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.mobile-team-page .compact-search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: #0F172A;
+  font-family: inherit;
+  width: 100%;
+}
+
+.mobile-team-page .team-add-member-btn {
+  height: 38px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 14px;
+}
+
+.mobile-team-page .compact-tabs-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 0 2px 0;
+}
+
+.mobile-team-page .compact-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-team-page .compact-tab-btn {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.mobile-team-page .compact-tab-btn.active {
+  background: #2563EB !important;
+  border-color: #2563EB !important;
+  color: #FFFFFF !important;
+}
+
+.mobile-team-page .team-roster-list {
+  padding: 4px 0 100px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: visible;
+}
+
+.mobile-team-page .team-roster-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mobile-team-page .team-roster-card:active {
+  background: #F8FAFC;
+}
+
+.mobile-team-page .team-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mobile-team-page .team-avatar-container {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mobile-team-page .team-avatar-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #E2E8F0;
+  display: block;
+}
+
+.mobile-team-page .team-avatar-initials {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #EFF6FF;
+  color: #2563EB;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #DBEAFE;
+}
+
+.mobile-team-page .team-avatar-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+}
+
+.mobile-team-page .team-avatar-dot.available { background: #10B981; }
+.mobile-team-page .team-avatar-dot.in-transit { background: #F59E0B; }
+.mobile-team-page .team-avatar-dot.on-leave { background: #F97316; }
+
+.mobile-team-page .team-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mobile-team-page .team-card-title-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mobile-team-page .team-card-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  white-space: nowrap;
+}
+
+.mobile-team-page .team-emp-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #475569;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.2px;
+}
+
+.team-card-status-line {
+  display: flex;
+  align-items: center;
+  margin: 2px 0 1px 0;
+}
+
+.team-card-status-line .status-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1.5px 8px;
+  border-radius: 9999px;
+  gap: 4px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.team-card-status-line .status-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.mobile-team-page .team-card-role {
+  font-size: 12px;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 1px 0;
+}
+
+.mobile-team-page .team-card-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #64748B;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.mobile-team-page .badge-trips-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1.5px 7px;
+  border-radius: 9999px;
+  background: #EFF6FF;
+  color: #2563EB;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid #DBEAFE;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mobile-team-page .team-meta-dot {
+  color: #CBD5E1;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.mobile-team-page .team-meta-loc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.mobile-team-page .team-meta-exp {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mobile-team-page .team-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mobile-team-page .circle-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #BFDBFE;
+  background: #EFF6FF;
+  color: #2563EB;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+}
+
+.mobile-team-page .circle-action-btn:hover {
+  background: #DBEAFE;
+  color: #1D4ED8;
+  border-color: #93C5FD;
+}
+
+.mobile-team-page .circle-action-btn.is-chevron {
+  border: none;
+  background: transparent;
+  color: #94A3B8;
+  width: 18px;
+  box-shadow: none;
+  cursor: default;
+}

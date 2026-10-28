@@ -13,24 +13,30 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
   // Mount the basic DOM structure
   host.innerHTML = `
     <div class="mobile-team-page">
-      <!-- Search Row -->
-      <div class="mobile-team-search-row" style="display: flex; align-items: center; gap: 8px;">
-        <div style="flex: 1;">
-          ${searchBox({ id: 'mobile-team-search-input', placeholder: 'Search members by name or role...', value: searchQuery, variant: 'mobile' })}
+      <div class="team-roster-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+          <h3 style="font-size: 15px; font-weight: 700; color: #0F172A; margin: 0;">Operations Team</h3>
+          <span class="mobile-team-duty-pill" style="font-size: 11.5px; font-weight: 600; color: #2563EB; background: #EFF6FF; padding: 2px 8px; border-radius: 9999px;">${OPERATIONS_TEAM_MEMBERS.length} on duty</span>
         </div>
-        <button type="button" class="team-add-member-btn" id="mobile-btn-add-team-member" title="Add Member" aria-label="Add Member" style="height: 42px; border-radius: 10px; padding: 0 12px;">
-          ${icon('plus', { size: 15, stroke: 2.4 })}
-          <span>Add Member</span>
-        </button>
+
+        <div class="team-search-row">
+          <div class="compact-search-bar" style="flex: 1;">
+            ${icon('search', { size: 14 })}
+            <input type="text" id="mobile-team-search-input" placeholder="Search team members..." value="${esc(searchQuery)}" aria-label="Search team members" />
+            <button id="mobile-team-search-clear" style="background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 13px; padding: 0 4px; display: none;" title="Clear search">✕</button>
+          </div>
+          <button type="button" class="team-add-member-btn" id="mobile-btn-add-team-member" title="Add Member" aria-label="Add Member">
+            ${icon('plus', { size: 15, stroke: 2.4 })}
+            <span>Add Member</span>
+          </button>
+        </div>
+
+        <div class="compact-tabs-nav tabs-scroller" id="mobile-team-filter-tabs" style="margin-top: 4px; margin-bottom: 2px; padding-bottom: 2px;">
+          <!-- Rendered dynamically -->
+        </div>
       </div>
 
-      <!-- Status Filter Tabs / Pills -->
-      <div class="mobile-team-tabs-scroller" id="mobile-team-filter-tabs">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <!-- Team Members Cards List -->
-      <div class="mobile-team-cards-list" id="mobile-team-cards-list">
+      <div class="team-roster-list" id="mobile-team-cards-list">
         <!-- Rendered dynamically -->
       </div>
     </div>
@@ -68,10 +74,21 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
 
   const $ = (sel) => host.querySelector(sel);
   const searchInput = $('#mobile-team-search-input');
+  const clearSearchBtn = $('#mobile-team-search-clear');
   const filterTabsContainer = $('#mobile-team-filter-tabs');
   const cardsListContainer = $('#mobile-team-cards-list');
   const backdropEl = $('#mobile-team-backdrop');
   const sheetEl = $('#mobile-team-sheet');
+
+  function getStatusPill(m) {
+    if (m.statusType === 'available') {
+      return { cls: 'status-paid', label: 'Available' };
+    }
+    if (m.statusType === 'in-transit') {
+      return { cls: 'status-part-paid', label: 'In Transit' };
+    }
+    return { cls: 'status-pending', label: 'On Leave' };
+  }
 
   function formatCardLocation(loc) {
     if (!loc) return '';
@@ -94,7 +111,8 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
           m.name.toLowerCase().includes(q) ||
           m.role.toLowerCase().includes(q) ||
           m.department.toLowerCase().includes(q) ||
-          m.officeLocation.toLowerCase().includes(q)
+          m.officeLocation.toLowerCase().includes(q) ||
+          (m.employeeId && m.employeeId.toLowerCase().includes(q))
         );
       }
       return true;
@@ -110,18 +128,17 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
     };
 
     const tabs = [
-      { key: 'ALL', label: 'All' },
-      { key: 'available', label: 'Available' },
-      { key: 'in-transit', label: 'In Transit' },
-      { key: 'on-leave', label: 'On Leave' },
+      { key: 'ALL', label: 'All', count: counts.ALL },
+      { key: 'available', label: 'Available', count: counts.available },
+      { key: 'in-transit', label: 'In Transit', count: counts['in-transit'] },
+      { key: 'on-leave', label: 'On Leave', count: counts['on-leave'] },
     ];
 
     filterTabsContainer.innerHTML = tabs
       .map(
         (t) => `
-        <button type="button" class="mobile-team-tab-btn ${activeStatusFilter === t.key ? 'active' : ''}" data-team-filter="${t.key}">
-          <span>${t.label}</span>
-          <span class="mobile-team-tab-count">${counts[t.key] || 0}</span>
+        <button type="button" class="compact-tab-btn ${activeStatusFilter === t.key ? 'active' : ''}" data-team-filter="${t.key}">
+          ${t.label} (${t.count})
         </button>
       `
       )
@@ -143,7 +160,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
       cardsListContainer.innerHTML = `
         <div class="team-empty-state" style="padding: 40px 16px; text-align: center; color: #64748B;">
           <p style="font-size: 14px; margin: 0 0 10px;">No team members found matching "<strong>${esc(searchQuery)}</strong>"</p>
-          <button type="button" class="team-btn-reset-search" id="mobile-team-reset-filter" style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #2563EB; border-radius: 8px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer;">
+          <button type="button" class="btn-secondary-desktop" id="mobile-team-reset-filter" style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #2563EB; border-radius: 8px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer;">
             Show All Members
           </button>
         </div>
@@ -151,6 +168,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
       $('#mobile-team-reset-filter')?.addEventListener('click', () => {
         searchQuery = '';
         if (searchInput) searchInput.value = '';
+        if (clearSearchBtn) clearSearchBtn.style.display = 'none';
         activeStatusFilter = 'ALL';
         renderFilterTabs();
         renderCards();
@@ -160,61 +178,60 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
 
     cardsListContainer.innerHTML = list
       .map((m) => {
-        const statusDotClass =
-          m.statusType === 'available'
-            ? 'status-dot-green'
-            : m.statusType === 'in-transit'
-              ? 'status-dot-blue'
-              : 'status-dot-amber';
-        const statusPillClass =
-          m.statusType === 'available'
-            ? 'pill-available'
-            : m.statusType === 'in-transit'
-              ? 'pill-in-transit'
-              : 'pill-on-leave';
+        const status = getStatusPill(m);
+        const inits = initials(m.name);
+        const isSelected = m.id === selectedMemberId;
 
         return `
-          <div class="mobile-team-member-card" data-member-id="${m.id}" role="button" tabindex="0">
-            <div class="mobile-team-card-left">
-              <div class="mobile-team-avatar-box">
-                <img src="${m.avatar}" alt="${esc(m.name)}" class="mobile-team-avatar" />
-                <span class="mobile-team-status-dot ${statusDotClass}" title="${esc(m.status)}"></span>
+          <div class="team-roster-card ${isSelected ? 'active' : ''}" data-member-id="${esc(m.id)}" role="button" tabindex="0">
+            <div class="team-card-left">
+              <div class="team-avatar-container">
+                ${m.avatar ? `<img src="${esc(m.avatar)}" alt="${esc(m.name)}" class="team-avatar-img" />` : `<div class="team-avatar-initials">${esc(inits)}</div>`}
+                <span class="team-avatar-dot ${m.statusType}"></span>
               </div>
-              <div class="mobile-team-info">
-                <div class="mobile-team-name-row">
-                  <h4 class="mobile-team-name">${esc(m.name)}</h4>
-                  <span class="team-emp-id-badge">${esc(m.id)}</span>
-                  <span class="team-status-pill ${statusPillClass}">${esc(m.status)}</span>
+              <div class="team-card-info">
+                <div class="team-card-title-line">
+                  <span class="team-card-name">${esc(m.name)}</span>
+                  ${m.employeeId ? `<span class="team-emp-tag">${esc(m.employeeId)}</span>` : ''}
                 </div>
-                <p class="mobile-team-role">${esc(m.role)}</p>
-                <div class="mobile-team-meta-row">
-                  <span class="team-trips-count-badge">${m.metrics.activeTrips} trips</span>
-                  <span>•</span>
-                  <span>${esc(formatCardLocation(m.officeLocation))}</span>
-                  <span>•</span>
-                  <span>${esc(m.experience)}</span>
+                <div class="team-card-status-line">
+                  <span class="status-pill ${status.cls}">
+                    <span class="dot"></span>
+                    ${esc(status.label)}
+                  </span>
+                </div>
+                <p class="team-card-role">${esc(m.role)}</p>
+                <div class="team-card-meta-line">
+                  <span class="badge-trips-pill">${m.metrics?.activeTrips ?? 0} Trips</span>
+                  <span class="team-meta-dot">•</span>
+                  <span class="team-meta-loc" title="${esc(m.officeLocation)}">${esc(formatCardLocation(m.officeLocation))}</span>
+                  <span class="team-meta-dot">•</span>
+                  <span class="team-meta-exp">${esc(m.experience)}</span>
                 </div>
               </div>
             </div>
 
-            <div class="mobile-team-card-actions">
-              <a href="tel:${esc(m.phone)}" class="mobile-team-action-icon-btn btn-call" title="Call ${esc(m.phone)}" onclick="event.stopPropagation();">
+            <div class="team-card-actions">
+              <button type="button" class="circle-action-btn" data-action-call="${esc(m.phone)}" title="Call ${esc(m.name)}" aria-label="Call ${esc(m.name)}">
                 ${icon('phone', { size: 14, stroke: 2.2 })}
-              </a>
-              <a href="mailto:${esc(m.email)}" class="mobile-team-action-icon-btn btn-mail" title="Email ${esc(m.email)}" onclick="event.stopPropagation();">
-                ${icon('mail', { size: 14, stroke: 2 })}
-              </a>
-              <button type="button" class="mobile-team-action-icon-btn btn-view" title="View Profile" aria-label="View Profile">
-                ${icon('chevronRight', { size: 15 })}
               </button>
+              <button type="button" class="circle-action-btn" data-action-mail="${esc(m.email)}" title="Email ${esc(m.name)}" aria-label="Email ${esc(m.name)}">
+                ${icon('mail', { size: 14, stroke: 2 })}
+              </button>
+              <span class="circle-action-btn is-chevron" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
             </div>
           </div>
         `;
       })
       .join('');
 
-    cardsListContainer.querySelectorAll('.mobile-team-member-card').forEach((card) => {
-      card.addEventListener('click', () => {
+    cardsListContainer.querySelectorAll('.team-roster-card').forEach((card) => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.circle-action-btn') && !e.target.closest('.is-chevron')) {
+          return;
+        }
         const id = card.dataset.memberId;
         if (id) openDetailSheet(id);
       });
@@ -224,6 +241,22 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
           const id = card.dataset.memberId;
           if (id) openDetailSheet(id);
         }
+      });
+    });
+
+    cardsListContainer.querySelectorAll('[data-action-call]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const phone = btn.dataset.actionCall;
+        if (phone) window.location.href = `tel:${phone}`;
+      });
+    });
+
+    cardsListContainer.querySelectorAll('[data-action-mail]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const email = btn.dataset.actionMail;
+        if (email) window.location.href = `mailto:${email}`;
       });
     });
   }
@@ -717,6 +750,16 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value.trim();
+      if (clearSearchBtn) clearSearchBtn.style.display = searchQuery ? 'block' : 'none';
+      renderCards();
+    });
+  }
+
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+      searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      clearSearchBtn.style.display = 'none';
       renderCards();
     });
   }
