@@ -1,6 +1,7 @@
 import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, getSpecialReqIconSvg } from './data.js';
 import { icon } from './shared/icons.js';
 import { createMobileCalendar } from './calendar-mobile.js';
+import { createMobileTeam } from './team-mobile.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
@@ -100,6 +101,7 @@ export function createMobileView(container, options = {}) {
         <div class="bookings-cards-list row-list" id="mobile-cards-list"></div>
         </div>
         <div id="mobile-calendar-page" hidden></div>
+        <div id="mobile-team-page" hidden></div>
       </div>
 
       <div id="mobile-page-host" class="mobile-screen-content"></div>
@@ -1301,6 +1303,9 @@ export function createMobileView(container, options = {}) {
       isActive: () => page === 'calendar' && document.documentElement.dataset.layout === 'mobile',
       onOpen: (b) => openModal(b),
     });
+    const team = createMobileTeam(container.querySelector('#mobile-team-page'), {
+      onViewBooking: (bId) => navigate('bookings', { q: bId })
+    });
 
     // Page routing: Bookings <-> Inquiries share one list, one detail panel
     const subtitleEl = container.querySelector('#mobile-header-subtitle');
@@ -1322,11 +1327,13 @@ export function createMobileView(container, options = {}) {
       container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
       if (page === 'calendar') setAddAction(null);
       else setAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') })); // Bookings has no add flow of its own: it opens the same one
-      container.querySelector('#mobile-bookings-page').hidden = page === 'calendar';
+      container.querySelector('#mobile-bookings-page').hidden = page === 'calendar' || page === 'team';
       container.querySelector('#mobile-calendar-page').hidden = page !== 'calendar';
+      container.querySelector('#mobile-team-page').hidden = page !== 'team';
       container.querySelector('#mobile-screen-scroll')?.classList.toggle('calendar-mode', page === 'calendar');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
-      if (subtitleEl) subtitleEl.textContent = page === 'calendar' ? 'Calendar' : page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
+      if (page === 'team') { if (changed) team.activate(); else team.render(); }
+      if (subtitleEl) subtitleEl.textContent = page === 'calendar' ? 'Calendar' : page === 'team' ? 'Operations Team' : page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
       if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking';
       applyParams();

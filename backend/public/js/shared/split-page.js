@@ -147,6 +147,7 @@ export function createSplitPage(host, ctx, cfg) {
           <div class="desktop-table-container">
             <div class="desktop-compact-list-view">
               <div class="compact-list-header">
+                ${cfg.listTitle ? `<div class="compact-header-title-row"><h3 class="compact-header-title">${esc(cfg.listTitle)}</h3></div>` : ''}
                 <div class="compact-header-top">
                   <div class="compact-search-bar">${icon('search', { size: 15 })}<input type="text" id="sp-search-${key}" placeholder="${esc(cfg.searchPlaceholder)}" aria-label="${esc(cfg.searchPlaceholder)}" /></div>
                   <span class="sp-filter-slot"></span>
@@ -212,6 +213,11 @@ export function createSplitPage(host, ctx, cfg) {
     listEl.innerHTML = rows.map((item) => {
       const r = cfg.row(item);
       const on = String(item.id) === String(state.selected) && !phone;
+      if (r.custom) {
+        return `<div class="booking-card list-row-card sp-row ${on ? 'active' : ''}" role="option" id="sp-opt-${esc(item.id)}" aria-selected="${on}" data-sp-id="${esc(item.id)}">
+          ${r.custom}
+        </div>`;
+      }
       return `<div class="booking-card list-row-card sp-row ${on ? 'active' : ''}" role="option" id="sp-opt-${esc(item.id)}" aria-selected="${on}" data-sp-id="${esc(item.id)}">
         <div class="row-lead-col"><div class="row-avatar" aria-hidden="true">${r.tile}</div></div>
         <div class="card-info-col">

@@ -9,11 +9,22 @@ import { esc, toast, initials } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { confirmDialog } from '../shared/sheet.js';
 import { detailGrid, rowGroup, linkRow } from '../shared/page-ui.js';
+import { OPERATIONS_TEAM_MEMBERS } from '../shared/team-data.js';
+
+function formatCardLocation(loc) {
+  if (!loc) return 'Mumbai HQ';
+  const main = loc.split('—')[0].trim();
+  return main
+    .replace(/\s+Logistics\s+Hub/i, ' Hub')
+    .replace(/\s+Ops\s+Base/i, ' Base');
+}
 
 const ACTIONS = ['view', 'add', 'edit', 'delete', 'download'];
 const ACTION_LABELS = { view: 'VIEW', add: 'ADD', edit: 'EDIT', delete: 'DELETE', download: 'DOWNLOAD' };
 
 const STATUS_NAMES = { active: 'Active', pending: 'Pending', inactive: 'Inactive' };
+
+const ALL_ACTIONS = ['view', 'add', 'edit', 'delete', 'download'];
 
 /** Hierarchical permission structure with 7 modules and sub-features matching the demo reference */
 const PERMISSION_GROUPS = [
@@ -23,7 +34,7 @@ const PERMISSION_GROUPS = [
     icon: 'grid',
     module: 'system',
     features: [
-      { key: 'dashboard', label: 'Dashboard', actions: ['view', 'add', 'edit', 'delete', 'download'] },
+      { key: 'dashboard', label: 'Dashboard', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -32,11 +43,11 @@ const PERMISSION_GROUPS = [
     icon: 'briefcase',
     module: 'bookings',
     features: [
-      { key: 'bookings', label: 'Bookings', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'booking_details', label: 'Booking Details', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'traveller_details', label: 'Traveller Details', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'payments', label: 'Payments', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'invoices', label: 'Invoices', actions: ['view', 'add', 'edit', 'download'] }, // delete unsupported
+      { key: 'bookings', label: 'Bookings', actions: [...ALL_ACTIONS] },
+      { key: 'booking_details', label: 'Booking Details', actions: [...ALL_ACTIONS] },
+      { key: 'traveller_details', label: 'Traveller Details', actions: [...ALL_ACTIONS] },
+      { key: 'payments', label: 'Payments', actions: [...ALL_ACTIONS] },
+      { key: 'invoices', label: 'Invoices', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -45,8 +56,8 @@ const PERMISSION_GROUPS = [
     icon: 'message',
     module: 'inquiries',
     features: [
-      { key: 'inquiry_details', label: 'Inquiry Details', actions: ['view', 'delete', 'download'] }, // add, edit unsupported
-      { key: 'customer_followup', label: 'Customer Follow-up', actions: ['view', 'add', 'edit'] }, // delete, download unsupported
+      { key: 'inquiry_details', label: 'Inquiry Details', actions: [...ALL_ACTIONS] },
+      { key: 'customer_followup', label: 'Customer Follow-up', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -55,8 +66,8 @@ const PERMISSION_GROUPS = [
     icon: 'calendar',
     module: 'calendar',
     features: [
-      { key: 'calendar_events', label: 'Calendar Events', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'availability', label: 'Availability', actions: ['view', 'add'] }, // edit, delete, download unsupported
+      { key: 'calendar_events', label: 'Calendar Events', actions: [...ALL_ACTIONS] },
+      { key: 'availability', label: 'Availability', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -65,8 +76,8 @@ const PERMISSION_GROUPS = [
     icon: 'users',
     module: 'team',
     features: [
-      { key: 'team_members', label: 'Team Members', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'assign_trips', label: 'Assign Trips', actions: ['view', 'add', 'edit', 'delete', 'download'] },
+      { key: 'team_members', label: 'Team Members', actions: [...ALL_ACTIONS] },
+      { key: 'assign_trips', label: 'Assign Trips', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -75,8 +86,8 @@ const PERMISSION_GROUPS = [
     icon: 'shield',
     module: 'system',
     features: [
-      { key: 'user_accounts', label: 'User Accounts', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'roles_permissions', label: 'Roles & Permissions', actions: ['view', 'add', 'edit', 'delete', 'download'] },
+      { key: 'user_accounts', label: 'User Accounts', actions: [...ALL_ACTIONS] },
+      { key: 'roles_permissions', label: 'Roles & Permissions', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -85,8 +96,8 @@ const PERMISSION_GROUPS = [
     icon: 'cog',
     module: 'system',
     features: [
-      { key: 'system_settings', label: 'System Settings', actions: ['view', 'add', 'edit', 'delete'] }, // download unsupported
-      { key: 'notifications', label: 'Notifications', actions: ['view', 'add', 'delete'] }, // edit, download unsupported
+      { key: 'system_settings', label: 'System Settings', actions: [...ALL_ACTIONS] },
+      { key: 'notifications', label: 'Notifications', actions: [...ALL_ACTIONS] },
     ],
   },
 ];
@@ -138,10 +149,34 @@ function extractFeatureMatrix(item, d) {
   // If stored in localStorage for persistence across reloads
   const stored = localStorage.getItem(`ruyi_user_perm_${item.id}`);
   if (stored) {
-    try { return JSON.parse(stored); } catch { /* ignore */ }
+    try {
+      const parsed = JSON.parse(stored);
+      PERMISSION_GROUPS.forEach((group) => {
+        group.features.forEach((feat) => {
+          if (!parsed[feat.key]) parsed[feat.key] = {};
+          ACTIONS.forEach((a) => {
+            if (typeof parsed[feat.key][a] !== 'boolean') {
+              parsed[feat.key][a] = !!parsed[feat.key].view;
+            }
+          });
+        });
+      });
+      return parsed;
+    } catch { /* ignore */ }
   }
   if (d?.featurePermissions && typeof d.featurePermissions === 'object') {
-    return clone(d.featurePermissions);
+    const parsed = clone(d.featurePermissions);
+    PERMISSION_GROUPS.forEach((group) => {
+      group.features.forEach((feat) => {
+        if (!parsed[feat.key]) parsed[feat.key] = {};
+        ACTIONS.forEach((a) => {
+          if (typeof parsed[feat.key][a] !== 'boolean') {
+            parsed[feat.key][a] = !!parsed[feat.key].view;
+          }
+        });
+      });
+    });
+    return parsed;
   }
   return buildDefaultFeatureMatrix(item.roleLabel || d?.roleLabel || 'Staff');
 }
@@ -155,28 +190,28 @@ function toBackendModules(fm) {
 
   // Bookings
   mod.bookings.view = !!fm.bookings?.view || !!fm.booking_details?.view;
-  mod.bookings.edit = !!fm.bookings?.edit || !!fm.bookings?.add;
-  mod.bookings.delete = !!fm.bookings?.delete;
+  mod.bookings.edit = !!fm.bookings?.edit || !!fm.bookings?.add || !!fm.booking_details?.edit || !!fm.booking_details?.add;
+  mod.bookings.delete = !!fm.bookings?.delete || !!fm.booking_details?.delete;
 
   // Inquiries
   mod.inquiries.view = !!fm.inquiry_details?.view || !!fm.customer_followup?.view;
-  mod.inquiries.edit = !!fm.customer_followup?.edit || !!fm.customer_followup?.add;
-  mod.inquiries.delete = !!fm.inquiry_details?.delete;
+  mod.inquiries.edit = !!fm.customer_followup?.edit || !!fm.customer_followup?.add || !!fm.inquiry_details?.edit || !!fm.inquiry_details?.add;
+  mod.inquiries.delete = !!fm.inquiry_details?.delete || !!fm.customer_followup?.delete;
 
   // Calendar
-  mod.calendar.view = !!fm.calendar_events?.view;
-  mod.calendar.edit = !!fm.calendar_events?.edit || !!fm.calendar_events?.add;
-  mod.calendar.delete = !!fm.calendar_events?.delete;
+  mod.calendar.view = !!fm.calendar_events?.view || !!fm.availability?.view;
+  mod.calendar.edit = !!fm.calendar_events?.edit || !!fm.calendar_events?.add || !!fm.availability?.edit || !!fm.availability?.add;
+  mod.calendar.delete = !!fm.calendar_events?.delete || !!fm.availability?.delete;
 
   // Team
-  mod.team.view = !!fm.team_members?.view;
-  mod.team.edit = !!fm.team_members?.edit || !!fm.assign_trips?.edit;
-  mod.team.delete = !!fm.team_members?.delete;
+  mod.team.view = !!fm.team_members?.view || !!fm.assign_trips?.view;
+  mod.team.edit = !!fm.team_members?.edit || !!fm.assign_trips?.edit || !!fm.team_members?.add || !!fm.assign_trips?.add;
+  mod.team.delete = !!fm.team_members?.delete || !!fm.assign_trips?.delete;
 
   // System
-  mod.system.view = !!fm.user_accounts?.view || !!fm.system_settings?.view;
-  mod.system.edit = !!fm.user_accounts?.edit || !!fm.roles_permissions?.edit || !!fm.system_settings?.edit;
-  mod.system.delete = !!fm.user_accounts?.delete;
+  mod.system.view = !!fm.user_accounts?.view || !!fm.roles_permissions?.view || !!fm.system_settings?.view || !!fm.notifications?.view;
+  mod.system.edit = !!fm.user_accounts?.edit || !!fm.roles_permissions?.edit || !!fm.system_settings?.edit || !!fm.system_settings?.add || !!fm.notifications?.edit || !!fm.notifications?.add;
+  mod.system.delete = !!fm.user_accounts?.delete || !!fm.roles_permissions?.delete || !!fm.system_settings?.delete || !!fm.notifications?.delete;
 
   // Catalog, travel, website preserved/active
   mod.catalog = { view: true, edit: false, delete: false };
@@ -187,10 +222,19 @@ function toBackendModules(fm) {
 }
 
 function statusKey(u) {
-  if (u.displayStatus === 'In Transit' || u.name === 'Karan Sapalia') return 'transit';
-  if (u.status === 'inactive' || u.displayStatus === 'Inactive') return 'inactive';
-  if (u.status === 'pending') return 'inactive';
+  const ds = (u.displayStatus || '').toLowerCase();
+  const st = (u.status || '').toLowerCase();
+  if (ds === 'in transit' || u.name === 'Karan Sapalia') return 'transit';
+  if (ds === 'pending' || st === 'pending' || u.name === 'Deepak Chopra') return 'pending';
+  if (ds === 'inactive' || st === 'inactive') return 'inactive';
   return 'active';
+}
+
+function statusPillClass(sKey) {
+  if (sKey === 'transit') return 'status-part-paid';
+  if (sKey === 'pending') return 'status-pending';
+  if (sKey === 'inactive') return 'status-draft';
+  return 'status-paid';
 }
 
 function roleBadgeClass(roleLabel) {
@@ -241,24 +285,85 @@ export default {
       if (page && page.api.current()?.id === item.id) page.api.refresh();
     }
 
-    /* ---------- Left User List Row Card ---------- */
+    /* ---------- Left User List Row Card (Operation Team Design & Components) ---------- */
     function renderUserRow(u) {
       const sKey = statusKey(u);
       const isDc = u.name === 'Deepak Chopra' || !u.avatar;
-      const avHtml = u.avatar && !isDc
-        ? `<div class="us-card-av-box"><img src="${esc(u.avatar)}" alt="${esc(u.name)}" class="us-card-avatar-img" /><span class="us-card-dot is-${sKey}"></span></div>`
-        : `<div class="us-card-av-box"><span class="us-card-initials-avatar">${esc(initials(u.name))}</span><span class="us-card-dot is-${sKey}"></span></div>`;
+      const inits = initials(u.name);
+      const tm = OPERATIONS_TEAM_MEMBERS.find((m) => m.name.toLowerCase() === u.name.toLowerCase()) || null;
 
+      const empId = tm?.employeeId || (u.id ? `EMP-${String(u.id).padStart(3, '0')}` : 'EMP-2024-001');
       const roleClass = roleBadgeClass(u.roleLabel);
-      const statusLabel = u.displayStatus || STATUS_NAMES[u.status] || 'Active';
+
+      let dotClass = 'available';
+      if (sKey === 'transit') dotClass = 'in-transit';
+      else if (sKey === 'pending' || sKey === 'inactive') dotClass = 'on-leave';
+
+      const statusLabel = u.displayStatus || STATUS_NAMES[u.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : (sKey === 'inactive' ? 'Inactive' : 'Available')));
+      const pillCls = statusPillClass(sKey);
+
+      const jobRole = tm?.role || u.title || `${u.roleLabel} • Operations`;
+      const tripsCount = tm?.metrics?.activeTrips ?? (sKey === 'pending' ? 1 : 4);
+      const locFull = tm?.officeLocation || 'Mumbai HQ — Operations Wing';
+      const locShort = formatCardLocation(locFull);
+      const exp = tm?.experience || '3.5 Years';
+      const phone = tm?.phone || u.phone || '+91 98765 00111';
+      const email = u.email || tm?.email || 'user@ruyitra.com';
+
+      const avHtml = u.avatar && !isDc
+        ? `<img src="${esc(u.avatar)}" alt="${esc(u.name)}" class="team-avatar-img" />`
+        : `<div class="team-avatar-initials">${esc(inits)}</div>`;
+
+      const showRoleBadge = u.roleLabel && u.roleLabel.toLowerCase() !== jobRole.toLowerCase();
+
+      const customHtml = `
+        <div class="team-card-left">
+          <div class="team-avatar-container">
+            ${avHtml}
+            <span class="team-avatar-dot ${dotClass}"></span>
+          </div>
+          <div class="team-card-info">
+            <div class="team-card-title-line">
+              <span class="team-card-name card-title">${esc(u.name)}</span>
+              <span class="team-emp-tag">${esc(empId)}</span>
+            </div>
+            <div class="team-card-status-line">
+              <span class="team-card-role">${esc(jobRole)}</span>
+              ${showRoleBadge ? `<span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>` : ''}
+              <span class="status-pill is-${sKey} ${pillCls}">
+                <span class="dot"></span>
+                ${esc(statusLabel)}
+              </span>
+            </div>
+            <div class="team-card-meta-line">
+              <span class="team-meta-loc" title="${esc(locFull)}">${esc(locShort)}</span>
+              <span class="team-meta-dot">•</span>
+              <span class="team-meta-exp">${esc(exp)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card-actions">
+          <button type="button" class="circle-action-btn" data-action-call="${esc(phone)}" title="Call ${esc(u.name)}" aria-label="Call ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='tel:${esc(phone)}';">
+            ${icon('phone', { size: 13, stroke: 2.2 })}
+          </button>
+          <button type="button" class="circle-action-btn" data-action-mail="${esc(email)}" title="Email ${esc(u.name)}" aria-label="Email ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='mailto:${esc(email)}';">
+            ${icon('mail', { size: 13, stroke: 2 })}
+          </button>
+          <span class="circle-action-btn is-chevron" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </div>
+      `;
 
       return {
+        custom: customHtml,
         raw: true,
         tile: avHtml,
         name: u.name,
         pill: `<span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>`,
-        sub: `<span class="us-card-email">${esc(u.email)}</span>`,
-        meta: `<span class="us-card-status is-${sKey}"><span class="us-card-status-dot"></span>${esc(statusLabel)}</span><span class="us-card-chevron">${icon('chevronRight', { size: 14, stroke: 2.2 })}</span>`,
+        sub: `<span class="us-card-email">${esc(email)}</span>`,
+        meta: `<span class="us-card-status is-${sKey} status-pill ${pillCls}"><span class="us-card-status-dot dot"></span>${esc(statusLabel)}</span>`,
       };
     }
 
@@ -266,24 +371,27 @@ export default {
     function renderSheetHeader(item, d) {
       const sKey = statusKey(item);
       const isDc = item.name === 'Deepak Chopra' || !item.avatar;
-      const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || 'Active';
+      const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : 'Active'));
       const phone = d?.phone || item.phone || '+91 98765 00111';
       const joined = d?.joinedFormatted || 'Joined 15 Mar 2021';
       const empId = d?.empId || `EMP-${String(item.id).padStart(3, '0')}`;
       const subtitle = item.title || `${item.roleLabel} • ${d?.department || 'Operations'}`;
 
       const avHtml = item.avatar && !isDc
-        ? `<img src="${esc(item.avatar)}" alt="${esc(item.name)}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />`
+        ? `<img src="${esc(item.avatar)}" alt="${esc(item.name)}" class="us-sheet-avatar-img" />`
         : esc(initials(item.name));
 
-      const statusClass = sKey === 'active' ? 'status-confirmed' : (sKey === 'transit' ? 'status-in-progress' : 'status-pending');
+      const pillCls = statusPillClass(sKey);
 
       return `<div class="sheet-customer-header">
-        <div class="customer-avatar-badge">${avHtml}</div>
+        <div class="customer-avatar-badge">
+          ${avHtml}
+          <span class="us-head-dot is-${sKey}"></span>
+        </div>
         <div class="customer-header-info">
           <div class="customer-title-row">
             <h2 class="customer-name-title">${esc(item.name)}</h2>
-            <span class="status-pill ${statusClass}">
+            <span class="status-pill is-${sKey} ${pillCls}">
               <span class="dot"></span>
               ${esc(statusLabel)}
             </span>
@@ -326,9 +434,9 @@ export default {
       const location = d?.location || 'Mumbai, India';
       const manager = d?.reportingManager || 'Karan Sapalia';
       const department = d?.department || 'Operations';
-      const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || 'Active';
+      const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : 'Active'));
       const cleanPhone = phone.replace(/[^0-9]/g, '');
-      const statusClass = sKey === 'active' ? 'status-confirmed' : (sKey === 'transit' ? 'status-in-progress' : 'status-pending');
+      const pillCls = statusPillClass(sKey);
       const bio = d?.bio || 'System administrator with 5+ years of experience in travel operations and team management.';
 
       return `<div class="details-section-card us-info-card ${infoExpanded ? 'is-expanded' : 'is-collapsed'}">
@@ -410,7 +518,7 @@ export default {
             </div>
             <div class="info-cell">
               <span class="info-label">Status</span>
-              <span class="status-pill ${statusClass}" style="width: fit-content;">
+              <span class="status-pill is-${sKey} ${pillCls}" style="width: fit-content;">
                 <span class="dot"></span> ${esc(statusLabel)}
               </span>
             </div>
@@ -445,7 +553,6 @@ export default {
             <span class="us-group-icon">${icon(group.icon, { size: 16, stroke: 2.2 })}</span>
             <span>${esc(group.name)}</span>
           </div>
-          ${ACTIONS.map(() => '<span class="us-tbl-cell us-tbl-cell-blank"></span>').join('')}
         </div>`;
 
         // Feature Rows
@@ -548,6 +655,7 @@ export default {
     /* ---------- Split Page Instance ---------- */
     page = createSplitPage(host, ctx, {
       title: 'Users',
+      listTitle: 'User',
       noun: 'user',
       plural: 'users',
       addLabel: null,

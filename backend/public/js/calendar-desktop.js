@@ -58,15 +58,34 @@ export function createDesktopCalendar(host, { onOpen, isActive }) {
     if (s.status === 'error') { agenda.innerHTML = errorAgenda(); return; }
     const groups = store.groupedByDate();
     if (s.status === 'loading' && ![...groups.values()].some((l) => l.length)) { agenda.innerHTML = loadingAgenda(); return; }
-    const selectedInMonth = s.selected.slice(0, 7) === `${s.year}-${String(s.month + 1).padStart(2, '0')}`;
-    if (selectedInMonth && !groups.has(s.selected)) groups.set(s.selected, []);
     if (![...groups.values()].some((l) => l.length)) { agenda.innerHTML = emptyAgenda(); return; }
-    const dates = [...groups.keys()].sort();
+    const dates = [...groups.keys()].filter((d) => groups.get(d)?.length).sort();
     agenda.innerHTML = dates.map((d) => dateSection(d, groups.get(d), { activeId, selected: d === s.selected, collapsed: collapsed.has(d) })).join('');
   }
 
   function scrollToSelected(smooth) {
-    const el = agenda.querySelector(`[data-cal-date="${store.getState().selected}"]`);
+    const targetDate = store.getState().selected;
+    let el = agenda.querySelector(`[data-cal-date="${targetDate}"]`);
+    if (!el) {
+      const sections = [...agenda.querySelectorAll('.cal-section[data-cal-date]')];
+      if (sections.length) {
+        el = sections.find((s) => s.dataset.calDate >= targetDate) || sections[sections.length - 1];
+        if (el) {
+          const nextDate = el.dataset.calDate;
+          store.getState().selected = nextDate;
+          $('#cal-days').querySelectorAll('.cal-day').forEach((b) => {
+            const on = b.dataset.calDay === nextDate;
+            b.classList.toggle('is-selected', on);
+            b.setAttribute('aria-selected', String(on));
+            b.tabIndex = on ? 0 : -1;
+          });
+          agenda.querySelectorAll('.cal-section').forEach((sec) => {
+            sec.classList.toggle('is-selected', sec === el);
+          });
+          $('#cal-foot-date').textContent = store.parseYmd(nextDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+      }
+    }
     if (el) agenda.scrollTo({ top: el.offsetTop - agenda.offsetTop - 4, behavior: smooth ? 'smooth' : 'auto' });
   }
 

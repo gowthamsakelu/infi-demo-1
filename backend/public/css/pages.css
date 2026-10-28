@@ -10,6 +10,16 @@
 .desktop-content-col.page-mode .desktop-workspace-split:not(.sp) { display: none; }
 #mobile-page-host { display: none; }
 .phone-device.page-mode #mobile-page-host { display: block; }
+.phone-device.page-mode #mobile-page-host[data-page="dashboard"] {
+  padding: 0 !important;
+  background: #F8FAFC !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+}
 .phone-device.page-mode #mobile-screen-scroll { display: none; }
 
 .sp { flex: 1 1 auto; min-height: 0; min-width: 0; }

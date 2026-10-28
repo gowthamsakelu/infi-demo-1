@@ -19,7 +19,8 @@ import { matchesCategory } from './shared/booking-filters.js';
 import { createDesktopCalendar } from './calendar-desktop.js';
 import { openAddInquiry } from './shared/add-inquiry.js';
 import { addButtonHtml, setAddAction } from './shared/add-button.js';
-import { paneLayout, writeSelected, bindListKeys } from './shared/split-view.js';
+import { paneLayout, selectedParam, writeSelected, chooseRecord, bindListKeys } from './shared/split-view.js';
+import { createDesktopTeam } from './team-desktop.js';
 
 export function createDesktopView(container) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -57,7 +58,19 @@ export function createDesktopView(container) {
           </div>
         </div>
 
-        <nav class="sidebar-nav" aria-label="Main">${sidebarNavHtml(currentPage())}</nav>
+        <nav class="sidebar-nav" aria-label="Main">
+          ${sidebarNavHtml(currentPage())}
+          <span class="nav-section-title nav-section-team-title" id="nav-section-operations" style="cursor: pointer;" title="Operations Team Roster">Staff Members</span>
+          ${STAFF_MEMBERS.map(s => `
+            <div class="sidebar-nav-item staff-member-item" data-staff-id="${s.id}" style="cursor: pointer;" title="View ${s.name}'s profile and trips">
+              <div class="nav-left">
+                <img src="${s.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />
+                <span style="font-size: 13px;">${s.name}</span>
+              </div>
+              <span class="sidebar-badge" style="font-size: 10px;">${s.activeTrips} trips</span>
+            </div>
+          `).join('')}
+        </nav>
 
         <div class="sidebar-profile-box">
           <div class="profile-user-left">
@@ -145,6 +158,16 @@ export function createDesktopView(container) {
               <aside class="desktop-calendar-empty" id="desktop-calendar-empty">
                 <div class="state-box"><h4>Select a booking</h4><p>Choose an item from the agenda to see its details here.</p></div>
               </aside>
+
+              <!-- Operations Team page: the roster takes the list's place; the detail pane shows team member details -->
+              <section class="desktop-team-col" id="desktop-team-col" aria-label="Operations Team"></section>
+              <aside class="desktop-team-empty" id="desktop-team-empty">
+                <div class="state-box">
+                  <h4 style="font-size: 16px; font-weight: 700; color: #0F172A; margin: 0 0 8px; letter-spacing: 0.3px;">SELECT MEMBER TO KNOW DETAILS</h4>
+                  <p style="font-size: 13.5px; color: #64748B; margin: 0; max-width: 380px; line-height: 1.5;">Choose a team member from the list to view their profile, performance, assignments, and operational details.</p>
+                </div>
+              </aside>
+              <aside class="desktop-team-detail" id="desktop-team-detail" aria-label="Team Member Details"></aside>
 
               <!-- Right Column: Inline Detail Pane (Outlook Style - NO dark popup backdrop!) -->
               <aside class="desktop-details-drawer" id="desktop-details-drawer">
@@ -426,6 +449,15 @@ export function createDesktopView(container) {
     isActive: () => page === 'calendar' && document.documentElement.dataset.layout === 'desktop',
     onOpen: (b) => openDrawer(b),
   });
+  const teamView = createDesktopTeam({
+    colHost: container.querySelector('#desktop-team-col'),
+    detailHost: container.querySelector('#desktop-team-detail'),
+    splitHost: container.querySelector('#desktop-workspace-split'),
+    isActive: () => page === 'team' && document.documentElement.dataset.layout === 'desktop',
+    onViewBooking: (bId) => {
+      navigate('bookings', { q: bId });
+    },
+  });
 
   const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Amount</th>${TH_ACTION}</tr>`;
   const THEAD_INQUIRIES = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Nights</th><th>Travel Date</th><th class="col-secondary">Assigned To</th><th>Status</th><th class="col-note" style="min-width: 150px;">Quick Note</th>${TH_ACTION}</tr>`;
@@ -670,7 +702,7 @@ export function createDesktopView(container) {
     if (countBadge) countBadge.textContent = b.guests.length;
 
     // Header: Unified, comprehensive Trip & Booking Header
-    const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
+    const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n => n[0]).join('') || 'CU');
     const custName = b.customer?.name || b.guest?.name || 'Customer';
 
     // Header: Unified Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
@@ -734,7 +766,7 @@ export function createDesktopView(container) {
     if (activeDetailTab === 'customer-details') {
       const c = b.customer || {
         name: b.guest.name,
-        initials: b.guest.name.split(' ').map(n=>n[0]).join('') || 'CU',
+        initials: b.guest.name.split(' ').map(n => n[0]).join('') || 'CU',
         phone: b.guest.phone,
         email: b.guest.email,
         location: 'New Delhi, Delhi',
@@ -897,8 +929,8 @@ export function createDesktopView(container) {
         </div>
       `;
     } else if (activeDetailTab === 'guests') {
-      const filteredGuests = b.guests.filter(g => 
-        !guestSearchQuery || 
+      const filteredGuests = b.guests.filter(g =>
+        !guestSearchQuery ||
         g.name.toLowerCase().includes(guestSearchQuery.toLowerCase()) ||
         (g.phone && g.phone.includes(guestSearchQuery))
       );
@@ -1335,11 +1367,24 @@ export function createDesktopView(container) {
       container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
       container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
+      container.querySelector('#nav-team')?.classList.toggle('active', page === 'team');
       if (page === 'calendar') setAddAction(null);
       else setAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') })); // Bookings has no add flow of its own: it opens the same one
       container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
+      container.querySelector('#desktop-workspace-split')?.classList.toggle('team-mode', page === 'team');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
-      if (topSearch) topSearch.placeholder = 'Search by name, trip, destination, or phone...';
+      if (page === 'team') {
+        const memId = getParams().member || null;
+        if (changed || memId !== teamView.getSelectedMemberId()) {
+          teamView.activate(memId);
+        } else {
+          teamView.render();
+        }
+      }
+      if (changed && page !== 'team') {
+        teamView.selectMember(null, false);
+      }
+      if (topSearch) topSearch.placeholder = page === 'team' ? 'Search team members by name or role...' : 'Search by name, trip, destination, or phone...';
       container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking');
       applyParams();
       if (changed && scroller) scroller.scrollTop = scrollMemory[page] || 0;
@@ -1365,6 +1410,14 @@ export function createDesktopView(container) {
     syncBookingPayments().then(() => renderTable());
 
     bindSidebar(container.querySelector('.desktop-sidebar'));
+
+    const opsHeader = container.querySelector('#nav-section-operations');
+    if (opsHeader) {
+      opsHeader.addEventListener('click', (e) => {
+        e.preventDefault();
+        goToPage('team');
+      });
+    }
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
 
     // Add Inquiry: the one wizard. After a save the list shows everything again, the new row is selected and the lists are at the top.
@@ -1511,8 +1564,12 @@ export function createDesktopView(container) {
     // Keyboard Esc closes drawer
     window.addEventListener('keydown', (e) => {
       // Esc belongs to an open dialog or sheet first (Assign, Follow-up, the itinerary builder), not the detail pane behind it.
-      if (e.key === 'Escape' && isDetailDrawerOpen && !e.defaultPrevented) {
-        closeDrawer();
+      if (e.key === 'Escape' && !e.defaultPrevented) {
+        if (page === 'team') {
+          teamView.selectMember(null);
+        } else if (isDetailDrawerOpen) {
+          closeDrawer();
+        }
       }
     });
 
@@ -1543,10 +1600,10 @@ export function createDesktopView(container) {
       const menuTrigger = e.target.closest('[data-trigger-desktop-item-menu], [data-trigger-item-menu]');
       if (menuTrigger) {
         e.stopPropagation();
-        const itemId = menuTrigger.getAttribute('data-trigger-desktop-item-menu') || 
-                       menuTrigger.getAttribute('data-trigger-item-menu') || 
-                       menuTrigger.dataset.triggerDesktopItemMenu || 
-                       menuTrigger.dataset.triggerItemMenu;
+        const itemId = menuTrigger.getAttribute('data-trigger-desktop-item-menu') ||
+          menuTrigger.getAttribute('data-trigger-item-menu') ||
+          menuTrigger.dataset.triggerDesktopItemMenu ||
+          menuTrigger.dataset.triggerItemMenu;
         openDropdownItemId = openDropdownItemId === itemId ? null : itemId;
         renderDetailPanel();
         return;
@@ -1556,12 +1613,12 @@ export function createDesktopView(container) {
       const dropdownAct = e.target.closest('[data-desktop-dropdown-act], [data-dropdown-act]');
       if (dropdownAct) {
         e.stopPropagation();
-        const act = dropdownAct.getAttribute('data-desktop-dropdown-act') || 
-                    dropdownAct.getAttribute('data-dropdown-act') || 
-                    dropdownAct.dataset.desktopDropdownAct || 
-                    dropdownAct.dataset.dropdownAct;
-        const itemId = dropdownAct.getAttribute('data-target-id') || 
-                       dropdownAct.dataset.targetId;
+        const act = dropdownAct.getAttribute('data-desktop-dropdown-act') ||
+          dropdownAct.getAttribute('data-dropdown-act') ||
+          dropdownAct.dataset.desktopDropdownAct ||
+          dropdownAct.dataset.dropdownAct;
+        const itemId = dropdownAct.getAttribute('data-target-id') ||
+          dropdownAct.dataset.targetId;
 
         let foundItem = null;
         activeBooking?.itineraryDays?.forEach(d => {
@@ -1584,9 +1641,9 @@ export function createDesktopView(container) {
             persist(activeBooking, { onRollback: renderDetailPanel });
             renderDetailPanel();
             window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { 
+              detail: {
                 message: foundItem.completed ? `Marked "${foundItem.title}" as Complete! ✓` : `Marked "${foundItem.title}" as Scheduled`,
-                type: 'success' 
+                type: 'success'
               }
             }));
           }
@@ -1692,9 +1749,9 @@ export function createDesktopView(container) {
           openDesktopActivityDetailsModal(modalActiveItem);
           renderDetailPanel();
           window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { 
+            detail: {
               message: modalActiveItem.completed ? `Marked "${modalActiveItem.title}" as Complete! ✓` : `Marked as Scheduled`,
-              type: 'success' 
+              type: 'success'
             }
           }));
         }
@@ -1976,7 +2033,7 @@ export function createDesktopView(container) {
         activeBooking.customer = activeBooking.customer || {};
         activeBooking.customer.name = name;
         activeBooking.guest.name = name;
-        activeBooking.customer.initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0, 2);
+        activeBooking.customer.initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
         if (phone) {
           activeBooking.customer.phone = phone;
@@ -2147,18 +2204,11 @@ export function createDesktopView(container) {
         return;
       }
 
-      // Staff member in left sidebar -> filter trips by staff
+      // Staff member in left sidebar -> open team page with member selected!
       const staffNav = e.target.closest('.staff-member-item');
       if (staffNav) {
         const staffId = staffNav.dataset.staffId;
-        const staff = STAFF_MEMBERS.find(s => s.id === staffId);
-        if (staff) {
-          if (currentPage() !== 'bookings') navigate('bookings');
-          setParams({ q: staff.name }, { push: false });
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Showing bookings assigned to ${staff.name}`, type: 'info' }
-          }));
-        }
+        navigate('team', { member: staffId });
         return;
       }
 

@@ -1,11 +1,15 @@
 /* Blogs: stat cards, tabs + search, and a table that turns into cards when it is narrow (phone, or a tablet next to the sidebar). */
-.sp[data-sp="blogs"] .sp-body { flex-direction: column; gap: 14px; overflow-y: auto; overscroll-behavior: contain; padding: 2px; container-type: inline-size; }
+.sp[data-sp="blogs"] .sp-body { flex-direction: column; gap: 16px; overflow-y: auto; overscroll-behavior: contain; padding: 2px; container-type: inline-size; }
 .bg-stats .sp-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.bg-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
-.bg-tabs { flex: 1 1 auto; min-width: 0; }
-.bg-search { flex: 0 1 300px; min-width: 0; }
-.bg-categories { flex: none; white-space: nowrap; }
-.bg-search .table-toolbar-search-box { width: 100%; }
+.bg-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; min-height: 38px; }
+.bg-tabs { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; }
+.bg-tabs .category-filter-tabs { margin: 0 !important; padding: 0 !important; display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.bg-tabs .category-filter-tabs::-webkit-scrollbar { display: none; }
+.bg-tabs .tab-pill { height: 38px !important; box-sizing: border-box !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; padding: 0 14px !important; border-radius: var(--radius-full) !important; font-size: 13px !important; font-weight: 600 !important; margin: 0 !important; line-height: 1 !important; flex: none; }
+.bg-tabs .tab-pill .pill-badge { display: inline-flex !important; align-items: center !important; justify-content: center !important; min-width: 20px !important; height: 20px !important; padding: 0 6px !important; border-radius: var(--radius-full) !important; font-size: 11.5px !important; font-weight: 700 !important; line-height: 1 !important; }
+.bg-search { flex: 0 1 280px; min-width: 0; display: flex; align-items: center; }
+.bg-search .table-toolbar-search-box { width: 100%; height: 38px !important; margin: 0 !important; box-sizing: border-box !important; }
+.bg-categories { flex: none; white-space: nowrap; height: 38px !important; margin: 0 !important; box-sizing: border-box !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; padding: 0 16px !important; border-radius: 10px !important; }
 
 .bg-table { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; overflow: hidden; }
 .bg-table.is-plain .bg-head { display: none; }
@@ -30,7 +34,7 @@
 /* narrow: each article is a card */
 @container (max-width: 760px) {
   .bg-stats .sp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .bg-bar { flex-direction: column; align-items: stretch; }
+  .bg-bar { flex-direction: column; align-items: stretch; min-height: 0; height: auto; gap: 12px; }
   .bg-categories { display: none; }
   .bg-search { order: -1; flex: none; }
   .bg-head { display: none; }

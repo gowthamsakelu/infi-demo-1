@@ -39,3 +39,12 @@ export function bindListKeys(listEl, { getList, getActiveId, onSelect }) {
     if (next.id !== getActiveId()) onSelect(next);
   });
 }
+
+/** The record to show: the first of the preferred ids that is still in the list, else the first record. null when the list is empty. */
+export function chooseRecord(list, ...preferredIds) {
+  for (const id of preferredIds) {
+    const hit = id && list.find((b) => b.id === id);
+    if (hit) return hit;
+  }
+  return list[0] || null;
+}
