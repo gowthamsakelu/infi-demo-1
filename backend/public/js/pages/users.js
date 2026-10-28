@@ -187,10 +187,19 @@ function toBackendModules(fm) {
 }
 
 function statusKey(u) {
-  if (u.displayStatus === 'In Transit' || u.name === 'Karan Sapalia') return 'transit';
-  if (u.status === 'inactive' || u.displayStatus === 'Inactive') return 'inactive';
-  if (u.status === 'pending') return 'inactive';
+  const ds = (u.displayStatus || '').toLowerCase();
+  const st = (u.status || '').toLowerCase();
+  if (ds === 'in transit' || u.name === 'Karan Sapalia') return 'transit';
+  if (ds === 'pending' || st === 'pending' || u.name === 'Deepak Chopra') return 'pending';
+  if (ds === 'inactive' || st === 'inactive') return 'inactive';
   return 'active';
+}
+
+function statusPillClass(sKey) {
+  if (sKey === 'transit') return 'status-part-paid';
+  if (sKey === 'pending') return 'status-pending';
+  if (sKey === 'inactive') return 'status-draft';
+  return 'status-paid';
 }
 
 function roleBadgeClass(roleLabel) {
@@ -250,7 +259,8 @@ export default {
         : `<div class="us-card-av-box"><span class="us-card-initials-avatar">${esc(initials(u.name))}</span><span class="us-card-dot is-${sKey}"></span></div>`;
 
       const roleClass = roleBadgeClass(u.roleLabel);
-      const statusLabel = u.displayStatus || STATUS_NAMES[u.status] || 'Active';
+      const statusLabel = u.displayStatus || STATUS_NAMES[u.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : 'Active'));
+      const pillCls = statusPillClass(sKey);
 
       return {
         raw: true,
@@ -258,7 +268,7 @@ export default {
         name: u.name,
         pill: `<span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>`,
         sub: `<span class="us-card-email">${esc(u.email)}</span>`,
-        meta: `<span class="us-card-status is-${sKey}"><span class="us-card-status-dot"></span>${esc(statusLabel)}</span><span class="us-card-chevron">${icon('chevronRight', { size: 14, stroke: 2.2 })}</span>`,
+        meta: `<span class="us-card-status is-${sKey} status-pill ${pillCls}"><span class="us-card-status-dot dot"></span>${esc(statusLabel)}</span><span class="us-card-chevron">${icon('chevronRight', { size: 14, stroke: 2.2 })}</span>`,
       };
     }
 
@@ -266,24 +276,27 @@ export default {
     function renderSheetHeader(item, d) {
       const sKey = statusKey(item);
       const isDc = item.name === 'Deepak Chopra' || !item.avatar;
-      const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || 'Active';
+      const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : 'Active'));
       const phone = d?.phone || item.phone || '+91 98765 00111';
       const joined = d?.joinedFormatted || 'Joined 15 Mar 2021';
       const empId = d?.empId || `EMP-${String(item.id).padStart(3, '0')}`;
       const subtitle = item.title || `${item.roleLabel} • ${d?.department || 'Operations'}`;
 
       const avHtml = item.avatar && !isDc
-        ? `<img src="${esc(item.avatar)}" alt="${esc(item.name)}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />`
+        ? `<img src="${esc(item.avatar)}" alt="${esc(item.name)}" class="us-sheet-avatar-img" />`
         : esc(initials(item.name));
 
-      const statusClass = sKey === 'active' ? 'status-confirmed' : (sKey === 'transit' ? 'status-in-progress' : 'status-pending');
+      const pillCls = statusPillClass(sKey);
 
       return `<div class="sheet-customer-header">
-        <div class="customer-avatar-badge">${avHtml}</div>
+        <div class="customer-avatar-badge">
+          ${avHtml}
+          <span class="us-head-dot is-${sKey}"></span>
+        </div>
         <div class="customer-header-info">
           <div class="customer-title-row">
             <h2 class="customer-name-title">${esc(item.name)}</h2>
-            <span class="status-pill ${statusClass}">
+            <span class="status-pill is-${sKey} ${pillCls}">
               <span class="dot"></span>
               ${esc(statusLabel)}
             </span>
@@ -326,9 +339,9 @@ export default {
       const location = d?.location || 'Mumbai, India';
       const manager = d?.reportingManager || 'Karan Sapalia';
       const department = d?.department || 'Operations';
-      const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || 'Active';
+      const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : 'Active'));
       const cleanPhone = phone.replace(/[^0-9]/g, '');
-      const statusClass = sKey === 'active' ? 'status-confirmed' : (sKey === 'transit' ? 'status-in-progress' : 'status-pending');
+      const pillCls = statusPillClass(sKey);
       const bio = d?.bio || 'System administrator with 5+ years of experience in travel operations and team management.';
 
       return `<div class="details-section-card us-info-card ${infoExpanded ? 'is-expanded' : 'is-collapsed'}">
@@ -410,7 +423,7 @@ export default {
             </div>
             <div class="info-cell">
               <span class="info-label">Status</span>
-              <span class="status-pill ${statusClass}" style="width: fit-content;">
+              <span class="status-pill is-${sKey} ${pillCls}" style="width: fit-content;">
                 <span class="dot"></span> ${esc(statusLabel)}
               </span>
             </div>

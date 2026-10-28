@@ -843,22 +843,22 @@ body.standalone-mobile .app-global-bar {
   border-radius: 50%;
 }
 
-.status-paid {
+.status-paid, .status-confirmed, .status-active {
   background: #DCFCE7;
   color: #15803D;
 }
 
-.status-paid .dot {
+.status-paid .dot, .status-confirmed .dot, .status-active .dot {
   background: #22C55E;
 }
 
-.status-part-paid {
-  background: #FEF9C3;
-  color: #A16207;
+.status-part-paid, .status-in-progress, .status-transit {
+  background: #FEF3C7;
+  color: #B45309;
 }
 
-.status-part-paid .dot {
-  background: #EAB308;
+.status-part-paid .dot, .status-in-progress .dot, .status-transit .dot {
+  background: #F59E0B;
 }
 
 .status-pending {
@@ -868,6 +868,15 @@ body.standalone-mobile .app-global-bar {
 
 .status-pending .dot {
   background: #FB923C;
+}
+
+.status-draft, .status-inactive {
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+.status-draft .dot, .status-inactive .dot {
+  background: #94A3B8;
 }
 
 .card-price {

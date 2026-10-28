@@ -69,25 +69,99 @@
 .us-role-manager { background: #E0E7FF; color: #4338CA; }
 .us-role-staff { background: #DCFCE7; color: #15803D; }
 
-/* Status on Card Right Side */
-.us-card-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 600;
+/* Status on Card Right Side - Styled as Pill Badges (Inspired by Operations Team) */
+.us-card-status,
+.us-card-status-pill,
+[data-sp="users"] .status-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 2.5px 8.5px !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0.15px !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  transition: all 0.15s ease !important;
 }
-.us-card-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+
+.us-card-status-dot,
+[data-sp="users"] .status-pill .dot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
 }
-.us-card-status.is-active { color: #16A34A; }
-.us-card-status.is-active .us-card-status-dot { background: #16A34A; }
-.us-card-status.is-transit { color: #D97706; }
-.us-card-status.is-transit .us-card-status-dot { background: #F59E0B; }
-.us-card-status.is-inactive { color: #94A3B8; }
-.us-card-status.is-inactive .us-card-status-dot { background: #94A3B8; }
+
+/* Active / Available */
+.us-card-status.is-active,
+.us-card-status-pill.is-active,
+[data-sp="users"] .status-pill.is-active,
+[data-sp="users"] .status-pill.status-confirmed,
+[data-sp="users"] .status-pill.status-paid {
+  background: #DCFCE7 !important;
+  color: #15803D !important;
+  border: 1px solid rgba(34, 197, 94, 0.25) !important;
+}
+.us-card-status.is-active .us-card-status-dot,
+.us-card-status-pill.is-active .dot,
+[data-sp="users"] .status-pill.is-active .dot,
+[data-sp="users"] .status-pill.status-confirmed .dot,
+[data-sp="users"] .status-pill.status-paid .dot {
+  background: #22C55E !important;
+}
+
+/* In Transit */
+.us-card-status.is-transit,
+.us-card-status-pill.is-transit,
+[data-sp="users"] .status-pill.is-transit,
+[data-sp="users"] .status-pill.status-in-progress,
+[data-sp="users"] .status-pill.status-part-paid {
+  background: #FEF3C7 !important;
+  color: #B45309 !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+.us-card-status.is-transit .us-card-status-dot,
+.us-card-status-pill.is-transit .dot,
+[data-sp="users"] .status-pill.is-transit .dot,
+[data-sp="users"] .status-pill.status-in-progress .dot,
+[data-sp="users"] .status-pill.status-part-paid .dot {
+  background: #F59E0B !important;
+}
+
+/* Pending / On Leave */
+.us-card-status.is-pending,
+.us-card-status-pill.is-pending,
+[data-sp="users"] .status-pill.is-pending,
+[data-sp="users"] .status-pill.status-pending {
+  background: #FFEDD5 !important;
+  color: #C2410C !important;
+  border: 1px solid rgba(251, 146, 60, 0.3) !important;
+}
+.us-card-status.is-pending .us-card-status-dot,
+.us-card-status-pill.is-pending .dot,
+[data-sp="users"] .status-pill.is-pending .dot,
+[data-sp="users"] .status-pill.status-pending .dot {
+  background: #FB923C !important;
+}
+
+/* Inactive */
+.us-card-status.is-inactive,
+.us-card-status-pill.is-inactive,
+[data-sp="users"] .status-pill.is-inactive,
+[data-sp="users"] .status-pill.status-draft {
+  background: #F1F5F9 !important;
+  color: #64748B !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+.us-card-status.is-inactive .us-card-status-dot,
+.us-card-status-pill.is-inactive .dot,
+[data-sp="users"] .status-pill.is-inactive .dot,
+[data-sp="users"] .status-pill.status-draft .dot {
+  background: #94A3B8 !important;
+}
 
 .us-card-chevron {
   display: inline-flex;
@@ -152,6 +226,116 @@
   display: flex;
   flex-direction: column;
   gap: 0 !important;
+}
+
+/* --------------------------------------------------------------------------
+   Detail Header: Proper Alignment of Staff Photo & Name (Desktop & Mobile)
+   -------------------------------------------------------------------------- */
+[data-sp="users"] .sheet-customer-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 10px 24px 16px 24px !important;
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #F1F5F9 !important;
+}
+
+[data-sp="users"] .customer-avatar-badge {
+  position: relative !important;
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px !important;
+  max-width: 54px !important;
+  border-radius: 50% !important;
+  border: 2px solid #E2E8F0 !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08) !important;
+  background: #EFF6FF !important;
+  color: #2563EB !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+[data-sp="users"] .customer-avatar-badge img,
+[data-sp="users"] .us-sheet-avatar-img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+[data-sp="users"] .customer-avatar-badge .us-head-dot {
+  position: absolute !important;
+  bottom: 0px !important;
+  right: 0px !important;
+  width: 13px !important;
+  height: 13px !important;
+  border-radius: 50% !important;
+  border: 2px solid #FFFFFF !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
+[data-sp="users"] .customer-avatar-badge .us-head-dot.is-active { background: #22C55E !important; }
+[data-sp="users"] .customer-avatar-badge .us-head-dot.is-transit { background: #F59E0B !important; }
+[data-sp="users"] .customer-avatar-badge .us-head-dot.is-pending { background: #FB923C !important; }
+[data-sp="users"] .customer-avatar-badge .us-head-dot.is-inactive { background: #94A3B8 !important; }
+
+[data-sp="users"] .customer-header-info {
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 3px !important;
+}
+
+[data-sp="users"] .customer-title-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+[data-sp="users"] .customer-name-title {
+  font-size: 19px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  margin: 0 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.2px !important;
+}
+
+[data-sp="users"] .customer-trip-subtitle {
+  font-size: 13px !important;
+  color: #64748B !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
+}
+
+[data-sp="users"] .customer-meta-chips {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 12px !important;
+  color: #64748B !important;
+  font-weight: 500 !important;
+  margin-top: 2px !important;
+  flex-wrap: wrap !important;
+}
+
+[data-sp="users"] .customer-meta-chips .meta-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4.5px !important;
+}
+
+[data-sp="users"] .customer-meta-chips .meta-dot {
+  color: #CBD5E1 !important;
+  font-weight: 700 !important;
 }
 
 .us-profile-card {
@@ -789,10 +973,13 @@
 }
 
 :where(html[data-layout="mobile"]) [data-sp="users"] .sheet-customer-header {
-  padding: 6px 18px 12px 18px !important;
+  padding: 10px 18px 12px 18px !important;
   border-bottom: 1px solid #F1F5F9 !important;
   background: #FFFFFF !important;
   padding-right: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
 }
 
 :where(html[data-layout="mobile"]) [data-sp="users"] .customer-name-title {
