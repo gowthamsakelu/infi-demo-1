@@ -10,7 +10,7 @@ export const NAV = [
       { key: 'inquiries', label: 'Inquiries', icon: 'message', kind: 'app', badgeId: 'sidebar-inquiries-badge', badge: '8' },
       { key: 'bookings', label: 'Bookings', icon: 'briefcase', kind: 'app', badgeId: 'sidebar-total-badge', badge: '28' },
       { key: 'calendar', label: 'Calendar', icon: 'calendar', kind: 'app' },
-      { key: 'team', label: 'Operation Team', icon: 'users', kind: 'soon' },
+      { key: 'team', label: 'Operation Team', icon: 'users', kind: 'app' },
     ],
   },
   {

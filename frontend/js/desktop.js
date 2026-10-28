@@ -2,15 +2,20 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, initials, skeletonRows, errorState } from './shared/ui.js';
-import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
+import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, initials, skeletonRows, errorState, checkbox } from './shared/ui.js';
+import { selectedOf, setSelected, toggleRow } from './shared/selection.js';
+import { notificationsHtml, bindNotifications } from './shared/notifications.js';
+import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bindQuickNotes, rowCard, bulkBar, bindBulkBar, updateBulkBar, inlineSelectionBar, updateInlineBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
-import { openEventDialog, openDayDialog, commit } from './shared/itinerary-dialog.js';
-import { daysOf, persist, renumber, EVENT_TYPES } from './shared/itinerary.js';
+import { openDayDialog, commit } from './shared/itinerary-dialog.js';
+import { daysOf, persist, renumber, eventKind, itemIconHtml, itemPills } from './shared/itinerary.js';
+import { openItineraryBuilder } from './shared/itinerary-builder-ui.js';
 import { matchesCategory } from './shared/booking-filters.js';
+import { createDesktopCalendar } from './calendar-desktop.js';
+import { createDesktopTeam } from './team-desktop.js';
 
 export function createDesktopView(container) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -21,6 +26,7 @@ export function createDesktopView(container) {
   let contacts = [...CONTACTS_LIST];
   let activeTab = 'All Bookings';
   let searchQuery = '';
+  let lastToggled = null; // anchor for Shift+click ranges
   let selectedCategory = 'ALL';
   let activeBooking = null; // Default: closed popup, table is full-width!
   let isDetailDrawerOpen = false;
@@ -81,7 +87,7 @@ export function createDesktopView(container) {
             <span class="sidebar-badge" id="sidebar-inquiries-badge">8</span>
           </a>
 
-          <a class="sidebar-nav-item" href="#calendar" id="nav-calendar">
+          <a class="sidebar-nav-item ${currentPage() === 'calendar' ? 'active' : ''}" href="#calendar" id="nav-calendar">
             <div class="nav-left">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
@@ -93,9 +99,22 @@ export function createDesktopView(container) {
             </div>
           </a>
 
-          <span class="nav-section-title">Operations Team</span>
+          <a class="sidebar-nav-item ${currentPage() === 'team' ? 'active' : ''}" href="#team" id="nav-team">
+            <div class="nav-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span>Operations Team</span>
+            </div>
+            <span class="sidebar-badge" id="sidebar-team-badge">5</span>
+          </a>
+
+          <span class="nav-section-title nav-section-team-title" id="nav-section-operations" style="cursor: pointer;" title="Operations Team Roster">Staff Members</span>
           ${STAFF_MEMBERS.map(s => `
-            <div class="sidebar-nav-item staff-member-item" data-staff-id="${s.id}" style="cursor: pointer;" title="Filter trips assigned to ${s.name}">
+            <div class="sidebar-nav-item staff-member-item" data-staff-id="${s.id}" style="cursor: pointer;" title="View ${s.name}'s profile and trips">
               <div class="nav-left">
                 <img src="${s.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />
                 <span style="font-size: 13px;">${s.name}</span>
@@ -146,41 +165,7 @@ export function createDesktopView(container) {
                 </svg>
                 <span class="bell-dot" id="desktop-bell-dot"></span>
               </button>
-              <div class="desktop-notifications-dropdown" id="desktop-notifications-dropdown" style="display: none;">
-                <div class="notifications-header">
-                  <h4>Notifications</h4>
-                  <button class="notifications-mark-read-btn" id="btn-mark-all-notifications-read">Mark all as read</button>
-                </div>
-                <div class="notifications-list">
-                  <div class="notification-item unread">
-                    <div class="notif-icon-circle blue">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                    </div>
-                    <div class="notif-content">
-                      <p class="notif-text"><strong>New Booking:</strong> Haridwar - Kashi Trip (BK-5021) • 12 Pax</p>
-                      <span class="notif-time">10m ago</span>
-                    </div>
-                  </div>
-                  <div class="notification-item unread">
-                    <div class="notif-icon-circle green">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                    <div class="notif-content">
-                      <p class="notif-text"><strong>Payment Confirmed:</strong> ₹36,000 received from Amit Verma</p>
-                      <span class="notif-time">25m ago</span>
-                    </div>
-                  </div>
-                  <div class="notification-item unread">
-                    <div class="notif-icon-circle purple">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                    </div>
-                    <div class="notif-content">
-                      <p class="notif-text"><strong>Special Requirement:</strong> Room Heating requested for BK-5027</p>
-                      <span class="notif-time">1h ago</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div class="desktop-notifications-dropdown notifications-panel" id="desktop-notifications-dropdown" hidden>${notificationsHtml()}</div>
             </div>
           </div>
         </header>
@@ -222,14 +207,39 @@ export function createDesktopView(container) {
                       <button class="btn-expand-full-table" id="desktop-btn-expand-table" title="Expand to Full Table View" aria-label="Expand to full table">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                       </button>
+                      ${inlineSelectionBar('compact')}
                     </div>
                     <div id="desktop-compact-tabs-host"></div>
                   </div>
-                  <div class="compact-list-items" id="desktop-compact-list-items">
+                  <div class="compact-list-items row-list" id="desktop-compact-list-items">
                     <!-- Populated dynamically in renderTable() -->
                   </div>
                 </div>
               </div>
+
+              <!-- Calendar page: the month and agenda take the list's place; the detail pane stays the same -->
+              <section class="desktop-calendar-col" id="desktop-calendar-col" aria-label="Calendar"></section>
+              <aside class="desktop-calendar-empty" id="desktop-calendar-empty">
+                <div class="state-box"><h4>Select a booking</h4><p>Choose an item from the agenda to see its details here.</p></div>
+              </aside>
+
+              <!-- Operations Team page: the roster takes the list's place; the detail pane shows team member details -->
+              <section class="desktop-team-col" id="desktop-team-col" aria-label="Operations Team"></section>
+              <aside class="desktop-team-empty" id="desktop-team-empty">
+                <div class="state-box">
+                  <div style="width: 56px; height: 56px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  </div>
+                  <h4 style="font-size: 16px; font-weight: 700; color: #0F172A; margin: 0 0 8px; letter-spacing: 0.3px;">SELECT MEMBER TO KNOW DETAILS</h4>
+                  <p style="font-size: 13.5px; color: #64748B; margin: 0; max-width: 380px; line-height: 1.5;">Choose a team member from the list to view their profile, performance, assignments, and operational details.</p>
+                </div>
+              </aside>
+              <aside class="desktop-team-detail" id="desktop-team-detail" aria-label="Team Member Details"></aside>
 
               <!-- Right Column: Inline Detail Pane (Outlook Style - NO dark popup backdrop!) -->
               <aside class="desktop-details-drawer" id="desktop-details-drawer">
@@ -507,6 +517,20 @@ export function createDesktopView(container) {
 
   const TH_CHECK = `<th style="width: 44px; padding-left: 20px; padding-right: 0;"><div class="custom-checkbox" id="desktop-th-select-all" role="checkbox" aria-checked="false" aria-label="Select all" tabindex="0">${icon('check', { size: 12, stroke: 3 })}</div></th>`;
   const TH_ACTION = '<th style="text-align: right; padding-right: 24px; min-width: 130px;">Action</th>';
+  const calendar = createDesktopCalendar(container.querySelector('#desktop-calendar-col'), {
+    isActive: () => page === 'calendar' && document.documentElement.dataset.layout === 'desktop',
+    onOpen: (b) => openDrawer(b),
+  });
+  const teamView = createDesktopTeam({
+    colHost: container.querySelector('#desktop-team-col'),
+    detailHost: container.querySelector('#desktop-team-detail'),
+    splitHost: container.querySelector('#desktop-workspace-split'),
+    isActive: () => page === 'team' && document.documentElement.dataset.layout === 'desktop',
+    onViewBooking: (bId) => {
+      navigate('bookings', { q: bId });
+    },
+  });
+
   const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Amount</th>${TH_ACTION}</tr>`;
   const THEAD_INQUIRIES = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Nights</th><th>Travel Date</th><th class="col-secondary">Assigned To</th><th>Status</th><th class="col-note" style="min-width: 150px;">Quick Note</th>${TH_ACTION}</tr>`;
 
@@ -557,49 +581,39 @@ export function createDesktopView(container) {
       </tr>`;
   }
 
-  function compactCard(b, isCardActive) {
-    const inquiry = b.kind === 'inquiry';
-    return `
-      <div class="compact-booking-card ${isCardActive ? 'active' : ''}" data-compact-booking-id="${b.id}" style="cursor: pointer;">
-        <div class="compact-card-top">
-          <div class="compact-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
-          <div class="compact-info-col">
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-              ${inquiry ? '' : categoryBadge(b, 'style="font-size: 10px; padding: 2px 6px;"')}
-              <span class="compact-dates" style="font-size: 11px; color: #64748B;">${esc(b.dates)}</span>
-            </div>
-            <div class="compact-name-line">
-              <h4 class="compact-trip-title" title="${esc(b.guest.name)}">${esc(b.guest.name)}</h4>
-              ${inquiry ? `<span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>` : ''}
-            </div>
-            <p class="compact-guest-sub" style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
-              <span>${esc(b.title)}</span><span style="color: #94A3B8;">•</span><span>${b.pax} Pax</span>
-            </p>
-          </div>
-        </div>
-        <div class="compact-card-bottom">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            ${inquiry ? '' : `<span class="compact-price">${esc(b.price)}</span><span class="compact-status-badge ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>`}
-          </div>
-          <div class="card-action-btns-row" style="gap: 5px;">${rowActionButtons(b, 13, 'width: 28px; height: 28px;')}</div>
-        </div>
-      </div>`;
+  const compactCard = (b, isCardActive) => rowCard(b, { split: true, active: isCardActive });
+
+  // The rows the current tab, search and category show: what Select all applies to.
+  const viewRows = () => {
+    const catValue = selectedCategory === 'ALL' ? '' : selectedCategory;
+    return bookings.filter(b => matchesSearch(b) && matchesCategory(b, catValue) && (activeTab === allKey() || b.category === activeTab));
+  };
+
+  function syncBulkBars() {
+    const n = selectedOf(bookings).length;
+    const th = container.querySelector('#desktop-th-select-all');
+    if (th) { th.classList.toggle('checked', n > 0); th.setAttribute('aria-checked', n > 0); }
+    updateBulkBar(container, 'desktop', n);
+    updateInlineBar(container, 'compact', n);
   }
 
   // Update selection visuals in place (no re-render, so rows never remount or shift).
   function syncSelectionUI() {
-    container.querySelectorAll('[data-desktop-row-id]').forEach((tr) => {
-      const b = bookings.find(x => x.id === tr.dataset.desktopRowId);
-      if (!b) return;
-      tr.classList.toggle('row-checked', !!b.selected);
-      const cb = tr.querySelector('.custom-checkbox');
+    const paint = (el, b, cls) => {
+      el.classList.toggle(cls, !!b.selected);
+      const cb = el.querySelector('.custom-checkbox');
       cb.classList.toggle('checked', !!b.selected);
       cb.setAttribute('aria-checked', !!b.selected);
+    };
+    container.querySelectorAll('[data-desktop-row-id]').forEach((tr) => {
+      const b = bookings.find(x => x.id === tr.dataset.desktopRowId);
+      if (b) paint(tr, b, 'row-checked');
     });
-    const n = bookings.filter(b => b.selected).length;
-    const th = container.querySelector('#desktop-th-select-all');
-    if (th) { th.classList.toggle('checked', n > 0); th.setAttribute('aria-checked', n > 0); }
-    updateBulkBar(container, 'desktop', n);
+    container.querySelectorAll('[data-compact-booking-id]').forEach((card) => {
+      const b = bookings.find(x => x.id === card.dataset.compactBookingId);
+      if (b) paint(card, b, 'card-selected');
+    });
+    syncBulkBars();
   }
 
   // Re-render only the rows that changed (assign, paid, ...), keeping the rest of the DOM untouched.
@@ -657,10 +671,7 @@ export function createDesktopView(container) {
     }
     if (compact) compact.scrollTop = keepScroll;
 
-    const selectedCount = bookings.filter(b => b.selected).length;
-    updateBulkBar(container, 'desktop', selectedCount);
-    const thAll = container.querySelector('#desktop-th-select-all');
-    if (thAll) { thAll.classList.toggle('checked', selectedCount > 0); thAll.setAttribute('aria-checked', selectedCount > 0); }
+    syncBulkBars();
   }
 
   // Open & Close Detail Pane (Outlook Inline Split View)
@@ -668,12 +679,15 @@ export function createDesktopView(container) {
     activeBooking = booking;
     isDetailDrawerOpen = true;
     renderDetailPanel();
+    // On the Calendar page the primary action only applies to pending bookings.
+    const confirmBtn = container.querySelector('#desktop-confirm-booking-btn');
+    if (page === 'calendar' && booking.status !== 'Pending') confirmBtn?.style.setProperty('display', 'none', 'important'); else confirmBtn?.style.removeProperty('display');
     const split = container.querySelector('#desktop-workspace-split');
     const drawer = container.querySelector('#desktop-details-drawer');
     split.classList.add('has-open-detail');
     drawer.classList.add('open');
     renderTable();
-    container.querySelector('#desktop-compact-list-items .compact-booking-card.active')?.scrollIntoView({ block: 'nearest' });
+    container.querySelector('#desktop-compact-list-items .list-row-card.active')?.scrollIntoView({ block: 'nearest' });
   }
 
   function closeDrawer() {
@@ -683,6 +697,7 @@ export function createDesktopView(container) {
     const drawer = container.querySelector('#desktop-details-drawer');
     split.classList.remove('has-open-detail');
     drawer.classList.remove('open');
+    calendar.clearSelection();
     renderTable();
   }
 
@@ -702,7 +717,8 @@ export function createDesktopView(container) {
 
     // Header: Unified Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
     headerEl.innerHTML = `
-      <div class="sheet-drag-handle-bar desktop-sheet-top-bar" style="display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px 0 18px; background: #FFFFFF;">
+      <div class="sheet-drag-handle-bar desktop-sheet-top-bar" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 12px 18px 0 18px; background: #FFFFFF;">
+        ${page === 'calendar' ? '<button type="button" class="cal-view-booking" id="desktop-view-booking">View booking</button>' : ''}
         <button class="sheet-close-btn" id="close-desktop-detail-btn" title="Close Drawer (Esc)" aria-label="Close">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -1036,14 +1052,6 @@ export function createDesktopView(container) {
       }
     } else if (activeDetailTab === 'itinerary') {
       const days = b.itineraryDays || [];
-      const getItemIcon = (type) => {
-        if (type === 'bus' || type === 'transport') return `<div class="item-icon-box item-icon-bus"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5.3c-.3-1.1-1.3-1.9-2.4-1.9H5c-1.1 0-2.1.8-2.4 1.9L1.2 12.8c-.1.4-.2.8-.2 1.2 0 .4.1.8.2 1.2.3 1.1.8 2.8.8 2.8h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg></div>`;
-        if (type === 'bed' || type === 'hotel') return `<div class="item-icon-box item-icon-bed"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg></div>`;
-        if (type === 'camera' || type === 'sightseeing') return `<div class="item-icon-box item-icon-camera"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>`;
-        if (type === 'raft' || type === 'activity') return `<div class="item-icon-box item-icon-raft"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M20 12v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3"/><line x1="8" y1="12" x2="6" y2="6"/><line x1="16" y1="12" x2="18" y2="6"/></svg></div>`;
-        return `<div class="item-icon-box item-icon-restaurant"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 11v11"/><path d="M4 2v20"/><path d="M4 2c2 0 5 1 5 4v2a3 3 0 0 1-3 3H4"/></svg></div>`;
-      };
-
       bodyEl.innerHTML = `
         <div class="itinerary-tab-content">
           <div class="itinerary-section-header-bar">
@@ -1058,32 +1066,33 @@ export function createDesktopView(container) {
               </div>
               <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
             </div>
-            <div class="itin-actions"><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button><button class="btn-add-event-pill" id="desktop-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
+            <div class="itin-actions"><button class="btn-add-event-pill" id="desktop-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
           </div>
 
           <div class="itinerary-v2-container">
-          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Add a day to start planning.</p><button class="btn-add-event-pill" data-add-day>${icon('plus', { size: 13, stroke: 2.5 })}Add Day</button></div>` : ''}
+          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Use Add Event to create the first day.</p></div>` : ''}
           ${days.map((d, dayIdx) => `
             <div class="itinerary-day-section">
               <div class="timeline-day-col">
-                <span class="day-badge-text">${d.day}</span>
-                <span class="day-date-sub">${d.date}</span>${d.title ? `<span class="day-title-sub">${esc(d.title)}</span>` : ''}<button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button>
+                <div class="day-head"><span class="day-badge-text">${d.day}</span><button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button></div><span class="day-date-sub">${d.date}</span>${d.title ? `<span class="day-title-sub">${esc(d.title)}</span>` : ''}
               </div>
               <div class="timeline-track-col">
                 <div class="timeline-line-track"></div>
                 <div class="timeline-dot-node"></div>
               </div>
               <div class="timeline-items-col">
+                ${d.items.length ? '' : '<p class="day-empty">No events yet</p>'}
                 ${d.items.map(item => `
                   <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-desktop-itinerary-item-id="${item.id}">
                     <div class="item-left-content">
-                      ${getItemIcon(item.type)}
+                      ${itemIconHtml(item)}
                       <div class="item-text-info">
-                        <h4 class="item-text-title">${item.title}</h4>
-                        <p class="item-text-sub">${item.subtitle}</p>
+                        <h4 class="item-text-title">${esc(item.title)}</h4>
+                        <p class="item-text-sub">${esc(item.subtitle)}</p>
                       </div>
                     </div>
                     <div class="item-right-content">
+                      ${itemPills(item)}
                       ${item.completed ? `
                         <span class="completed-pill-badge" title="Completed">
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -1359,11 +1368,11 @@ export function createDesktopView(container) {
     const rec = activeBooking;
     if (!item || !rec) return;
     const prev = item.assigned;
-    const t = EVENT_TYPES.find(x => x.value === item.type) || EVENT_TYPES[0];
+    const t = eventKind(item);
     openAssign({
       kind: 'itinerary',
       items: [{ id: item.id, title: item.title, name: item.title }],
-      summary: { title: item.title, subtitle: item.subtitle, badge: t.label.split(' / ')[0], iconHtml: icon(t.icon, { size: 22 }) },
+      summary: { title: item.title, subtitle: item.subtitle, badge: t.label, iconHtml: icon(t.icon, { size: 22 }) },
       onApply: (who) => { item.assigned = { isAssigned: true, name: who.name, avatar: who.avatar }; renderDetailPanel(); },
       onRevert: () => { item.assigned = prev; renderDetailPanel(); },
       persist: () => persist(rec, { onRollback: renderDetailPanel }),
@@ -1482,7 +1491,23 @@ export function createDesktopView(container) {
       }
       container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
-      if (topSearch) topSearch.placeholder = 'Search by name, trip, destination, or phone...';
+      container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
+      container.querySelector('#nav-team')?.classList.toggle('active', page === 'team');
+      container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
+      container.querySelector('#desktop-workspace-split')?.classList.toggle('team-mode', page === 'team');
+      if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
+      if (page === 'team') {
+        const memId = getParams().member || null;
+        if (changed || memId !== teamView.getSelectedMemberId()) {
+          teamView.activate(memId);
+        } else {
+          teamView.render();
+        }
+      }
+      if (changed && page !== 'team') {
+        teamView.selectMember(null, false);
+      }
+      if (topSearch) topSearch.placeholder = page === 'team' ? 'Search team members by name or role...' : 'Search by name, trip, destination, or phone...';
       container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking');
       applyParams();
       if (changed && scroller) scroller.scrollTop = scrollMemory[page] || 0;
@@ -1505,25 +1530,36 @@ export function createDesktopView(container) {
     loadInquiries();
     syncBookingPayments().then(() => renderTable());
 
-    container.querySelectorAll('a.sidebar-nav-item[href="#bookings"], a.sidebar-nav-item[href="#inquiries"]').forEach((a) => {
+    container.querySelectorAll('a.sidebar-nav-item[href="#bookings"], a.sidebar-nav-item[href="#inquiries"], a.sidebar-nav-item[href="#calendar"], a.sidebar-nav-item[href="#team"]').forEach((a) => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
         navigate(a.getAttribute('href').slice(1));
       });
     });
 
+    const opsHeader = container.querySelector('#nav-section-operations');
+    if (opsHeader) {
+      opsHeader.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate('team');
+      });
+    }
+
     // Pages that are not built yet: stay on the current page and say so (no hash change, no mismatch)
-    container.querySelectorAll('a.sidebar-nav-item[href="#dashboard"], a.sidebar-nav-item[href="#calendar"], a.sidebar-nav-item[href="#settings"]').forEach((a) => {
+    container.querySelectorAll('a.sidebar-nav-item[href="#dashboard"], a.sidebar-nav-item[href="#settings"]').forEach((a) => {
       a.addEventListener('click', (e) => { e.preventDefault(); toast(`${a.textContent.trim()} is coming soon.`, 'info'); });
     });
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
 
     // Bulk bar: select all / clear / search / filter / Assign
-    bindBulkBar(container, 'desktop', {
-      onSelectAll: () => { const any = bookings.some(b => !b.selected); bookings.forEach(b => { b.selected = any; }); syncSelectionUI(); },
-      onClear: () => { bookings.forEach(b => { b.selected = false; }); syncSelectionUI(); },
-      onAssign: () => assignSelected(),
-    });
+    for (const prefix of ['desktop', 'compact']) {
+      bindBulkBar(container, prefix, {
+        selectAllLabel: () => `Select all ${viewRows().length}`,
+        onSelectAll: () => { setSelected(viewRows(), true); syncSelectionUI(); },
+        onClear: () => { setSelected(bookings, false); syncSelectionUI(); },
+        onAssign: () => assignSelected(),
+      });
+    }
 
     function startAssign(list) {
       const prev = list.map(b => ({ b, assignedTo: b.assignedTo, assignedStatus: b.assignedStatus }));
@@ -1571,13 +1607,28 @@ export function createDesktopView(container) {
       else if (key === 'followup') openFollowUpModal(b.raw);
     }
 
+    // Icon-rail sidebar (below 1100px): tap the logo to expand it over the content; tap outside, a link or Esc to fold it.
+    const layoutEl = container.querySelector('.desktop-layout');
+    const sidebar = container.querySelector('.desktop-sidebar');
+    const setRail = (open) => { sidebar.classList.toggle('rail-open', open); layoutEl.classList.toggle('rail-open', open); };
+    container.addEventListener('click', (e) => {
+      if (e.target.closest('.brand-icon-box') && innerWidth < 1100) { setRail(!sidebar.classList.contains('rail-open')); return; }
+      if (sidebar.classList.contains('rail-open') && (e.target.closest('a.sidebar-nav-item') || !e.target.closest('.desktop-sidebar'))) setRail(false);
+    });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') setRail(false); });
+    window.addEventListener('resize', () => { if (innerWidth >= 1100) setRail(false); });
+
+    bindQuickNotes(container);
     container.addEventListener('submit', async (e) => {
       const form = e.target.closest('[data-quick-note]');
       if (!form) return;
       e.preventDefault();
       const input = form.querySelector('input');
-      if (!input.value.trim()) { input.focus(); return; } // empty: just focus the field
+      const send = form.querySelector('.quick-note-send');
+      if (!input.value.trim() || send.disabled) return; // empty notes cannot be sent
+      send.disabled = true; // one request at a time; it stays off until the field changes
       if (await saveQuickNote(form.dataset.quickNote, input.value)) input.value = '';
+      else send.disabled = !input.value.trim();
     });
 
     container.addEventListener('click', (e) => {
@@ -1605,10 +1656,40 @@ export function createDesktopView(container) {
     const backdrop = container.querySelector('#desktop-drawer-backdrop');
     if (backdrop) backdrop.addEventListener('click', closeDrawer);
 
+    bindNotifications({ bell: container.querySelector('#desktop-bell-btn'), panel: container.querySelector('#desktop-notifications-dropdown'), dot: container.querySelector('#desktop-bell-dot') });
+
+    // Selection from the keyboard: Space toggles the focused checkbox, Ctrl/Cmd+A selects every row in view, Esc clears.
+    container.addEventListener('keydown', (e) => {
+      const chk = e.target.closest?.('[data-desktop-select-id]');
+      if (chk && (e.key === ' ' || e.key === 'Enter')) {
+        e.preventDefault();
+        const id = chk.dataset.desktopSelectId;
+        toggleRow(viewRows(), id);
+        lastToggled = id;
+        syncSelectionUI();
+        return;
+      }
+      if (!e.target.closest?.('#desktop-compact-list-view, #desktop-full-table-view') || e.target.closest('input, textarea')) return;
+      if ((e.key === 'a' || e.key === 'A') && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        setSelected(viewRows(), true);
+        syncSelectionUI();
+      } else if (e.key === 'Escape' && selectedOf(bookings).length) {
+        e.stopPropagation();
+        setSelected(bookings, false);
+        syncSelectionUI();
+      }
+    });
+
     // Keyboard Esc closes drawer
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isDetailDrawerOpen) {
-        closeDrawer();
+      // Esc belongs to an open dialog or sheet first (Assign, Follow-up, the itinerary builder), not the detail pane behind it.
+      if (e.key === 'Escape' && !e.defaultPrevented) {
+        if (page === 'team') {
+          teamView.selectMember(null);
+        } else if (isDetailDrawerOpen) {
+          closeDrawer();
+        }
       }
     });
 
@@ -1617,6 +1698,10 @@ export function createDesktopView(container) {
       // Drawer Close Button (delegated)
       if (e.target.closest('#close-desktop-detail-btn')) {
         closeDrawer();
+        return;
+      }
+      if (e.target.closest('#desktop-view-booking') && activeBooking) {
+        navigate('bookings', { q: activeBooking.id });
         return;
       }
       // Reset filters button in empty state
@@ -1758,17 +1843,18 @@ export function createDesktopView(container) {
       }
 
       // Desktop Add Event Modal Triggers & Actions
-      if (e.target.closest('#desktop-add-event-btn')) { openEventDialog(activeBooking, { onChange: renderDetailPanel }); return; }
-      if (e.target.closest('[data-add-day]')) { openDayDialog(activeBooking, { onChange: renderDetailPanel }); return; }
+      if (e.target.closest('#desktop-add-event-btn')) { openItineraryBuilder(activeBooking, { onChange: renderDetailPanel }); return; }
       const dayMenuBtn = e.target.closest('[data-day-menu]');
       if (dayMenuBtn) {
         e.stopPropagation();
         const idx = Number(dayMenuBtn.dataset.dayMenu);
         const rec = activeBooking;
         openRowMenu(dayMenuBtn, [
+          { key: 'add', label: 'Add event', icon: 'plus' },
           { key: 'rename', label: 'Rename day', icon: 'edit' },
           { key: 'delete', label: 'Delete day', icon: 'trash', danger: true },
         ], (key) => {
+          if (key === 'add') return openItineraryBuilder(rec, { day: idx, step: 2, onChange: renderDetailPanel });
           if (key === 'rename') return openDayDialog(rec, { index: idx, onChange: renderDetailPanel });
           if (daysOf(rec)[idx]?.items.length) return toast('Only empty days can be deleted. Remove its events first.', 'warning');
           commit(rec, () => { daysOf(rec).splice(idx, 1); renumber(rec); }, renderDetailPanel, 'Day deleted');
@@ -1920,11 +2006,9 @@ export function createDesktopView(container) {
       if (chk) {
         e.stopPropagation();
         const id = chk.dataset.desktopSelectId;
-        const b = bookings.find(item => item.id === id);
-        if (b) {
-          b.selected = !b.selected;
-          syncSelectionUI();
-        }
+        toggleRow(viewRows(), id, { from: lastToggled, shift: e.shiftKey });
+        lastToggled = id;
+        syncSelectionUI();
         return;
       }
 
@@ -1932,8 +2016,8 @@ export function createDesktopView(container) {
       const selectAllTrigger = e.target.closest('#desktop-select-all-box, #desktop-th-select-all');
       if (selectAllTrigger) {
         e.stopPropagation();
-        const anyUnselected = bookings.some(b => !b.selected);
-        bookings.forEach(b => b.selected = anyUnselected);
+        const rows = viewRows();
+        setSelected(rows, rows.some(b => !b.selected));
         syncSelectionUI();
         return;
       }
@@ -1987,6 +2071,7 @@ export function createDesktopView(container) {
       // Click on Compact Master List Card (Outlook Split View)
       const compactCard = e.target.closest('[data-compact-booking-id]');
       if (compactCard) {
+        if (e.target.closest('.quick-note')) return; // typing or sending a note never switches the detail pane
         const id = compactCard.dataset.compactBookingId;
         const b = bookings.find(item => item.id === id);
         if (b) {
@@ -2250,18 +2335,11 @@ export function createDesktopView(container) {
         return;
       }
 
-      // Staff member in left sidebar -> filter trips by staff
+      // Staff member in left sidebar -> open team page with member selected!
       const staffNav = e.target.closest('.staff-member-item');
       if (staffNav) {
         const staffId = staffNav.dataset.staffId;
-        const staff = STAFF_MEMBERS.find(s => s.id === staffId);
-        if (staff) {
-          if (currentPage() !== 'bookings') navigate('bookings');
-          setParams({ q: staff.name }, { push: false });
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Showing bookings assigned to ${staff.name}`, type: 'info' }
-          }));
-        }
+        navigate('team', { member: staffId });
         return;
       }
 
@@ -2326,35 +2404,6 @@ export function createDesktopView(container) {
       if (e.target.closest('#desktop-new-booking-btn')) {
         window.dispatchEvent(new CustomEvent('open-new-booking-modal'));
         return;
-      }
-
-      // Notification Bell on Desktop Top Header
-      if (e.target.closest('#desktop-bell-btn')) {
-        const dropdown = container.querySelector('#desktop-notifications-dropdown');
-        if (dropdown) {
-          const isOpen = dropdown.style.display === 'block';
-          dropdown.style.display = isOpen ? 'none' : 'block';
-          const dot = container.querySelector('#desktop-bell-dot');
-          if (dot) dot.style.display = 'none';
-        }
-        return;
-      }
-
-      // Mark All Notifications as Read
-      if (e.target.closest('#btn-mark-all-notifications-read')) {
-        container.querySelectorAll('.notification-item.unread').forEach(el => el.classList.remove('unread'));
-        const dot = container.querySelector('#desktop-bell-dot');
-        if (dot) dot.style.display = 'none';
-        window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { message: 'All notifications marked as read.', type: 'success' }
-        }));
-        return;
-      }
-
-      // Close notifications if clicked outside
-      if (!e.target.closest('#desktop-bell-btn') && !e.target.closest('#desktop-notifications-dropdown')) {
-        const dropdown = container.querySelector('#desktop-notifications-dropdown');
-        if (dropdown) dropdown.style.display = 'none';
       }
 
       // Guest Three Dots Menu Click

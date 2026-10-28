@@ -19,6 +19,7 @@ import { matchesCategory } from './shared/booking-filters.js';
 import { createDesktopCalendar } from './calendar-desktop.js';
 import { openAddInquiry } from './shared/add-inquiry.js';
 import { paneLayout, selectedParam, writeSelected, chooseRecord, bindListKeys } from './shared/split-view.js';
+import { createDesktopTeam } from './team-desktop.js';
 
 export function createDesktopView(container) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -57,7 +58,19 @@ export function createDesktopView(container) {
           </div>
         </div>
 
-        <nav class="sidebar-nav" aria-label="Main">${sidebarNavHtml(currentPage())}</nav>
+        <nav class="sidebar-nav" aria-label="Main">
+          ${sidebarNavHtml(currentPage())}
+          <span class="nav-section-title nav-section-team-title" id="nav-section-operations" style="cursor: pointer;" title="Operations Team Roster">Staff Members</span>
+          ${STAFF_MEMBERS.map(s => `
+            <div class="sidebar-nav-item staff-member-item" data-staff-id="${s.id}" style="cursor: pointer;" title="View ${s.name}'s profile and trips">
+              <div class="nav-left">
+                <img src="${s.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />
+                <span style="font-size: 13px;">${s.name}</span>
+              </div>
+              <span class="sidebar-badge" style="font-size: 10px;">${s.activeTrips} trips</span>
+            </div>
+          `).join('')}
+        </nav>
 
         <div class="sidebar-profile-box">
           <div class="profile-user-left">
@@ -149,6 +162,24 @@ export function createDesktopView(container) {
               <aside class="desktop-calendar-empty" id="desktop-calendar-empty">
                 <div class="state-box"><h4>Select a booking</h4><p>Choose an item from the agenda to see its details here.</p></div>
               </aside>
+
+              <!-- Operations Team page: the roster takes the list's place; the detail pane shows team member details -->
+              <section class="desktop-team-col" id="desktop-team-col" aria-label="Operations Team"></section>
+              <aside class="desktop-team-empty" id="desktop-team-empty">
+                <div class="state-box">
+                  <div style="width: 56px; height: 56px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  </div>
+                  <h4 style="font-size: 16px; font-weight: 700; color: #0F172A; margin: 0 0 8px; letter-spacing: 0.3px;">SELECT MEMBER TO KNOW DETAILS</h4>
+                  <p style="font-size: 13.5px; color: #64748B; margin: 0; max-width: 380px; line-height: 1.5;">Choose a team member from the list to view their profile, performance, assignments, and operational details.</p>
+                </div>
+              </aside>
+              <aside class="desktop-team-detail" id="desktop-team-detail" aria-label="Team Member Details"></aside>
 
               <!-- Right Column: Inline Detail Pane (Outlook Style - NO dark popup backdrop!) -->
               <aside class="desktop-details-drawer" id="desktop-details-drawer">
@@ -429,6 +460,15 @@ export function createDesktopView(container) {
   const calendar = createDesktopCalendar(container.querySelector('#desktop-calendar-col'), {
     isActive: () => page === 'calendar' && document.documentElement.dataset.layout === 'desktop',
     onOpen: (b) => openDrawer(b),
+  });
+  const teamView = createDesktopTeam({
+    colHost: container.querySelector('#desktop-team-col'),
+    detailHost: container.querySelector('#desktop-team-detail'),
+    splitHost: container.querySelector('#desktop-workspace-split'),
+    isActive: () => page === 'team' && document.documentElement.dataset.layout === 'desktop',
+    onViewBooking: (bId) => {
+      navigate('bookings', { q: bId });
+    },
   });
 
   const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Amount</th>${TH_ACTION}</tr>`;
@@ -1338,10 +1378,23 @@ export function createDesktopView(container) {
       container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
       container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
+      container.querySelector('#nav-team')?.classList.toggle('active', page === 'team');
       container.querySelector('#desktop-add-inquiry').hidden = page !== 'inquiries';
       container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
+      container.querySelector('#desktop-workspace-split')?.classList.toggle('team-mode', page === 'team');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
-      if (topSearch) topSearch.placeholder = 'Search by name, trip, destination, or phone...';
+      if (page === 'team') {
+        const memId = getParams().member || null;
+        if (changed || memId !== teamView.getSelectedMemberId()) {
+          teamView.activate(memId);
+        } else {
+          teamView.render();
+        }
+      }
+      if (changed && page !== 'team') {
+        teamView.selectMember(null, false);
+      }
+      if (topSearch) topSearch.placeholder = page === 'team' ? 'Search team members by name or role...' : 'Search by name, trip, destination, or phone...';
       container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking');
       applyParams();
       if (changed && scroller) scroller.scrollTop = scrollMemory[page] || 0;
@@ -1367,6 +1420,14 @@ export function createDesktopView(container) {
     syncBookingPayments().then(() => renderTable());
 
     bindSidebar(container.querySelector('.desktop-sidebar'));
+
+    const opsHeader = container.querySelector('#nav-section-operations');
+    if (opsHeader) {
+      opsHeader.addEventListener('click', (e) => {
+        e.preventDefault();
+        goToPage('team');
+      });
+    }
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
 
     // Add Inquiry: the one wizard. After a save the list shows everything again, the new row is selected and the lists are at the top.
@@ -1516,8 +1577,12 @@ export function createDesktopView(container) {
     // Keyboard Esc closes drawer
     window.addEventListener('keydown', (e) => {
       // Esc belongs to an open dialog or sheet first (Assign, Follow-up, the itinerary builder), not the detail pane behind it.
-      if (e.key === 'Escape' && isDetailDrawerOpen && !e.defaultPrevented) {
-        closeDrawer();
+      if (e.key === 'Escape' && !e.defaultPrevented) {
+        if (page === 'team') {
+          teamView.selectMember(null);
+        } else if (isDetailDrawerOpen) {
+          closeDrawer();
+        }
       }
     });
 
@@ -2163,18 +2228,11 @@ export function createDesktopView(container) {
         return;
       }
 
-      // Staff member in left sidebar -> filter trips by staff
+      // Staff member in left sidebar -> open team page with member selected!
       const staffNav = e.target.closest('.staff-member-item');
       if (staffNav) {
         const staffId = staffNav.dataset.staffId;
-        const staff = STAFF_MEMBERS.find(s => s.id === staffId);
-        if (staff) {
-          if (currentPage() !== 'bookings') navigate('bookings');
-          setParams({ q: staff.name }, { push: false });
-          window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { message: `Showing bookings assigned to ${staff.name}`, type: 'info' }
-          }));
-        }
+        navigate('team', { member: staffId });
         return;
       }
 

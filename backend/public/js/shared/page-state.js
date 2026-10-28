@@ -7,7 +7,14 @@ const notify = () => listeners.forEach((fn) => fn());
 import { NAV_ITEMS } from './nav.js';
 
 const PAGES = NAV_ITEMS.map((i) => i.key);
-const ALIASES = { enquiries: 'inquiries', enquiry: 'inquiries', inquiry: 'inquiries' };
+const ALIASES = {
+  enquiries: 'inquiries',
+  enquiry: 'inquiries',
+  inquiry: 'inquiries',
+  operations: 'team',
+  'operations-team': 'team',
+  team: 'team'
+};
 
 export function currentPage() {
   const raw = location.hash.replace(/^#/, '').split('?')[0].toLowerCase();
