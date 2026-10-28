@@ -347,10 +347,10 @@ export default {
 
         <div class="team-card-actions">
           <button type="button" class="circle-action-btn" data-action-call="${esc(phone)}" title="Call ${esc(u.name)}" aria-label="Call ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='tel:${esc(phone)}';">
-            ${icon('phone', { size: 12, stroke: 2.2 })}
+            ${icon('phone', { size: 13, stroke: 2.2 })}
           </button>
           <button type="button" class="circle-action-btn" data-action-mail="${esc(email)}" title="Email ${esc(u.name)}" aria-label="Email ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='mailto:${esc(email)}';">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            ${icon('mail', { size: 13, stroke: 2 })}
           </button>
           <span class="circle-action-btn is-chevron" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>

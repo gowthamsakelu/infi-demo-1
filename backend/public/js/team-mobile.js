@@ -199,10 +199,10 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
 
             <div class="mobile-team-card-actions">
               <a href="tel:${esc(m.phone)}" class="mobile-team-action-icon-btn btn-call" title="Call ${esc(m.phone)}" onclick="event.stopPropagation();">
-                ${icon('phone', { size: 16 })}
+                ${icon('phone', { size: 14, stroke: 2.2 })}
               </a>
               <a href="mailto:${esc(m.email)}" class="mobile-team-action-icon-btn btn-mail" title="Email ${esc(m.email)}" onclick="event.stopPropagation();">
-                ${icon('mail', { size: 16 })}
+                ${icon('mail', { size: 14, stroke: 2 })}
               </a>
               <button type="button" class="mobile-team-action-icon-btn btn-view" title="View Profile" aria-label="View Profile">
                 ${icon('chevronRight', { size: 15 })}

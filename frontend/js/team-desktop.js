@@ -423,7 +423,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
                   ${icon('phone', { size: 14, stroke: 2.2 })}
                 </button>
                 <button type="button" class="circle-action-btn" data-action-mail="${esc(m.email)}" title="Email ${esc(m.name)}" aria-label="Email ${esc(m.name)}">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  ${icon('mail', { size: 14, stroke: 2 })}
                 </button>
                 <span class="circle-action-btn is-chevron" aria-hidden="true">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
