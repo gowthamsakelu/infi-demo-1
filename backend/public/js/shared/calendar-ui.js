@@ -36,17 +36,16 @@ export function agendaCard(e, activeId) {
     </div>`;
 }
 
-/** One date: a collapsible heading and its timeline. `events` may be empty for the selected date. */
+/** One date: a collapsible heading and its timeline. Only dates with events are rendered. */
 export function dateSection(date, events, { activeId, selected, collapsed = false }) {
-  const body = events.length
-    ? `<div class="cal-timeline">${events.map((e) => agendaCard(e, activeId)).join('')}</div>`
-    : '<p class="cal-none">No bookings on this day</p>';
-  const meta = events.length ? `${events.length} ${events.length === 1 ? 'item' : 'items'}` : '';
+  if (!events || !events.length) return '';
+  const body = `<div class="cal-timeline">${events.map((e) => agendaCard(e, activeId)).join('')}</div>`;
+  const meta = `${events.length} ${events.length === 1 ? 'item' : 'items'}`;
   return `
     <section class="cal-section ${selected ? 'is-selected' : ''} ${collapsed ? 'is-collapsed' : ''}" data-cal-date="${date}">
       <button type="button" class="cal-section-head" data-cal-toggle="${date}" aria-expanded="${!collapsed}">
         <span class="cal-section-title">${esc(dateLabel(date))}</span>
-        <span class="cal-section-meta">${meta}${events.length ? icon('chevronDown', { size: 14, cls: 'cal-chev' }) : ''}</span>
+        <span class="cal-section-meta">${meta}${icon('chevronDown', { size: 14, cls: 'cal-chev' })}</span>
       </button>
       ${body}
     </section>`;

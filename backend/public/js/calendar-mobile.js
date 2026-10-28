@@ -92,10 +92,8 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
       if (s.status === 'error') { pane.innerHTML = errorAgenda(); return; }
       const groups = store.groupedByDate(c.key);
       if (s.status === 'loading' && ![...groups.values()].some((l) => l.length)) { pane.innerHTML = loadingAgenda(); return; }
-      const inMonth = s.selected.slice(0, 7) === `${s.year}-${String(s.month + 1).padStart(2, '0')}`;
-      if (inMonth && !groups.has(s.selected)) groups.set(s.selected, []);
       if (![...groups.values()].some((l) => l.length)) { pane.innerHTML = emptyAgenda(`No ${c.label.toLowerCase()} this month`); return; }
-      pane.innerHTML = [...groups.keys()].sort().map((d) => dateSection(d, groups.get(d), { selected: d === s.selected, collapsed: collapsed.has(d) })).join('');
+      pane.innerHTML = [...groups.keys()].filter((d) => groups.get(d)?.length).sort().map((d) => dateSection(d, groups.get(d), { selected: d === s.selected, collapsed: collapsed.has(d) })).join('');
     });
   }
 
@@ -159,7 +157,32 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
 
   function scrollPaneToSelected(smooth) {
     const pane = panes.children[paneIndex];
-    const el = pane?.querySelector(`[data-cal-date="${store.getState().selected}"]`);
+    if (!pane) return;
+    const targetDate = store.getState().selected;
+    let el = pane.querySelector(`[data-cal-date="${targetDate}"]`);
+    if (!el) {
+      const sections = [...pane.querySelectorAll('.cal-section[data-cal-date]')];
+      if (sections.length) {
+        el = sections.find((s) => s.dataset.calDate >= targetDate) || sections[sections.length - 1];
+        if (el) {
+          const nextDate = el.dataset.calDate;
+          store.getState().selected = nextDate;
+          lastSelected = nextDate;
+          weekVp.querySelectorAll('.cal-pill').forEach((p) => {
+            const on = p.dataset.calDay === nextDate;
+            p.classList.toggle('is-selected', on);
+            p.setAttribute('aria-pressed', String(on));
+          });
+          pane.querySelectorAll('.cal-section').forEach((sec) => {
+            sec.classList.toggle('is-selected', sec === el);
+          });
+          const targetWeek = weekOfSelected();
+          if (targetWeek !== -1 && targetWeek !== currentWeek()) {
+            showWeek(targetWeek, true);
+          }
+        }
+      }
+    }
     if (el) {
       if (smooth) {
         isScrollingProgrammatically = true;
@@ -206,7 +229,7 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
     if (s.selected !== lastSelected) {
       lastSelected = s.selected;
       weekVp.querySelectorAll('.cal-pill').forEach((p) => { const on = p.dataset.calDay === s.selected; p.classList.toggle('is-selected', on); p.setAttribute('aria-pressed', String(on)); });
-      renderPanes(); // the selected date always has a section, even an empty one
+      renderPanes();
       showWeek(Math.max(0, weekOfSelected()), true);
       scrollPaneToSelected(true);
     }
