@@ -1,5 +1,6 @@
-// One dropdown component: a trigger that opens a plain option list directly below it.
-// Used for the category filter on Bookings/Inquiries and for the filter in the Assign sheet.
+// One dropdown component: a trigger that opens a plain option list anchored to it, in a fixed layer above everything (never clipped by a parent,
+// never pushing the layout). The list is at least as wide as the trigger and at most 260px, aligns to the trigger's left edge, flips to the right
+// edge when it would leave the screen, and opens upward when there is no room below. Used for every filter and every select in the app.
 import { icon } from './icons.js';
 import { esc, dismissOnOutside } from './ui.js';
 
@@ -41,19 +42,44 @@ export function createDropdown({ options, onChange, variant = 'labelled', ariaLa
     });
   }
 
-  // Keep the list inside the viewport: flip above the trigger / align to the other edge when needed.
+  // Anchor the list to its trigger in a fixed layer and keep it inside the viewport (flip to the right edge, flip upward).
+  const GAP = 6;
+  const EDGE = 8;
   function place(host) {
+    const trigger = host.querySelector('.dd-trigger');
     const list = host.querySelector('.dd-list');
-    const r = host.getBoundingClientRect();
-    list.classList.remove('dd-up', 'dd-left');
-    const lr = list.getBoundingClientRect();
-    if (lr.bottom > window.innerHeight - 8 && r.top > lr.height + 12) list.classList.add('dd-up');
-    if (lr.left < 8) list.classList.add('dd-left');
+    if (!trigger || !list) return;
+    const r = trigger.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const vh = window.innerHeight;
+    const maxW = Math.min(260, vw - EDGE * 2);
+    Object.assign(list.style, { position: 'fixed', right: 'auto', bottom: 'auto', margin: '0', zIndex: '1300', minWidth: `${Math.min(r.width, maxW)}px`, maxWidth: `${maxW}px`, width: 'max-content', maxHeight: '', overflowY: 'auto', left: '0px', top: '0px', visibility: 'hidden' });
+    const lw = list.getBoundingClientRect().width;
+    const lh = list.getBoundingClientRect().height;
+    let left = r.left;
+    if (left + lw > vw - EDGE) left = r.right - lw; // would leave the screen: align to the trigger's right edge
+    left = Math.max(EDGE, Math.min(left, vw - EDGE - lw));
+    let top = r.bottom + GAP;
+    const roomBelow = vh - EDGE - top;
+    const roomAbove = r.top - GAP - EDGE;
+    if (lh > roomBelow && roomAbove > roomBelow) { // no room below, more above: open upward
+      top = Math.max(EDGE, r.top - GAP - Math.min(lh, roomAbove));
+      list.style.maxHeight = `${Math.min(lh, roomAbove)}px`;
+      list.classList.add('dd-up');
+    } else {
+      list.style.maxHeight = `${Math.max(120, Math.min(lh, roomBelow))}px`;
+      list.classList.remove('dd-up');
+    }
+    Object.assign(list.style, { left: `${left}px`, top: `${top}px`, visibility: '' });
   }
 
   function openList(host) {
     closeList(false);
-    open = { host, dispose: dismissOnOutside(host, () => closeList(true)) };
+    const stopOutside = dismissOnOutside(host, () => closeList(true));
+    const move = () => { if (open) place(open.host); };
+    window.addEventListener('resize', move);
+    window.addEventListener('scroll', move, true);
+    open = { host, dispose: () => { stopOutside(); window.removeEventListener('resize', move); window.removeEventListener('scroll', move, true); } };
     render();
     host.querySelector('li.selected')?.focus({ preventScroll: true });
   }

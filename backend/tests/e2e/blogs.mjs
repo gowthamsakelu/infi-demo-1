@@ -100,10 +100,12 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
 
   // Write Blog does nothing
   const add = page.locator(m ? '#mobile-page-add' : '#desktop-page-add');
-  check(`${tag} Write Blog is drawn`, await add.isVisible() && /Write Blog/.test(await add.innerText()));
+  check(`${tag} Write Blog is drawn`, await add.isVisible() && /^Add$/.test((await add.innerText()).trim()));
   await page.locator('[data-bg-tab="all"]').click(); await wait(300);
   await add.click(); await wait(400);
-  check(`${tag} Write Blog does nothing yet`, await page.locator('.modal-overlay.open, .asg-overlay.open, .sheet-overlay.open, [role="dialog"]:visible').count() === 0 && await page.locator('.bg-row').count() === 10);
+  await page.locator('#desktop-page-add, #mobile-page-add').first().click(); await wait(700);
+  check(`${tag} Write Blog opens the shared wizard`, await page.locator('.wiz-sheet').count() === 1 && await page.locator('.bg-row, .bn-card').count() === 10);
+  await page.keyboard.press('Escape'); await wait(500);
   check(`${tag} no field focused`, await page.evaluate(() => !/INPUT|TEXTAREA/.test(document.activeElement.tagName)));
 
   // empty and error states

@@ -108,9 +108,11 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
 
   // Add Banner does nothing
   const add = page.locator(m ? '#mobile-page-add' : '#desktop-page-add');
-  check(`${tag} Add Banner is drawn`, await add.isVisible() && /Add Banner/.test(await add.innerText()));
+  check(`${tag} Add Banner is drawn`, await add.isVisible() && /^Add$/.test((await add.innerText()).trim()));
   await add.click(); await wait(400);
-  check(`${tag} Add Banner does nothing yet`, await page.locator('.modal-overlay.open, .asg-overlay.open, .sheet-overlay.open, [role="dialog"]:visible').count() === 0 && await page.locator('.bn-card').count() === 8);
+  await page.locator('#desktop-page-add, #mobile-page-add').first().click(); await wait(700);
+  check(`${tag} Add Banner opens the shared wizard`, await page.locator('.wiz-sheet').count() === 1 && await page.locator('.bg-row, .bn-card').count() === 8);
+  await page.keyboard.press('Escape'); await wait(500);
   check(`${tag} no field focused`, await page.evaluate(() => !/INPUT|TEXTAREA/.test(document.activeElement.tagName)));
   check(`${tag} the only solid primary button is Add Banner in the top bar (no title row)`, m || (await page.locator('.sp .btn-primary-desktop:visible').count() === 0 && await page.locator('.sp-titlebar, .sp-actions, .sp-add').count() === 0 && await page.locator('#desktop-page-add.btn-primary-desktop').isVisible()));
 

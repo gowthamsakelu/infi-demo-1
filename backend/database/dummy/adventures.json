@@ -19,10 +19,24 @@
             "minAge": "3 years",
             "partner": "Gulmarg Ropeway Ltd.",
             "meetingPoint": "Gondola base station",
-            "description": "Cable car to Kongdoori and Apharwat Peak with views over the Pir Panjal.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "Ride Asia's highest cable car to Kongdoori and Apharwat Peak.\n\nPhase 1 climbs to Kongdoori meadows; Phase 2 continues to the snow line with views over the Pir Panjal range. Queues are shortest before 10 AM.",
+            "highlights": [
+                "Two-stage gondola to Apharwat Peak",
+                "Panoramic views of the Pir Panjal range",
+                "Snow play at Kongdoori",
+                "Short walk to the Strawberry Valley viewpoint"
+            ],
+            "inclusions": [
+                "Gondola tickets, both phases",
+                "Boarding entry and queue pass",
+                "Safety instructions at the base station"
+            ],
+            "exclusions": [
+                "Transport to Gulmarg",
+                "Guide charges",
+                "Meals and drinks",
+                "Personal expenses"
+            ],
             "bookings": 25
         },
         {
@@ -44,10 +58,23 @@
             "minAge": "All ages",
             "partner": "Srinagar Local Guides",
             "meetingPoint": "Dal Lake",
-            "description": "A sunrise or sunset paddle across the lake past floating gardens.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "A quiet sunrise or sunset shikara ride across Dal Lake, past the floating gardens and the houseboat rows.",
+            "highlights": [
+                "Private shikara for the whole ride",
+                "Floating vegetable gardens",
+                "Tea stop with Kahwa on the water",
+                "Views of Hari Parbat fort"
+            ],
+            "inclusions": [
+                "Private shikara for 1 hour",
+                "Life jackets",
+                "Boatman"
+            ],
+            "exclusions": [
+                "Hotel pickup and drop",
+                "Photography charges",
+                "Shopping on the lake"
+            ],
             "bookings": 21
         },
         {
@@ -69,10 +96,23 @@
             "minAge": "All ages",
             "partner": "Srinagar Local Guides",
             "meetingPoint": "Boulevard Road",
-            "description": "Nishat, Shalimar and Chashme Shahi gardens by car with a guide.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "A relaxed tour of the Mughal-era gardens beside Dal Lake: Nishat Bagh, Shalimar Bagh and Chashme Shahi.\n\nTerraced lawns, chinar trees and fountains make this a good half-day for families.",
+            "highlights": [
+                "Nishat Bagh terraces and fountains",
+                "Shalimar Bagh, built for Empress Nur Jahan",
+                "Chinar-lined walkways",
+                "Best in spring tulip and autumn colours"
+            ],
+            "inclusions": [
+                "Entry tickets for three gardens",
+                "Cab with driver for the tour",
+                "Local guide on request"
+            ],
+            "exclusions": [
+                "Camera fees",
+                "Meals and snacks",
+                "Tips"
+            ],
             "bookings": 23
         },
         {
@@ -94,10 +134,21 @@
             "minAge": "All ages",
             "partner": "Srinagar Local Guides",
             "meetingPoint": "Shankaracharya Hill",
-            "description": "A short climb to the hilltop temple with views over the valley.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "A short climb to the Shankaracharya Temple on Zabarwan hill, with the best sweep of Srinagar and Dal Lake.",
+            "highlights": [
+                "Ancient Shiva temple on a hilltop",
+                "Views over Srinagar and Dal Lake",
+                "About 240 steps from the parking area"
+            ],
+            "inclusions": [
+                "Cab to the base of the hill",
+                "Driver waiting time"
+            ],
+            "exclusions": [
+                "Temple offerings",
+                "Mobile and camera deposit",
+                "Meals"
+            ],
             "bookings": 23
         },
         {
@@ -119,10 +170,22 @@
             "minAge": "All ages",
             "partner": "Srinagar Local Guides",
             "meetingPoint": "Downtown",
-            "description": "Jamia Masjid, Khanqah-e-Moula and the lanes of the old city.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "Walk the lanes of Srinagar's old city with a local guide: Jamia Masjid, Khanqah-e-Moula and the wooden shrines along the Jhelum.",
+            "highlights": [
+                "Jamia Masjid courtyard",
+                "Khanqah-e-Moula shrine",
+                "Old bakeries and spice lanes",
+                "Papier-mache workshops"
+            ],
+            "inclusions": [
+                "Local guide for 3 hours",
+                "Kahwa tasting"
+            ],
+            "exclusions": [
+                "Transport to the old city",
+                "Shopping",
+                "Lunch"
+            ],
             "bookings": 22
         },
         {
@@ -144,10 +207,21 @@
             "minAge": "All ages",
             "partner": "Srinagar Local Guides",
             "meetingPoint": "Lal Chowk",
-            "description": "A traditional multi-course Kashmiri feast.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "A seven-course Wazwan dinner at a family-run kitchen, served in the traditional trami platter for four.",
+            "highlights": [
+                "Seven-course traditional Wazwan",
+                "Served on the shared trami platter",
+                "Vegetarian option on request"
+            ],
+            "inclusions": [
+                "Wazwan dinner",
+                "Kahwa to finish"
+            ],
+            "exclusions": [
+                "Transport",
+                "Soft drinks and bottled water",
+                "Extra dishes"
+            ],
             "bookings": 21
         },
         {
@@ -169,10 +243,21 @@
             "minAge": "All ages",
             "partner": "Srinagar Local Guides",
             "meetingPoint": "Dal Lake",
-            "description": "Early morning vegetable market held on boats.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "Paddle through the early-morning vegetable market on Dal Lake, where growers sell by boat before sunrise.",
+            "highlights": [
+                "Sunrise market on the water",
+                "Fresh lotus stems and local greens",
+                "Photography of the boat traders"
+            ],
+            "inclusions": [
+                "Shikara for 2 hours",
+                "Boatman guide"
+            ],
+            "exclusions": [
+                "Hotel pickup (5 AM)",
+                "Breakfast",
+                "Anything you buy"
+            ],
             "bookings": 33
         },
         {
@@ -194,10 +279,21 @@
             "minAge": "All ages",
             "partner": "Srinagar Local Guides",
             "meetingPoint": "Zabarwan",
-            "description": "Terraced garden ruins with evening views.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "Two small Mughal-era gardens on the Zabarwan slope: Pari Mahal, a terraced palace, and the spring-fed Chashme Shahi.",
+            "highlights": [
+                "Terraced garden with lake views",
+                "Chashme Shahi natural spring",
+                "Short, easy walks"
+            ],
+            "inclusions": [
+                "Entry tickets",
+                "Cab for the visit"
+            ],
+            "exclusions": [
+                "Guide charges",
+                "Meals",
+                "Photography fees"
+            ],
             "bookings": 31
         },
         {
@@ -219,10 +315,21 @@
             "minAge": "All ages",
             "partner": "Gulmarg Local Guides",
             "meetingPoint": "Gulmarg Meadow",
-            "description": "Cable car from the meadow to Kongdoori.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "The first phase of the Gulmarg Gondola, from Gulmarg town to Kongdoori at 2,600 m. A shorter, cheaper option for a half-day.",
+            "highlights": [
+                "Ride to Kongdoori meadows",
+                "Snow play and sledding",
+                "Tea stalls at the top station"
+            ],
+            "inclusions": [
+                "Phase 1 gondola ticket",
+                "Boarding entry"
+            ],
+            "exclusions": [
+                "Phase 2 ticket",
+                "Sledge hire",
+                "Meals"
+            ],
             "bookings": 33
         },
         {
@@ -244,10 +351,22 @@
             "minAge": "8 years",
             "partner": "Gulmarg Local Guides",
             "meetingPoint": "Apharwat Peak",
-            "description": "The higher ride to Apharwat with snow views most of the year.",
-            "highlights": [],
-            "inclusions": [],
-            "exclusions": [],
+            "description": "The second phase, from Kongdoori to Apharwat Peak at 3,980 m. Open when the weather allows; the staff can confirm on the day.",
+            "highlights": [
+                "Ride to the Apharwat snow line",
+                "Top views of the Pir Panjal",
+                "Skiing viewpoint"
+            ],
+            "inclusions": [
+                "Phase 2 gondola ticket",
+                "Boarding entry",
+                "Safety briefing"
+            ],
+            "exclusions": [
+                "Phase 1 ticket",
+                "Ski gear hire",
+                "Guide charges"
+            ],
             "bookings": 14
         }
     ]

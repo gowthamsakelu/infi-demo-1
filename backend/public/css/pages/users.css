@@ -378,7 +378,7 @@
   background: transparent !important;
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--motion-fast) var(--ease-out);
 }
 
 .us-info-card.is-collapsed .us-info-dropdown-header {
@@ -405,7 +405,7 @@
   font-weight: 700;
   color: #0F172A;
   letter-spacing: -0.01em;
-  transition: color 0.15s ease;
+  transition: color var(--motion-fast) var(--ease-out);
 }
 
 .us-dropdown-arrow {
@@ -415,7 +415,7 @@
   width: 20px;
   height: 20px;
   color: #64748B;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s;
+  transition: transform var(--motion-base) var(--ease-out), color var(--motion-base);
   transform: rotate(-90deg);
 }
 
@@ -433,7 +433,7 @@
 
 .us-info-dropdown-body.open {
   display: block;
-  animation: usFadeIn 0.2s ease-out;
+  animation: usFadeIn var(--motion-base) var(--ease-out);
 }
 
 @keyframes usFadeIn {
@@ -622,7 +622,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color var(--motion-base) var(--ease-out);
   outline: none;
   flex: none;
 }
@@ -647,7 +647,7 @@
   border-radius: 50%;
   background: #FFFFFF;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--motion-base) var(--ease-out);
 }
 
 .us-toggle.is-checked .us-toggle-knob {
@@ -717,7 +717,7 @@
   z-index: 399 !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: opacity var(--motion-slow) var(--ease-out) !important;
 }
 
 :where(html[data-layout="mobile"]) body.sp-detail-open [data-sp="users"] .us-sheet-backdrop {
@@ -740,7 +740,7 @@
   display: flex !important;
   flex-direction: column !important;
   transform: translateY(105%) !important;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform var(--motion-slow) var(--ease-out) !important;
   padding: 0 !important;
   overflow: hidden !important;
 }
@@ -779,7 +779,7 @@
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  transition: background 0.15s ease, color 0.15s ease !important;
+  transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out) !important;
   padding: 0 !important;
 }
 :where(html[data-layout="mobile"]) [data-sp="users"] .us-sheet-close-btn:hover,
@@ -918,39 +918,14 @@
   border: 1px solid #E2E8F0 !important;
   border-radius: 12px !important;
   padding: 12px 14px !important;
-  transition: background 0.15s ease, border-color 0.15s ease !important;
+  transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out) !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
 }
 :where(html[data-layout="mobile"]) [data-sp="users"] .sp-row:active {
   background: #F8FAFC !important;
 }
 
-/* --------------------------------------------------------------------------
-   Header Add User Button & Modals
-   -------------------------------------------------------------------------- */
-.us-header-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 14px;
-  height: 38px;
-  border-radius: 8px;
-  background: #2563EB;
-  color: #FFFFFF;
-  font-size: 13px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s ease;
-}
-.us-header-add-btn:hover {
-  background: #1D4ED8;
-}
-
-:where(html[data-layout="mobile"]) .us-header-add-btn {
-  display: none;
-}
+/* Modals */
 
 .us-modal .modal-card {
   width: 500px;
@@ -965,8 +940,3 @@
   overflow-y: auto;
 }
 
-/* Ensure redundant top-bar Add button is never visible on Users page */
-:where(html) .page-mode #desktop-page-add,
-#desktop-page-add[hidden] {
-  display: none !important;
-}

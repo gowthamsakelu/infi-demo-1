@@ -9,6 +9,9 @@ use App\Models\Inquiry;
 use App\Models\SavedActivity;
 use App\Models\SavedHotel;
 use App\Support\DummyData;
+use App\Http\Requests\SaveDestinationRequest;
+use App\Support\DataUrlImage;
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -81,6 +84,8 @@ class DestinationController extends Controller
             'region' => $destination->region,
             'status' => $destination->status,
             'description' => $destination->description,
+            'highlights' => $destination->highlights ?? [],
+            'howToReach' => $destination->how_to_reach,
             'about' => [
                 'bestSeason' => $destination->best_season,
                 'averageTrip' => $destination->avg_days ? "{$destination->avg_days} days / {$destination->avg_nights} nights" : null,
@@ -120,5 +125,56 @@ class DestinationController extends Controller
 
             return false;
         })->count();
+    }
+
+    /** Add a destination from the wizard. With dummy data nothing is written: the page keeps the record in memory. */
+    public function store(SaveDestinationRequest $request): JsonResponse
+    {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
+        }
+
+        $destination = Destination::create($this->columns($request));
+        Cache::forget('pages.destinations.index');
+
+        return response()->json(['success' => true, 'data' => ['id' => $destination->id]], 201);
+    }
+
+    /** Save the destination the wizard was opened on. The id is a string: with dummy data it can be one the page made this session. */
+    public function update(SaveDestinationRequest $request, string $destination): JsonResponse
+    {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
+        }
+
+        $record = Destination::query()->findOrFail((int) $destination);
+        $record->update($this->columns($request, $record));
+        Cache::forget('pages.destinations.index');
+
+        return response()->json(['success' => true, 'data' => ['id' => $record->id]]);
+    }
+
+    /** The wizard's values in the table's columns. A new destination gets a unique slug from its name. */
+    private function columns(SaveDestinationRequest $r, ?Destination $current = null): array
+    {
+        $columns = [
+            'name' => $r->input('name'), 'region' => $r->input('region'), 'status' => $r->input('status', 'draft'), 'popular' => $r->boolean('popular'),
+            'best_season' => $r->input('bestSeason'), 'avg_days' => $r->input('avgDays'), 'avg_nights' => $r->input('avgNights'),
+            'ideal_duration' => $r->input('idealDuration'), 'nearest_airport' => $r->input('nearestAirport'), 'how_to_reach' => $r->input('howToReach'),
+            'description' => $r->input('description'), 'highlights' => array_values($r->input('highlights', [])),
+        ];
+        if (! $current) {
+            $base = Str::slug((string) $r->input('name')) ?: 'destination';
+            $slug = $base;
+            for ($n = 2; Destination::query()->where('slug', $slug)->exists(); $n++) {
+                $slug = $base.'-'.$n;
+            }
+            $columns['slug'] = $slug;
+        }
+        if ($image = DataUrlImage::store($r->input('image'), 'destinations')) {
+            $columns['image'] = $image;
+        }
+
+        return $columns;
     }
 }

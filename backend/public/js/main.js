@@ -1,10 +1,10 @@
 // Main Application Orchestrator
-import { createMobileView } from './mobile.js';
-import { createDesktopView } from './desktop.js';
+// mobile.js and desktop.js (about 115 KB each) are loaded only for the layout that is showing; the other one is loaded if the screen flips.
 import { INITIAL_BOOKINGS, STAFF_MEMBERS } from './data.js';
 import { refresh } from './shared/page-state.js';
 import { initKeyboard } from './shared/keyboard.js';
 import { watchScrollRows } from './shared/list-ui.js';
+import { watchStaticOverlays } from './shared/push.js';
 import { initLayout, applyLayout } from './shared/layout.js';
 import { enhanceSelects } from './shared/dropdown-filter.js';
 import { closeRowMenu } from './shared/ui.js';
@@ -33,13 +33,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!appContainer) return;
   await fontsReady();
   watchScrollRows();
+  watchStaticOverlays();
 
   // Layout can change live (fold/unfold, rotate, resize). CSS swaps the layout from <html data-layout>; here we reset
   // open overlays so nothing is left in a state that does not exist in the new layout.
-  initLayout(() => {
+  initLayout(async () => {
     closeRowMenu();
     closeAssign();
     closeFollowUpModal();
+    await ensureView();
     window.dispatchEvent(new Event('layout-changed'));
     refresh();
   });
@@ -129,9 +131,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const desktopSlot = document.getElementById('desktop-view-slot');
   const mobileSlot = document.getElementById('mobile-view-slot');
 
-  // Initialize Views
-  const mobileView = createMobileView(mobileSlot);
-  const desktopView = createDesktopView(desktopSlot);
+  // Build the view for the layout that is showing (the other one is built only if the screen flips).
+  let mobileView = null;
+  let desktopView = null;
+  async function ensureView() {
+    if (document.documentElement.dataset.layout === 'mobile') {
+      if (!mobileView) { const { createMobileView } = await import('./mobile.js'); mobileView = createMobileView(mobileSlot); }
+    } else if (!desktopView) {
+      const { createDesktopView } = await import('./desktop.js');
+      desktopView = createDesktopView(desktopSlot);
+    }
+  }
+  await ensureView();
 
   // Pages outside Bookings / Inquiries / Calendar live in a host: the PC one beside the sidebar, the phone one under the header.
   function syncHostedPage() {
@@ -187,8 +198,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       booking.pax = booking.guests.length;
 
       // Update both views
-      mobileView.updateBooking(booking);
-      desktopView.updateBooking(booking);
+      mobileView?.updateBooking(booking);
+      desktopView?.updateBooking(booking);
 
       showToast(`Added ${name} to ${booking.title}!`, 'success');
     }
@@ -219,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(10px)';
-      toast.style.transition = 'all 0.3s ease';
+      toast.style.transition = 'opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out)';
       setTimeout(() => toast.remove(), 300);
     }, action ? 6000 : 3200);
   }

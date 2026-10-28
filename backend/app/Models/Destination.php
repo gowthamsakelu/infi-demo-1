@@ -10,9 +10,9 @@ class Destination extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['slug', 'name', 'region', 'status', 'popular', 'keywords', 'best_season', 'avg_days', 'avg_nights', 'ideal_duration', 'nearest_airport', 'description', 'image'];
+    protected $fillable = ['slug', 'name', 'region', 'status', 'popular', 'keywords', 'best_season', 'avg_days', 'avg_nights', 'ideal_duration', 'nearest_airport', 'description', 'image', 'highlights', 'how_to_reach'];
 
-    protected $casts = ['popular' => 'boolean', 'keywords' => 'array', 'avg_days' => 'integer', 'avg_nights' => 'integer'];
+    protected $casts = ['popular' => 'boolean', 'keywords' => 'array', 'avg_days' => 'integer', 'avg_nights' => 'integer', 'highlights' => 'array'];
 
     /** The words that mean this destination in free text: its name and its keywords. */
     public function terms(): array

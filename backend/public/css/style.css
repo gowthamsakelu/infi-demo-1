@@ -2,7 +2,7 @@
    Ruyi Admin - Comprehensive Responsive Design System (Mobile & Desktop)
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+/* Fonts are self-hosted (css/fonts.css, font-display: swap): no blocking request to Google Fonts. */
 
 :root {
   --primary: #2563EB;
@@ -289,7 +289,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   color: #374151;
   border-radius: 50%;
-  transition: background 0.15s;
+  transition: background var(--motion-fast);
 }
 
 .icon-bell-btn:hover {
@@ -359,7 +359,7 @@ body.standalone-mobile .app-global-bar {
   height: 44px;
   gap: 10px;
   color: #64748B;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color var(--motion-base), box-shadow var(--motion-base);
 }
 
 .search-input-wrapper:focus-within {
@@ -396,7 +396,7 @@ body.standalone-mobile .app-global-bar {
   left: 12px;
   pointer-events: none;
   color: #64748B;
-  transition: color 0.15s ease;
+  transition: color var(--motion-fast) var(--ease-out);
   z-index: 2;
 }
 
@@ -417,7 +417,7 @@ body.standalone-mobile .app-global-bar {
   outline: none;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  transition: border-color var(--motion-base), box-shadow var(--motion-base), background-color var(--motion-base);
   min-width: 145px;
   max-width: 185px;
   appearance: none;
@@ -462,7 +462,7 @@ body.standalone-mobile .app-global-bar {
   color: #475569;
   border: none;
   font-family: var(--font-family);
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+  transition: background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out);
 }
 
 .tab-pill .pill-badge {
@@ -517,7 +517,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   cursor: pointer;
   background: #FFFFFF;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   user-select: none;
 }
 
@@ -546,7 +546,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .action-pill-btn:hover {
@@ -564,7 +564,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   color: #334155;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .action-more-btn:hover {
@@ -601,7 +601,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   border-radius: 8px;
   font-family: inherit;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   text-align: left;
 }
 
@@ -644,7 +644,7 @@ body.standalone-mobile .app-global-bar {
   border-radius: 16px;
   border: 1px solid #F1F5F9;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+  transition: background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out);
   cursor: pointer;
 }
 
@@ -773,7 +773,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   flex-shrink: 0;
   text-decoration: none;
   box-sizing: border-box;
@@ -898,7 +898,7 @@ body.standalone-mobile .app-global-bar {
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: color var(--motion-fast);
   background: none;
   border: none;
 }
@@ -942,7 +942,7 @@ body.standalone-mobile .app-global-bar {
   z-index: 30;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--motion-slow) var(--ease-out);
 }
 
 .sheet-backdrop.open {
@@ -970,7 +970,7 @@ body.standalone-mobile .app-global-bar {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.35s;
+  transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out), visibility var(--motion-slow);
   overflow: hidden;
 }
 
@@ -1143,7 +1143,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  transition: background 0.15s;
+  transition: background var(--motion-fast);
 }
 
 .btn-edit-action:hover {
@@ -1230,7 +1230,7 @@ body.standalone-mobile .app-global-bar {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.15s, opacity 0.15s;
+  transition: transform var(--motion-fast), opacity var(--motion-fast);
   flex-shrink: 0;
   padding: 0;
 }
@@ -1300,7 +1300,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   font-family: var(--font-family);
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   white-space: nowrap;
 }
 
@@ -1456,7 +1456,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   color: #475569;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--motion-fast);
 }
 
 .sheet-close-btn:hover {
@@ -1481,7 +1481,7 @@ body.standalone-mobile .app-global-bar {
   position: static !important;
   margin-left: auto !important;
   margin-top: 2px !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease !important;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out) !important;
   z-index: 10 !important;
   padding: 0 !important;
 }
@@ -1602,7 +1602,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   position: relative;
   font-family: var(--font-family);
-  transition: color 0.15s ease;
+  transition: color var(--motion-fast) var(--ease-out);
   flex-shrink: 0;
 }
 
@@ -1712,7 +1712,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: transform 0.15s, opacity 0.15s;
+  transition: transform var(--motion-fast), opacity var(--motion-fast);
 }
 
 .circle-action-btn:hover {
@@ -1808,7 +1808,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   font-family: var(--font-family);
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   white-space: nowrap;
 }
 
@@ -1838,7 +1838,7 @@ body.standalone-mobile .app-global-bar {
   background: #FFFFFF;
   border: 1px solid #F1F5F9;
   border-radius: 14px;
-  transition: background 0.15s;
+  transition: background var(--motion-fast);
 }
 
 .guest-item-card:hover {
@@ -1898,7 +1898,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   margin-top: 8px;
   font-family: var(--font-family);
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast), opacity var(--motion-fast);
 }
 
 .more-guests-toggle-btn:hover {
@@ -2045,7 +2045,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
   font-family: var(--font-family);
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+  transition: background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2078,7 +2078,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .quick-action-col-btn:hover {
@@ -2165,7 +2165,7 @@ body.standalone-mobile .app-global-bar {
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   cursor: pointer;
 }
 
@@ -2273,7 +2273,7 @@ body.standalone-mobile .app-global-bar {
   padding: 0 14px;
   gap: 10px;
   color: #64748B;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
 }
 
 .desktop-search-wrapper:focus-within {
@@ -2305,7 +2305,7 @@ body.standalone-mobile .app-global-bar {
   border: 1px solid #E2E8F0;
   background: #FFFFFF;
   color: #334155;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
@@ -2370,7 +2370,7 @@ body.standalone-mobile .app-global-bar {
   gap: 12px;
   padding: 12px 16px;
   border-bottom: 1px solid #F8FAFC;
-  transition: background 0.15s;
+  transition: background var(--motion-fast);
   cursor: pointer;
 }
 
@@ -2440,7 +2440,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   font-family: var(--font-family);
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast), opacity var(--motion-fast);
 }
 
 .btn-primary-desktop:hover {
@@ -2461,7 +2461,7 @@ body.standalone-mobile .app-global-bar {
   gap: 8px;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast), opacity var(--motion-fast);
 }
 
 .btn-secondary-desktop:hover {
@@ -2508,7 +2508,7 @@ body.standalone-mobile .app-global-bar {
   align-items: center;
   gap: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out);
 }
 
 .metric-card:hover {
@@ -2589,7 +2589,7 @@ body.standalone-mobile .app-global-bar {
   border: 1px solid transparent;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast), opacity var(--motion-fast);
 }
 
 .desktop-tab-btn:hover {
@@ -2621,7 +2621,7 @@ body.standalone-mobile .app-global-bar {
   height: 38px;
   width: 220px;
   color: #64748B;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .table-toolbar-search-box:focus-within {
@@ -2652,7 +2652,7 @@ body.standalone-mobile .app-global-bar {
   outline: none;
   cursor: pointer;
   font-family: inherit;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .desktop-select-filter:hover {
@@ -2738,7 +2738,7 @@ body.standalone-mobile .app-global-bar {
   border-radius: 8px;
   font-family: inherit;
   font-weight: 600;
-  transition: background 0.12s;
+  transition: background var(--motion-fast);
 }
 
 .bulk-more-dropdown .dropdown-item-btn:hover {
@@ -2773,7 +2773,7 @@ body.standalone-mobile .app-global-bar {
 
 .bookings-table tbody tr {
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out);
 }
 
 .bookings-table tbody tr:hover {
@@ -2869,7 +2869,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .row-view-details-btn:hover,
@@ -2895,14 +2895,14 @@ body.standalone-mobile .app-global-bar {
   flex: 1;
   position: relative;
   overflow: hidden;
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
+  transition: background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out);
 }
 
 .desktop-table-container {
   flex: 1;
   width: 100%;
   min-width: 0;
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
+  transition: background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out);
 }
 
 .desktop-workspace-split.has-open-detail .desktop-table-container {
@@ -3000,27 +3000,6 @@ body.standalone-mobile .app-global-bar {
   font-family: inherit;
 }
 
-.btn-expand-full-table {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid #E2E8F0;
-  background: #F8FAFC;
-  color: #64748B;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
-  flex-shrink: 0;
-}
-
-.btn-expand-full-table:hover {
-  background: #EFF6FF;
-  color: #2563EB;
-  border-color: #BFDBFE;
-}
-
 .compact-tabs-nav {
   display: flex;
   gap: 4px;
@@ -3043,7 +3022,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .compact-tab-btn.active {
@@ -3066,7 +3045,7 @@ body.standalone-mobile .app-global-bar {
   border: 1px solid #F1F5F9;
   background: #FFFFFF;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -3211,7 +3190,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   border: 1px solid transparent;
   font-family: inherit;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .pill-btn-call {
@@ -3257,7 +3236,7 @@ body.standalone-mobile .app-global-bar {
   border: 1px solid #CBD5E1;
   cursor: pointer;
   font-family: inherit;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .btn-edit-customer-pill:hover {
@@ -3448,7 +3427,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   cursor: pointer;
   color: #64748B;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .drawer-close-btn:hover {
@@ -3635,7 +3614,7 @@ body.standalone-mobile .app-global-bar {
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: transform 0.15s, opacity 0.15s;
+  transition: transform var(--motion-fast), opacity var(--motion-fast);
 }
 
 .mini-circle-btn:hover {
@@ -3669,7 +3648,7 @@ body.standalone-mobile .app-global-bar {
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease !important;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out) !important;
   font-family: var(--font-family) !important;
 }
 
@@ -3703,7 +3682,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600 !important;
   cursor: pointer !important;
   font-family: var(--font-family) !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease !important;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 
@@ -3760,7 +3739,7 @@ body.standalone-mobile .app-global-bar {
   z-index: 1000;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--motion-base) var(--ease-out);
 }
 
 .modal-overlay.open {
@@ -3778,7 +3757,7 @@ body.standalone-mobile .app-global-bar {
   display: flex;
   flex-direction: column;
   transform: scale(0.95);
-  transition: transform 0.2s ease;
+  transition: transform var(--motion-base) var(--ease-out);
 }
 
 .modal-overlay.open .modal-card {
@@ -3843,7 +3822,7 @@ body.standalone-mobile .app-global-bar {
   font-family: var(--font-family);
   color: #0F172A;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--motion-fast);
 }
 
 .form-group textarea {
@@ -3892,7 +3871,7 @@ body.standalone-mobile .app-global-bar {
   align-items: center;
   gap: 10px;
   pointer-events: auto;
-  animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideInToast var(--motion-slow) var(--ease-out);
 }
 
 .toast.toast-success {
@@ -4064,7 +4043,7 @@ body.standalone-mobile .app-global-bar {
   background: #FFFFFF;
   border: 1px solid #F1F5F9;
   position: relative;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .itinerary-card-item:hover {
@@ -4174,7 +4153,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   font-family: var(--font-family);
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   white-space: nowrap;
 }
 
@@ -4209,7 +4188,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer !important;
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
   font-family: var(--font-family) !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease !important;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out) !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
   line-height: 1 !important;
@@ -4284,7 +4263,7 @@ body.standalone-mobile .app-global-bar {
   padding: 4px 8px;
   border-radius: 6px;
   font-family: var(--font-family);
-  transition: background 0.15s ease;
+  transition: background var(--motion-fast) var(--ease-out);
 }
 
 .special-req-edit-btn:hover {
@@ -4309,7 +4288,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   color: #1E293B;
   user-select: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .special-req-chip:hover {
@@ -4355,7 +4334,7 @@ body.standalone-mobile .app-global-bar {
   font-weight: 600;
   color: #334155;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
   font-family: var(--font-family);
 }
 
@@ -4492,7 +4471,7 @@ body.standalone-mobile .app-global-bar {
   align-items: center;
   justify-content: center;
   color: #64748B;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--motion-fast), color var(--motion-fast);
 }
 
 .item-menu-btn::after { content: ""; position: absolute; inset: -6px; } /* a 44px touch target without taking 44px of width */
@@ -4519,7 +4498,7 @@ body.standalone-mobile .app-global-bar {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  animation: dropdownFadeIn 0.15s ease-out;
+  animation: dropdownFadeIn var(--motion-fast) var(--ease-out);
 }
 
 @keyframes dropdownFadeIn {
@@ -4548,7 +4527,7 @@ body.standalone-mobile .app-global-bar {
   cursor: pointer;
   font-family: var(--font-family);
   text-align: left;
-  transition: background 0.12s ease;
+  transition: background var(--motion-fast) var(--ease-out);
 }
 
 .dropdown-item-btn svg {
@@ -4599,7 +4578,7 @@ body.standalone-mobile .app-global-bar {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.35s;
+  transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out), visibility var(--motion-slow);
   overflow: hidden;
 }
 
@@ -4732,7 +4711,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   cursor: pointer;
   position: relative;
   font-family: var(--font-family);
-  transition: color 0.15s ease;
+  transition: color var(--motion-fast) var(--ease-out);
 }
 
 .assign-tab-btn.active {
@@ -4799,7 +4778,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   background: #FFFFFF;
   border: 1px solid #F1F5F9;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 
 .vendor-item-card:hover {
@@ -4917,7 +4896,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   font-weight: 700;
   cursor: pointer;
   font-family: var(--font-family);
-  transition: background 0.15s;
+  transition: background var(--motion-fast);
 }
 
 .btn-cancel-assign:hover {
@@ -4940,7 +4919,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   gap: 8px;
   font-family: var(--font-family);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, opacity 0.15s;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast), opacity var(--motion-fast);
 }
 
 .btn-whatsapp-assign:hover {
@@ -5410,7 +5389,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
 }
 .fu-toggle button.active { background: #2563EB; color: #FFFFFF; box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35); }
 .fu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -5469,7 +5448,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
 }
 .dd-trigger svg:first-child { color: #2563EB; flex-shrink: 0; }
 .dd-trigger:hover { border-color: #94A3B8; }
@@ -5562,7 +5541,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   flex-shrink: 0;
   position: relative;
   box-sizing: border-box;
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 }
 .quick-note-send::after { content: ""; position: absolute; inset: -2px; }
 .quick-note-send:hover { background: #1D4ED8; border-color: #1D4ED8; }
@@ -5631,7 +5610,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 /* ---- Split view: persistent DOM, only opacity/transform animate ---- */
 .desktop-workspace-split, .desktop-table-container { transition: none !important; }
 .desktop-workspace-split .desktop-compact-list-view { display: none; }
-.desktop-workspace-split.has-open-detail .desktop-compact-list-view { display: flex; animation: splitFadeIn 0.22s ease-out; }
+.desktop-workspace-split.has-open-detail .desktop-compact-list-view { display: flex; animation: splitFadeIn var(--motion-base) var(--ease-out); }
 .desktop-workspace-split.has-open-detail .desktop-full-table-view { display: none !important; }
 .desktop-workspace-split .desktop-details-drawer {
   display: flex !important;
@@ -5643,7 +5622,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   visibility: hidden;
   pointer-events: none;
   transform: translateX(28px) !important;
-  transition: opacity 0.28s ease-out, transform 0.28s ease-out, visibility 0s linear 0.28s !important;
+  transition: opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), visibility 0s linear var(--motion-base) !important;
 }
 .desktop-workspace-split .desktop-details-drawer.open {
   flex: 1 1 auto !important;
@@ -5653,7 +5632,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
   visibility: visible;
   pointer-events: auto;
   transform: none !important;
-  transition: opacity 0.28s ease-out 0.04s, transform 0.28s ease-out 0.04s, visibility 0s !important;
+  transition: opacity var(--motion-base) var(--ease-out) 0.04s, transform var(--motion-base) var(--ease-out) 0.04s, visibility 0s !important;
 }
 @keyframes splitFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -5676,7 +5655,7 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .filter-handle { display: none; width: 40px; height: 4px; border-radius: 4px; background: #CBD5E1; margin: 8px auto 0; }
 .fu-header .sheet-close-btn { position: static; flex-shrink: 0; }
 .fu-field > label { display: block; font-size: 12.5px; font-weight: 700; color: #475569; margin-bottom: 6px; }
-.fu-field select, .fu-field input, .fu-field textarea { width: 100%; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid #E2E8F0; background: #F8FAFC; color: #111827; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
+.fu-field select, .fu-field input, .fu-field textarea { width: 100%; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid #E2E8F0; background: #F8FAFC; color: #111827; font-size: 14px; font-family: inherit; outline: none; transition: border-color var(--motion-base), box-shadow var(--motion-base), background-color var(--motion-base); }
 .fu-field select:focus, .fu-field input:focus, .fu-field textarea:focus { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
 .fu-field .fu-textarea textarea { height: auto; min-height: 104px; padding: 10px 12px 34px; resize: none; }
 
@@ -5757,9 +5736,9 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .bulk-bar .bulk-count-btn, .bulk-bar .bulk-assign-btn { min-height: 40px; }
 
 /* ---- Assign sheet (shared by Bookings + Inquiries) ---- */
-.asg-overlay { position: fixed; inset: 0; z-index: 1150; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(2px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.2s ease; }
+.asg-overlay { position: fixed; inset: 0; z-index: 1150; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(2px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity var(--motion-base) var(--ease-out); }
 .asg-overlay.open { opacity: 1; }
-.asg-sheet { width: 100%; max-width: 560px; max-height: 92dvh; background: #FFFFFF; border-radius: 26px 26px 0 0; display: flex; flex-direction: column; overflow: hidden; transform: translateY(40px); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.22); }
+.asg-sheet { width: 100%; max-width: 560px; max-height: 92dvh; background: #FFFFFF; border-radius: 26px 26px 0 0; display: flex; flex-direction: column; overflow: hidden; transform: translateY(40px); transition: transform var(--motion-slow) var(--ease-out); box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.22); }
 .asg-overlay.open .asg-sheet { transform: none; }
 .asg-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 20px 8px; flex-shrink: 0; }
 .asg-header h3 { font-size: 18px; font-weight: 800; color: #111827; }
@@ -5816,13 +5795,13 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
     opacity: 1 !important;
     visibility: hidden !important;
     pointer-events: none !important;
-    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.32s !important;
+    transition: transform var(--motion-slow) var(--ease-out), visibility 0s linear var(--motion-slow) !important;
   }
 :where(html[data-layout="mobile"]) .phone-device .bottom-sheet.open {
     transform: translateY(0) !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s !important;
+    transition: transform var(--motion-slow) var(--ease-out), visibility 0s !important;
   }
 :where(html[data-layout="mobile"]) .sheet-sticky-footer { padding-bottom: max(12px, var(--safe-bottom)); }
 :where(html[data-layout="mobile"]) .sheet-drag-handle-bar { touch-action: none; }
@@ -5883,7 +5862,7 @@ html[data-layout="mobile"] { --row-avatar: 44px; }
 
 /* Follow-up sheet: same input look for date/time pickers and the outcome dropdown */
 .fu-card.asg-sheet { max-width: 520px; }
-.fu-picker { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 44px; padding: 0 12px; border: 1px solid #E2E8F0; border-radius: 12px; background: #F8FAFC; color: #111827; font-size: 14px; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
+.fu-picker { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 44px; padding: 0 12px; border: 1px solid #E2E8F0; border-radius: 12px; background: #F8FAFC; color: #111827; font-size: 14px; transition: border-color var(--motion-base), box-shadow var(--motion-base), background-color var(--motion-base); }
 .fu-picker svg { color: #64748B; flex-shrink: 0; }
 .fu-picker.is-empty .fu-picker-text { color: #94A3B8; }
 .fu-picker:focus-within { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
@@ -5913,8 +5892,8 @@ html[data-layout="mobile"] { --row-avatar: 44px; }
    ========================================================================== */
 :root {
   --motion-fast: 150ms;
-  --motion-base: 260ms;
-  --motion-slow: 320ms;
+  --motion-base: 240ms;
+  --motion-slow: 280ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 }
@@ -6079,7 +6058,6 @@ html.is-keyboard-open .asg-tabs .assign-tab-btn { min-height: 36px; }
 html.is-keyboard-open .asg-search-row { padding-top: 6px; padding-bottom: 4px; }
 html.is-keyboard-open .optional-note-box:not(:focus-within) { display: none; }
 html.is-keyboard-open .asg-footer { padding-top: 8px; padding-bottom: 10px; }
-.asg-summary, .asg-header, .asg-search-row { transition: margin var(--motion-base) var(--ease-out), padding var(--motion-base) var(--ease-out); }
 
 /* Summary icon box for itinerary events */
 .asg-thumb.asg-icon { display: flex; align-items: center; justify-content: center; background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
@@ -6353,8 +6331,8 @@ body,
    ========================================================================== */
 .compact-header-top { position: relative; min-height: 36px; }
 .compact-header-top > :not(.compact-selection-bar) { transition: opacity var(--motion-fast) var(--ease-out); }
-.compact-header-top.is-selecting > :not(.compact-selection-bar):not(.btn-expand-full-table) { opacity: 0; pointer-events: none; }
-.compact-selection-bar { position: absolute; top: 0; bottom: 0; left: 0; right: 40px; margin: 0; padding: 0; gap: 8px; background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity var(--motion-fast) var(--ease-out); }
+.compact-header-top.is-selecting > :not(.compact-selection-bar) { opacity: 0; pointer-events: none; }
+.compact-selection-bar { position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: 0; padding: 0; gap: 8px; background: #FFFFFF; opacity: 0; pointer-events: none; transition: opacity var(--motion-fast) var(--ease-out); }
 .compact-header-top.is-selecting .compact-selection-bar { opacity: 1; pointer-events: auto; }
 .compact-selection-bar .bulk-assign-btn { height: 36px; padding: 0 14px; }
 .compact-selection-bar .bulk-count-btn { height: 36px; }
@@ -6431,7 +6409,7 @@ body,
 :where(html[data-layout="mobile"]) .bld-footer .btn-primary-desktop { flex: 1 1 auto; }
 :where(html[data-layout="mobile"]) .bld-draft { display: none; }
 
-.bld-input { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 10px 0 12px; border: 1px solid #E2E8F0; border-radius: 12px; background: #F8FAFC; color: #64748B; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
+.bld-input { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 10px 0 12px; border: 1px solid #E2E8F0; border-radius: 12px; background: #F8FAFC; color: #64748B; transition: border-color var(--motion-base), box-shadow var(--motion-base), background-color var(--motion-base); }
 .bld-input:focus-within { border-color: #3B82F6; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
 .bld-input input, .fu-field .bld-input input { flex: 1 1 auto; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; box-shadow: none; font-size: 14px; color: #111827; }
 .bld-clear, .bld-stop-ok { flex: none; border: 0; background: transparent; color: #64748B; cursor: pointer; border-radius: 8px; min-width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font: inherit; font-size: 13px; font-weight: 700; }
@@ -6693,12 +6671,7 @@ body,
    Add Inquiry wizard: one dialog on the desktop layout, one bottom sheet on the mobile layout.
    Built from the shared sheet, fields, chips, counter and builder styles above; only its own layout lives here.
    ========================================================================== */
-.add-inquiry-btn[hidden], .add-inquiry-fab[hidden] { display: none; }
-.add-inquiry-btn { flex: none; white-space: nowrap; }
-.add-inquiry-fab { position: fixed; right: max(16px, var(--safe-right)); bottom: calc(68px + 16px + var(--safe-bottom)); z-index: 19; display: inline-flex; align-items: center; gap: 8px; height: 52px; padding: 0 20px 0 16px; border: 0; border-radius: var(--radius-full); background: var(--primary); color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; white-space: nowrap; box-shadow: var(--shadow-lg); cursor: pointer; transition: transform var(--motion-fast) var(--ease-out); }
-.add-inquiry-fab:active { transform: scale(0.97); }
-html.is-keyboard-open .add-inquiry-fab { display: none; }
-.add-inquiry-btn:focus-visible, .add-inquiry-fab:focus-visible, .wiz-step:focus-visible, .wiz-early:focus-visible, .toast-action:focus-visible, .wiz-bld .bld-link:focus-visible, .wiz-itin .bld-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ui-add-btn:focus-visible, .wiz-step:focus-visible, .wiz-early:focus-visible, .toast-action:focus-visible, .wiz-bld .bld-link:focus-visible, .wiz-itin .bld-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .toast-action { flex: none; min-height: 32px; margin-left: 4px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; color: #93C5FD; font: inherit; font-weight: 700; cursor: pointer; }
 
 .asg-sheet.wiz-sheet { width: 100%; max-width: 860px; display: flex; flex-direction: column; }

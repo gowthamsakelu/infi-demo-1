@@ -3,7 +3,7 @@
 // a scrolling body and a footer that stays in view. One engine below; each kind of event only supplies its fields.
 import { icon } from './icons.js';
 import { esc, initials } from './ui.js';
-import { openSheet, confirmDialog } from './sheet.js';
+import { openScreen, confirmDialog } from './sheet.js';
 import { enhanceSelects } from './dropdown-filter.js';
 import { openAssign } from './assign-sheet.js';
 import * as M from './itinerary-builder.js';
@@ -71,22 +71,14 @@ function openItemDialog({ title, saveLabel, values, track, returnFocus, render, 
   const snap = () => JSON.stringify(track.map((k) => norm(v[k])));
   let initial = snap();
 
-  const dlg = openSheet({
-    modal: true,
-    label: title,
-    cls: 'item-dialog-card',
+  // A screen pushed inside the open sheet or dialog (see openScreen), not a second popup on top of it.
+  const dlg = openScreen({
+    title,
     returnFocus,
     onClose,
     beforeClose: () => snap() === initial || confirmDialog({ title: 'Discard this entry?', text: 'What you entered here has not been added yet.', confirm: 'Discard', cancel: 'Keep editing', danger: true }),
-    html: `<header class="modal-header item-dialog-head">
-        <h3 data-dialog-title tabindex="-1">${esc(title)}</h3>
-        <button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button>
-      </header>
-      <div class="modal-body item-dialog-body" role="group" aria-label="${esc(title)}"></div>
-      <footer class="modal-footer item-dialog-foot">
-        <button type="button" class="btn-secondary-desktop" data-sheet-close>Cancel</button>
-        <button type="button" class="btn-primary-desktop" data-form-save>${esc(saveLabel)}</button>
-      </footer>`,
+    footer: `<button type="button" class="btn-secondary-desktop" data-sheet-close>Cancel</button>
+        <button type="button" class="btn-primary-desktop" data-form-save>${esc(saveLabel)}</button>`,
   });
   const body = dlg.$('.item-dialog-body');
 

@@ -89,6 +89,6 @@ class StaysTest extends TestCase
     public function test_an_unknown_stay_is_a_404_and_the_page_has_no_write_routes(): void
     {
         $this->getJson('/api/stays/999')->assertNotFound();
-        $this->postJson('/api/stays', ['name' => 'x'])->assertStatus(405);
+        $this->postJson('/api/stays', ['tag' => 'villa'])->assertUnprocessable()->assertJsonValidationErrors('name'); // only the name is required
     }
 }

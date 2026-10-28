@@ -117,7 +117,7 @@
             "name": "Kashmir",
             "region": "Jammu & Kashmir, India",
             "status": "active",
-            "description": "Kashmir is one of our most requested trips. Plan 5 to 7 day trips around Mar - Jun, Dec - Feb.",
+            "description": "Kashmir is a valley of lakes, meadows and snow peaks. Most trips start in Srinagar and move on to Gulmarg, Pahalgam and Sonamarg.",
             "about": {
                 "bestSeason": "Mar - Jun, Dec - Feb",
                 "averageTrip": "5 days / 4 nights",
@@ -477,14 +477,22 @@
                     "travelDate": "2026-12-15",
                     "pax": 3
                 }
-            ]
+            ],
+            "highlights": [
+                "Dal Lake and shikara rides",
+                "Gulmarg Gondola",
+                "Mughal Gardens",
+                "Pahalgam and Betaab Valley",
+                "Sonamarg meadows"
+            ],
+            "howToReach": "Fly to Srinagar (SXR), 20 minutes from the Boulevard. By road, Srinagar is 270 km from Jammu on NH44, about 8 to 9 hours. The nearest railhead is Jammu Tawi."
         },
         "2": {
             "id": 2,
             "name": "Goa",
             "region": "Goa, India",
             "status": "active",
-            "description": "Goa is one of our most requested trips. Plan 3 to 5 day trips around Nov - Feb.",
+            "description": "Goa is a coastline of beaches, old Portuguese lanes and a relaxed night life, split between a busy north and a quieter south.",
             "about": {
                 "bestSeason": "Nov - Feb",
                 "averageTrip": "4 days / 3 nights",
@@ -632,14 +640,22 @@
                     "travelDate": "2026-12-04",
                     "pax": 6
                 }
-            ]
+            ],
+            "highlights": [
+                "Calangute and Baga beaches",
+                "Fontainhas Latin Quarter",
+                "Basilica of Bom Jesus",
+                "Dudhsagar Falls",
+                "Palolem beach"
+            ],
+            "howToReach": "Fly to Dabolim (GOI) or the newer Mopa airport. By train, Madgaon and Thivim are the main stations. Volvo buses run from Mumbai and Bengaluru."
         },
         "3": {
             "id": 3,
             "name": "Manali",
             "region": "Himachal Pradesh, India",
             "status": "active",
-            "description": "Manali is one of our most requested trips. Plan 4 to 6 day trips around Mar - Jun, Dec - Jan.",
+            "description": "Manali sits in the Beas valley, the base for the Rohtang and Solang excursions and for a long list of mountain adventures.",
             "about": {
                 "bestSeason": "Mar - Jun, Dec - Jan",
                 "averageTrip": "5 days / 4 nights",
@@ -780,14 +796,22 @@
                     "travelDate": "2027-01-10",
                     "pax": 4
                 }
-            ]
+            ],
+            "highlights": [
+                "Solang Valley",
+                "Rohtang Pass (permit needed)",
+                "Hadimba Temple",
+                "Old Manali cafes",
+                "Jogini Falls"
+            ],
+            "howToReach": "Fly to Bhuntar (KUU), 50 km away, or drive from Chandigarh, about 8 hours. The nearest railhead is Joginder Nagar."
         },
         "4": {
             "id": 4,
             "name": "Kerala",
             "region": "Kerala, India",
             "status": "active",
-            "description": "Kerala is one of our most requested trips. Plan 5 to 7 day trips around Sep - Mar.",
+            "description": "Kerala is known for its backwaters, hill stations and long coast. Most itineraries combine Munnar, Thekkady and Alleppey.",
             "about": {
                 "bestSeason": "Sep - Mar",
                 "averageTrip": "6 days / 5 nights",
@@ -919,14 +943,22 @@
                     "meetingPoint": "Alappuzha"
                 }
             ],
-            "inquiries": []
+            "inquiries": [],
+            "highlights": [
+                "Alleppey houseboat",
+                "Munnar tea gardens",
+                "Periyar Wildlife Sanctuary",
+                "Fort Kochi",
+                "Kovalam beach"
+            ],
+            "howToReach": "Fly to Kochi (COK) or Trivandrum (TRV). Ernakulam and Trivandrum Central are the main railheads."
         },
         "5": {
             "id": 5,
             "name": "Bali",
             "region": "Indonesia",
             "status": "active",
-            "description": "Bali is one of our most requested trips. Plan 5 to 7 day trips around Apr - Oct.",
+            "description": "Bali mixes rice terraces, temples and beaches in a small island, with Ubud, Seminyak and Uluwatu as the usual bases.",
             "about": {
                 "bestSeason": "Apr - Oct",
                 "averageTrip": "6 days / 5 nights",
@@ -1050,14 +1082,22 @@
                     "meetingPoint": "Ubud"
                 }
             ],
-            "inquiries": []
+            "inquiries": [],
+            "highlights": [
+                "Ubud rice terraces",
+                "Tanah Lot temple",
+                "Uluwatu cliff temple",
+                "Nusa Penida day trip",
+                "Seminyak beach clubs"
+            ],
+            "howToReach": "Fly to Ngurah Rai (DPS). Indian passport holders need a visa on arrival; check current rules before booking."
         },
         "6": {
             "id": 6,
             "name": "Rishikesh",
             "region": "Uttarakhand, India",
             "status": "active",
-            "description": "Rishikesh is one of our most requested trips. Plan 2 to 4 day trips around Sep - Nov, Feb - Apr.",
+            "description": "Rishikesh is the yoga capital on the Ganga, and the base for rafting, camping and the Char Dham trips.",
             "about": {
                 "bestSeason": "Sep - Nov, Feb - Apr",
                 "averageTrip": "3 days / 2 nights",
@@ -1293,14 +1333,22 @@
                     "travelDate": "2026-11-14",
                     "pax": 8
                 }
-            ]
+            ],
+            "highlights": [
+                "Laxman Jhula and Ram Jhula",
+                "Ganga aarti at Triveni Ghat",
+                "White-water rafting",
+                "Beatles Ashram",
+                "Neer Garh waterfall"
+            ],
+            "howToReach": "Fly to Jolly Grant (DED), 35 km away. Haridwar and Rishikesh stations connect to Delhi, 5 to 6 hours."
         },
         "7": {
             "id": 7,
             "name": "Udaipur",
             "region": "Rajasthan, India",
             "status": "active",
-            "description": "Udaipur is one of our most requested trips. Plan 3 to 5 day trips around Oct - Mar.",
+            "description": "Udaipur is the city of lakes, with palaces, havelis and rooftop dining around Lake Pichola.",
             "about": {
                 "bestSeason": "Oct - Mar",
                 "averageTrip": "4 days / 3 nights",
@@ -1424,14 +1472,22 @@
                     "meetingPoint": "Old City"
                 }
             ],
-            "inquiries": []
+            "inquiries": [],
+            "highlights": [
+                "City Palace",
+                "Lake Pichola boat ride",
+                "Jag Mandir",
+                "Saheliyon ki Bari",
+                "Sajjangarh Monsoon Palace"
+            ],
+            "howToReach": "Fly to Dabok (UDR), 22 km from the city. Udaipur City station is on the Ahmedabad and Delhi lines."
         },
         "8": {
             "id": 8,
             "name": "Jaipur",
             "region": "Rajasthan, India",
             "status": "active",
-            "description": "Jaipur is one of our most requested trips. Plan 2 to 4 day trips around Oct - Mar.",
+            "description": "Jaipur is the Pink City, the first stop on most Rajasthan circuits, with forts and bazaars in walking distance.",
             "about": {
                 "bestSeason": "Oct - Mar",
                 "averageTrip": "3 days / 2 nights",
@@ -1450,14 +1506,22 @@
             "packages": [],
             "stays": [],
             "activities": [],
-            "inquiries": []
+            "inquiries": [],
+            "highlights": [
+                "Amber Fort",
+                "City Palace and Hawa Mahal",
+                "Jantar Mantar",
+                "Nahargarh sunset",
+                "Johari Bazaar"
+            ],
+            "howToReach": "Fly to Jaipur (JAI). Jaipur Junction is 4 to 5 hours by train from Delhi."
         },
         "9": {
             "id": 9,
             "name": "Ladakh",
             "region": "Ladakh, India",
             "status": "active",
-            "description": "Ladakh is one of our most requested trips. Plan 6 to 8 day trips around Jun - Sep.",
+            "description": "Ladakh is a high-altitude desert of monasteries, passes and blue lakes. Acclimatise for two days in Leh before going higher.",
             "about": {
                 "bestSeason": "Jun - Sep",
                 "averageTrip": "7 days / 6 nights",
@@ -1476,14 +1540,22 @@
             "packages": [],
             "stays": [],
             "activities": [],
-            "inquiries": []
+            "inquiries": [],
+            "highlights": [
+                "Pangong Lake",
+                "Nubra Valley",
+                "Khardung La",
+                "Thiksey Monastery",
+                "Magnetic Hill"
+            ],
+            "howToReach": "Fly to Leh (IXL). By road, the Manali and Srinagar highways are open from about June to October."
         },
         "10": {
             "id": 10,
             "name": "Andaman",
             "region": "Andaman & Nicobar, India",
             "status": "active",
-            "description": "Andaman is one of our most requested trips. Plan 4 to 6 day trips around Oct - May.",
+            "description": "The Andamans are a chain of islands with clear water, coral and quiet beaches, reached through Port Blair.",
             "about": {
                 "bestSeason": "Oct - May",
                 "averageTrip": "5 days / 4 nights",
@@ -1502,7 +1574,15 @@
             "packages": [],
             "stays": [],
             "activities": [],
-            "inquiries": []
+            "inquiries": [],
+            "highlights": [
+                "Radhanagar Beach, Havelock",
+                "Cellular Jail light show",
+                "Snorkelling at Elephant Beach",
+                "Neil Island",
+                "Ross Island ruins"
+            ],
+            "howToReach": "Fly to Veer Savarkar airport (IXZ) in Port Blair from Chennai, Kolkata or Delhi. Ferries connect Havelock and Neil."
         }
     }
 }

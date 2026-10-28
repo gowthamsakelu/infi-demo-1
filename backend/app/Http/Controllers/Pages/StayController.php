@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pages;
 use App\Http\Controllers\Controller;
 use App\Models\SavedHotel;
 use App\Support\DummyData;
+use App\Http\Requests\SaveStayRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
@@ -61,6 +62,44 @@ class StayController extends Controller
             'roomsCount' => $h->rooms_count,
             'price' => $h->price_from,
             'bookings' => $h->bookings_count,
+        ];
+    }
+
+    /** Add a stay from the wizard. With dummy data nothing is written. */
+    public function store(SaveStayRequest $request): JsonResponse
+    {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
+        }
+
+        $stay = SavedHotel::query()->create($this->columns($request));
+        Cache::forget('pages.stays.index');
+
+        return response()->json(['success' => true, 'data' => ['id' => $stay->id]], 201);
+    }
+
+    /** Save the stay the wizard was opened on (the id is a string: with dummy data it can be one the page made this session). */
+    public function save(SaveStayRequest $request, string $stay): JsonResponse
+    {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
+        }
+
+        $record = SavedHotel::query()->findOrFail((int) $stay);
+        $record->update($this->columns($request));
+        Cache::forget('pages.stays.index');
+
+        return response()->json(['success' => true, 'data' => ['id' => $record->id]]);
+    }
+
+    private function columns(SaveStayRequest $r): array
+    {
+        return [
+            'name' => $r->input('name'), 'tag' => $r->input('tag', 'hotel'), 'status' => $r->input('status', 'active'),
+            'city' => $r->input('city'), 'region' => $r->input('region'), 'address' => $r->input('address'), 'phone' => $r->input('phone'), 'email' => $r->input('email'),
+            'price_from' => $r->input('price'), 'rooms_count' => $r->input('roomsCount'), 'price_note' => $r->input('priceNote'), 'description' => $r->input('description'),
+            'amenities' => array_values($r->input('amenities', [])), 'inclusions' => array_values($r->input('inclusions', [])),
+            'exclusions' => array_values($r->input('exclusions', [])), 'extra_charges' => array_values($r->input('extraCharges', [])),
         ];
     }
 }

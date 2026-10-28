@@ -27,7 +27,7 @@ export const noteCard = (ico, title, inner) => `
     ${inner}
   </section>`;
 
-const list = (items, kind) => `<ul class="ie-list">${items.map((t) => `<li><span class="ie-ico ${kind}">${kind === 'dot' ? '' : icon(kind === 'no' ? 'close' : 'check', { size: 12, stroke: 3 })}</span><span>${esc(t)}</span></li>`).join('')}</ul>`;
+const list = (items, kind, cols = false) => `<ul class="ie-list${cols ? ' cols' : ''}">${items.map((t) => `<li><span class="ie-ico ${kind}">${kind === 'dot' ? '' : icon(kind === 'no' ? 'close' : 'check', { size: 12, stroke: 3 })}</span><span>${esc(t)}</span></li>`).join('')}</ul>`;
 
 /** "Inclusions & Exclusions": one card, the two lists stacked on the phone and side by side on PC. */
 export function inclusionsCard(inclusions = [], exclusions = []) {
@@ -44,4 +44,16 @@ export function inclusionsCard(inclusions = [], exclusions = []) {
 export const bulletCard = (ico, title, items = []) => {
   const rows = (items || []).filter(Boolean);
   return rows.length ? noteCard(ico, title, list(rows, 'dot')) : '';
+};
+
+/** "Highlights": green checks, two columns on PC and one on the phone. */
+export const highlightsCard = (items = [], title = 'Highlights') => {
+  const rows = (items || []).filter(Boolean);
+  return rows.length ? noteCard('star', title, list(rows, 'check', true)) : '';
+};
+
+/** The "Overview" description: one paragraph per blank line, text wraps. */
+export const overviewCard = (text, title = 'Overview') => {
+  const paras = String(text || '').split(/\n\s*\n/).map((t) => t.trim()).filter(Boolean);
+  return paras.length ? noteCard('info', title, `<div class="ov-text">${paras.map((t) => `<p>${esc(t)}</p>`).join('')}</div>`) : '';
 };

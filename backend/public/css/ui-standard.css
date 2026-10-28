@@ -141,3 +141,124 @@ html[data-layout="mobile"] .sp-detail-body .sp-chips.scroll-row { margin-inline:
 .sp-detail-head .customer-avatar-badge { width: 56px; height: 56px; flex: none; }
 /* Cards inside a detail pane are spaced by the pane's own gap, not by their own margin as well */
 .sp-content > .details-section-card { margin-top: 0; margin-bottom: 0; }
+
+/* ==========================================================================
+   Motion: one scale (--motion-fast / --motion-base / --motion-slow and --ease-out, defined with the tokens in style.css), only transform and opacity.
+   fast = press, toggle, menus · base = backdrop, fades, list items · slow = sheets, dialogs and slide-in screens.
+   ========================================================================== */
+
+/* A screen pushed inside an open sheet or dialog (openScreen in js/shared/sheet.js): enters from the right, leaves to the right */
+.asg-sheet, .bld-inplace { position: relative; }
+.bld-inplace { position: absolute; }
+.push-screen.item-dialog {
+  position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; width: auto; max-width: none; max-height: none; margin: 0;
+  background: #FFFFFF; border-radius: inherit; box-shadow: none; opacity: 1;
+  transform: translateX(100%); transition: transform var(--motion-slow) var(--ease-out); will-change: transform;
+}
+.push-screen.item-dialog.is-in { transform: none; }
+.push-screen .item-dialog-head { gap: 4px; padding: 10px 16px 10px 8px; }
+.push-screen .dialog-back { flex: none; }
+
+/* Buttons and switches answer a press at once */
+.btn-primary-desktop, .btn-secondary-desktop, .btn-confirm-booking, .quick-action-col-btn, .tab-pill, .sheet-tab-btn { transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out); }
+.btn-primary-desktop:not(:disabled):active, .btn-secondary-desktop:not(:disabled):active, .btn-confirm-booking:not(:disabled):active, .quick-action-col-btn:not(:disabled):active, .bld-switch:active { transform: scale(0.98); }
+
+/* Content that changes (tab content, a record's detail) fades in briefly; a list's rows fade up once, when it first loads (no stagger) */
+.sp-content, .sheet-body-scroll > *:first-child { animation: motionFadeIn var(--motion-fast) var(--ease-out); }
+.sp-list.is-entering .sp-row { animation: motionSlideUp var(--motion-base) var(--ease-out) both; }
+
+/* Motion off for people who ask: nothing moves, nothing waits for an animation to end */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .push-screen.item-dialog { transform: none; }
+}
+
+/* ==========================================================================
+   Sheets opened from inside a sheet (Assign to, Add Follow-up, the Bookings edit forms ...) are screens pushed into the place of the sheet
+   underneath (js/shared/push.js): same box, no second backdrop, in from the right and out to the right. Back arrow, title, round X.
+   ========================================================================== */
+.asg-overlay.is-pushed, .modal-overlay.is-pushed { position: fixed; display: block; padding: 0; background: transparent !important; backdrop-filter: none !important; }
+.is-pushed > .asg-sheet, .is-pushed > .modal-card, .is-pushed > .fu-card {
+  width: 100% !important; max-width: none !important; height: 100% !important; max-height: none !important; margin: 0 !important;
+  border-radius: var(--push-radius, 0) !important; box-shadow: none !important; opacity: 1 !important;
+  transform: translateX(100%) !important; transition: transform var(--motion-slow) var(--ease-out) !important;
+}
+.is-pushed.open > .asg-sheet, .is-pushed.open > .modal-card, .is-pushed.open > .fu-card { transform: none !important; }
+.is-pushed .filter-handle, .is-pushed .modal-card::before { display: none !important; }
+
+/* One header on every pushed screen: back arrow, title, 36px round X, vertically centred, fixed at the top while the body scrolls under it */
+.is-pushed .asg-header, .is-pushed .fu-header, .is-pushed .modal-header, .push-screen .item-dialog-head {
+  display: flex; align-items: center; gap: 8px; flex: none; position: sticky; top: 0; z-index: 2; padding: 10px 16px 10px 8px; background: #FFFFFF;
+}
+.is-pushed .asg-header h3, .is-pushed .fu-header h3, .is-pushed .modal-header h3, .push-screen .item-dialog-head h3 { flex: 1 1 auto; min-width: 0; margin: 0; font-size: var(--ui-sheet-title, 18px); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-pushed .fu-header > div:not(:first-child) { flex: 1 1 auto; min-width: 0; }
+.is-pushed .dialog-back, .push-screen .dialog-back { flex: none; }
+.is-pushed .sheet-close-btn, .push-screen .push-x { position: relative !important; top: auto !important; right: auto !important; flex: none; margin-left: auto; }
+html[data-layout] .is-pushed .sheet-close-btn:not(.dialog-back), html[data-layout] .push-screen .push-x { width: 36px; height: 36px; }
+.push-screen.item-dialog { z-index: 20; }
+.is-pushed .asg-sheet, .is-pushed .modal-card, .is-pushed .fu-card { display: flex; flex-direction: column; overflow: hidden; }
+
+/* The X everywhere: a 40px (or more) touch target around whatever size it is drawn at, and in headers it takes part in the layout */
+.sheet-close-btn::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; }
+.modal-header .sheet-close-btn, .asg-header .sheet-close-btn, .item-dialog-head .sheet-close-btn { position: relative !important; }
+@media (prefers-reduced-motion: reduce) { .is-pushed > .asg-sheet, .is-pushed > .modal-card, .is-pushed > .fu-card { transition: none !important; } }
+
+/* ==========================================================================
+   Dropdowns (js/shared/dropdown-filter.js): the list is placed by script in a fixed layer, anchored to its trigger; here only how it looks.
+   Same item height, padding, radius and shadow everywhere; options and the selected label stay on one line (ellipsis only for long names).
+   ========================================================================== */
+.dd-list, .dd-block .dd-list, .fu-outcome .dd-list { padding: 6px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08) !important; }
+.dd-list li { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: 8px; }
+.dd-list li > span { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (pointer: coarse) { .dd-list li { min-height: 44px; } }
+.dd-trigger > .dd-label { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dd-trigger > svg:last-child:not(:first-child) { flex: none; width: 13px; height: 13px; }
+.dd-compact .dd-trigger { max-width: 168px; }
+.dd-compact .dd-label { max-width: none; }
+/* the filter beside the search box and the tab row under it share the header's width; neither pushes the other out of it */
+.compact-header-top > .compact-search-bar { flex: 1 1 auto; min-width: 0; }
+.compact-header-top > [id$="filter-slot"], .compact-header-top > .dd-filter { flex: none; }
+#desktop-compact-tabs-host, .sp-tabs { min-width: 0; max-width: 100%; }
+
+/* Row menu: same dropdown everywhere; on touch screens the rows are at least 44px high */
+@media (pointer: coarse) { .row-floating-menu .dropdown-item-btn { min-height: 44px; } }
+.row-floating-menu .dropdown-item-btn:active { background: #EFF6FF; }
+
+/* The one Add button (shared/add-button.js): solid blue, plus icon, the word "Add". Top bar on PC; floating above the bottom bar on the phone. */
+.ui-add-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 12px; background: #2563EB; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; line-height: 1; white-space: nowrap; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); }
+.ui-add-btn:hover { background: #1D4ED8; }
+.ui-add-btn:active { transform: scale(0.97); }
+.ui-add-btn[hidden] { display: none !important; }
+html[data-layout="mobile"] .ui-add-fab { position: fixed; right: max(16px, var(--safe-right, 0px)); bottom: calc(68px + 12px + var(--safe-bottom, 0px)); z-index: 19; height: 44px; padding: 0 16px 0 14px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22); }
+html.is-keyboard-open .ui-add-fab { display: none; }
+html[data-layout="desktop"] .ui-add-fab { display: none !important; }
+html[data-layout="mobile"] .desktop-header-actions .ui-add-btn { display: none !important; }
+/* the lists end above the floating Add button */
+html[data-layout="mobile"] :is(#mobile-screen-scroll, #mobile-page-host .sp-list) { scroll-padding-bottom: 140px; }
+html[data-layout="mobile"] #mobile-page-host .sp-list, html[data-layout="mobile"] #mobile-bookings-page { padding-bottom: calc(68px + 72px + var(--safe-bottom, 0px)); }
+
+/* Catalog wizard (shared/wizard.js): the Add Inquiry wizard's shell plus list rows, image thumbs and the Review step */
+.wf-hint { margin: 4px 0 0; font-size: 12px; color: var(--text-muted); }
+.wf-list { display: flex; flex-direction: column; gap: 8px; }
+.wf-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.wf-row .bld-input { flex: 1 1 0; min-width: 0; }
+.wf-row-rate .bld-input:last-of-type { flex: 0 0 38%; }
+.wf-icon-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; color: var(--text-muted); cursor: pointer; }
+.wf-icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+.wf-add { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.wf-card { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); }
+.wf-card-text { flex: 1 1 auto; min-width: 0; }
+.wf-card-text b, .wf-card-text small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wf-card-text small { margin-top: 2px; color: var(--text-muted); font-size: 12px; }
+.wf-images { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.wf-thumb { position: relative; width: 72px; height: 72px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); }
+.wf-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.wf-thumb .wf-icon-btn { position: absolute; top: 2px; right: 2px; width: 24px; height: 24px; background: rgba(15, 23, 42, 0.6); color: #FFFFFF; }
+.wz-review-group { padding: 12px 14px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); }
+.wz-review-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.wz-review-head h4 { margin: 0; font-size: 14px; font-weight: 700; color: var(--text-main); }
+.wz-review { margin: 8px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.wz-review > div { display: grid; grid-template-columns: minmax(0, 36%) minmax(0, 1fr); gap: 10px; font-size: 13px; }
+.wz-review dt { color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wz-review dd { margin: 0; color: var(--text-main); overflow-wrap: anywhere; }
+.wiz-step-pane .wf-select .dd-trigger { width: 100%; max-width: none; justify-content: space-between; }

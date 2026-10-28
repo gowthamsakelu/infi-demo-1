@@ -2,6 +2,8 @@
 // The row menu publishes an article or moves it back to draft. The Write Blog button is drawn as designed and does nothing yet.
 import { pageFrame } from '../shared/split-page.js';
 import { getJson, sendJson } from '../shared/http.js';
+import { createCatalogCrud, numOrNull, textOrNull, listOf } from '../shared/catalog-crud.js';
+const today = () => new Date().toISOString().slice(0, 10);
 import { esc, toast, searchBox, skeletonCards, errorState, emptyState, openRowMenu } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { renderTabs } from '../shared/list-ui.js';
@@ -19,15 +21,37 @@ function dateLine(p) {
   return `Last edited ${full(p.updatedAt)}`;
 }
 
-const row = (p) => `<div class="bg-row" role="row" data-bg-id="${esc(p.id)}">
+const row = (p, fresh = false) => `<div class="bg-row" role="row" data-bg-id="${esc(p.id)}">
   <span class="bg-tile sp-tile sp-tile-sm">${tile('note', 20)}</span>
   <div class="bg-art"><b title="${esc(p.title)}">${esc(p.title)}</b><small>${esc(dateLine(p))}</small></div>
   <span class="bg-author">${esc(p.author)}</span>
   <span class="bg-cat">${tag(CAT[p.category] || 'tour', CAT_LABEL[p.category] || p.category)}</span>
   <span class="bg-nums"><span class="bg-views" data-unit="views">${num(p.views)}</span><span class="bg-leads" data-unit="leads">${num(p.leads)}</span></span>
-  <span class="bg-status">${pill(p.status, LABEL[p.status] || p.status)}</span>
+  <span class="bg-status">${pill(p.status, LABEL[p.status] || p.status)}${fresh ? '<span class="just-added-tag">JUST ADDED</span>' : ''}</span>
   <button type="button" class="sp-icon-btn bg-menu" data-bg-menu="${esc(p.id)}" aria-haspopup="menu" aria-label="More options for ${esc(p.title)}">${icon('more', { size: 18 })}</button>
 </div>`;
+
+/** Add / Edit an article: the shared catalog wizard, described by config only (see shared/wizard.js). */
+const BG_CATS = [{ value: 'guide', label: 'Guide' }, { value: 'itinerary', label: 'Itinerary' }, { value: 'tips', label: 'Tips' }];
+function wizardConfig() {
+  return {
+    noun: 'article',
+    requiredKey: 'title',
+    steps: [
+      { label: 'Basics', title: 'Basics', sub: 'The title, who wrote it and what it is about.', fields: [
+        { key: 'title', type: 'text', label: 'Article title', placeholder: 'e.g. Top 10 places to visit in Kashmir in winter', optional: false, max: 160 },
+        { key: 'author', type: 'text', label: 'Author', placeholder: 'e.g. Riya Sharma', max: 80 },
+        { key: 'category', type: 'chips', label: 'Category', options: BG_CATS },
+      ] },
+      { label: 'Publishing', title: 'Publishing', sub: 'Publish now, keep it as a draft, or schedule it.', fields: [
+        { key: 'status', type: 'chips', label: 'Status', options: [{ value: 'published', label: 'Published' }, { value: 'draft', label: 'Draft' }, { value: 'scheduled', label: 'Scheduled' }] },
+        { key: 'publishedAt', type: 'date', label: 'Publish date', hint: 'Used for scheduled articles and shown on the article' },
+      ] },
+    ],
+    defaults: () => ({ title: '', author: '', category: 'guide', status: 'draft', publishedAt: '' }),
+    preview: (v) => ({ title: String(v.title || '').trim(), lines: [BG_CATS.find((c) => c.value === v.category)?.label, v.status ? v.status[0].toUpperCase() + v.status.slice(1) : '', v.author] }),
+  };
+}
 
 export default {
   css: true,
@@ -35,7 +59,7 @@ export default {
     const state = { posts: [], stats: null, status: 'loading', tab: 'all', q: '' };
     let alive = true;
     let timer = null;
-    const frame = pageFrame(host, ctx, { title: 'Blogs', subtitle: '', addLabel: 'Write Blog' });
+    const frame = pageFrame(host, ctx, { title: 'Blogs', subtitle: '', addLabel: 'Write Blog', onAdd: () => crud.add({ returnFocus: () => document.querySelector('#desktop-page-add, #mobile-page-add') }) });
     frame.body.innerHTML = `
       <div class="bg-stats"></div>
       <div class="bg-bar">
@@ -76,14 +100,37 @@ export default {
       if (!state.posts.length) { list.innerHTML = emptyState({ title: 'No articles yet', text: 'Articles you write will show up here.', resetId: 'bg-reset' }); return; }
       const rows = base.filter((p) => state.tab === 'all' || p.status === state.tab);
       table.classList.toggle('is-plain', !rows.length);
-      list.innerHTML = rows.length ? rows.map(row).join('') : emptyState({ title: 'No articles found', text: 'Nothing matches your search. Try resetting the filters.', resetId: 'bg-reset' });
+      list.innerHTML = rows.length ? rows.map((p) => row(p, crud.isFresh(p.id))).join('') : emptyState({ title: 'No articles found', text: 'Nothing matches your search. Try resetting the filters.', resetId: 'bg-reset' });
     }
+
+    const crud = createCatalogCrud({
+      key: 'blogs',
+      endpoint: '/api/blogs',
+      wizard: () => wizardConfig(),
+      toBody: (v) => ({ title: v.title.trim(), author: textOrNull(v.author), category: v.category || 'guide', status: v.status || 'draft', publishedAt: textOrNull(v.publishedAt) }),
+      local: (v, old) => {
+        const status = v.status || 'draft';
+        const publishedAt = textOrNull(v.publishedAt) ?? (status === 'draft' ? null : today());
+        return {
+          ...(old || {}), title: v.title.trim(), author: textOrNull(v.author) ?? '', category: v.category || 'guide', status, publishedAt,
+          updatedAt: today(), slug: old?.slug ?? v.title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+          views: old?.views ?? 0, leads: old?.leads ?? 0, converted: old?.converted ?? 0,
+        };
+      },
+      values: (p) => ({ title: p.title, author: p.author ?? '', category: p.category || 'guide', status: p.status || 'draft', publishedAt: p.publishedAt ?? '' }),
+      load: async () => {
+        const d = await getJson('/api/blogs');
+        state.stats = d.stats;
+        return d.posts;
+      },
+      onChange: (list) => { state.posts = list; state.stats = { ...state.stats, total: list.length }; render(); },
+    });
 
     async function load() {
       state.status = 'loading'; render();
       try {
-        const d = await getJson('/api/blogs');
-        state.posts = d.posts; state.stats = d.stats; state.status = 'ready';
+        state.posts = await crud.load();
+        state.status = 'ready';
       } catch (err) { state.status = 'error'; state.error = err; }
       if (alive) render();
     }
@@ -105,10 +152,12 @@ export default {
       if (menu) {
         const p = state.posts.find((x) => String(x.id) === menu.dataset.bgMenu); if (!p) return;
         openRowMenu(menu, [
+          { key: 'edit', label: 'Edit', icon: 'edit' },
           ...(p.status !== 'published' ? [{ key: 'published', label: 'Publish now', icon: 'check' }] : []),
           ...(p.status !== 'draft' ? [{ key: 'draft', label: 'Move to draft', icon: 'edit' }] : []),
           { key: 'copy', label: 'Copy link', icon: 'copy' },
         ], async (key) => {
+          if (key === 'edit') { crud.edit(p, { returnFocus: () => menu }); return; }
           if (key !== 'copy') { setStatus(p.id, key); return; }
           try { await navigator.clipboard.writeText(`/blog/${p.slug}`); toast('Link copied', 'success'); } catch { toast(`/blog/${p.slug}`, 'info'); }
         });

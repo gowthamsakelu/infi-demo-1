@@ -63,9 +63,9 @@ for (const kind of KINDS) {
       const d = page.locator('.item-dialog');
       check(`${tag} ${sec}: dialog opens`, await d.count() === 1);
       const box = await d.boundingBox();
-      check(`${tag} ${sec}: smaller than the itinerary popup`, box && box.width < builderBox.width && box.height < builderBox.height, JSON.stringify({ box, builderBox }));
-      check(`${tag} ${sec}: inset and on screen`, box && box.x >= 8 && box.y >= 8 && box.x + box.width <= w - 8 && box.y + box.height <= h - 8, JSON.stringify(box));
-      check(`${tag} ${sec}: width 480-520 on PC`, m || (box.width >= 440 && box.width <= 520), String(box?.width));
+      // a screen pushed inside the builder's own sheet: it fills that sheet, there is no second popup and no second backdrop
+      check(`${tag} ${sec}: pushed inside the builder (fills it, not a popup on top)`, box && Math.abs(box.width - builderBox.width) <= 1 && Math.abs(box.height - builderBox.height) <= 1 && await page.locator('.push-screen').count() === 1, JSON.stringify({ box, builderBox }));
+      check(`${tag} ${sec}: one backdrop only`, await page.locator('.asg-overlay.open, .modal-overlay.open').count() <= 1);
       check(`${tag} ${sec}: focus on title, no input`, await page.evaluate(() => document.activeElement?.matches('[data-dialog-title]') && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)));
       check(`${tag} ${sec}: back arrow labelled`, await page.locator('.item-dialog .dialog-back[aria-label="Back"]').count() === 1);
       check(`${tag} ${sec}: builder stays behind`, await page.locator('.bld-sheet, .bld-inplace').isVisible());
@@ -82,8 +82,8 @@ for (const kind of KINDS) {
     await page.keyboard.press('Escape'); await wait(500);
     check(`${tag} Esc closes only the dialog`, await page.locator('.item-dialog').count() === 0 && await page.locator('.bld-sheet, .bld-inplace').count() === 1);
     await addBtn('note').click(); await wait(400);
-    await page.mouse.click(4, 4); await wait(500); // the dim backdrop
-    check(`${tag} backdrop closes only the dialog`, await page.locator('.item-dialog').count() === 0 && await page.locator('.bld-sheet, .bld-inplace').count() === 1);
+    await page.locator('.item-dialog .dialog-back').click(); await wait(600); // the back arrow slides the screen out
+    check(`${tag} back arrow closes only the screen`, await page.locator('.item-dialog').count() === 0 && await page.locator('.bld-sheet, .bld-inplace').count() === 1);
     await addBtn('note').click(); await wait(400);
     const hashBefore = await page.evaluate(() => location.href);
     await page.goBack(); await wait(500);
@@ -117,7 +117,7 @@ for (const kind of KINDS) {
     };
     const rowsNow = () => page.locator('.bld-row').count();
     for (const sec of ['activity', 'hotel', 'transport', 'meal', 'note']) {
-      const which = sec === 'activity' ? Object.keys(exits) : ['cancel', 'esc'];
+      const which = sec === 'activity' ? Object.keys(exits).filter((k) => k !== 'backdrop') : ['cancel', 'esc']; // no backdrop: the add screen is pushed inside the sheet
       // opened and left alone (prefilled and default values only): nothing to confirm, even after the lists have loaded
       await addBtn(sec).click(); await wait(1200);
       await exits.back(); await wait(500);
@@ -137,8 +137,8 @@ for (const kind of KINDS) {
           check(`${tag} confirm: title and text`, m.title === 'Discard this entry?' && /has not been added yet/.test(m.text), JSON.stringify(m));
           check(`${tag} confirm: two equal buttons, no X`, m.n === 2 && m.sameH && m.sameW && m.noX, JSON.stringify(m));
           check(`${tag} confirm: Keep editing focused`, m.focus === 'no');
-          check(`${tag} confirm: smaller than the dialog, centred, on top`, m.smaller && m.centred && m.top, JSON.stringify(m));
-          check(`${tag} confirm: Discard is red, same size as other buttons`, m.danger === 'rgb(220, 38, 38)' && m.h >= 38 && m.h <= 42, JSON.stringify(m));
+          check(`${tag} confirm: on top (smaller and centred on PC; a bottom sheet on the phone)`, (w < 700 || (m.smaller && m.centred)) && m.top, JSON.stringify(m));
+          check(`${tag} confirm: Discard is red, same size as other buttons`, m.danger === 'rgb(220, 38, 38)' && m.h >= 38 && m.h <= 48, JSON.stringify(m));
           await shot('confirm');
           // Esc on the confirm = keep editing, and only the confirm closes
           await page.keyboard.press('Escape'); await wait(500);

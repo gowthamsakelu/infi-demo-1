@@ -11,11 +11,11 @@ class TourPackage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['destination_id', 'name', 'tag', 'status', 'seasonal', 'days', 'nights', 'price_from', 'description', 'price_tiers', 'inclusions', 'exclusions', 'min_pax', 'bookings_count'];
+    protected $fillable = ['destination_id', 'name', 'tag', 'status', 'seasonal', 'days', 'nights', 'price_from', 'description', 'price_tiers', 'inclusions', 'exclusions', 'min_pax', 'season', 'highlights', 'bookings_count'];
 
     protected $casts = [
         'seasonal' => 'boolean', 'days' => 'integer', 'nights' => 'integer', 'price_from' => 'float', 'bookings_count' => 'integer',
-        'price_tiers' => 'array', 'inclusions' => 'array', 'exclusions' => 'array',
+        'price_tiers' => 'array', 'inclusions' => 'array', 'exclusions' => 'array', 'highlights' => 'array',
     ];
 
     public function destination(): BelongsTo

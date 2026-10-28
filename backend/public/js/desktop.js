@@ -2,12 +2,12 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, jsq, initials, skeletonRows, errorState, checkbox } from './shared/ui.js';
+import { searchBox, emptyState, selectEmptyState, toast, openRowMenu, closeRowMenu, esc, jsq, initials, skeletonRows, errorState, checkbox } from './shared/ui.js';
 import { selectedOf, setSelected, toggleRow } from './shared/selection.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { renderTabs, avatar, justAddedTag, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bindQuickNotes, rowCard, bulkBar, bindBulkBar, updateBulkBar, inlineSelectionBar, updateInlineBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
-import { openFollowUpModal } from './shared/followup-modal.js';
+import { openFollowUpModal, openBookingFollowUp } from './shared/followup-modal.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
 import { openDayDialog, commit } from './shared/itinerary-dialog.js';
@@ -18,7 +18,8 @@ import { sidebarNavHtml, bindSidebar } from './shared/nav-ui.js';
 import { matchesCategory } from './shared/booking-filters.js';
 import { createDesktopCalendar } from './calendar-desktop.js';
 import { openAddInquiry } from './shared/add-inquiry.js';
-import { paneLayout, selectedParam, writeSelected, chooseRecord, bindListKeys } from './shared/split-view.js';
+import { addButtonHtml, setAddAction } from './shared/add-button.js';
+import { paneLayout, writeSelected, bindListKeys } from './shared/split-view.js';
 
 export function createDesktopView(container) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -33,7 +34,6 @@ export function createDesktopView(container) {
   let selectedCategory = 'ALL';
   let activeBooking = null; // Default: closed popup, table is full-width!
   let isDetailDrawerOpen = false;
-  let userClosed = false; // the user collapsed the reading pane (expand, close, Esc): it stays closed until a record is clicked
   let wantedId = null; // ?selected= from the address bar
   let activeDetailTab = 'customer-details';
   let guestSearchQuery = '';
@@ -81,8 +81,7 @@ export function createDesktopView(container) {
           </div>
 
           <div class="desktop-header-actions">
-            <button type="button" class="btn-primary-desktop add-inquiry-btn" id="desktop-add-inquiry" data-add-inquiry ${currentPage() === 'inquiries' ? '' : 'hidden'}>${icon('plus', { size: 16, stroke: 2.5 })}Add Inquiry</button>
-            <button type="button" class="btn-primary-desktop add-inquiry-btn" id="desktop-page-add" hidden>${icon('plus', { size: 16, stroke: 2.5 })}<span class="sp-add-label"></span></button>
+            ${addButtonHtml('desktop-page-add')}
             <div class="desktop-notification-wrapper" style="position: relative;">
               <button class="icon-bell-btn" id="desktop-bell-btn" title="Notifications" aria-label="Notifications">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -131,9 +130,6 @@ export function createDesktopView(container) {
                         <input type="text" id="desktop-compact-search-input" placeholder="Search bookings..." value="${searchQuery}" aria-label="Search" />
                       </div>
                       <span id="desktop-compact-filter-slot"></span>
-                      <button class="btn-expand-full-table" id="desktop-btn-expand-table" title="Expand to Full Table View" aria-label="Expand to full table">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                      </button>
                       ${inlineSelectionBar('compact')}
                     </div>
                     <div id="desktop-compact-tabs-host"></div>
@@ -543,34 +539,37 @@ export function createDesktopView(container) {
     return { base, filtered: base.filter(b => activeTab === allKey() || b.category === activeTab) };
   }
 
-  // Reading pane: keep a record selected whenever the PC layout is showing a list (Bookings and Inquiries).
-  const paneEnabled = () => paneLayout() && (page === 'bookings' || page === 'inquiries') && !userClosed;
+  // Reading pane (PC and tablet): the list is always on the left and the pane on the right. Nothing is selected by itself: the pane shows
+  // "Select a booking / an inquiry" until a row is clicked, and goes back to that when the selected record leaves the list or Esc is pressed.
+  const paneEnabled = () => paneLayout() && (page === 'bookings' || page === 'inquiries');
   function reconcileSelection(filtered) {
     if (!paneEnabled()) return false;
     if (isInquiries() && (!inquiryState.loaded || inquiryState.failed)) return false;
     const split = container.querySelector('#desktop-workspace-split');
     const drawer = container.querySelector('#desktop-details-drawer');
-    if (!filtered.length) {
-      activeBooking = null;
-      isDetailDrawerOpen = true;
-      showEmptyDetail();
-      split.classList.add('has-open-detail');
-      drawer.classList.add('open');
+    split.classList.add('has-open-detail');
+    drawer.classList.add('open');
+    const wanted = wantedId; // ?selected= from the address bar
+    wantedId = null;
+    const keep = wanted ? filtered.find((r) => String(r.id) === String(wanted)) : activeBooking && filtered.find((r) => r.id === activeBooking.id);
+    if (!keep) {
+      if (activeBooking || !drawer.classList.contains('is-empty')) showSelectEmpty();
       writeSelected(null);
       return true;
     }
-    const next = chooseRecord(filtered, wantedId, activeBooking?.id);
-    wantedId = null;
-    if (next !== activeBooking || !isDetailDrawerOpen || drawer.classList.contains('is-empty')) showDetail(next);
-    writeSelected(next.id);
+    if (keep !== activeBooking || drawer.classList.contains('is-empty')) showDetail(keep);
+    writeSelected(keep.id);
     return true;
   }
 
-  function showEmptyDetail() {
+  /** The pane with nothing selected: the shared "Select ..." empty state. */
+  function showSelectEmpty() {
+    activeBooking = null;
+    isDetailDrawerOpen = true;
     const drawer = container.querySelector('#desktop-details-drawer');
     drawer.classList.add('is-empty');
     container.querySelector('#desktop-sheet-header').innerHTML = '';
-    container.querySelector('#desktop-sheet-body').innerHTML = '<div class="state-box detail-empty"><h4>No records to show</h4><p>Change the search or filters to see more.</p></div>';
+    container.querySelector('#desktop-sheet-body').innerHTML = selectEmptyState(isInquiries() ? 'an inquiry' : 'a booking');
   }
 
   function renderTable() {
@@ -641,16 +640,15 @@ export function createDesktopView(container) {
 
   // A click, a keyboard move or a new record: select it, remember it in the URL (one history step) and redraw the list.
   function openDrawer(booking, { push = true } = {}) {
-    userClosed = false;
     showDetail(booking);
     if (page === 'bookings' || page === 'inquiries') { if (paneLayout()) writeSelected(booking.id, { push }); }
     renderTable();
     container.querySelector('#desktop-compact-list-items .list-row-card.active')?.scrollIntoView({ block: 'nearest' });
   }
 
-  // `user: true` (the default) is the user collapsing the pane: it stays collapsed until they click a record.
+  // `user: true` (the default): on the Bookings / Inquiries lists the X and Esc deselect (the pane stays, showing "Select ..."); elsewhere the pane closes.
   function closeDrawer({ user = true, render = true } = {}) {
-    if (user && paneLayout() && (page === 'bookings' || page === 'inquiries')) { userClosed = true; writeSelected(null); }
+    if (user && paneEnabled()) { showSelectEmpty(); writeSelected(null); if (render) renderTable(); return; }
     activeBooking = null;
     isDetailDrawerOpen = false;
     const split = container.querySelector('#desktop-workspace-split');
@@ -883,13 +881,13 @@ export function createDesktopView(container) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              ${b.kind === 'inquiry' ? '' : `<button class="btn-add-followup" id="btn-add-followup-action">
+              <button class="btn-add-followup" id="btn-add-followup-action">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="12" x2="12" y1="5" y2="19"/>
                   <line x1="5" x2="19" y1="12" y2="12"/>
                 </svg>
                 Add Follow-up
-              </button>`}
+              </button>
             </div>
 
             <div class="lead-journey-timeline">
@@ -1329,7 +1327,6 @@ export function createDesktopView(container) {
       const scroller = container.querySelector('.desktop-full-table-view');
       if (changed) {
         scrollMemory[page === 'inquiries' ? 'bookings' : 'inquiries'] = scroller ? scroller.scrollTop : 0;
-        userClosed = false;
         if (isDetailDrawerOpen) closeDrawer({ user: false, render: false });
         bookings = page === 'inquiries' ? inquiryState.list : bookingsData;
         bookings.forEach(b => { b.selected = false; });
@@ -1338,7 +1335,8 @@ export function createDesktopView(container) {
       container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
       container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
-      container.querySelector('#desktop-add-inquiry').hidden = page !== 'inquiries';
+      if (page === 'calendar') setAddAction(null);
+      else setAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') })); // Bookings has no add flow of its own: it opens the same one
       container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
       if (topSearch) topSearch.placeholder = 'Search by name, trip, destination, or phone...';
@@ -1358,7 +1356,7 @@ export function createDesktopView(container) {
     subscribeFollowUps(() => {
       if (isDetailDrawerOpen && activeDetailTab === 'customer-details' && activeBooking) renderDetailPanel();
     });
-    window.addEventListener('layout-changed', () => { userClosed = false; if (isDetailDrawerOpen) closeDrawer({ user: false, render: false }); renderTable(); });
+    window.addEventListener('layout-changed', () => { if (isDetailDrawerOpen) closeDrawer({ user: false, render: false }); renderTable(); });
     container.addEventListener('click', (e) => { if (e.target.id === 'desktop-workspace-split' && isDetailDrawerOpen) closeDrawer(); });
     bindListKeys(container.querySelector('#desktop-compact-list-items'), { getList: () => visibleRecords().filtered, getActiveId: () => activeBooking?.id, onSelect: (b) => openDrawer(b, { push: false }) });
     window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
@@ -1379,9 +1377,6 @@ export function createDesktopView(container) {
       setParams({ q: null, tab: null, category: null, selected: paneLayout() ? row.id : null }, { push: false });
       requestAnimationFrame(toTop);
     }
-    container.querySelector('#desktop-add-inquiry').addEventListener('click', () => {
-      openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-add-inquiry') });
-    });
 
     // Bulk bar: select all / clear / search / filter / Assign
     for (const prefix of ['desktop', 'compact']) {
@@ -1908,12 +1903,6 @@ export function createDesktopView(container) {
         return;
       }
 
-      // Expand to Full Table View Button
-      if (e.target.closest('#desktop-btn-expand-table')) {
-        closeDrawer();
-        return;
-      }
-
       // Action button "View" or Row Click -> Open Popup Drawer!
       const openBtn = e.target.closest('[data-open-detail]');
       const row = e.target.closest('[data-desktop-row-id]');
@@ -2027,12 +2016,7 @@ export function createDesktopView(container) {
       // Open Add Follow-up Modal (App-based modal, no browser popups)
       if (e.target.closest('#desktop-add-followup-btn') || e.target.closest('#btn-add-followup-action')) {
         if (activeBooking?.kind === 'inquiry') { openFollowUpModal(activeBooking.raw); return; }
-        const modal = container.querySelector('#desktop-add-followup-modal');
-        if (modal) {
-          container.querySelector('#desktop-modal-followup-title').value = '';
-          container.querySelector('#desktop-modal-followup-desc').value = '';
-          modal.classList.add('open');
-        }
+        if (activeBooking) openBookingFollowUp(activeBooking, renderDetailPanel);
         return;
       }
 

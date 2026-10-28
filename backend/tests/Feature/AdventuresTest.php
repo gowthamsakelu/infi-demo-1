@@ -72,6 +72,6 @@ class AdventuresTest extends TestCase
 
     public function test_the_page_has_no_write_routes_yet(): void
     {
-        $this->postJson('/api/adventures', ['name' => 'x'])->assertStatus(405);
+        $this->postJson('/api/adventures', ['tag' => 'water'])->assertUnprocessable()->assertJsonValidationErrors('name'); // only the name is required
     }
 }

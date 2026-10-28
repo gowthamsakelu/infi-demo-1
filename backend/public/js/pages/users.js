@@ -595,7 +595,6 @@ export default {
     });
 
     page.api.bindDirty(isDirty);
-    ctx.setAddButton?.(null);
 
     /* ---------- Mobile Bottom Sheet Setup (Backdrop, Drag Handle & Close ✕ Button) ---------- */
     function ensureMobileSheetUI() {
@@ -666,12 +665,6 @@ export default {
     }
 
     ensureMobileSheetUI();
-
-    /* In-Header Add User Button in split page filter slot */
-    const filterSlot = host.querySelector('.sp-filter-slot');
-    if (filterSlot) {
-      filterSlot.innerHTML = `<button type="button" class="us-header-add-btn" data-us-act="add">${icon('plus', { size: 15, stroke: 2.4 })} Add User</button>`;
-    }
 
     /* ---------- Add & Edit Modals Container ---------- */
     const modalContainer = document.createElement('div');
@@ -900,9 +893,7 @@ export default {
       }
     });
 
-    const onMobAddClick = () => openAddUserModal();
-    const mobAddBtn = document.querySelector('#mobile-page-add');
-    mobAddBtn?.addEventListener('click', onMobAddClick);
+    ctx.setAddButton?.('Add User', openAddUserModal);
 
     /* ---------- Switch Toggling & Saving Logic ---------- */
     function syncSaveButton() {
@@ -1066,7 +1057,6 @@ export default {
       destroy() {
         window.removeEventListener('layout-changed', onLayout);
         window.removeEventListener('keydown', onKeyDown);
-        mobAddBtn?.removeEventListener('click', onMobAddClick);
         modalContainer.remove();
         host.removeEventListener('click', onClick);
         host.removeEventListener('change', onChange);

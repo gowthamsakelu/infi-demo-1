@@ -129,6 +129,19 @@
             "roomsCount": 38,
             "price": 3200,
             "bookings": 13
+        },
+        {
+            "id": 11,
+            "name": "Hotel Mandovi Residency",
+            "city": "Panjim",
+            "region": "Goa",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.3,
+            "reviews": 186,
+            "roomsCount": 32,
+            "price": 5200,
+            "bookings": 9
         }
     ],
     "detail": {
@@ -147,7 +160,7 @@
             "address": null,
             "phone": "+91 194 250 1234",
             "email": "stay@hotellakeview.example.com",
-            "description": "Hotel Lake View in Srinagar. Rates below are per room per night.",
+            "description": "A family-run hotel on the Boulevard with direct views of Dal Lake. Rooms are warm and wood-panelled, and the staff arrange shikara rides from the hotel ghat.\n\nBreakfast is served with fresh Kashmiri bread.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -155,10 +168,21 @@
                 "Airport pickup",
                 "Room service"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Breakfast",
+                "Airport pickup (on request)",
+                "Wi-Fi"
+            ],
+            "exclusions": [
+                "Lunch and dinner",
+                "Heater charges in winter"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM",
+                "Room heater: ₹500 per night"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 184800,
             "rooms": [
                 {
@@ -222,7 +246,7 @@
             "address": null,
             "phone": "+91 832 227 6655",
             "email": "stay@calangutebeachvilla.example.com",
-            "description": "Calangute Beach Villa in Goa. Rates below are per room per night.",
+            "description": "A private two-storey villa a short walk from Calangute beach, with a pool and a small garden. Good for families and groups of up to eight.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -230,10 +254,22 @@
                 "Airport pickup",
                 "Room service"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Daily breakfast",
+                "Pool access",
+                "Housekeeping"
+            ],
+            "exclusions": [
+                "Lunch and dinner",
+                "Airport transfer",
+                "Water sports"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM",
+                "Chef on call: ₹1,500 per meal"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 285000,
             "rooms": [
                 {
@@ -297,7 +333,7 @@
             "address": null,
             "phone": "+91 1902 252 120",
             "email": "stay@snowpeakresort.example.com",
-            "description": "Snow Peak Resort in Manali. Rates below are per room per night.",
+            "description": "A resort at the edge of Manali with views of the Pir Panjal and Solang. Heated rooms, a bonfire in the evenings and an on-site restaurant.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -305,10 +341,22 @@
                 "Airport pickup",
                 "Pool"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Breakfast and dinner",
+                "Evening bonfire",
+                "Wi-Fi"
+            ],
+            "exclusions": [
+                "Lunch",
+                "Adventure activities",
+                "Room heater in some rooms"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM",
+                "Room heater: ₹500 per night"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 89600,
             "rooms": [
                 {
@@ -372,7 +420,7 @@
             "address": null,
             "phone": "+91 477 223 4411",
             "email": "stay@backwaterhaven.example.com",
-            "description": "Backwater Haven in Kerala. Rates below are per room per night.",
+            "description": "A houseboat-style resort on the Alleppey backwaters with air-conditioned rooms, a sit-out deck and local Kerala meals.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -380,10 +428,21 @@
                 "Airport pickup",
                 "Pool"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "All meals on board",
+                "Welcome drink",
+                "Backwater cruise"
+            ],
+            "exclusions": [
+                "Alcohol",
+                "Airport transfer",
+                "Ayurveda spa"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 158400,
             "rooms": [
                 {
@@ -447,7 +506,7 @@
             "address": null,
             "phone": "+91 135 243 0088",
             "email": "stay@gangaviewhotel.example.com",
-            "description": "Ganga View Hotel in Rishikesh. Rates below are per room per night.",
+            "description": "A riverside hotel with Ganga views, five minutes from Laxman Jhula. A quiet base for yoga, rafting and temple visits.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -455,10 +514,21 @@
                 "Airport pickup",
                 "Room service"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Breakfast",
+                "Yoga hall access",
+                "Wi-Fi"
+            ],
+            "exclusions": [
+                "Lunch and dinner",
+                "Rafting",
+                "Laundry"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 78000,
             "rooms": [
                 {
@@ -522,7 +592,7 @@
             "address": null,
             "phone": "+91 294 242 2200",
             "email": "stay@lakepicholavilla.example.com",
-            "description": "Lake Pichola Villa in Udaipur. Rates below are per room per night.",
+            "description": "A heritage villa on the Pichola lakefront with rooftop dining and views of the City Palace. Each room is decorated with local art.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -530,10 +600,22 @@
                 "Airport pickup",
                 "Room service"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Breakfast",
+                "Rooftop dining",
+                "Welcome drink"
+            ],
+            "exclusions": [
+                "Lunch and dinner",
+                "Boat ride",
+                "Airport transfer"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM",
+                "Private dinner: ₹3,500 for two"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 480000,
             "rooms": [
                 {
@@ -597,7 +679,7 @@
             "address": "Dal Lake, Srinagar",
             "phone": "+91 9286522771",
             "email": "stay@houseboatgoldencrown.example.com",
-            "description": "Carved-cedar houseboat with shikara pick-up and meals.",
+            "description": "A traditional Kashmiri houseboat on Dal Lake with carved walnut panels, a sun deck and a shikara to shore.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -605,10 +687,21 @@
                 "Airport pickup",
                 "Room service"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Breakfast, lunch and dinner",
+                "Shikara to the shore",
+                "Kahwa on arrival"
+            ],
+            "exclusions": [
+                "Shikara rides on the lake",
+                "Shopping",
+                "Heater in winter"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Room heater: ₹500 per night"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 247000,
             "rooms": [
                 {
@@ -672,7 +765,7 @@
             "address": "Gupkar Road, Srinagar",
             "phone": "+91 9107851742",
             "email": "stay@hotellalitgrandpalace.example.com",
-            "description": "Palace hotel above the lake with a spa.",
+            "description": "A large lakeside palace hotel in Srinagar with a spa, multiple restaurants and an indoor pool.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -680,10 +773,22 @@
                 "Airport pickup",
                 "Room service"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Breakfast",
+                "Indoor pool and spa access",
+                "Wi-Fi"
+            ],
+            "exclusions": [
+                "Lunch and dinner",
+                "Airport transfer",
+                "Spa treatments"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM",
+                "Airport pickup: ₹1,200"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 144000,
             "rooms": [
                 {
@@ -747,7 +852,7 @@
             "address": "Rajbagh, Srinagar",
             "phone": "+91 9576135602",
             "email": "stay@hotelheevan.example.com",
-            "description": "Comfortable rooms near the Boulevard.",
+            "description": "A mid-range hotel close to the Boulevard and Lal Chowk, popular with groups for its multi-bedded rooms.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -755,10 +860,20 @@
                 "Airport pickup",
                 "Room service"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Breakfast",
+                "Wi-Fi",
+                "Parking"
+            ],
+            "exclusions": [
+                "Lunch and dinner",
+                "Laundry"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 135200,
             "rooms": [
                 {
@@ -822,7 +937,7 @@
             "address": "Boulevard Road, Srinagar",
             "phone": "+91 9894425157",
             "email": "stay@zabarwanresidency.example.com",
-            "description": "Simple rooms a short walk from Dal Lake.",
+            "description": "A clean, simple hotel on the Zabarwan slope, ten minutes from the Mughal Gardens. A quiet option for budget trips.",
             "amenities": [
                 "Wi-Fi",
                 "Heater",
@@ -830,10 +945,20 @@
                 "Airport pickup",
                 "Room service"
             ],
-            "inclusions": [],
-            "exclusions": [],
-            "extraCharges": [],
-            "priceNote": null,
+            "inclusions": [
+                "Breakfast",
+                "Wi-Fi",
+                "Parking"
+            ],
+            "exclusions": [
+                "Lunch and dinner",
+                "Heater charges"
+            ],
+            "extraCharges": [
+                "Extra mattress: ₹800 per night",
+                "Late check-out: ₹1,000 after 12 PM"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
             "revenue": 83200,
             "rooms": [
                 {
@@ -878,6 +1003,93 @@
                         "breakfast": 6400,
                         "map": 7100,
                         "all": 7700
+                    }
+                }
+            ]
+        },
+        "11": {
+            "id": 11,
+            "name": "Hotel Mandovi Residency",
+            "city": "Panjim",
+            "region": "Goa",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.3,
+            "reviews": 186,
+            "roomsCount": 32,
+            "price": 5200,
+            "bookings": 9,
+            "address": "Dr Dada Vaidya Road, Panjim",
+            "phone": "+91 832 222 4455",
+            "email": "stay@mandoviresidency.example.com",
+            "description": "A city hotel on the Mandovi riverfront in Panjim, a short walk from the Latin Quarter of Fontainhas and the ferry wharf.\n\nRooms face the river or the old town, and the rooftop restaurant serves Goan breakfast and seafood.",
+            "amenities": [
+                "Wi-Fi",
+                "Air conditioning",
+                "Rooftop restaurant",
+                "Parking",
+                "Lift"
+            ],
+            "inclusions": [
+                "Daily breakfast",
+                "Wi-Fi",
+                "Parking"
+            ],
+            "exclusions": [
+                "Lunch and dinner",
+                "Airport transfer",
+                "Alcohol"
+            ],
+            "extraCharges": [
+                "Breakfast for extra guests: ₹450 per person",
+                "Late check-out: ₹1,200 after 12 PM",
+                "Extra mattress: ₹900 per night"
+            ],
+            "priceNote": "Price may vary, please confirm before booking",
+            "revenue": 46800,
+            "rooms": [
+                {
+                    "id": 5,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 7600,
+                        "breakfast": 8100,
+                        "map": 8800,
+                        "all": 9400
+                    }
+                },
+                {
+                    "id": 6,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 9500,
+                        "breakfast": 10000,
+                        "map": 10700,
+                        "all": 11300
+                    }
+                },
+                {
+                    "id": 7,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 12800,
+                        "breakfast": 13300,
+                        "map": 14000,
+                        "all": 14600
+                    }
+                },
+                {
+                    "id": 8,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 17600,
+                        "breakfast": 18100,
+                        "map": 18800,
+                        "all": 19400
                     }
                 }
             ]

@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateBlogPostRequest;
 use App\Models\BlogPost;
 use App\Support\DummyData;
+use Illuminate\Support\Carbon;
+use App\Http\Requests\SaveBlogPostRequest;
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 
 /** Blogs page: the four stat cards are real sums over blog_posts, and the list is the articles, newest first. */
@@ -56,5 +59,54 @@ class BlogController extends Controller
             'leads' => $p->leads,
             'converted' => $p->converted,
         ];
+    }
+
+    /** Add an article from the wizard. With dummy data nothing is written. */
+    public function store(SaveBlogPostRequest $request): JsonResponse
+    {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
+        }
+
+        $post = BlogPost::query()->create($this->columns($request, null) + ['views' => 0, 'leads' => 0, 'converted' => 0]);
+
+        return response()->json(['success' => true, 'data' => ['id' => $post->id]], 201);
+    }
+
+    /** Save the article the wizard was opened on (the id is a string: with dummy data it can be one the page made this session). */
+    public function save(SaveBlogPostRequest $request, string $post): JsonResponse
+    {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
+        }
+
+        $record = BlogPost::query()->findOrFail((int) $post);
+        $record->update($this->columns($request, $record));
+
+        return response()->json(['success' => true, 'data' => ['id' => $record->id]]);
+    }
+
+    /** The wizard's values in the table's columns. A new article gets a unique slug from its title. */
+    private function columns(SaveBlogPostRequest $r, ?BlogPost $current): array
+    {
+        $status = $r->input('status', 'draft');
+        $publishedAt = match (true) {
+            $r->filled('publishedAt') => Carbon::parse($r->input('publishedAt')),
+            $status === 'draft' => null,
+            $current?->published_at !== null => $current->published_at,
+            $status === 'scheduled' => now()->addDay(),
+            default => now(),
+        };
+        $columns = ['title' => $r->input('title'), 'author' => $r->input('author', ''), 'category' => $r->input('category'), 'status' => $status, 'published_at' => $publishedAt];
+        if (! $current) {
+            $base = Str::slug((string) $r->input('title')) ?: 'article';
+            $slug = $base;
+            for ($n = 2; BlogPost::query()->where('slug', $slug)->exists(); $n++) {
+                $slug = $base.'-'.$n;
+            }
+            $columns['slug'] = $slug;
+        }
+
+        return $columns;
     }
 }

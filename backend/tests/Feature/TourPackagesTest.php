@@ -115,6 +115,6 @@ class TourPackagesTest extends TestCase
     public function test_an_unknown_package_is_a_404_and_the_page_has_no_write_routes(): void
     {
         $this->getJson('/api/tour-packages/999')->assertNotFound();
-        $this->postJson('/api/tour-packages', ['name' => 'x'])->assertStatus(405); // the Add flow is not built yet
+        $this->postJson('/api/tour-packages', ['tag' => 'tour'])->assertUnprocessable()->assertJsonValidationErrors('name'); // only the name is required
     }
 }

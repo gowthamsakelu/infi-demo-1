@@ -1,5 +1,6 @@
 // The one Assign flow for Bookings and Inquiries (single from the ⋮ menu, many from the bulk bar).
 // Bottom sheet on phones, centered modal on larger screens (CSS decides); same markup everywhere.
+import { placeAsPushed } from './push.js';
 import { STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST } from '../data.js';
 import { icon } from './icons.js';
 import { esc, toast, initials, dismissOnOutside, openWhatsApp, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
@@ -85,6 +86,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
       </div>
     </div>`;
   document.body.appendChild(ov);
+  queueMicrotask(() => placeAsPushed(ov)); // opened from inside a sheet (a screen pushed into its place), not stacked on top of it
   const unlock = lockScroll();
   const trigger = document.activeElement;
   afterPaint(() => ov.classList.add('open'));

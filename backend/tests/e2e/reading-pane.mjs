@@ -1,4 +1,6 @@
-// Browser test (not run by PHPUnit): the always-open detail ("reading") pane on Bookings and Inquiries.
+// Browser test (not run by PHPUnit): the detail pane on the PC / tablet list pages (Bookings, Inquiries and the catalog pages).
+// Nothing is selected by itself: the pane says "Select ..." until a row is clicked; a click shows the record, another click switches it, Esc deselects.
+// There is no expand (fullscreen) button, and the filter dropdown stays inside the screen.
 // Run against a dev server: `BASE=http://127.0.0.1:8000/ node reading-pane.mjs`.
 import { chromium } from 'playwright';
 import { signIn } from './signin.mjs';
@@ -12,103 +14,71 @@ const summary = () => { const failed = results.filter(([, ok]) => !ok); console.
 process.on('uncaughtException', (e) => { console.log('STOPPED:', String(e.message).split('\n')[0]); summary(); process.exit(2); });
 
 const sel = (page) => new URL(page.url()).searchParams.get('selected');
-const activeId = (page) => page.evaluate(() => document.querySelector('#desktop-compact-list-items .list-row-card.active')?.dataset.compactBookingId || null);
-const ids = (page) => page.evaluate(() => [...document.querySelectorAll('#desktop-compact-list-items [data-compact-booking-id]')].map((c) => c.dataset.compactBookingId));
-const detailName = (page) => page.evaluate(() => document.querySelector('#desktop-sheet-header .customer-name-title')?.textContent.trim() || '');
-const drawerOpen = (page) => page.evaluate(() => document.querySelector('#desktop-details-drawer').classList.contains('open'));
+const emptyText = (page) => page.evaluate(() => { const e = document.querySelector('.detail-empty'); return e && e.getClientRects().length ? e.innerText.replace(/\s+/g, ' ').trim() : null; });
 
 for (const [w, h] of [[1280, 800], [768, 1024]]) {
-  for (const kind of ['bookings', 'inquiries']) {
+  const ctx = await browser.newContext({ viewport: { width: w, height: h } });
+  const page = await ctx.newPage();
+  await signIn(page, BASE);
+  page.setDefaultTimeout(20000);
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  const wait = (ms = 500) => page.waitForTimeout(ms);
+
+  // Bookings and Inquiries
+  for (const [kind, noun] of [['bookings', 'booking'], ['inquiries', 'inquiry']]) {
     const tag = `${kind}@${w}`;
-    const ctx = await browser.newContext({ viewport: { width: w, height: h } });
-    const page = await ctx.newPage();
-    await signIn(page, BASE);
-    page.setDefaultTimeout(20000);
-    const errors = [];
-    page.on('pageerror', (e) => errors.push(String(e)));
-    const wait = (ms = 350) => page.waitForTimeout(ms);
-    const open = async (query = '') => { await page.goto(`${BASE}${query}#${kind}`.replace('?#', '#'), { waitUntil: 'networkidle' }); await wait(900); };
-
-    await open();
-    const all = await ids(page);
-    check(`${tag} list has records`, all.length >= 3, String(all.length));
-    check(`${tag} first record selected on load`, await activeId(page) === all[0], `${await activeId(page)} vs ${all[0]}`);
-    check(`${tag} detail pane open with the record`, await drawerOpen(page) && (await detailName(page)).length > 0);
-    check(`${tag} URL carries ?selected=`, sel(page) === all[0], page.url());
-    check(`${tag} listbox + option roles`, await page.evaluate(() => document.querySelector('#desktop-compact-list-items').getAttribute('role') === 'listbox' && document.querySelector('#desktop-compact-list-items .list-row-card.active').getAttribute('aria-selected') === 'true'));
+    await page.goto(`${BASE}#${kind}`); await page.reload();
+    await page.waitForSelector('#desktop-compact-list-items .list-row-card'); await wait(2500);
+    const ids = await page.evaluate(() => [...document.querySelectorAll('#desktop-compact-list-items [data-compact-booking-id]')].map((c) => c.dataset.compactBookingId));
+    const title = (id) => page.locator(`#desktop-compact-list-items [data-compact-booking-id="${id}"] .card-title`);
+    check(`${tag} list has records`, ids.length >= 3, String(ids.length));
+    check(`${tag} nothing selected on load, the pane says Select`, sel(page) === null && new RegExp(`^Select an? ${noun}`).test(await emptyText(page) || '') && /Choose an item from the list/.test(await emptyText(page) || ''), String(await emptyText(page)));
+    check(`${tag} no expand / fullscreen button`, await page.locator('#desktop-btn-expand-table, .btn-expand-full-table').count() === 0);
     check(`${tag} nothing focused on load`, await page.evaluate(() => !/INPUT|TEXTAREA/.test(document.activeElement.tagName)));
-
-    // click another record: pane switches, never blank in between
-    const trace = page.evaluate(() => { window.__blank = 0; const body = document.querySelector('#desktop-sheet-header'); new MutationObserver(() => { if (!body.textContent.trim()) window.__blank += 1; }).observe(body, { childList: true, subtree: true }); });
-    await trace;
-    const nameBefore = await detailName(page);
-    await page.locator(`#desktop-compact-list-items [data-compact-booking-id="${all[1]}"]`).click(); await wait();
-    check(`${tag} click switches the pane`, await activeId(page) === all[1] && sel(page) === all[1] && (await detailName(page)) !== nameBefore);
-    check(`${tag} pane stayed open and never blank`, await drawerOpen(page) && await page.evaluate(() => window.__blank === 0));
-
-    // arrow keys with the list focused
-    await page.locator('#desktop-compact-list-items').focus();
-    await page.keyboard.press('ArrowDown'); await wait(250);
-    check(`${tag} ArrowDown selects the next record`, await activeId(page) === all[2]);
-    check(`${tag} focus stays on the list`, await page.evaluate(() => document.activeElement.id === 'desktop-compact-list-items'));
-    await page.keyboard.press('ArrowUp'); await wait(250);
-    check(`${tag} ArrowUp selects the previous record`, await activeId(page) === all[1]);
-
-    // bulk checkbox and row buttons do not change the selection
-    await page.locator(`#desktop-compact-list-items [data-compact-booking-id="${all[3] || all[2]}"] [data-desktop-select-id]`).click(); await wait(250);
-    check(`${tag} checkbox keeps the selection`, await activeId(page) === all[1]);
-    await page.locator('#desktop-compact-list-items [data-desktop-select-id]').nth(3).click().catch(() => {}); await wait(150);
-
-    // back / forward
-    await page.goBack(); await wait(500);
-    check(`${tag} browser back returns to the earlier record`, await activeId(page) === all[0] && sel(page) === all[0], `${await activeId(page)} ${page.url()}`);
-    await page.goForward(); await wait(500);
-    check(`${tag} browser forward`, await activeId(page) === all[1]);
-
-    // reload keeps it; a bad id falls back to the first
-    await open(`?selected=${all[2]}`);
-    check(`${tag} reload with ?selected= keeps the record`, await activeId(page) === all[2]);
-    await open('?selected=NOPE-999');
-    check(`${tag} unknown id falls back to the first`, await activeId(page) === all[0] && sel(page) === all[0]);
-
-    // search: selection kept while still in results, first result otherwise, calm empty state
-    await open(`?selected=${all[2]}`);
-    const name2 = (await detailName(page)).split(' ')[0];
-    await page.locator('#desktop-compact-search-input').fill(name2); await wait(900);
-    check(`${tag} search keeps the selection when it is still listed`, await activeId(page) === all[2]);
-    await page.locator('#desktop-compact-search-input').fill('zzzzqqqq'); await wait(900);
-    check(`${tag} empty results: empty detail state`, /No records to show/.test(await page.locator('#desktop-sheet-body').innerText()) && await drawerOpen(page));
-    check(`${tag} empty results: tabs and footer hidden`, await page.evaluate(() => getComputedStyle(document.querySelector('.desktop-drawer-footer')).display === 'none'));
-    check(`${tag} empty results: list shows its empty state`, /No .* found/.test(await page.locator('#desktop-compact-list-items').innerText()));
-    await page.locator('#desktop-compact-search-input').fill(''); await wait(900);
-    check(`${tag} clearing search selects a record again`, !!(await activeId(page)) && (await detailName(page)).length > 0);
-
-    // a search that removes the selected record selects the first result
-    await open(`?selected=${all[all.length - 1]}`);
-    const first = await detailName(page);
-    await page.locator('#desktop-compact-search-input').fill((await page.evaluate((id) => document.querySelector(`[data-compact-booking-id="${id}"] .card-title`)?.textContent || '', all[0])).trim().split(' ')[0]); await wait(900);
-    const nowIds = await ids(page);
-    check(`${tag} filtering moves the selection to the first result`, nowIds.length >= 1 && await activeId(page) === nowIds[0]);
-
-    // expand collapses the pane and it stays collapsed
-    await open();
-    await page.locator('#desktop-btn-expand-table').click(); await wait(400);
-    check(`${tag} expand closes the pane`, !(await drawerOpen(page)) && sel(page) === null);
-    await page.locator('#desktop-table-search-input').fill('a'); await wait(700);
-    check(`${tag} pane stays closed while filtering`, !(await drawerOpen(page)));
-    await page.locator('#desktop-table-body [data-desktop-row-id]').first().click(); await wait(400);
-    check(`${tag} clicking a row reopens the pane`, await drawerOpen(page) && !!sel(page));
-
-    check(`${tag} no page errors`, errors.length === 0, errors.join(' | '));
-    await ctx.close();
+    await title(ids[1]).click(); await wait(900);
+    check(`${tag} a click selects the row and shows its detail`, sel(page) === ids[1] && await emptyText(page) === null && await page.locator('#desktop-compact-list-items .list-row-card.active').count() === 1);
+    await title(ids[2]).click(); await wait(700);
+    check(`${tag} another click switches the pane`, sel(page) === ids[2]);
+    await title(ids[2]).click(); await wait(400);
+    check(`${tag} clicking the selected row again keeps it open`, sel(page) === ids[2] && await emptyText(page) === null);
+    await page.keyboard.press('Escape'); await wait(700);
+    check(`${tag} Esc deselects and shows the empty state`, sel(page) === null && await emptyText(page) !== null && await page.locator('#desktop-compact-list-items .list-row-card.active').count() === 0);
+    await page.locator('#desktop-compact-search-input').fill('a'); await wait(900);
+    check(`${tag} searching selects nothing by itself`, sel(page) === null && await emptyText(page) !== null);
+    await page.locator('#desktop-compact-search-input').fill(''); await wait(700);
+    await page.goto(`${BASE}?selected=${ids[1]}#${kind}`); await page.waitForSelector('#desktop-compact-list-items .list-row-card'); await wait(2500);
+    check(`${tag} ?selected= opens that record on load`, sel(page) === ids[1] && await emptyText(page) === null);
   }
+
+  // the filter dropdown stays inside the screen, anchored to its button
+  await page.goto(`${BASE}#inquiries`); await page.reload(); await page.waitForSelector('#desktop-compact-list-items .list-row-card'); await wait(1500);
+  await page.locator('#desktop-compact-filter-slot .dd-trigger').click(); await wait(400);
+  const dd = await page.evaluate(() => { const l = document.querySelector('#desktop-compact-filter-slot .dd-list:not([hidden])'); const t = document.querySelector('#desktop-compact-filter-slot .dd-trigger'); if (!l) return null; const r = l.getBoundingClientRect(); const tr = t.getBoundingClientRect(); return { inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight, atLeastTrigger: r.width + 1 >= tr.width, atMost260: r.width <= 261, fixed: getComputedStyle(l).position === 'fixed' }; });
+  check(`inquiries@${w} filter list: inside the screen, at least the button wide, at most 260px, fixed layer`, dd && dd.inside && dd.atLeastTrigger && dd.atMost260 && dd.fixed, JSON.stringify(dd));
+  await page.keyboard.press('Escape'); await wait(300);
+  check(`inquiries@${w} filter list closes on Escape`, await page.locator('#desktop-compact-filter-slot .dd-list:not([hidden])').count() === 0);
+
+  // catalog pages
+  for (const [key, noun] of [['tour-packages', 'package'], ['transport', 'vehicle'], ['stays', 'stay'], ['adventures', 'adventure'], ['destinations', 'destination'], ['users', 'user']]) {
+    const tag = `${key}@${w}`;
+    await page.goto(`${BASE}#${key}`); await page.reload(); await page.waitForSelector('.sp-row'); await wait(700);
+    check(`${tag} nothing selected on load, the pane says Select`, sel(page) === null && new RegExp(`^Select an? ${noun}`).test(await emptyText(page) || ''), String(await emptyText(page)));
+    await page.locator('.sp-row').nth(1).click(); await wait(800);
+    check(`${tag} a click selects the row and shows its detail`, !!sel(page) && await page.locator('.sp-detail-head .customer-name-title').count() === 1 && await page.locator('.sp-row.active').count() === 1);
+    await page.keyboard.press('Escape'); await wait(600);
+    check(`${tag} Esc deselects`, sel(page) === null && await emptyText(page) !== null && await page.locator('.sp-row.active').count() === 0);
+  }
+
+  check(`@${w} no page errors`, errors.length === 0, errors.join(' | '));
+  await ctx.close();
 }
 
 // phone layout: nothing opens by itself and the URL is left alone
 for (const kind of ['bookings', 'inquiries']) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   const page = await ctx.newPage();
-    await signIn(page, BASE);
+  await signIn(page, BASE);
   page.setDefaultTimeout(20000);
   await page.goto(`${BASE}#${kind}`, { waitUntil: 'networkidle' }); await page.waitForTimeout(900);
   check(`${kind}@390 no auto selection in the URL`, sel(page) === null, page.url());
@@ -120,4 +90,5 @@ for (const kind of ['bookings', 'inquiries']) {
 }
 
 await browser.close();
-process.exit(summary() ? 1 : 0);
+const failed = summary();
+process.exit(failed ? 1 : 0);

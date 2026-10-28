@@ -217,7 +217,7 @@ export function updateInlineBar(root, prefix, selectedCount) {
   const top = bar.parentElement;
   top.classList.toggle('is-selecting', on);
   bar.toggleAttribute('inert', !on);
-  [...top.children].forEach((el) => { if (el !== bar && !el.matches('.btn-expand-full-table')) el.toggleAttribute('inert', on); });
+  [...top.children].forEach((el) => { if (el !== bar) el.toggleAttribute('inert', on); });
   if (on) root.querySelector(`#${prefix}-selected-count`).textContent = `${selectedCount} selected`;
 }
 

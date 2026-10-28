@@ -5,6 +5,7 @@ import { navItem } from './nav.js';
 import { currentPage, getParams, setParams, navigate } from './page-state.js';
 import { toast } from './ui.js';
 import { confirmDialog } from './sheet.js';
+import { setAddAction } from './add-button.js';
 
 let current = null; // { key, host, instance, token }
 let token = 0;
@@ -21,16 +22,8 @@ function loadPageCss(key) {
   document.head.appendChild(link);
 }
 
-/** The Add button of the open page: its label in the top bar (PC) and on the floating button (phone); null hides both. It has no behaviour yet. */
-function setAddButton(label) {
-  ['#desktop-page-add', '#mobile-page-add'].forEach((sel) => {
-    const b = document.querySelector(sel);
-    if (!b) return;
-    b.hidden = !label;
-    const span = b.querySelector('.sp-add-label');
-    if (span && label) span.textContent = label;
-  });
-}
+/** The Add button of the open page (shared/add-button.js): its wording, and what it does; null hides it. */
+const setAddButton = setAddAction;
 
 export async function mountPage(key, host) {
   if (current && current.key === key && current.host === host) return; // already showing it

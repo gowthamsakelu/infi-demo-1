@@ -42,7 +42,23 @@
                 }
             ],
             "trips": 58,
-            "avgDays": 3.2
+            "avgDays": 3.2,
+            "overview": "A compact four-seater for couples and small families, with enough boot for two medium bags.",
+            "highlights": [
+                "Air conditioning",
+                "Push-back seats",
+                "Boot space for 2 bags",
+                "Music system"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver",
+                "Toll and parking within the base km"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Meals and stay for the driver beyond the night-halt charge"
+            ]
         },
         {
             "id": 2,
@@ -86,7 +102,23 @@
                 }
             ],
             "trips": 41,
-            "avgDays": 4.1
+            "avgDays": 4.1,
+            "overview": "A six-seater SUV for families of five, with a roomy third row and a roof carrier.",
+            "highlights": [
+                "Air conditioning",
+                "Third-row seating",
+                "Roof carrier",
+                "Good for hill roads"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver",
+                "Toll and parking within the base km"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Night halt allowance"
+            ]
         },
         {
             "id": 3,
@@ -130,7 +162,24 @@
                 }
             ],
             "trips": 26,
-            "avgDays": 4.6
+            "avgDays": 4.6,
+            "overview": "A twelve-seater for groups, with push-back seats and room for luggage at the back.",
+            "highlights": [
+                "Air conditioning",
+                "Push-back seats",
+                "Luggage space at the back",
+                "Reading lights and charging points"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver",
+                "Toll and parking within the base km"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Extra km beyond the package",
+                "Night halt allowance"
+            ]
         },
         {
             "id": 4,
@@ -174,7 +223,21 @@
                 }
             ],
             "trips": 9,
-            "avgDays": 2.8
+            "avgDays": 2.8,
+            "overview": "A reliable vehicle for the trip, driven by a local driver who knows the roads.",
+            "highlights": [
+                "Local driver",
+                "Clean and serviced vehicle"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Toll and parking",
+                "Extra km beyond the package"
+            ]
         },
         {
             "id": 5,
@@ -218,7 +281,21 @@
                 }
             ],
             "trips": 12,
-            "avgDays": 3
+            "avgDays": 3,
+            "overview": "A reliable vehicle for the trip, driven by a local driver who knows the roads.",
+            "highlights": [
+                "Local driver",
+                "Clean and serviced vehicle"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Toll and parking",
+                "Extra km beyond the package"
+            ]
         },
         {
             "id": 6,
@@ -262,7 +339,21 @@
                 }
             ],
             "trips": 8,
-            "avgDays": 3.6
+            "avgDays": 3.6,
+            "overview": "A reliable vehicle for the trip, driven by a local driver who knows the roads.",
+            "highlights": [
+                "Local driver",
+                "Clean and serviced vehicle"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Toll and parking",
+                "Extra km beyond the package"
+            ]
         },
         {
             "id": 7,
@@ -306,7 +397,21 @@
                 }
             ],
             "trips": 5,
-            "avgDays": 2.4
+            "avgDays": 2.4,
+            "overview": "A reliable vehicle for the trip, driven by a local driver who knows the roads.",
+            "highlights": [
+                "Local driver",
+                "Clean and serviced vehicle"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Toll and parking",
+                "Extra km beyond the package"
+            ]
         },
         {
             "id": 8,
@@ -350,7 +455,21 @@
                 }
             ],
             "trips": 17,
-            "avgDays": 2
+            "avgDays": 2,
+            "overview": "A reliable vehicle for the trip, driven by a local driver who knows the roads.",
+            "highlights": [
+                "Local driver",
+                "Clean and serviced vehicle"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Toll and parking",
+                "Extra km beyond the package"
+            ]
         },
         {
             "id": 9,
@@ -394,7 +513,21 @@
                 }
             ],
             "trips": 7,
-            "avgDays": 3.5
+            "avgDays": 3.5,
+            "overview": "A reliable vehicle for the trip, driven by a local driver who knows the roads.",
+            "highlights": [
+                "Local driver",
+                "Clean and serviced vehicle"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Toll and parking",
+                "Extra km beyond the package"
+            ]
         },
         {
             "id": 10,
@@ -438,7 +571,21 @@
                 }
             ],
             "trips": 6,
-            "avgDays": 1.5
+            "avgDays": 1.5,
+            "overview": "A reliable vehicle for the trip, driven by a local driver who knows the roads.",
+            "highlights": [
+                "Local driver",
+                "Clean and serviced vehicle"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Toll and parking",
+                "Extra km beyond the package"
+            ]
         },
         {
             "id": 11,
@@ -457,7 +604,21 @@
             "showInBuilder": true,
             "rateCard": [],
             "trips": 0,
-            "avgDays": null
+            "avgDays": null,
+            "overview": "A reliable vehicle for the trip, driven by a local driver who knows the roads.",
+            "highlights": [
+                "Local driver",
+                "Clean and serviced vehicle"
+            ],
+            "inclusions": [
+                "Fuel",
+                "Driver"
+            ],
+            "exclusions": [
+                "Entry tickets",
+                "Toll and parking",
+                "Extra km beyond the package"
+            ]
         },
         {
             "id": 12,
@@ -476,7 +637,16 @@
             "showInBuilder": true,
             "rateCard": [],
             "trips": 0,
-            "avgDays": null
+            "avgDays": null,
+            "overview": "Booked by the customer or the agent; no vehicle or driver is provided by us.",
+            "highlights": [
+                "Booked separately"
+            ],
+            "inclusions": [],
+            "exclusions": [
+                "Tickets",
+                "Airport or station transfers"
+            ]
         },
         {
             "id": 13,
@@ -495,7 +665,16 @@
             "showInBuilder": true,
             "rateCard": [],
             "trips": 0,
-            "avgDays": null
+            "avgDays": null,
+            "overview": "Booked by the customer or the agent; no vehicle or driver is provided by us.",
+            "highlights": [
+                "Booked separately"
+            ],
+            "inclusions": [],
+            "exclusions": [
+                "Tickets",
+                "Airport or station transfers"
+            ]
         }
     ]
 }

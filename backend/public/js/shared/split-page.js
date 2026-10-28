@@ -5,12 +5,13 @@
 // PC: the first record is selected on load and the pane is never empty; the choice lives in the URL (?selected=ID).
 // Phone: tapping a card opens the detail as the same bottom sheet as the Bookings detail (X or backdrop closes it; the browser Back button too).
 import { icon } from './icons.js';
-import { esc, searchBox, skeletonCards, errorState, emptyState } from './ui.js';
+import { esc, searchBox, skeletonCards, errorState, emptyState, selectEmptyState, rowMenuButton, openRowMenu } from './ui.js';
 import { renderTabs } from './list-ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { confirmDialog } from './sheet.js';
 import { detailHeaderHtml, sheetHandleHtml } from './detail-sheet.js';
-import { chooseRecord, bindListKeys } from './split-view.js';
+import { bindListKeys } from './split-view.js';
+import { hasOpenLayer } from './sheet.js';
 import { getParams, setParams, subscribe } from './page-state.js';
 
 const isPhone = () => document.documentElement.dataset.layout === 'mobile';
@@ -55,10 +56,10 @@ function footerHtml(f) {
  * @param {HTMLElement} host
  * @param {object} ctx  from page-host
  * @param {{ title: string, subtitle?: string, addLabel?: string }} cfg
- * The Add button is drawn in the top bar (PC) or as the floating button (phone), exactly where "Add Inquiry" sits, and does nothing yet.
+ * The Add button is the shared one (shared/add-button.js): top bar on PC, floating on the phone. `onAdd` is what it does.
  */
 export function pageFrame(host, ctx, cfg) {
-  ctx.setAddButton?.(cfg.addLabel || null);
+  ctx.setAddButton?.(cfg.addLabel || null, cfg.onAdd);
   host.innerHTML = `<section class="sp sp-frame" data-sp="${esc(ctx.key)}">${isPhone() ? phoneHeader(cfg.subtitle || cfg.title) : ''}<div class="sp-body"></div></section>`;
   host.querySelector('[data-sp-bell]')?.addEventListener('click', () => document.querySelector('#mobile-bell-btn')?.click());
   return {
@@ -91,11 +92,12 @@ export function pageFrame(host, ctx, cfg) {
  *     foot?: { primary?: { label: string, icon?: string, act?: string }, quick?: { label: string, icon?: string, act?: string }[] } | string },
  *   afterDetail?: (el: HTMLElement, item: object, api: object) => void,
  *   isDirty?: () => boolean, discard?: () => void,
+ *   onAdd?: () => void, rowMenu?: (item: object) => { key: string, label: string, icon: string, danger?: boolean }[], onRowMenu?: (key: string, item: object) => void,
  * }} cfg
  * The filter dropdown beside the search box is `filter` (a real filter, like All Categories on Inquiries) or, when a page has none, its `sorts`.
  */
 export function createSplitPage(host, ctx, cfg) {
-  ctx.setAddButton?.(cfg.addLabel || null);
+  ctx.setAddButton?.(cfg.addLabel || null, cfg.onAdd);
   const state = { items: [], status: 'loading', q: '', tab: cfg.tabs[0].key, filter: '', sort: '', selected: null, dtab: '' };
   let pushed = false; // did we add a history entry when the phone opened a detail?
   let timer = null;
@@ -217,9 +219,12 @@ export function createSplitPage(host, ctx, cfg) {
           ${r.sub ? `<p class="row-trip">${r.raw ? r.sub : esc(r.sub)}</p>` : ''}
           ${r.meta ? `<div class="card-meta-row">${r.raw ? r.meta : `<span>${esc(r.meta)}</span>`}</div>` : ''}
         </div>
+        ${cfg.rowMenu ? `<div class="card-right-col"><div class="card-action-btns-row">${rowMenuButton({ id: item.id, name: r.name, size: 15, attr: 'data-sp-menu' })}</div></div>` : ''}
       </div>`;
     }).join('');
     listEl.setAttribute('aria-activedescendant', state.selected ? `sp-opt-${state.selected}` : '');
+    // the rows fade up once, when the list first appears (not on every search or filter)
+    if (!state.entered) { state.entered = true; listEl.classList.add('is-entering'); setTimeout(() => listEl.classList.remove('is-entering'), 400); }
   }
 
   function renderDetail({ keepScroll = false } = {}) {
@@ -237,7 +242,7 @@ export function createSplitPage(host, ctx, cfg) {
     }
     if (!item) {
       clear();
-      scroller.innerHTML = '<div class="state-box detail-empty"><h4>No records to show</h4><p>Change the search or filters to see more.</p></div>';
+      scroller.innerHTML = selectEmptyState(/^(?!us)[aeiou]/i.test(cfg.noun) ? `an ${cfg.noun}` : `a ${cfg.noun}`);
       return;
     }
     let d = cfg.detail(item, { tab: state.dtab });
@@ -276,7 +281,7 @@ export function createSplitPage(host, ctx, cfg) {
   }
 
   /* ---------- selection ---------- */
-  /** The record the pane should show: the URL's, else the one open, else the first (PC only). */
+  /** The record the pane should show: the URL's, else the one already open, else none: the pane says "Select ..." until a row is clicked. */
   function reconcile() {
     if (state.status !== 'ready') return;
     const rows = visible();
@@ -285,9 +290,19 @@ export function createSplitPage(host, ctx, cfg) {
       state.selected = wanted && rows.some((i) => String(i.id) === String(wanted)) ? wanted : null;
       return;
     }
-    const next = chooseRecord(rows, ...[getParams().selected, state.selected].filter(Boolean).map(String));
-    state.selected = next ? next.id : null;
+    const keep = [getParams().selected, state.selected].filter(Boolean).map(String).map((id) => rows.find((i) => String(i.id) === id)).find(Boolean);
+    state.selected = keep ? keep.id : null;
     if ((getParams().selected || null) !== (state.selected ? String(state.selected) : null)) setParams({ selected: state.selected }, { push: false, silent: true });
+  }
+
+  /** PC: back to the empty pane (Esc). */
+  async function deselect() {
+    if (phone || state.selected == null || !(await mayLeaveRecord())) return;
+    state.selected = null;
+    state.dtab = '';
+    setParams({ selected: null }, { push: false, silent: true });
+    renderList();
+    renderDetail();
   }
 
   async function select(id, { push = true } = {}) {
@@ -334,6 +349,12 @@ export function createSplitPage(host, ctx, cfg) {
 
   /* ---------- events (on the host, so they survive a re-built shell) ---------- */
   function onClick(e) {
+    const more = e.target.closest('[data-sp-menu]');
+    if (more) { // the ⋮ of a row: the shared row menu (Edit first); it does not select the row
+      const item = byId(more.dataset.spMenu);
+      if (item) openRowMenu(more, cfg.rowMenu(item), (key) => cfg.onRowMenu(key, item));
+      return;
+    }
     const row = e.target.closest('[data-sp-id]');
     if (row) { select(byId(row.dataset.spId)?.id ?? row.dataset.spId); return; }
     const tab = e.target.closest('[data-sp-tab]');
@@ -353,6 +374,9 @@ export function createSplitPage(host, ctx, cfg) {
     renderHeader();
   };
   window.addEventListener('layout-changed', onLayout);
+  // Esc belongs to an open sheet or dialog first, and to a field being typed in; otherwise it deselects the record
+  const onEsc = (e) => { if (e.key === 'Escape' && !e.defaultPrevented && alive && !phone && !hasOpenLayer() && !e.target.closest?.('input, textarea, select')) deselect(); };
+  window.addEventListener('keydown', onEsc);
 
   /* ---------- data ---------- */
   async function load() {
@@ -380,6 +404,10 @@ export function createSplitPage(host, ctx, cfg) {
     items: () => state.items,
     current,
     reload: load,
+    /** Replace the list (a record was added or edited in memory) and show it. */
+    setItems(items) { state.items = items.map((i) => ({ ...i, id: String(i.id) })); state.status = 'ready'; reconcile(); renderAll(); },
+    /** Open a record (PC: in the pane; phone: its sheet). */
+    select: (id) => select(String(id)),
     /** A page that edits the open record reports whether it has unsaved changes. */
     bindDirty(fn) { dirtyApi = { isDirty: fn }; },
     /** Open one of the detail tabs. */
@@ -399,6 +427,7 @@ export function createSplitPage(host, ctx, cfg) {
       unsub();
       host.removeEventListener('click', onClick);
       window.removeEventListener('layout-changed', onLayout);
+      window.removeEventListener('keydown', onEsc);
       ctx.setAddButton?.(null);
       document.body.classList.remove('sp-detail-open');
     },

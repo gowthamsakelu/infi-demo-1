@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache rewrite module
-RUN a2enmod rewrite headers
+RUN a2enmod rewrite headers deflate expires
 
 # Configure Apache virtual host
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf

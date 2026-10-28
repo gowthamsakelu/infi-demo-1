@@ -2,6 +2,8 @@
 // that saves at once, and Move earlier / later to change the order. The Add Banner button is drawn as designed and does nothing yet.
 import { pageFrame } from '../shared/split-page.js';
 import { getJson, sendJson } from '../shared/http.js';
+import { createCatalogCrud, numOrNull, textOrNull, listOf } from '../shared/catalog-crud.js';
+const today = () => new Date().toISOString().slice(0, 10);
 import { esc, toast, skeletonCards, errorState, emptyState, openRowMenu } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { renderTabs } from '../shared/list-ui.js';
@@ -33,7 +35,7 @@ function hero(b, { thumb = false } = {}) {
     <div class="bn-copy"><h3>${esc(b.headline)}</h3>${b.cta ? `<p>${esc(b.cta)}</p>` : ''}</div>`}</div>`;
 }
 
-const card = (b) => `<article class="bn-card" data-bn-id="${esc(b.id)}">${hero(b)}
+const card = (b, fresh = false) => `<article class="bn-card" data-bn-id="${esc(b.id)}">${hero(b)}${fresh ? '<span class="just-added-tag">JUST ADDED</span>' : ''}
   <div class="bn-info">
     <div class="bn-row"><div class="bn-name"><b>${esc(b.name)}</b><small>${esc(meta(b))}</small></div>${toggleBtn(b)}</div>
     ${stats(b)}
@@ -49,12 +51,43 @@ const orderRow = (b, i, n) => `<div class="bn-order-row" data-bn-id="${esc(b.id)
   </div>
 </div>`;
 
+/** Add / Edit a banner: the shared catalog wizard, described by config only (see shared/wizard.js). */
+const BN_TONES = ['blue', 'green', 'amber', 'indigo', 'rose', 'sky', 'teal', 'violet'].map((t) => ({ value: t, label: t[0].toUpperCase() + t.slice(1) }));
+const BN_PLACEMENTS = ['Home hero', 'Destinations page', 'Adventures page', 'Not placed yet'].map((p) => ({ value: p, label: p }));
+const isPicture = (x) => String(x ?? '').startsWith('data:');
+function wizardConfig() {
+  return {
+    noun: 'banner',
+    requiredKey: 'name',
+    steps: [
+      { label: 'Basics', title: 'Basics', sub: 'The name for the team, and the words on the banner.', fields: [
+        { key: 'name', type: 'text', label: 'Name (for the team)', placeholder: 'e.g. Kashmir Winter Special', optional: false, max: 120 },
+        { key: 'headline', type: 'text', label: 'Headline on the banner', placeholder: 'e.g. Kashmir in snow', max: 160 },
+        { key: 'cta', type: 'text', label: 'Button text', placeholder: 'e.g. Book from ₹15,000', max: 120 },
+        { key: 'tone', type: 'chips', label: 'Colour', options: BN_TONES },
+      ] },
+      { label: 'Where & when', title: 'Where & when', sub: 'Where the banner shows, and for how long.', fields: [
+        { key: 'placement', type: 'select', label: 'Placement', options: BN_PLACEMENTS, optional: false },
+        { key: 'slot', type: 'number', label: 'Slot', placeholder: '1', half: true, max: 1 },
+        { key: 'active', type: 'toggle', label: 'On the website', hint: 'Switch off to hide it without deleting it' },
+        { key: 'startsAt', type: 'date', label: 'Starts', half: true },
+        { key: 'endsAt', type: 'date', label: 'Ends', half: true },
+      ] },
+      { label: 'Picture', title: 'Picture', sub: 'The photo behind the text. Without one the banner uses its colour.', fields: [
+        { key: 'image', type: 'image', label: 'Picture', hint: 'A wide photo works best' },
+      ] },
+    ],
+    defaults: () => ({ name: '', headline: '', cta: '', tone: 'blue', placement: 'Not placed yet', slot: '', active: true, startsAt: '', endsAt: '', image: [] }),
+    preview: (v) => ({ title: String(v.headline || v.name || '').trim(), lines: [v.name, BN_PLACEMENTS.find((p) => p.value === v.placement)?.label, v.active ? 'On the website' : 'Off'] }),
+  };
+}
+
 export default {
   css: true,
   mount(host, ctx) {
     const state = { items: [], status: 'loading', tab: 'all', mode: 'grid' };
     let alive = true;
-    const frame = pageFrame(host, ctx, { title: 'Banners', subtitle: '', addLabel: 'Add Banner' });
+    const frame = pageFrame(host, ctx, { title: 'Banners', subtitle: '', addLabel: 'Add Banner', onAdd: () => crud.add({ returnFocus: () => document.querySelector('#desktop-page-add, #mobile-page-add') }) });
     frame.body.innerHTML = `
       <div class="bn-bar">
         <div class="bn-tabs sp-tabs"></div>
@@ -85,12 +118,39 @@ export default {
       if (!rows.length) { content.innerHTML = emptyState({ title: 'No banners found', text: 'Nothing in this tab yet.', resetId: 'bn-reset' }); return; }
       content.innerHTML = state.mode === 'order'
         ? `<div class="bn-order">${state.items.map((b, i) => orderRow(b, i, state.items.length)).join('')}</div>`
-        : `<div class="bn-grid">${rows.map(card).join('')}</div>`;
+        : `<div class="bn-grid">${rows.map((b) => card(b, crud.isFresh(b.id))).join('')}</div>`;
     }
+
+    const crud = createCatalogCrud({
+      key: 'banners',
+      endpoint: '/api/banners',
+      wizard: () => wizardConfig(),
+      toBody: (v) => ({
+        name: v.name.trim(), headline: textOrNull(v.headline), cta: textOrNull(v.cta), tone: v.tone || 'blue', placement: v.placement || 'Not placed yet',
+        slot: numOrNull(v.slot), active: !!v.active, startsAt: textOrNull(v.startsAt), endsAt: textOrNull(v.endsAt), image: isPicture(v.image?.[0]) ? v.image[0] : undefined,
+      }),
+      local: (v, old) => {
+        const startsAt = textOrNull(v.startsAt);
+        const endsAt = textOrNull(v.endsAt);
+        const active = !!v.active;
+        return {
+          ...(old || {}), name: v.name.trim(), headline: textOrNull(v.headline), cta: textOrNull(v.cta), tone: v.tone || 'blue', placement: v.placement || 'Not placed yet',
+          slot: numOrNull(v.slot), active, startsAt, endsAt, image: isPicture(v.image?.[0]) ? v.image[0] : (old?.image ?? null),
+          status: !active ? 'draft' : startsAt && startsAt > today() ? 'scheduled' : 'active',
+          position: old?.position ?? 99, clicks: old?.clicks ?? 0, leads: old?.leads ?? 0, converted: old?.converted ?? 0,
+        };
+      },
+      values: (b) => ({
+        name: b.name, headline: b.headline ?? '', cta: b.cta ?? '', tone: b.tone || 'blue', placement: b.placement || 'Not placed yet', slot: b.slot ?? '',
+        active: !!b.active, startsAt: b.startsAt ?? '', endsAt: b.endsAt ?? '', image: b.image ? [b.image] : [],
+      }),
+      load: () => getJson('/api/banners'),
+      onChange: (list) => { state.items = list; render(); },
+    });
 
     async function load() {
       state.status = 'loading'; render();
-      try { state.items = await getJson('/api/banners'); state.status = 'ready'; } catch (err) { state.status = 'error'; state.error = err; }
+      try { state.items = await crud.load(); state.status = 'ready'; } catch (err) { state.status = 'error'; state.error = err; }
       if (alive) render();
     }
 
@@ -141,10 +201,11 @@ export default {
         const b = find(more.dataset.bnMore); if (!b) return;
         const i = state.items.indexOf(b);
         openRowMenu(more, [
+          { key: 'edit', label: 'Edit', icon: 'edit' },
           { key: 'toggle', label: b.active ? 'Switch off' : 'Switch on', icon: 'check' },
           ...(i > 0 ? [{ key: 'up', label: 'Move earlier', icon: 'chevronDown' }] : []),
           ...(i < state.items.length - 1 ? [{ key: 'down', label: 'Move later', icon: 'chevronDown' }] : []),
-        ], (key) => { if (key === 'toggle') setActive(b.id, !b.active); else move(b.id, key); });
+        ], (key) => { if (key === 'edit') crud.edit(b, { returnFocus: () => more }); else if (key === 'toggle') setActive(b.id, !b.active); else move(b.id, key); });
         return;
       }
       if (e.target.closest('#bn-reset')) { state.tab = 'all'; render(); return; }

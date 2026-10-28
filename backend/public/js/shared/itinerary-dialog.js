@@ -1,12 +1,8 @@
 // "Rename Day" dialog and the optimistic save helper for in-place itinerary edits (Bookings and Inquiries, phone and PC).
 import { icon } from './icons.js';
 import { esc, toast } from './ui.js';
-import { openSheet } from './sheet.js';
+import { openScreen } from './sheet.js';
 import { daysOf, snapshot, saveItinerary, dayName, markSaved } from './itinerary.js';
-
-function header(title) {
-  return `<header class="asg-header"><h3>${esc(title)}</h3><button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>`;
-}
 
 /** Save a mutation optimistically; roll back (and re-render) if the server refuses. */
 export async function commit(b, mutate, onChange, okMessage) {
@@ -24,18 +20,16 @@ export function openDayDialog(b, { index, onChange }) {
   if (!existing) return;
   const date = existing.date;
 
-  const dlg = openSheet({
+  // A screen pushed inside the open sheet (openScreen), not a popup on top of it.
+  const dlg = openScreen({
+    title: 'Rename Day',
     label: 'Rename day',
-    cls: 'itin-sheet',
-    html: `${header('Rename Day')}
-      <div class="itin-body">
-        <p class="itin-hint"><strong>${dayName(index + 1)}${date && date !== 'TBD' ? ` · ${esc(date)}` : ''}</strong></p>
-        <div class="fu-field"><label for="itin-day-title">Day title (optional)</label><input id="itin-day-title" type="text" maxlength="80" placeholder="e.g. Arrival in Rishikesh" value="${esc(existing.title || '')}" /></div>
-      </div>
-      <footer class="fu-footer itin-footer">
-        <button type="button" class="btn-secondary-desktop" data-sheet-close>Cancel</button>
-        <button type="button" class="btn-primary-desktop" data-itin-save>Save</button>
-      </footer>`,
+    bodyCls: 'itin-body',
+    footCls: 'fu-footer itin-footer',
+    body: `<p class="itin-hint"><strong>${dayName(index + 1)}${date && date !== 'TBD' ? ` · ${esc(date)}` : ''}</strong></p>
+        <div class="fu-field"><label for="itin-day-title">Day title (optional)</label><input id="itin-day-title" type="text" maxlength="80" placeholder="e.g. Arrival in Rishikesh" value="${esc(existing.title || '')}" /></div>`,
+    footer: `<button type="button" class="btn-secondary-desktop" data-sheet-close>Cancel</button>
+        <button type="button" class="btn-primary-desktop" data-itin-save>Save</button>`,
   });
 
   dlg.ov.addEventListener('click', async (e) => {

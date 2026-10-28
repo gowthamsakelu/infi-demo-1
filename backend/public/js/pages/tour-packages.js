@@ -3,15 +3,17 @@
 // Same shape as destinations.js. The Add and Edit buttons are drawn as designed and do nothing yet; "Use as itinerary for an inquiry"
 // opens the itinerary builder prefilled with this package (see tour-packages-builder.js).
 import { createSplitPage } from '../shared/split-page.js';
-import { getJson } from '../shared/http.js';
-import { esc, errorState } from '../shared/ui.js';
+import { getJson, sendJson } from '../shared/http.js';
+import { openWizard } from '../shared/wizard.js';
+import { createCatalogCrud, numOrNull, textOrNull, listOf } from '../shared/catalog-crud.js';
+import { esc, errorState, toast } from '../shared/ui.js';
 import { itemIconHtml, itemPills } from '../shared/itinerary.js';
 import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, linkRow, money, plural } from '../shared/page-ui.js';
-import { card, optionsOf, filled, inclusionsCard } from './catalog-ui.js';
+import { card, optionsOf, filled, inclusionsCard, highlightsCard } from './catalog-ui.js';
 import { useAsItinerary } from './tour-packages-builder.js';
 
-const TAGS = { tour: 'tour', villa: 'villa', activity: 'activity' };
-const TYPE = { tour: 'Tour', villa: 'Villa stay', activity: 'Activity trip' };
+const TAGS = { tour: 'tour', group: 'tour', family: 'tour', honeymoon: 'tour', villa: 'villa', activity: 'activity' };
+const TYPE = { tour: 'Tour', group: 'Group', family: 'Family', honeymoon: 'Honeymoon', villa: 'Villa stay', activity: 'Activity trip' };
 const STATUS = { published: 'Published', draft: 'Draft' };
 const trip = (p) => `${p.days}D / ${p.nights}N`;
 const day = (iso) => (iso ? new Date(`${iso}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'No date');
@@ -41,6 +43,49 @@ function timeline(days) {
     </div>`).join('')}</div>`;
 }
 
+/** The notes of a saved day, for editing it in the wizard: the text of its events, else their titles. */
+const dayText = (d) => (d.items || []).map((it) => it.subtitle || it.title).filter(Boolean).join('\n');
+
+/** Add / Edit Tour Package: the shared catalog wizard described by config only (see shared/wizard.js). */
+function wizardConfig(destOptions) {
+  return {
+    noun: 'package',
+    requiredKey: 'name',
+    steps: [
+      { label: 'Basics', title: 'Basics', sub: 'The name, where it goes and how long it is.', fields: [
+        { key: 'name', type: 'text', label: 'Package name', placeholder: 'e.g. Kashmir Valley & Gulmarg Tour', optional: false, max: 120 },
+        { key: 'destinationId', type: 'select', label: 'Destination', options: destOptions, icon: 'pin' },
+        { key: 'tag', type: 'chips', label: 'Type', options: [['tour', 'Tour'], ['group', 'Group'], ['family', 'Family'], ['honeymoon', 'Honeymoon']].map(([value, label]) => ({ value, label })) },
+        { key: 'days', type: 'number', label: 'Days', placeholder: '5', half: true, max: 2 },
+        { key: 'nights', type: 'number', label: 'Nights', placeholder: '4', half: true, max: 2 },
+        { key: 'season', type: 'text', label: 'Season', placeholder: 'e.g. Mar - Jun', max: 60 },
+        { key: 'status', type: 'chips', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft'], ['seasonal', 'Seasonal']].map(([value, label]) => ({ value, label })) },
+        { key: 'minPax', type: 'number', label: 'Minimum group size', placeholder: 'e.g. 2', max: 3 },
+      ] },
+      { label: 'Pricing', title: 'Pricing', sub: 'Per person, in rupees.', fields: [
+        { key: 'price', type: 'price', label: 'From price per person', placeholder: '15,000', max: 9 },
+        { key: 'groupPrice', type: 'price', label: 'Price per person for groups', placeholder: '12,500', max: 9 },
+      ] },
+      { label: 'Itinerary', title: 'Itinerary', sub: 'One row per day. You can plan the details later in the itinerary builder.', fields: [
+        { key: 'itinerary', type: 'rows', label: 'Days', addLabel: 'Add day', sub: { title: 'Day', rowLabel: (i) => `Day ${i + 1}`, fields: [
+          { key: 'title', type: 'text', label: 'Title', placeholder: 'e.g. Arrival in Srinagar', required: true, optional: false, max: 80 },
+          { key: 'description', type: 'textarea', label: 'Description', placeholder: 'What happens on this day', rows: 4, max: 1000 },
+        ] } },
+      ] },
+      { label: 'Inclusions & Exclusions', title: 'Inclusions & Exclusions', sub: 'What the price covers, what it does not, and what makes the trip special.', fields: [
+        { key: 'inclusions', type: 'list', label: 'Inclusions', placeholder: 'e.g. Daily breakfast', addLabel: 'Add inclusion' },
+        { key: 'exclusions', type: 'list', label: 'Exclusions', placeholder: 'e.g. Flights', addLabel: 'Add exclusion' },
+        { key: 'highlights', type: 'list', label: 'Highlights', placeholder: 'e.g. Shikara ride on Dal Lake', addLabel: 'Add highlight' },
+      ] },
+    ],
+    defaults: () => ({ name: '', destinationId: '', tag: 'tour', days: '', nights: '', season: '', status: 'draft', minPax: '', price: '', groupPrice: '', itinerary: [], inclusions: [], exclusions: [], highlights: [] }),
+    preview: (v) => ({
+      title: String(v.name || '').trim(),
+      lines: [destOptions().find((o) => o.value === String(v.destinationId))?.label || 'No destination yet', v.days ? `${v.days}D / ${v.nights || 0}N` : 'No duration yet', v.price ? `From ${money(v.price)}` : 'No price yet', STATUS[v.status] || (v.status === 'seasonal' ? 'Seasonal' : 'Draft')],
+    }),
+  };
+}
+
 export default {
   css: true,
   mount(host, ctx) {
@@ -48,8 +93,11 @@ export default {
     const loading = new Set();
     const abort = new AbortController();
     let page = null;
+    let destinations = null;
 
     async function ensureDetail(item, force = false) {
+      const mine = crud.detail(item.id);
+      if (mine) { cache.set(item.id, mine); return; }
       if (!force && (cache.has(item.id) || loading.has(item.id))) return;
       cache.delete(item.id);
       loading.add(item.id);
@@ -60,6 +108,65 @@ export default {
       }
       loading.delete(item.id);
       if (page && page.api.current()?.id === item.id) page.api.refresh();
+    }
+
+    const destOptions = () => (destinations || []).map((d) => ({ value: String(d.id), label: d.name }));
+    async function loadDestinations() {
+      if (destinations) return;
+      try { destinations = await getJson('/api/destinations'); } catch { destinations = []; }
+    }
+    const destLabel = (id) => destOptions().find((o) => o.value === String(id))?.label || '';
+    const tiersOf = (v) => [
+      numOrNull(v.price) != null ? { label: 'Per person', note: 'Starting price', price: Number(v.price) } : null,
+      numOrNull(v.groupPrice) != null ? { label: 'Group', note: 'Per person, for groups', price: Number(v.groupPrice) } : null,
+    ].filter(Boolean);
+    const dayShape = (d, i) => ({
+      day: `Day ${i + 1}`, date: 'TBD', isoDate: null, title: d.title, location: null, locationMode: 'same',
+      items: textOrNull(d.description) ? [{ id: `new-D${i + 1}`, type: 'note', icon: 'note', title: d.title, subtitle: d.description, details: { b: { role: 'note' } } }] : [],
+    });
+
+    const crud = createCatalogCrud({
+      key: 'tour-packages',
+      endpoint: '/api/tour-packages',
+      wizard: () => wizardConfig(destOptions),
+      toBody: (v) => ({
+        name: v.name.trim(), destinationId: numOrNull(v.destinationId), destination: destLabel(v.destinationId) || undefined,
+        tag: v.tag || undefined, status: v.status || undefined, days: numOrNull(v.days), nights: numOrNull(v.nights), season: textOrNull(v.season), minPax: numOrNull(v.minPax),
+        price: numOrNull(v.price), groupPrice: numOrNull(v.groupPrice),
+        itinerary: (v.itinerary || []).map((d) => ({ title: d.title.trim(), description: textOrNull(d.description) })), itineraryChanged: !!v.itineraryTouched,
+        inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions), highlights: listOf(v.highlights),
+      }),
+      local: (v, old) => {
+        const days = numOrNull(v.days) ?? 1;
+        return {
+          ...(old || {}), name: v.name.trim(), destinationId: numOrNull(v.destinationId), destination: destLabel(v.destinationId), tag: v.tag || 'tour',
+          status: v.status === 'seasonal' ? 'published' : v.status || 'draft', seasonal: v.status === 'seasonal', season: textOrNull(v.season),
+          days, nights: numOrNull(v.nights) ?? Math.max(0, days - 1), price: numOrNull(v.price), minPax: numOrNull(v.minPax),
+          bookings: old?.bookings ?? 0, priceTiers: tiersOf(v), inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions), highlights: listOf(v.highlights),
+          itinerary: v.itineraryTouched || !old ? (v.itinerary || []).map(dayShape) : old.itinerary,
+          description: old?.description ?? null, inquiries: old?.inquiries ?? [],
+        };
+      },
+      values: (d) => ({
+        name: d.name, destinationId: d.destinationId != null ? String(d.destinationId) : '', tag: d.tag || 'tour', days: d.days ?? '', nights: d.nights ?? '',
+        season: d.season || '', status: d.seasonal ? 'seasonal' : d.status, minPax: d.minPax ?? '', price: d.price ?? '',
+        groupPrice: (d.priceTiers || []).find((t) => t.label === 'Group')?.price ?? '',
+        itinerary: (d.itinerary || []).map((day) => ({ title: day.title || day.day, description: dayText(day) })),
+        inclusions: d.inclusions || [], exclusions: d.exclusions || [], highlights: d.highlights || [],
+      }),
+      load: () => getJson('/api/tour-packages'),
+      onChange: (list, { id, added }) => {
+        if (id) cache.delete(id); // the detail is read again (the in-memory record wins over the server's)
+        page.api.setItems(list);
+        if (added && id && document.documentElement.dataset.layout !== 'mobile') ctx.setParams({ selected: id, q: null, tab: null, filter: null }, { push: false });
+      },
+    });
+
+    async function openEdit(item) {
+      await Promise.all([loadDestinations(), ensureDetail(item)]);
+      const d = cache.get(item.id);
+      if (!d || d.failed) { toast('Could not load this package. Try again.', 'warning'); return; }
+      crud.edit({ ...item, ...d }, { returnFocus: () => host.querySelector('[data-sp-act="edit"]') });
     }
 
     const empty = (text) => `<p class="sp-none">${esc(text)}</p>`;
@@ -75,6 +182,7 @@ export default {
           { icon: 'note', label: 'Inquiries', value: ready ? d.inquiries.length : '…', tone: 'amber' },
         ])}
         ${aboutCard(item, d)}
+        ${ready ? highlightsCard(d.highlights) : ''}
         ${ready ? inclusionsCard(d.inclusions, d.exclusions) : ''}
         ${ready ? recent(d) : ''}`;
     }
@@ -83,7 +191,7 @@ export default {
       const ready = d && !d.failed;
       const grid = filled([
         ['Destination', item.destination || ''], ['Duration', `${plural(item.days, 'day')} / ${plural(item.nights, 'night')}`],
-        ['Type', TYPE[item.tag] || ''], ['Season', item.seasonal ? 'Seasonal' : 'All year'],
+        ['Type', TYPE[item.tag] || ''], ['Season', item.season || (item.seasonal ? 'Seasonal' : 'All year')],
         ['Group size', ready && d.minPax ? `Min. ${plural(d.minPax, 'person')}` : ''],
       ]);
       const about = ready && d.description ? `<p class="tp-about">${esc(d.description)}</p>` : '';
@@ -102,7 +210,10 @@ export default {
       plural: 'packages',
       addLabel: 'Add Package',
       searchPlaceholder: 'Search packages...',
-      load: () => getJson('/api/tour-packages'),
+      onAdd: () => { loadDestinations().then(() => crud.add({ returnFocus: () => document.querySelector('#desktop-page-add, #mobile-page-add') })); },
+      rowMenu: () => [{ key: 'edit', label: 'Edit', icon: 'edit' }, { key: 'view', label: 'View details', icon: 'eye' }],
+      onRowMenu: (key, item) => (key === 'edit' ? openEdit(item) : page.api.select(item.id)),
+      load: () => crud.load(),
       subtitle: (items) => `Tour Packages • ${items.length} Total`,
       tabs: [
         { key: 'all', label: 'All', test: () => true },
@@ -119,7 +230,7 @@ export default {
       row: (i) => ({
         tile: tile('layers'),
         name: i.name,
-        pill: pill(i.status, STATUS[i.status] || i.status),
+        pill: `${pill(i.status, STATUS[i.status] || i.status)}${crud.isFresh(i.id) ? '<span class="just-added-tag">JUST ADDED</span>' : ''}`,
         sub: [i.destination, trip(i)].filter(Boolean).join(' · '),
         meta: `${money(i.price)}   ${plural(i.bookings, 'booking')}`,
       }),
@@ -163,7 +274,8 @@ export default {
       if (!item) return;
       if (e.target.closest('[data-tp-retry]')) { ensureDetail(item, true); page.api.refresh(); return; }
       const act = e.target.closest('[data-sp-act]')?.dataset.spAct;
-      if (act === 'tab-itinerary') page.api.setTab('itinerary');
+      if (act === 'edit') openEdit(item);
+      else if (act === 'tab-itinerary') page.api.setTab('itinerary');
       else if (act === 'tab-pricing') page.api.setTab('pricing');
       else if (act === 'use-itinerary') {
         let d = cache.get(item.id);

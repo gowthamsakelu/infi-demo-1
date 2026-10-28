@@ -1,7 +1,7 @@
 // The list + detail "reading pane" (Outlook style) shared by every page that has it (Bookings and Inquiries today).
-// This module holds the rules; desktop.js only calls it. Rules: on the PC / tablet layout a record is always selected
-// (the URL's ?selected=ID, else the one already open, else the first in the list), the detail pane shows it, and
-// the arrow keys move through the list. Phones keep their own tap-to-open behaviour and never use any of this.
+// This module holds the rules; desktop.js and split-page.js only call it. Rules: on the PC / tablet layout the list is always shown with the detail
+// pane beside it, and nothing is selected by itself: the pane says "Select ..." until a row is clicked (the URL's ?selected=ID is honoured on load).
+// The arrow keys move through the list. Phones keep their own tap-to-open behaviour and never use any of this.
 import { getParams, setParams } from './page-state.js';
 
 /** The PC layout is the only one with a reading pane. */
@@ -13,15 +13,6 @@ export const selectedParam = () => getParams().selected || null;
 export function writeSelected(id, { push = false } = {}) {
   if ((id || null) === selectedParam()) return;
   setParams({ selected: id }, { push, silent: true });
-}
-
-/** The record to show: the first of the preferred ids that is still in the list, else the first record. null when the list is empty. */
-export function chooseRecord(list, ...preferredIds) {
-  for (const id of preferredIds) {
-    const hit = id && list.find((b) => b.id === id);
-    if (hit) return hit;
-  }
-  return list[0] || null;
 }
 
 /** The record an arrow key moves to (Up / Down by one, Home / End to the ends), or null when the key does nothing. */

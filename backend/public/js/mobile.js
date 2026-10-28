@@ -7,7 +7,7 @@ import { createCategoryFilter } from './shared/dropdown-filter.js';
 import { searchBox, emptyState, toast, openRowMenu, esc, jsq, skeletonCards, errorState } from './shared/ui.js';
 import { renderTabs, bindQuickNotes, rowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
-import { openFollowUpModal } from './shared/followup-modal.js';
+import { openFollowUpModal, openBookingFollowUp } from './shared/followup-modal.js';
 import { detailHeaderHtml, sheetHandleHtml } from './shared/detail-sheet.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
@@ -19,6 +19,7 @@ import { openMoreSheet } from './shared/nav-ui.js';
 import { goToPage } from './shared/page-host.js';
 import { matchesCategory } from './shared/booking-filters.js';
 import { openAddInquiry } from './shared/add-inquiry.js';
+import { addButtonHtml, setAddAction } from './shared/add-button.js';
 
 export function createMobileView(container, options = {}) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -102,14 +103,11 @@ export function createMobileView(container, options = {}) {
       </div>
 
       <div id="mobile-page-host" class="mobile-screen-content"></div>
-      <button type="button" class="add-inquiry-fab" id="mobile-page-add" hidden>${icon('plus', { size: 20, stroke: 2.5 })}<span class="sp-add-label"></span></button>
+      ${addButtonHtml('mobile-page-add', true)}
 
       <!-- Notifications: the same panel as on PC, across the screen under the header -->
       <div class="notif-backdrop" id="mobile-notif-backdrop" hidden></div>
       <div class="notifications-panel mobile-notifications" id="mobile-notifications" role="dialog" aria-label="Notifications" hidden>${notificationsHtml()}</div>
-
-      <!-- Add Inquiry (Inquiries page only) -->
-      <button type="button" class="add-inquiry-fab" id="mobile-add-inquiry" data-add-inquiry ${currentPage() === 'inquiries' ? '' : 'hidden'}>${icon('plus', { size: 20, stroke: 2.5 })}<span>Add Inquiry</span></button>
 
       <!-- Bottom Navigation Bar (Fixed) -->
       <div class="mobile-bottom-nav">
@@ -687,13 +685,13 @@ export function createMobileView(container, options = {}) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              ${b.kind === 'inquiry' ? '' : `<button class="btn-add-followup" id="btn-add-followup-action">
+              <button class="btn-add-followup" id="btn-add-followup-action">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="12" x2="12" y1="5" y2="19"/>
                   <line x1="5" x2="19" y1="12" y2="12"/>
                 </svg>
                 Add Follow-up
-              </button>`}
+              </button>
             </div>
 
             <div class="lead-journey-timeline">
@@ -1322,7 +1320,8 @@ export function createMobileView(container, options = {}) {
         needRestore = true;
       }
       container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
-      container.querySelector('#mobile-add-inquiry').hidden = page !== 'inquiries';
+      if (page === 'calendar') setAddAction(null);
+      else setAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') })); // Bookings has no add flow of its own: it opens the same one
       container.querySelector('#mobile-bookings-page').hidden = page === 'calendar';
       container.querySelector('#mobile-calendar-page').hidden = page !== 'calendar';
       container.querySelector('#mobile-screen-scroll')?.classList.toggle('calendar-mode', page === 'calendar');
@@ -1363,9 +1362,6 @@ export function createMobileView(container, options = {}) {
       setParams({ q: null, tab: null, category: null }, { push: false });
       requestAnimationFrame(() => container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
     }
-    container.querySelector('#mobile-add-inquiry').addEventListener('click', () => {
-      openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-add-inquiry') });
-    });
 
     // Bulk bar: select all / clear / search / filter / Assign
     bindBulkBar(container, 'mobile', {
@@ -1467,7 +1463,7 @@ export function createMobileView(container, options = {}) {
       const listEl = container.querySelector('#mobile-cards-list');
       if (listEl) {
         const offset = slideDir === 'left' ? '-14px' : slideDir === 'right' ? '14px' : '0px';
-        listEl.style.transition = 'opacity 0.1s ease, transform 0.1s ease';
+        listEl.style.transition = 'opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)';
         listEl.style.opacity = '0';
         listEl.style.transform = `translateX(${offset})`;
 
@@ -1475,7 +1471,7 @@ export function createMobileView(container, options = {}) {
           renderCards();
           listEl.style.transform = slideDir === 'left' ? 'translateX(14px)' : slideDir === 'right' ? 'translateX(-14px)' : 'translateX(0)';
           void listEl.offsetHeight; // trigger reflow
-          listEl.style.transition = 'opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)';
+          listEl.style.transition = 'opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)';
           listEl.style.opacity = '1';
           listEl.style.transform = 'translateX(0)';
         }, 60);
@@ -1841,7 +1837,7 @@ export function createMobileView(container, options = {}) {
         return;
       }
       if (e.target.closest('#btn-add-followup-action')) {
-        openMobileAddFollowupModal();
+        if (activeModalBooking) openBookingFollowUp(activeModalBooking, renderSheetBody);
         return;
       }
 
@@ -2422,7 +2418,7 @@ export function createMobileView(container, options = {}) {
     if (bodyEl && slideDir) {
       const exitOffset = slideDir === 'left' ? '18px' : '-18px';
       const enterOffset = slideDir === 'left' ? '-18px' : '18px';
-      bodyEl.style.transition = 'opacity 0.12s ease-out, transform 0.12s ease-out';
+      bodyEl.style.transition = 'opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)';
       bodyEl.style.opacity = '0.3';
       bodyEl.style.transform = `translateX(${exitOffset})`;
 
@@ -2432,7 +2428,7 @@ export function createMobileView(container, options = {}) {
         bodyEl.style.transition = 'none';
         bodyEl.style.transform = `translateX(${enterOffset})`;
         void bodyEl.offsetHeight; // Force reflow
-        bodyEl.style.transition = 'opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+        bodyEl.style.transition = 'opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out)';
         bodyEl.style.opacity = '1';
         bodyEl.style.transform = 'translateX(0)';
       }, 70);

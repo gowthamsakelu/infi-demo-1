@@ -26,7 +26,7 @@ for (const [w, h] of VPS) {
   page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
   const shot = (name) => (SHOTS ? page.screenshot({ path: `${SHOTS}/add-inquiry-${w}-${name}.png` }) : null);
 
-  const addBtn = page.locator(m ? '#mobile-add-inquiry' : '#desktop-add-inquiry');
+  const addBtn = page.locator(m ? '#mobile-page-add' : '#desktop-page-add');
   const wiz = page.locator('.wiz-sheet');
   const body = page.locator('#wiz-body');
   const settle = (ms = 350) => page.waitForTimeout(ms);
@@ -53,7 +53,7 @@ for (const [w, h] of VPS) {
 
   /* ---------- entry point and dialog basics ---------- */
   check(`${tag} the one Add Inquiry button is visible`, await addBtn.isVisible());
-  check(`${tag} the other layout's button is hidden`, !(await page.locator(m ? '#desktop-add-inquiry' : '#mobile-add-inquiry').isVisible()));
+  check(`${tag} the other layout's button is hidden`, !(await page.locator(m ? '#desktop-page-add' : '#mobile-page-add').isVisible()));
   await openWizard();
   const dlgAttrs = await page.locator('.wiz-sheet').evaluate((el) => ({ role: el.getAttribute('role'), modal: el.getAttribute('aria-modal'), label: el.getAttribute('aria-label') }));
   check(`${tag} dialog role and aria-modal`, dlgAttrs.role === 'dialog' && dlgAttrs.modal === 'true' && dlgAttrs.label === 'Add Inquiry', JSON.stringify(dlgAttrs));
@@ -197,7 +197,7 @@ for (const [w, h] of VPS) {
   await settle(400);
   const toastText = await page.locator('.toast').last().innerText();
   check(`${tag} toast says "Inquiry saved with 10 details." with a View link`, toastText.includes('Inquiry saved with 10 details.') && toastText.includes('View'), toastText);
-  check(`${tag} focus returned to the Add Inquiry button`, await page.evaluate((id) => document.activeElement?.id === id, m ? 'mobile-add-inquiry' : 'desktop-add-inquiry'));
+  check(`${tag} focus returned to the Add Inquiry button`, await page.evaluate((id) => document.activeElement?.id === id, m ? 'mobile-page-add' : 'desktop-page-add'));
   const row = freshRow();
   check(`${tag} the new row is highlighted with JUST ADDED`, (await row.count()) === 1 && (await row.innerText()).includes('JUST ADDED'));
   const rowText = await row.innerText();
@@ -292,7 +292,7 @@ for (const [w, h] of VPS) {
   await page.keyboard.press('Escape');
   await wiz.waitFor({ state: 'detached' });
   check(`${tag} Esc closes an empty wizard without asking`, (await page.locator('.confirm-card').count()) === 0);
-  check(`${tag} focus returns to the opening button`, await page.evaluate((id) => document.activeElement?.id === id, m ? 'mobile-add-inquiry' : 'desktop-add-inquiry'));
+  check(`${tag} focus returns to the opening button`, await page.evaluate((id) => document.activeElement?.id === id, m ? 'mobile-page-add' : 'desktop-page-add'));
 
   await openWizard();
   await page.locator('#wiz-name').fill('Temp');

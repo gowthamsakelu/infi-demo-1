@@ -1,4 +1,5 @@
 // Schedule / Follow-up: the same shared sheet as Assign (bottom sheet below 1100px, centered modal above).
+import { placeAsPushed } from './push.js';
 import { icon } from './icons.js';
 import { esc, toast, dismissOnOutside, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
@@ -27,7 +28,7 @@ const fmtTime = (v) => {
   return new Date(2000, 0, 1, h, m).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 };
 
-export function openFollowUpModal(inquiry, { onSaved } = {}) {
+export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
   closeFollowUpModal();
   lastFocus = document.activeElement;
   let type = 'follow_up';
@@ -84,6 +85,7 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
       </footer>
     </div>`;
   document.body.appendChild(overlay);
+  queueMicrotask(() => placeAsPushed(overlay)); // opened from inside a sheet: pushed into its place, not stacked on top of it
   unlockScroll = lockScroll();
   const shown = overlay;
   afterPaint(() => shown.classList.add('open'));
@@ -143,6 +145,13 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
     if (comment.value.length > MAX) return showError(`Comment can be at most ${MAX} characters.`);
     showError('');
 
+    if (onSubmit) { // a booking: no follow-up API, the entry goes straight into its Lead Flow
+      onSubmit({ type, date, time, comment: comment.value.trim(), outcome: type === 'called' ? outcome.getValue() : null });
+      closeFollowUpModal();
+      toast('Follow-up saved', 'success');
+      return;
+    }
+
     const btn = $('[data-fu-save]');
     btn.disabled = true;
     btn.textContent = 'Saving...';
@@ -174,6 +183,23 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
     btn.disabled = false;
     btn.textContent = 'Save Follow-up';
   }
+}
+
+/** Add Follow-up for a booking: the entry is added to the top of its Lead Flow (newest first) and becomes its next follow-up. */
+export function openBookingFollowUp(booking, rerender) {
+  const c = booking.customer || {};
+  openFollowUpModal({ customer_name: booking.guest?.name || c.name || 'Customer', trip: booking.trip || booking.tripName || booking.destination || booking.id || '' }, {
+    onSubmit: ({ type, date, time, comment, outcome }) => {
+      const meta = { follow_up: ['followup', 'Follow-up scheduled'], called: ['call', outcome ? `Called: ${outcome}` : 'Called'], cc: ['cc', 'CC'] }[type] || ['followup', 'Follow-up scheduled'];
+      booking.customer = c;
+      c.leadFlow = [{
+        date: fmtDate(date), time: fmtTime(time), type: meta[0], iconBg: type === 'called' ? 'icon-green' : 'icon-blue',
+        title: meta[1], desc: comment || 'No comment added.', author: 'By Ruyi Admin',
+      }, ...(c.leadFlow || [])];
+      booking.nextFollowUp = `${date}T${time}`;
+      rerender?.();
+    },
+  });
 }
 
 export function closeFollowUpModal() {

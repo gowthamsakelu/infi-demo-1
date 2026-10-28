@@ -177,71 +177,45 @@ export function closeRowMenu(instant = false) { activeMenu?.close(instant); }
 
 export function openRowMenu(trigger, items, onSelect) {
   closeRowMenu(true);
-  const phoneSheet = document.documentElement.dataset.layout === 'mobile';
   const menu = document.createElement('div');
-  menu.className = `bulk-more-dropdown row-floating-menu${phoneSheet ? ' row-menu-actions' : ''}`;
+  menu.className = 'bulk-more-dropdown row-floating-menu';
   menu.setAttribute('role', 'menu');
   menu.tabIndex = -1;
   menu.innerHTML = items.map((it) => `
     <button class="dropdown-item-btn ${it.danger ? 'item-danger' : ''}" role="menuitem" data-menu-key="${it.key}">
       ${icon(it.icon, { size: 15 })}<span>${esc(it.label)}</span>
     </button>`).join('');
-  let root = menu;
-  let panel = null;
-  let unlock = null;
-  let stopSheet = () => {};
   const initialRect = trigger.getBoundingClientRect();
-  if (phoneSheet) {
-    const title = trigger.getAttribute('aria-label') || trigger.title || trigger.textContent.trim();
-    root = document.createElement('div');
-    root.className = 'asg-overlay row-menu-overlay';
-    root.innerHTML = `<section class="asg-sheet row-menu-sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}" tabindex="-1">
-      <div class="filter-handle" aria-hidden="true"></div>
-      <header class="asg-header row-menu-header"><h3>${esc(title)}</h3><button type="button" class="sheet-close-btn" data-row-menu-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
-      <div class="row-menu-body"></div>
-    </section>`;
-    panel = root.querySelector('.row-menu-sheet');
-    root.querySelector('.row-menu-body').appendChild(menu);
-    document.body.appendChild(root);
-    unlock = lockScroll();
-    afterPaint(() => root.classList.add('open'));
-    panel.focus({ preventScroll: true });
-    stopSheet = bindSheet(root, panel, () => close());
-    root.addEventListener('click', (e) => {
-      if (e.target === root || e.target.closest('[data-row-menu-close]')) close();
-    });
-  } else {
-    menu.style.visibility = 'hidden';
-    document.body.appendChild(menu);
-    const r = initialRect;
-    const mw = menu.offsetWidth;
-    const mh = menu.offsetHeight;
-    const left = Math.max(8, Math.min(r.right - mw, window.innerWidth - mw - 8));
-    const nav = document.querySelector('.mobile-bottom-nav');
-    const navTop = nav && nav.getClientRects().length ? nav.getBoundingClientRect().top : window.innerHeight;
-    const limit = Math.min(window.innerHeight, navTop) - 8;
-    const up = r.bottom + 6 + mh > limit;
-    const top = up ? Math.max(8, r.top - mh - 6) : r.bottom + 6;
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
-    // Grow from the trigger: origin is the trigger centre relative to the menu.
-    menu.style.transformOrigin = `${Math.round(r.left + r.width / 2 - left)}px ${up ? '100%' : '0'}`;
-    menu.style.visibility = '';
-  }
+  // One dropdown for every screen size: fixed layer, right edge on the trigger's, downward (upward when there is no room), kept 8px inside the screen.
+  menu.style.visibility = 'hidden';
+  document.body.appendChild(menu);
+  const r = initialRect;
+  const mw = menu.offsetWidth;
+  const mh = menu.offsetHeight;
+  const left = Math.max(8, Math.min(r.right - mw, window.innerWidth - mw - 8));
+  const nav = document.querySelector('.mobile-bottom-nav');
+  const navTop = nav && nav.getClientRects().length ? nav.getBoundingClientRect().top : window.innerHeight;
+  const limit = Math.min(window.innerHeight, navTop) - 8;
+  const up = r.bottom + 6 + mh > limit;
+  const top = up ? Math.max(8, r.top - mh - 6) : r.bottom + 6;
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+  // Grow from the trigger: origin is the trigger centre relative to the menu.
+  menu.style.transformOrigin = `${Math.round(r.left + r.width / 2 - left)}px ${up ? '100%' : '0'}`;
+  menu.style.visibility = '';
 
   trigger.setAttribute('aria-expanded', 'true');
-  if (!phoneSheet) { afterPaint(() => menu.classList.add('open')); menu.focus({ preventScroll: true }); } // focus stays on the menu, never an input
+  afterPaint(() => menu.classList.add('open'));
+  menu.focus({ preventScroll: true }); // focus stays on the menu, never an input
 
-  const dispose = dismissOnOutside(phoneSheet ? panel : menu, () => close(), [trigger]);
+  const dispose = dismissOnOutside(menu, () => close(), [trigger]);
   // Close when the page scrolls the trigger away from where the menu was placed.
   const onScroll = () => {
     const now = trigger.getBoundingClientRect();
     if (Math.abs(now.top - initialRect.top) > 2 || Math.abs(now.left - initialRect.left) > 2) close();
   };
-  if (!phoneSheet) {
-    window.addEventListener('resize', onScroll);
-    window.addEventListener('scroll', onScroll, true);
-  }
+  window.addEventListener('resize', onScroll);
+  window.addEventListener('scroll', onScroll, true);
 
   menu.addEventListener('click', (e) => {
     const b = e.target.closest('[data-menu-key]');
@@ -261,23 +235,14 @@ export function openRowMenu(trigger, items, onSelect) {
     if (closed) return;
     closed = true;
     dispose();
-    if (!phoneSheet) {
-      window.removeEventListener('resize', onScroll);
-      window.removeEventListener('scroll', onScroll, true);
-    }
+    window.removeEventListener('resize', onScroll);
+    window.removeEventListener('scroll', onScroll, true);
     trigger.setAttribute('aria-expanded', 'false');
     if (activeMenu && activeMenu.menu === menu) activeMenu = null;
-    stopSheet();
-    if (instant) { root.remove(); unlock?.(); return; }
-    if (phoneSheet) {
-      root.classList.remove('open');
-      afterTransition(panel, 380).then(() => { root.remove(); unlock?.(); });
-      if (document.activeElement === document.body || panel.contains(document.activeElement)) trigger.focus({ preventScroll: true });
-      return;
-    }
+    if (instant) { menu.remove(); return; }
     menu.classList.remove('open');
     menu.classList.add('closing');
-    afterTransition(menu, 220).then(() => root.remove());
+    afterTransition(menu, 220).then(() => menu.remove());
     if (document.activeElement === document.body || menu.contains(document.activeElement)) trigger.focus({ preventScroll: true });
   }
   activeMenu = { menu, close };
@@ -325,6 +290,11 @@ export function skeletonCards(n = 5) {
 export function skeletonRows(cols, n = 8) {
   return Array.from({ length: n }, () => `<tr class="skel-row" aria-hidden="true">${Array.from({ length: cols }, () => '<td><div class="skel"></div></td>').join('')}</tr>`).join('');
 }
+/** The detail pane when nothing is selected (PC and tablet): "Select a booking" and one muted line. `noun` is "a booking", "an inquiry", "a package" ... */
+export function selectEmptyState(noun) {
+  return `<div class="state-box detail-empty"><div class="state-box-ico">${icon('eye', { size: 22 })}</div><h4>Select ${esc(noun)}</h4><p>Choose an item from the list to see its details here.</p></div>`;
+}
+
 /** The sentence under "Could not load ...": no answer from the server vs. a server error. Never the raw error text. */
 export function loadErrorText(error, what = 'this') {
   if (error?.kind === 'network') return "Can't reach the server. Check your connection and try again.";
