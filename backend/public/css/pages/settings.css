@@ -11,7 +11,67 @@
 .st-bookings-payments { background: #DCFCE7; color: #15803D; }
 .st-message-templates { background: #FEF3C7; color: #B45309; }
 .st-glyph { font-size: 20px; font-weight: 800; line-height: 1; }
-.st-head-ico .st-glyph { font-size: 26px; }
+
+/* ---- the detail header layout ---- */
+.st-detail-header,
+.desktop-details-drawer .sheet-customer-header.st-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px 16px 24px;
+  border-bottom: 1px solid #E2E8F0;
+  background: #FFFFFF;
+}
+
+.st-head-ico {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.st-head-ico .st-glyph {
+  font-size: 24px;
+}
+
+.st-detail-header .customer-header-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.st-detail-header .customer-name-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.25;
+}
+
+.st-detail-header .customer-trip-subtitle {
+  margin: 0;
+  font-size: 13.5px;
+  color: #64748B;
+  line-height: 1.4;
+}
+
+:where(html[data-layout="mobile"]) .st-detail-header,
+:where(html[data-layout="mobile"]) .desktop-details-drawer .sheet-customer-header.st-detail-header {
+  padding: 14px 16px;
+  gap: 12px;
+}
+
+:where(html[data-layout="mobile"]) .st-head-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+}
 
 /* ---- fields ---- */
 .st-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
