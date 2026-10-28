@@ -129,4 +129,52 @@ class DashboardTest extends TestCase
         $this->assertGreaterThan(0, $data['revenue']['total']);
         $this->assertGreaterThan(0, $data['payments']['total_received']);
     }
+
+    public function test_period_filtering_accepts_valid_ranges(): void
+    {
+        foreach (['today', '7days', '30days', 'year'] as $period) {
+            $res = $this->getJson("/api/dashboard?period={$period}");
+            $res->assertOk();
+            $res->assertJsonPath('success', true);
+            $res->assertJsonPath('data.period', $period);
+            $this->assertNotEmpty($res->json('data.period_label'));
+        }
+    }
+
+    public function test_invalid_period_defaults_to_30days(): void
+    {
+        $res = $this->getJson('/api/dashboard?period=unknown_range');
+        $res->assertOk();
+        $res->assertJsonPath('data.period', '30days');
+    }
+
+    public function test_dashboard_includes_revenue_trend(): void
+    {
+        $res = $this->getJson('/api/dashboard?period=7days');
+        $res->assertOk();
+        $trend = $res->json('data.metrics.revenue.trend');
+        $this->assertIsArray($trend);
+        $this->assertCount(7, $trend);
+        $this->assertArrayHasKey('label', $trend[0]);
+        $this->assertArrayHasKey('revenue', $trend[0]);
+        $this->assertArrayHasKey('received', $trend[0]);
+    }
+
+    public function test_authenticated_user_can_export_dashboard_csv(): void
+    {
+        foreach (['today', '7days', '30days', 'year'] as $period) {
+            $res = $this->get("/api/dashboard/export?period={$period}");
+            $res->assertOk();
+            $this->assertTrue(str_contains($res->headers->get('content-type') ?? '', 'text/csv'));
+            $this->assertTrue(str_contains($res->headers->get('content-disposition') ?? '', 'attachment'));
+            $this->assertTrue(str_contains($res->headers->get('content-disposition') ?? '', 'Ruyi_Dashboard_Report'));
+        }
+    }
+
+    public function test_guest_cannot_export_dashboard_csv(): void
+    {
+        auth()->logout();
+        $this->get('/api/dashboard/export')->assertRedirect('/login');
+        $this->getJson('/api/dashboard/export')->assertUnauthorized();
+    }
 }
