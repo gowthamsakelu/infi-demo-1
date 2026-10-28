@@ -24,6 +24,8 @@ const ACTION_LABELS = { view: 'VIEW', add: 'ADD', edit: 'EDIT', delete: 'DELETE'
 
 const STATUS_NAMES = { active: 'Active', pending: 'Pending', inactive: 'Inactive' };
 
+const ALL_ACTIONS = ['view', 'add', 'edit', 'delete', 'download'];
+
 /** Hierarchical permission structure with 7 modules and sub-features matching the demo reference */
 const PERMISSION_GROUPS = [
   {
@@ -32,7 +34,7 @@ const PERMISSION_GROUPS = [
     icon: 'grid',
     module: 'system',
     features: [
-      { key: 'dashboard', label: 'Dashboard', actions: ['view', 'add', 'edit', 'delete', 'download'] },
+      { key: 'dashboard', label: 'Dashboard', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -41,11 +43,11 @@ const PERMISSION_GROUPS = [
     icon: 'briefcase',
     module: 'bookings',
     features: [
-      { key: 'bookings', label: 'Bookings', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'booking_details', label: 'Booking Details', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'traveller_details', label: 'Traveller Details', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'payments', label: 'Payments', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'invoices', label: 'Invoices', actions: ['view', 'add', 'edit', 'download'] }, // delete unsupported
+      { key: 'bookings', label: 'Bookings', actions: [...ALL_ACTIONS] },
+      { key: 'booking_details', label: 'Booking Details', actions: [...ALL_ACTIONS] },
+      { key: 'traveller_details', label: 'Traveller Details', actions: [...ALL_ACTIONS] },
+      { key: 'payments', label: 'Payments', actions: [...ALL_ACTIONS] },
+      { key: 'invoices', label: 'Invoices', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -54,8 +56,8 @@ const PERMISSION_GROUPS = [
     icon: 'message',
     module: 'inquiries',
     features: [
-      { key: 'inquiry_details', label: 'Inquiry Details', actions: ['view', 'delete', 'download'] }, // add, edit unsupported
-      { key: 'customer_followup', label: 'Customer Follow-up', actions: ['view', 'add', 'edit'] }, // delete, download unsupported
+      { key: 'inquiry_details', label: 'Inquiry Details', actions: [...ALL_ACTIONS] },
+      { key: 'customer_followup', label: 'Customer Follow-up', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -64,8 +66,8 @@ const PERMISSION_GROUPS = [
     icon: 'calendar',
     module: 'calendar',
     features: [
-      { key: 'calendar_events', label: 'Calendar Events', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'availability', label: 'Availability', actions: ['view', 'add'] }, // edit, delete, download unsupported
+      { key: 'calendar_events', label: 'Calendar Events', actions: [...ALL_ACTIONS] },
+      { key: 'availability', label: 'Availability', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -74,8 +76,8 @@ const PERMISSION_GROUPS = [
     icon: 'users',
     module: 'team',
     features: [
-      { key: 'team_members', label: 'Team Members', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'assign_trips', label: 'Assign Trips', actions: ['view', 'add', 'edit', 'delete', 'download'] },
+      { key: 'team_members', label: 'Team Members', actions: [...ALL_ACTIONS] },
+      { key: 'assign_trips', label: 'Assign Trips', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -84,8 +86,8 @@ const PERMISSION_GROUPS = [
     icon: 'shield',
     module: 'system',
     features: [
-      { key: 'user_accounts', label: 'User Accounts', actions: ['view', 'add', 'edit', 'delete', 'download'] },
-      { key: 'roles_permissions', label: 'Roles & Permissions', actions: ['view', 'add', 'edit', 'delete', 'download'] },
+      { key: 'user_accounts', label: 'User Accounts', actions: [...ALL_ACTIONS] },
+      { key: 'roles_permissions', label: 'Roles & Permissions', actions: [...ALL_ACTIONS] },
     ],
   },
   {
@@ -94,8 +96,8 @@ const PERMISSION_GROUPS = [
     icon: 'cog',
     module: 'system',
     features: [
-      { key: 'system_settings', label: 'System Settings', actions: ['view', 'add', 'edit', 'delete'] }, // download unsupported
-      { key: 'notifications', label: 'Notifications', actions: ['view', 'add', 'delete'] }, // edit, download unsupported
+      { key: 'system_settings', label: 'System Settings', actions: [...ALL_ACTIONS] },
+      { key: 'notifications', label: 'Notifications', actions: [...ALL_ACTIONS] },
     ],
   },
 ];
@@ -147,10 +149,34 @@ function extractFeatureMatrix(item, d) {
   // If stored in localStorage for persistence across reloads
   const stored = localStorage.getItem(`ruyi_user_perm_${item.id}`);
   if (stored) {
-    try { return JSON.parse(stored); } catch { /* ignore */ }
+    try {
+      const parsed = JSON.parse(stored);
+      PERMISSION_GROUPS.forEach((group) => {
+        group.features.forEach((feat) => {
+          if (!parsed[feat.key]) parsed[feat.key] = {};
+          ACTIONS.forEach((a) => {
+            if (typeof parsed[feat.key][a] !== 'boolean') {
+              parsed[feat.key][a] = !!parsed[feat.key].view;
+            }
+          });
+        });
+      });
+      return parsed;
+    } catch { /* ignore */ }
   }
   if (d?.featurePermissions && typeof d.featurePermissions === 'object') {
-    return clone(d.featurePermissions);
+    const parsed = clone(d.featurePermissions);
+    PERMISSION_GROUPS.forEach((group) => {
+      group.features.forEach((feat) => {
+        if (!parsed[feat.key]) parsed[feat.key] = {};
+        ACTIONS.forEach((a) => {
+          if (typeof parsed[feat.key][a] !== 'boolean') {
+            parsed[feat.key][a] = !!parsed[feat.key].view;
+          }
+        });
+      });
+    });
+    return parsed;
   }
   return buildDefaultFeatureMatrix(item.roleLabel || d?.roleLabel || 'Staff');
 }
@@ -164,28 +190,28 @@ function toBackendModules(fm) {
 
   // Bookings
   mod.bookings.view = !!fm.bookings?.view || !!fm.booking_details?.view;
-  mod.bookings.edit = !!fm.bookings?.edit || !!fm.bookings?.add;
-  mod.bookings.delete = !!fm.bookings?.delete;
+  mod.bookings.edit = !!fm.bookings?.edit || !!fm.bookings?.add || !!fm.booking_details?.edit || !!fm.booking_details?.add;
+  mod.bookings.delete = !!fm.bookings?.delete || !!fm.booking_details?.delete;
 
   // Inquiries
   mod.inquiries.view = !!fm.inquiry_details?.view || !!fm.customer_followup?.view;
-  mod.inquiries.edit = !!fm.customer_followup?.edit || !!fm.customer_followup?.add;
-  mod.inquiries.delete = !!fm.inquiry_details?.delete;
+  mod.inquiries.edit = !!fm.customer_followup?.edit || !!fm.customer_followup?.add || !!fm.inquiry_details?.edit || !!fm.inquiry_details?.add;
+  mod.inquiries.delete = !!fm.inquiry_details?.delete || !!fm.customer_followup?.delete;
 
   // Calendar
-  mod.calendar.view = !!fm.calendar_events?.view;
-  mod.calendar.edit = !!fm.calendar_events?.edit || !!fm.calendar_events?.add;
-  mod.calendar.delete = !!fm.calendar_events?.delete;
+  mod.calendar.view = !!fm.calendar_events?.view || !!fm.availability?.view;
+  mod.calendar.edit = !!fm.calendar_events?.edit || !!fm.calendar_events?.add || !!fm.availability?.edit || !!fm.availability?.add;
+  mod.calendar.delete = !!fm.calendar_events?.delete || !!fm.availability?.delete;
 
   // Team
-  mod.team.view = !!fm.team_members?.view;
-  mod.team.edit = !!fm.team_members?.edit || !!fm.assign_trips?.edit;
-  mod.team.delete = !!fm.team_members?.delete;
+  mod.team.view = !!fm.team_members?.view || !!fm.assign_trips?.view;
+  mod.team.edit = !!fm.team_members?.edit || !!fm.assign_trips?.edit || !!fm.team_members?.add || !!fm.assign_trips?.add;
+  mod.team.delete = !!fm.team_members?.delete || !!fm.assign_trips?.delete;
 
   // System
-  mod.system.view = !!fm.user_accounts?.view || !!fm.system_settings?.view;
-  mod.system.edit = !!fm.user_accounts?.edit || !!fm.roles_permissions?.edit || !!fm.system_settings?.edit;
-  mod.system.delete = !!fm.user_accounts?.delete;
+  mod.system.view = !!fm.user_accounts?.view || !!fm.roles_permissions?.view || !!fm.system_settings?.view || !!fm.notifications?.view;
+  mod.system.edit = !!fm.user_accounts?.edit || !!fm.roles_permissions?.edit || !!fm.system_settings?.edit || !!fm.system_settings?.add || !!fm.notifications?.edit || !!fm.notifications?.add;
+  mod.system.delete = !!fm.user_accounts?.delete || !!fm.roles_permissions?.delete || !!fm.system_settings?.delete || !!fm.notifications?.delete;
 
   // Catalog, travel, website preserved/active
   mod.catalog = { view: true, edit: false, delete: false };
