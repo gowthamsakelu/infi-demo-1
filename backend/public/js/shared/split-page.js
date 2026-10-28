@@ -155,6 +155,7 @@ export function createSplitPage(host, ctx, cfg) {
           <div class="desktop-table-container">
             <div class="desktop-compact-list-view">
               <div class="compact-list-header">
+                ${cfg.listTitle ? `<div class="compact-header-title-row"><h3 class="compact-header-title">${esc(cfg.listTitle)}</h3></div>` : ''}
                 <div class="compact-header-top">
                   <div class="compact-search-bar">${icon('search', { size: 15 })}<input type="text" id="sp-search-${key}" placeholder="${esc(cfg.searchPlaceholder)}" aria-label="${esc(cfg.searchPlaceholder)}" /></div>
                   <span class="sp-filter-slot"></span>

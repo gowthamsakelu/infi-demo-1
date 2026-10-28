@@ -336,8 +336,6 @@ export default {
               </span>
             </div>
             <div class="team-card-meta-line">
-              <span class="badge-trips-pill">${tripsCount} Trips</span>
-              <span class="team-meta-dot">•</span>
               <span class="team-meta-loc" title="${esc(locFull)}">${esc(locShort)}</span>
               <span class="team-meta-dot">•</span>
               <span class="team-meta-exp">${esc(exp)}</span>
@@ -657,6 +655,7 @@ export default {
     /* ---------- Split Page Instance ---------- */
     page = createSplitPage(host, ctx, {
       title: 'Users',
+      listTitle: 'User',
       noun: 'user',
       plural: 'users',
       addLabel: null,

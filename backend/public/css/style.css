@@ -2981,6 +2981,20 @@ body.standalone-mobile .app-global-bar {
   flex-shrink: 0;
 }
 
+.compact-header-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.compact-header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1.2;
+}
+
 .compact-header-top {
   display: flex;
   align-items: center;
