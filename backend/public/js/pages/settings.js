@@ -155,14 +155,8 @@ export default {
       row: (s) => ({ tile: `<span class="st-ico st-${esc(s.id)}">${glyph(s.icon)}</span>`, name: s.name, sub: s.description }),
       detail: (item) => {
         const d = cache.get(item.id);
-        const head = `
-          <div class="sheet-customer-header st-detail-header">
-            <span class="st-head-ico st-ico st-${esc(item.id)}">${glyph(item.icon, 24)}</span>
-            <div class="customer-header-info">
-              <div class="customer-title-row"><h2 class="customer-name-title">${esc(item.name)}</h2></div>
-              <p class="customer-trip-subtitle">${esc(HEAD_SUB[item.id] || item.description)}</p>
-            </div>
-          </div>`;
+        const head = `<span class="sp-tile st-head-ico"><span class="st-ico st-${esc(item.id)}">${glyph(item.icon, 26)}</span></span>
+          <div class="sp-head-text"><div class="sp-head-name"><h2>${esc(item.name)}</h2></div><p class="sp-head-sub">${esc(HEAD_SUB[item.id] || item.description)}</p></div>`;
         let body;
         if (d) body = bodies[item.id](item.id, d);
         else if (failed.has(item.id)) body = `<div class="state-box is-error" role="alert"><h4>Could not load ${esc(item.name)}</h4><p>Check your connection and try again.</p><button type="button" class="btn-secondary-desktop" data-st-retry style="height:36px;">Try again</button></div>`;

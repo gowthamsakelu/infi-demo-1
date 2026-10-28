@@ -112,6 +112,17 @@ export function createDesktopView(container) {
             <span class="sidebar-badge" id="sidebar-team-badge">5</span>
           </a>
 
+          <span class="nav-section-title nav-section-team-title" id="nav-section-operations" style="cursor: pointer;" title="Operations Team Roster">Staff Members</span>
+          ${STAFF_MEMBERS.map(s => `
+            <div class="sidebar-nav-item staff-member-item" data-staff-id="${s.id}" style="cursor: pointer;" title="View ${s.name}'s profile and trips">
+              <div class="nav-left">
+                <img src="${s.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />
+                <span style="font-size: 13px;">${s.name}</span>
+              </div>
+              <span class="sidebar-badge" style="font-size: 10px;">${s.activeTrips} trips</span>
+            </div>
+          `).join('')}
+
           <span class="nav-section-title">System</span>
           <a class="sidebar-nav-item" href="#settings" id="nav-settings">
             <div class="nav-left">
@@ -701,7 +712,7 @@ export function createDesktopView(container) {
     if (countBadge) countBadge.textContent = b.guests.length;
 
     // Header: Unified, comprehensive Trip & Booking Header
-    const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
+    const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n => n[0]).join('') || 'CU');
     const custName = b.customer?.name || b.guest?.name || 'Customer';
 
     // Header: Unified Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
@@ -765,7 +776,7 @@ export function createDesktopView(container) {
     if (activeDetailTab === 'customer-details') {
       const c = b.customer || {
         name: b.guest.name,
-        initials: b.guest.name.split(' ').map(n=>n[0]).join('') || 'CU',
+        initials: b.guest.name.split(' ').map(n => n[0]).join('') || 'CU',
         phone: b.guest.phone,
         email: b.guest.email,
         location: 'New Delhi, Delhi',
@@ -928,8 +939,8 @@ export function createDesktopView(container) {
         </div>
       `;
     } else if (activeDetailTab === 'guests') {
-      const filteredGuests = b.guests.filter(g => 
-        !guestSearchQuery || 
+      const filteredGuests = b.guests.filter(g =>
+        !guestSearchQuery ||
         g.name.toLowerCase().includes(guestSearchQuery.toLowerCase()) ||
         (g.phone && g.phone.includes(guestSearchQuery))
       );
@@ -1526,6 +1537,14 @@ export function createDesktopView(container) {
       });
     });
 
+    const opsHeader = container.querySelector('#nav-section-operations');
+    if (opsHeader) {
+      opsHeader.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate('team');
+      });
+    }
+
     // Pages that are not built yet: stay on the current page and say so (no hash change, no mismatch)
     container.querySelectorAll('a.sidebar-nav-item[href="#dashboard"], a.sidebar-nav-item[href="#settings"]').forEach((a) => {
       a.addEventListener('click', (e) => { e.preventDefault(); toast(`${a.textContent.trim()} is coming soon.`, 'info'); });
@@ -1701,10 +1720,10 @@ export function createDesktopView(container) {
       const menuTrigger = e.target.closest('[data-trigger-desktop-item-menu], [data-trigger-item-menu]');
       if (menuTrigger) {
         e.stopPropagation();
-        const itemId = menuTrigger.getAttribute('data-trigger-desktop-item-menu') || 
-                       menuTrigger.getAttribute('data-trigger-item-menu') || 
-                       menuTrigger.dataset.triggerDesktopItemMenu || 
-                       menuTrigger.dataset.triggerItemMenu;
+        const itemId = menuTrigger.getAttribute('data-trigger-desktop-item-menu') ||
+          menuTrigger.getAttribute('data-trigger-item-menu') ||
+          menuTrigger.dataset.triggerDesktopItemMenu ||
+          menuTrigger.dataset.triggerItemMenu;
         openDropdownItemId = openDropdownItemId === itemId ? null : itemId;
         renderDetailPanel();
         return;
@@ -1714,12 +1733,12 @@ export function createDesktopView(container) {
       const dropdownAct = e.target.closest('[data-desktop-dropdown-act], [data-dropdown-act]');
       if (dropdownAct) {
         e.stopPropagation();
-        const act = dropdownAct.getAttribute('data-desktop-dropdown-act') || 
-                    dropdownAct.getAttribute('data-dropdown-act') || 
-                    dropdownAct.dataset.desktopDropdownAct || 
-                    dropdownAct.dataset.dropdownAct;
-        const itemId = dropdownAct.getAttribute('data-target-id') || 
-                       dropdownAct.dataset.targetId;
+        const act = dropdownAct.getAttribute('data-desktop-dropdown-act') ||
+          dropdownAct.getAttribute('data-dropdown-act') ||
+          dropdownAct.dataset.desktopDropdownAct ||
+          dropdownAct.dataset.dropdownAct;
+        const itemId = dropdownAct.getAttribute('data-target-id') ||
+          dropdownAct.dataset.targetId;
 
         let foundItem = null;
         activeBooking?.itineraryDays?.forEach(d => {
@@ -1742,9 +1761,9 @@ export function createDesktopView(container) {
             persist(activeBooking, { onRollback: renderDetailPanel });
             renderDetailPanel();
             window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { 
+              detail: {
                 message: foundItem.completed ? `Marked "${foundItem.title}" as Complete! ✓` : `Marked "${foundItem.title}" as Scheduled`,
-                type: 'success' 
+                type: 'success'
               }
             }));
           }
@@ -1850,9 +1869,9 @@ export function createDesktopView(container) {
           openDesktopActivityDetailsModal(modalActiveItem);
           renderDetailPanel();
           window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { 
+            detail: {
               message: modalActiveItem.completed ? `Marked "${modalActiveItem.title}" as Complete! ✓` : `Marked as Scheduled`,
-              type: 'success' 
+              type: 'success'
             }
           }));
         }
@@ -2140,7 +2159,7 @@ export function createDesktopView(container) {
         activeBooking.customer = activeBooking.customer || {};
         activeBooking.customer.name = name;
         activeBooking.guest.name = name;
-        activeBooking.customer.initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0, 2);
+        activeBooking.customer.initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
         if (phone) {
           activeBooking.customer.phone = phone;
