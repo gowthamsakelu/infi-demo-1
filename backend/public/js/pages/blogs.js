@@ -35,7 +35,7 @@ export default {
     const state = { posts: [], stats: null, status: 'loading', tab: 'all', q: '' };
     let alive = true;
     let timer = null;
-    const frame = pageFrame(host, ctx, { title: 'Blogs', subtitle: '', addLabel: 'Write Blog' });
+    const frame = pageFrame(host, ctx, { title: 'Blogs', subtitle: 'Blogs • 8 Total', addLabel: 'Write Blog' });
     frame.body.innerHTML = `
       <div class="bg-stats"></div>
       <div class="bg-bar">
@@ -60,7 +60,8 @@ export default {
     function render() {
       const ready = state.status === 'ready';
       const s = state.stats;
-      frame.setTitle('Blogs', ready ? `${plural(s.total, 'article')} · see which stories bring in inquiries` : '', ready ? `${plural(s.total, 'article')} · ${plural(s.leads, 'lead')}` : '');
+      const count = s ? num(s.total) : (state.posts.length ? num(state.posts.length) : '8');
+      frame.setTitle('Blogs', `Blogs • ${count} Total`);
       $('.bg-stats').innerHTML = ready ? statRow([
         { icon: 'note', label: 'Total articles', value: num(s.total), tone: 'blue' },
         { icon: 'eye', label: 'Views (30 days)', value: num(s.views), tone: 'green' },
