@@ -69,6 +69,14 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
     return { cls: 'status-pending', label: 'On Leave' };
   }
 
+  function formatCardLocation(loc) {
+    if (!loc) return '';
+    const main = loc.split('—')[0].trim();
+    return main
+      .replace(/\s+Logistics\s+Hub/i, ' Hub')
+      .replace(/\s+Ops\s+Base/i, ' Base');
+  }
+
   // ==========================================
   // LEFT PANEL: Team Member List
   // ==========================================
@@ -156,10 +164,10 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
                   <p class="team-card-role">${esc(m.role)}</p>
                   <div class="team-card-meta-line">
                     <span class="badge-trips-pill">${m.metrics.activeTrips} Trips</span>
-                    <span>•</span>
-                    <span>${esc(m.officeLocation.split('—')[0].trim())}</span>
-                    <span>•</span>
-                    <span>${esc(m.experience)}</span>
+                    <span class="team-meta-dot">•</span>
+                    <span class="team-meta-loc" title="${esc(m.officeLocation)}">${esc(formatCardLocation(m.officeLocation))}</span>
+                    <span class="team-meta-dot">•</span>
+                    <span class="team-meta-exp">${esc(m.experience)}</span>
                   </div>
                 </div>
               </div>

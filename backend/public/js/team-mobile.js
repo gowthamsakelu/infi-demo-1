@@ -67,6 +67,14 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
   const backdropEl = $('#mobile-team-backdrop');
   const sheetEl = $('#mobile-team-sheet');
 
+  function formatCardLocation(loc) {
+    if (!loc) return '';
+    const main = loc.split('—')[0].trim();
+    return main
+      .replace(/\s+Logistics\s+Hub/i, ' Hub')
+      .replace(/\s+Ops\s+Base/i, ' Base');
+  }
+
   function getFilteredMembers() {
     return OPERATIONS_TEAM_MEMBERS.filter((m) => {
       // Filter by status tab
@@ -176,7 +184,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
                 <div class="mobile-team-meta-row">
                   <span class="team-trips-count-badge">${m.metrics.activeTrips} trips</span>
                   <span>•</span>
-                  <span>${esc(m.officeLocation.split('—')[0].trim())}</span>
+                  <span>${esc(formatCardLocation(m.officeLocation))}</span>
                   <span>•</span>
                   <span>${esc(m.experience)}</span>
                 </div>
