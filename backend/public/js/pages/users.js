@@ -527,7 +527,6 @@ export default {
             <span class="us-group-icon">${icon(group.icon, { size: 16, stroke: 2.2 })}</span>
             <span>${esc(group.name)}</span>
           </div>
-          ${ACTIONS.map(() => '<span class="us-tbl-cell us-tbl-cell-blank"></span>').join('')}
         </div>`;
 
         // Feature Rows
