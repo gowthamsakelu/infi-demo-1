@@ -8760,32 +8760,33 @@ body,
 }
 
 .team-add-member-btn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  border-radius: 10px;
-  background: #2563EB;
-  color: #FFFFFF;
-  border: 1px solid transparent;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 38px;
+  border-radius: 8px;
+  background: #2563EB;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
   cursor: pointer;
+  white-space: nowrap;
   flex-shrink: 0;
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.22);
+  transition: background 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
 }
 
 .team-add-member-btn:hover {
   background: #1D4ED8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.32);
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
 }
 
 .team-add-member-btn:active {
   background: #1E40AF;
   transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
 }
 
 .team-add-member-btn svg {

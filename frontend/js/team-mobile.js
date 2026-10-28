@@ -18,8 +18,9 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
         <div style="flex: 1;">
           ${searchBox({ id: 'mobile-team-search-input', placeholder: 'Search members by name or role...', value: searchQuery, variant: 'mobile' })}
         </div>
-        <button type="button" class="team-add-member-btn" id="mobile-btn-add-team-member" title="Add Member" aria-label="Add Member" style="height: 42px; width: 42px; min-width: 42px; border-radius: 12px;">
-          ${icon('userPlus', { size: 18, stroke: 2.2 })}
+        <button type="button" class="team-add-member-btn" id="mobile-btn-add-team-member" title="Add Member" aria-label="Add Member" style="height: 42px; border-radius: 10px; padding: 0 12px;">
+          ${icon('plus', { size: 15, stroke: 2.4 })}
+          <span>Add Member</span>
         </button>
       </div>
 

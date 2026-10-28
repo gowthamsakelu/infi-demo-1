@@ -32,7 +32,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
         <div class="modal-header">
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 32px; height: 32px; border-radius: 8px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center;">
-              ${icon('userPlus', { size: 17, stroke: 2.2 })}
+              ${icon('plus', { size: 17, stroke: 2.4 })}
             </div>
             <div>
               <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #0F172A;">Add Team Member</h3>
@@ -367,8 +367,9 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
             <input type="text" id="team-roster-search-input" placeholder="Search team members..." value="${esc(searchQuery)}" aria-label="Search team members" />
             ${searchQuery ? `<button id="team-roster-search-clear" style="background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 13px; padding: 0 4px;" title="Clear search">✕</button>` : ''}
           </div>
-          <button type="button" class="team-add-member-btn" id="btn-add-team-member" title="Add Team Member" aria-label="Add Team Member">
-            ${icon('userPlus', { size: 16, stroke: 2.2 })}
+          <button type="button" class="team-add-member-btn" id="btn-add-team-member" title="Add Member" aria-label="Add Member">
+            ${icon('plus', { size: 15, stroke: 2.4 })}
+            <span>Add Member</span>
           </button>
         </div>
 
