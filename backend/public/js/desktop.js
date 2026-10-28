@@ -58,19 +58,7 @@ export function createDesktopView(container) {
           </div>
         </div>
 
-        <nav class="sidebar-nav" aria-label="Main">
-          ${sidebarNavHtml(currentPage())}
-          <span class="nav-section-title nav-section-team-title" id="nav-section-operations" style="cursor: pointer;" title="Operations Team Roster">Staff Members</span>
-          ${STAFF_MEMBERS.map(s => `
-            <div class="sidebar-nav-item staff-member-item" data-staff-id="${s.id}" style="cursor: pointer;" title="View ${s.name}'s profile and trips">
-              <div class="nav-left">
-                <img src="${s.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />
-                <span style="font-size: 13px;">${s.name}</span>
-              </div>
-              <span class="sidebar-badge" style="font-size: 10px;">${s.activeTrips} trips</span>
-            </div>
-          `).join('')}
-        </nav>
+        <nav class="sidebar-nav" aria-label="Main">${sidebarNavHtml(currentPage())}</nav>
 
         <div class="sidebar-profile-box">
           <div class="profile-user-left">
@@ -1420,14 +1408,6 @@ export function createDesktopView(container) {
     syncBookingPayments().then(() => renderTable());
 
     bindSidebar(container.querySelector('.desktop-sidebar'));
-
-    const opsHeader = container.querySelector('#nav-section-operations');
-    if (opsHeader) {
-      opsHeader.addEventListener('click', (e) => {
-        e.preventDefault();
-        goToPage('team');
-      });
-    }
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
 
     // Add Inquiry: the one wizard. After a save the list shows everything again, the new row is selected and the lists are at the top.
