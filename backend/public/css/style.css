@@ -5616,6 +5616,18 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 #desktop-tabs-host, #desktop-compact-tabs-host { min-width: 0; flex: 1 1 auto; }
 .compact-tabs-nav.tabs-scroller { display: flex; gap: 4px; }
 
+/* ---- The one scroll row: every row of pills, chips or tabs (list filters, sheet tabs, day chips, amenity chips) ----
+   Swipes both ways, no scrollbar, items never shrink or wrap, 16px at both ends on the phone. The page itself never scrolls sideways.
+   shared/list-ui.js (watchScrollRows) keeps the active item in view. */
+.scroll-row { display: flex; flex-wrap: nowrap; align-items: center; min-width: 0; max-width: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: auto; }
+.scroll-row::-webkit-scrollbar { display: none; }
+.scroll-row > * { flex: none; white-space: nowrap; }
+:where(html[data-layout="mobile"]) .scroll-row { padding-inline: 16px; scroll-padding-inline: 16px; }
+/* list filter pills sit outside the page padding so the row reaches the screen edges and the first pill still starts 16px in */
+:where(html[data-layout="mobile"]) .category-filter-tabs.scroll-row { width: 100vw; max-width: 100vw; margin-inline: calc(50% - 50vw); }
+/* PC / tablet: amenity chips wrap as before */
+:where(html[data-layout="desktop"]) .sp-chips.scroll-row { flex-wrap: wrap; overflow: visible; }
+
 /* ---- Split view: persistent DOM, only opacity/transform animate ---- */
 .desktop-workspace-split, .desktop-table-container { transition: none !important; }
 .desktop-workspace-split .desktop-compact-list-view { display: none; }
@@ -6001,7 +6013,8 @@ html { scrollbar-gutter: auto; }
 .state-box { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 48px 20px; text-align: center; color: #64748B; }
 .state-box h4 { font-size: 15px; color: #0F172A; font-weight: 700; margin: 0; }
 .state-box p { font-size: 13px; color: #94A3B8; margin: 0 0 6px; }
-.state-box.is-error h4 { color: #B91C1C; }
+.state-box-ico { width: 48px; height: 48px; border-radius: 50%; background: #F1F5F9; color: #94A3B8; display: flex; align-items: center; justify-content: center; }
+.state-box .btn-secondary-desktop { height: 36px; font-size: 12.5px; justify-content: center; }
 
 /* List content swaps with a short fade instead of blanking */
 .list-fade { animation: motionFadeIn var(--motion-fast) var(--ease-out); }
@@ -6016,6 +6029,8 @@ html { scrollbar-gutter: auto; }
 /* Short crossfade of page content between Bookings and Inquiries (shell is identical) */
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 150ms; animation-timing-function: var(--ease-out); }
 @media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } .skel::after { animation: none; } }
+
+
 .bookings-table thead tr { height: 59px; } .bookings-table thead th { vertical-align: middle; }
 
 

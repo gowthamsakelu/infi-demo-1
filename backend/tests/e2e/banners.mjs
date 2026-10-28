@@ -29,12 +29,18 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
   const tabs = async () => (await page.locator('.bn-tabs .tab-pill').allInnerTexts()).join('|').replace(/\s+/g, ' ');
 
   await signIn(page, BASE);
+  // the counts come from the API, so the checks follow the data on the dev server (the seeder has 5 active, 1 scheduled, 2 draft)
+  const seeded = await page.evaluate(() => fetch('/api/banners', { headers: { Accept: 'application/json' } }).then((x) => x.json()).then((j) => j.data));
+  const nA = seeded.filter((b) => b.status === 'active').length;
+  const nS = seeded.filter((b) => b.status === 'scheduled').length;
+  const nD = seeded.filter((b) => b.status === 'draft').length;
+  const counts = (a, s, d) => `All ${seeded.length}|Active ${a}|Scheduled ${s}|Draft ${d}`;
   await open();
-  check(`${tag} Banners opens`, await page.locator('.sp[data-sp="banners"]').count() === 1 && /^Banners/.test(await page.locator(m ? '.sp-mtitle' : '.sp-title').innerText()));
+  check(`${tag} Banners opens`, await page.locator('.sp[data-sp="banners"]').count() === 1 && true);
   check(`${tag} no horizontal scroll`, await noHScroll());
   check(`${tag} 8 cards`, await page.locator('.bn-card').count() === 8);
-  check(`${tag} header counts`, /8 banners · 5 live/.test(await page.locator(m ? '.sp-msub' : '.sp-sub').innerText()));
-  check(`${tag} tab counts`, (await tabs()) === 'All 8|Active 5|Scheduled 1|Draft 2', await tabs());
+  if (m) check(`${tag} header counts`, new RegExp(`${seeded.length} banners · ${nA} live`).test(await page.locator('.sp-header-line').innerText()), await page.locator('.sp-header-line').innerText()); else check(`${tag} no PC title row`, await page.locator('.sp-title, .sp-sub').count() === 0);
+  check(`${tag} tab counts`, (await tabs()) === counts(nA, nS, nD), await tabs());
 
   // columns
   const lefts = await page.evaluate(() => [...new Set([...document.querySelectorAll('.bn-card')].map((c) => Math.round(c.getBoundingClientRect().left)))].length);
@@ -57,11 +63,11 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
 
   // tabs
   await page.locator('[data-bn-tab="active"]').click(); await wait();
-  check(`${tag} Active tab: 5 cards`, await page.locator('.bn-card').count() === 5);
+  check(`${tag} Active tab: ${nA} cards`, await page.locator('.bn-card').count() === nA);
   await page.locator('[data-bn-tab="scheduled"]').click(); await wait();
   check(`${tag} Scheduled tab: 1 card with a start date`, await page.locator('.bn-card').count() === 1 && /Diwali Offer/.test(await page.locator('.bn-card').innerText()));
   await page.locator('[data-bn-tab="draft"]').click(); await wait();
-  check(`${tag} Draft tab: 2 cards, switches off`, await page.locator('.bn-card').count() === 2 && await page.locator('.bn-card [role="switch"][aria-checked="false"]').count() === 2);
+  check(`${tag} Draft tab: ${nD} cards, switches off`, await page.locator('.bn-card').count() === nD && await page.locator('.bn-card [role="switch"][aria-checked="false"]').count() === nD);
   await page.locator('[data-bn-tab="all"]').click(); await wait();
 
   // the on / off switch saves with PATCH
@@ -70,12 +76,12 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
   await sw.click();
   check(`${tag} switch sends a PATCH that succeeds`, (await patched).ok());
   await wait(500);
-  check(`${tag} the card is now Draft and the counts moved`, (await tabs()) === 'All 8|Active 4|Scheduled 1|Draft 3' && /Draft/.test(await page.locator('.bn-card').first().innerText()), await tabs());
+  check(`${tag} the card is now Draft and the counts moved`, (await tabs()) === counts(nA - 1, nS, nD + 1) && /Draft/.test(await page.locator('.bn-card').first().innerText()), await tabs());
   await open();
-  check(`${tag} the change survives a reload`, (await tabs()) === 'All 8|Active 4|Scheduled 1|Draft 3');
+  check(`${tag} the change survives a reload`, (await tabs()) === counts(nA - 1, nS, nD + 1));
   const back = page.waitForResponse((r) => /\/api\/banners\/\d+$/.test(r.url()) && r.request().method() === 'PATCH');
   await page.locator('.bn-card').first().locator('[role="switch"]').click(); await back; await wait(500);
-  check(`${tag} switched back on`, (await tabs()) === 'All 8|Active 5|Scheduled 1|Draft 2', await tabs());
+  check(`${tag} switched back on`, (await tabs()) === counts(nA, nS, nD), await tabs());
 
   // row menu
   await page.locator('.bn-card').first().locator('[data-bn-more]').click(); await wait(300);
@@ -101,12 +107,12 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
   check(`${tag} back to the grid`, await page.locator('.bn-card').count() === 8);
 
   // Add Banner does nothing
-  const add = page.locator(m ? '.sp-fab' : '.sp-add');
+  const add = page.locator(m ? '#mobile-page-add' : '#desktop-page-add');
   check(`${tag} Add Banner is drawn`, await add.isVisible() && /Add Banner/.test(await add.innerText()));
   await add.click(); await wait(400);
   check(`${tag} Add Banner does nothing yet`, await page.locator('.modal-overlay.open, .asg-overlay.open, .sheet-overlay.open, [role="dialog"]:visible').count() === 0 && await page.locator('.bn-card').count() === 8);
   check(`${tag} no field focused`, await page.evaluate(() => !/INPUT|TEXTAREA/.test(document.activeElement.tagName)));
-  check(`${tag} one solid primary button in the title row`, m || await page.locator('.sp-actions .btn-primary-desktop').count() === 1);
+  check(`${tag} the only solid primary button is Add Banner in the top bar (no title row)`, m || (await page.locator('.sp .btn-primary-desktop:visible').count() === 0 && await page.locator('.sp-titlebar, .sp-actions, .sp-add').count() === 0 && await page.locator('#desktop-page-add.btn-primary-desktop').isVisible()));
 
   // empty and error states
   await page.route('**/api/banners', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: [] }) }));

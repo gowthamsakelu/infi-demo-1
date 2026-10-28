@@ -1,0 +1,501 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "key": "sedan_ac",
+            "name": "Sedan 4-seater AC",
+            "icon": "car",
+            "seats": 4,
+            "ac": true,
+            "category": "car",
+            "baseRate": 3500,
+            "rateUnit": "per_day",
+            "rank": 1,
+            "description": "Dzire, Etios or similar",
+            "active": true,
+            "mostPopular": true,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 3500,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 14,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 1200,
+                    "unit": null
+                }
+            ],
+            "trips": 58,
+            "avgDays": 3.2
+        },
+        {
+            "id": 2,
+            "key": "suv_ac",
+            "name": "SUV 6-seater AC",
+            "icon": "suv",
+            "seats": 6,
+            "ac": true,
+            "category": "car",
+            "baseRate": 4800,
+            "rateUnit": "per_day",
+            "rank": 2,
+            "description": "Innova, Ertiga or similar",
+            "active": true,
+            "mostPopular": true,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 4800,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 19,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 1600,
+                    "unit": null
+                }
+            ],
+            "trips": 41,
+            "avgDays": 4.1
+        },
+        {
+            "id": 3,
+            "key": "tempo_traveller",
+            "name": "Tempo Traveller 12-seater",
+            "icon": "van",
+            "seats": 12,
+            "ac": true,
+            "category": "van",
+            "baseRate": 7500,
+            "rateUnit": "per_day",
+            "rank": 3,
+            "description": "AC, push-back seats",
+            "active": true,
+            "mostPopular": true,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 7500,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 30,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 2600,
+                    "unit": null
+                }
+            ],
+            "trips": 26,
+            "avgDays": 4.6
+        },
+        {
+            "id": 4,
+            "key": "black_premium",
+            "name": "Black premium car",
+            "icon": "car",
+            "seats": 4,
+            "ac": true,
+            "category": "car",
+            "baseRate": 6500,
+            "rateUnit": "per_day",
+            "rank": 4,
+            "description": "Luxury sedan",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 6500,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 26,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 2200,
+                    "unit": null
+                }
+            ],
+            "trips": 9,
+            "avgDays": 2.8
+        },
+        {
+            "id": 5,
+            "key": "sedan_nonac",
+            "name": "Non-AC sedan",
+            "icon": "car",
+            "seats": 4,
+            "ac": false,
+            "category": "car",
+            "baseRate": 2800,
+            "rateUnit": "per_day",
+            "rank": 5,
+            "description": "Budget option",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 2800,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 11,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 1000,
+                    "unit": null
+                }
+            ],
+            "trips": 12,
+            "avgDays": 3
+        },
+        {
+            "id": 6,
+            "key": "suv_nonac",
+            "name": "Non-AC SUV",
+            "icon": "suv",
+            "seats": 6,
+            "ac": false,
+            "category": "car",
+            "baseRate": 3800,
+            "rateUnit": "per_day",
+            "rank": 6,
+            "description": "Budget SUV for hill roads",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 3800,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 15,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 1300,
+                    "unit": null
+                }
+            ],
+            "trips": 8,
+            "avgDays": 3.6
+        },
+        {
+            "id": 7,
+            "key": "mini_bus",
+            "name": "Mini bus",
+            "icon": "bus",
+            "seats": 20,
+            "ac": true,
+            "category": "bus",
+            "baseRate": 11000,
+            "rateUnit": "per_day",
+            "rank": 7,
+            "description": "Group travel, 20 seats",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 11000,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 44,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 3700,
+                    "unit": null
+                }
+            ],
+            "trips": 5,
+            "avgDays": 2.4
+        },
+        {
+            "id": 8,
+            "key": "scooter_bike",
+            "name": "Scooter / Bike rental",
+            "icon": "bike",
+            "seats": 2,
+            "ac": false,
+            "category": "bike",
+            "baseRate": 600,
+            "rateUnit": "per_day",
+            "rank": 8,
+            "description": "Self ride, helmet included",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 600,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 2,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 200,
+                    "unit": null
+                }
+            ],
+            "trips": 17,
+            "avgDays": 2
+        },
+        {
+            "id": 9,
+            "key": "self_drive",
+            "name": "Self-drive rental",
+            "icon": "car",
+            "seats": 5,
+            "ac": true,
+            "category": "car",
+            "baseRate": 2200,
+            "rateUnit": "per_day",
+            "rank": 9,
+            "description": "Self-drive, fuel extra",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 2200,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 9,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 700,
+                    "unit": null
+                }
+            ],
+            "trips": 7,
+            "avgDays": 3.5
+        },
+        {
+            "id": 10,
+            "key": "boat",
+            "name": "Cruise / Houseboat / Boat",
+            "icon": "boat",
+            "seats": null,
+            "ac": true,
+            "category": "boat",
+            "baseRate": 9000,
+            "rateUnit": "per_day",
+            "rank": 10,
+            "description": "Per night, meals optional",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [
+                {
+                    "label": "Base rate",
+                    "note": "8 hours, 80 km per day",
+                    "amount": 9000,
+                    "unit": "day"
+                },
+                {
+                    "label": "Extra distance",
+                    "note": "After 80 km per day",
+                    "amount": 36,
+                    "unit": "km"
+                },
+                {
+                    "label": "Night halt",
+                    "note": "Driver allowance",
+                    "amount": 500,
+                    "unit": "night"
+                },
+                {
+                    "label": "Airport transfer",
+                    "note": "One way, within city",
+                    "amount": 3100,
+                    "unit": null
+                }
+            ],
+            "trips": 6,
+            "avgDays": 1.5
+        },
+        {
+            "id": 11,
+            "key": "bus",
+            "name": "Bus",
+            "icon": "bus",
+            "seats": null,
+            "ac": true,
+            "category": "public",
+            "baseRate": null,
+            "rateUnit": null,
+            "rank": 11,
+            "description": "Ticketed, arranged by the customer",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [],
+            "trips": 0,
+            "avgDays": null
+        },
+        {
+            "id": 12,
+            "key": "train",
+            "name": "Train",
+            "icon": "train",
+            "seats": null,
+            "ac": true,
+            "category": "public",
+            "baseRate": null,
+            "rateUnit": null,
+            "rank": 12,
+            "description": "Ticketed, arranged by the customer",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [],
+            "trips": 0,
+            "avgDays": null
+        },
+        {
+            "id": 13,
+            "key": "flight",
+            "name": "Flight",
+            "icon": "plane",
+            "seats": null,
+            "ac": true,
+            "category": "public",
+            "baseRate": null,
+            "rateUnit": null,
+            "rank": 13,
+            "description": "Ticketed, arranged by the customer",
+            "active": true,
+            "mostPopular": false,
+            "showInBuilder": true,
+            "rateCard": [],
+            "trips": 0,
+            "avgDays": null
+        }
+    ]
+}

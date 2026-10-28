@@ -14,3 +14,34 @@ export const optionsOf = (items, pick) => [...new Set(items.map(pick).filter(Boo
 
 /** City and region without repeating themselves ("Goa, Goa"). */
 export const place = (o) => [...new Set([o.city, o.region].filter(Boolean))].join(', ');
+
+/* ---- Overview pieces shared by Tour Packages, Adventures and Stays. A section with no data is not drawn. ---- */
+
+/** Only the label / value pairs that have a value (no row of dashes). */
+export const filled = (pairs) => pairs.filter(([, v]) => v !== '' && v != null && v !== false);
+
+/** A note card in the style of the Bookings "Short Details" card. */
+export const noteCard = (ico, title, inner) => `
+  <section class="short-details-card">
+    <div class="short-details-header">${icon(ico, { size: 15 })}<span>${esc(title)}</span></div>
+    ${inner}
+  </section>`;
+
+const list = (items, kind) => `<ul class="ie-list">${items.map((t) => `<li><span class="ie-ico ${kind}">${kind === 'dot' ? '' : icon(kind === 'no' ? 'close' : 'check', { size: 12, stroke: 3 })}</span><span>${esc(t)}</span></li>`).join('')}</ul>`;
+
+/** "Inclusions & Exclusions": one card, the two lists stacked on the phone and side by side on PC. */
+export function inclusionsCard(inclusions = [], exclusions = []) {
+  const inc = (inclusions || []).filter(Boolean);
+  const exc = (exclusions || []).filter(Boolean);
+  if (!inc.length && !exc.length) return '';
+  return noteCard('check', 'Inclusions & Exclusions', `<div class="ie-lists">
+    ${inc.length ? `<div><h4 class="ie-title">Inclusions</h4>${list(inc, 'check')}</div>` : ''}
+    ${exc.length ? `<div><h4 class="ie-title">Exclusions</h4>${list(exc, 'no')}</div>` : ''}
+  </div>`);
+}
+
+/** A card with a plain list (Highlights, Extra charges): neutral dots. */
+export const bulletCard = (ico, title, items = []) => {
+  const rows = (items || []).filter(Boolean);
+  return rows.length ? noteCard(ico, title, list(rows, 'dot')) : '';
+};

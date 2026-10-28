@@ -44,7 +44,6 @@ class Permissions
         'adventures' => 'travel',
         'banners' => 'website',
         'blogs' => 'website',
-        'contacts' => 'website',
         'users' => 'system',
         'settings' => 'system',
     ];
@@ -62,10 +61,13 @@ class Permissions
     public static function matrix(User $user): array
     {
         $all = fn (bool $on) => array_fill_keys(self::ACTIONS, $on);
-        if ($user->status !== 'active') {
+        // A database that has not had the access migration yet has no status column: that person is active (nothing is locked that worked before).
+        $status = array_key_exists('status', $user->getAttributes()) ? $user->status : 'active';
+        if ($status !== 'active') {
             return array_map(fn () => $all(false), self::MODULES);
         }
-        if ($user->isAdmin()) {
+        // No role column yet (access migration not run): the app behaves as it did before access control existed.
+        if ($user->isAdmin() || !array_key_exists('role', $user->getAttributes())) {
             return array_map(fn () => $all(true), self::MODULES);
         }
 
@@ -94,7 +96,7 @@ class Permissions
     public static function pages(User $user): array
     {
         $matrix = self::matrix($user);
-        $active = $user->status === 'active';
+        $active = (array_key_exists('status', $user->getAttributes()) ? $user->status : 'active') === 'active';
         $out = [];
         foreach (self::PAGES as $page => $module) {
             $out[$page] = $module ? $matrix[$module] : array_fill_keys(self::ACTIONS, $active);

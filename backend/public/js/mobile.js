@@ -8,6 +8,7 @@ import { searchBox, emptyState, toast, openRowMenu, esc, jsq, skeletonCards, err
 import { renderTabs, bindQuickNotes, rowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
+import { detailHeaderHtml, sheetHandleHtml } from './shared/detail-sheet.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
 import { openDayDialog, commit } from './shared/itinerary-dialog.js';
@@ -165,7 +166,7 @@ export function createMobileView(container, options = {}) {
         </div>
 
         <!-- Sheet Navigation Tabs (Customer Details, Guests, Itinerary, Updates) -->
-        <div class="sheet-tabs-nav">
+        <div class="sheet-tabs-nav scroll-row">
           <button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
           <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
           <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
@@ -235,12 +236,12 @@ export function createMobileView(container, options = {}) {
               <label>Add Custom Requirement</label>
               <div style="display: flex; gap: 8px;">
                 <input type="text" id="modal-custom-req-input" placeholder="e.g. Extra pillows, Non-smoking room" style="flex: 1;" />
-                <button class="btn-primary-desktop" id="btn-add-custom-req" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">Add</button>
+                <button class="btn-primary-desktop" id="btn-add-custom-req">Add</button>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn-confirm-booking" id="btn-done-special-req" style="height: 40px; font-size: 13.5px; border-radius: 10px;">Save & Apply</button>
+            <button class="btn-confirm-booking" id="btn-done-special-req">Save & Apply</button>
           </div>
         </div>
       </div>
@@ -256,12 +257,10 @@ export function createMobileView(container, options = {}) {
             <button class="sheet-close-btn" id="close-modal-details-btn" style="position: static;">✕</button>
           </div>
           <div class="modal-body" id="modal-details-body-content"></div>
-          <div class="modal-footer" style="display: flex; gap: 8px; justify-content: space-between;">
-            <button class="action-pill-btn" id="btn-modal-details-toggle-complete" style="padding: 8px 14px; font-size: 12.5px;">Mark Completed</button>
-            <div style="display: flex; gap: 8px;">
-              <button class="action-pill-btn" id="btn-modal-details-edit-trigger" style="padding: 8px 14px; font-size: 12.5px;">Edit</button>
-              <button class="btn-primary-desktop" id="btn-modal-details-close-btn" style="padding: 8px 16px; border-radius: 10px; font-size: 13px;">Close</button>
-            </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="btn-modal-details-toggle-complete">Mark Completed</button>
+            <button class="action-pill-btn" id="btn-modal-details-edit-trigger">Edit</button>
+            <button class="btn-primary-desktop" id="btn-modal-details-close-btn">Close</button>
           </div>
         </div>
       </div>
@@ -295,7 +294,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-edit-activity">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-save-edit-activity" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Changes</button>
+            <button class="btn-primary-desktop" id="btn-save-edit-activity">Save Changes</button>
           </div>
         </div>
       </div>
@@ -358,7 +357,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-edit-customer">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-save-edit-customer" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Customer Details</button>
+            <button class="btn-primary-desktop" id="btn-save-edit-customer">Save Customer Details</button>
           </div>
         </div>
       </div>
@@ -400,7 +399,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-add-followup">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-submit-add-followup" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Follow-up</button>
+            <button class="btn-primary-desktop" id="btn-submit-add-followup">Save Follow-up</button>
           </div>
         </div>
       </div>
@@ -428,7 +427,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-add-assignee">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-submit-add-assignee" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save & Assign</button>
+            <button class="btn-primary-desktop" id="btn-submit-add-assignee">Save & Assign</button>
           </div>
         </div>
       </div>
@@ -518,57 +517,13 @@ export function createMobileView(container, options = {}) {
     const custName = b.customer?.name || b.guest?.name || 'Customer';
 
     // Uniform Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
-    headerCard.innerHTML = `
-      <div class="sheet-drag-handle-bar" id="mobile-sheet-handle">
-        <div class="sheet-handle"></div>
-      </div>
-      <div class="sheet-customer-header">
-        <div class="customer-avatar-badge">${esc(initials)}</div>
-        <div class="customer-header-info">
-          <div class="customer-title-row">
-            <h2 class="customer-name-title">${esc(custName)}</h2>
-            <span class="status-pill ${b.statusClass}">
-              <span class="dot"></span>
-              ${b.status}
-            </span>
-          </div>
-          <p class="customer-trip-subtitle">${esc(b.title)}</p>
-          <div class="customer-meta-chips">
-            <span class="meta-chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-              </svg>
-              ${b.pax} Pax
-            </span>
-            <span class="meta-dot">•</span>
-            <span class="meta-chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-              ${esc(b.duration || '—')}
-            </span>
-            <span class="meta-dot">•</span>
-            <span class="meta-chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                <line x1="16" x2="16" y1="2" y2="6"/>
-                <line x1="8" x2="8" y1="2" y2="6"/>
-                <line x1="3" x2="21" y1="10" y2="10"/>
-              </svg>
-              ${b.dates}
-            </span>
-          </div>
-        </div>
-        <button class="sheet-close-btn mobile-sheet-close-pill" id="mobile-sheet-close-btn" title="Close" aria-label="Close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-    `;
+    headerCard.innerHTML = sheetHandleHtml('mobile-sheet-handle') + detailHeaderHtml({
+      avatar: esc(initials),
+      title: custName,
+      pill: `<span class="status-pill ${b.statusClass}"><span class="dot"></span>${b.status}</span>`,
+      subtitle: b.title,
+      chips: [{ icon: 'user', text: `${b.pax} Pax` }, { icon: 'clock', text: b.duration || '—' }, { icon: 'calendar', text: b.dates }],
+    }, { close: 'id="mobile-sheet-close-btn"' });
 
     const guestBadge = container.querySelector('#sheet-guest-count-badge');
     if (guestBadge) guestBadge.textContent = b.guests.length;

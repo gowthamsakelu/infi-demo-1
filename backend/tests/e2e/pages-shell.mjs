@@ -67,7 +67,7 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
   } else {
     check(`${tag} phone: nothing opens by itself`, sel(page) === null && await page.locator('.sp-detail.is-open').count() === 0);
     await page.locator('.sp-row[data-sp-id="2"]').click(); await wait(500);
-    check(`${tag} phone: tapping a card opens the detail full screen`, sel(page) === '2' && await page.locator('.sp-detail.is-open').count() === 1 && /Goa/.test(await page.locator('.sp-head-name h2').innerText()));
+    check(`${tag} phone: tapping a card opens the detail full screen`, sel(page) === '2' && await page.locator('.sp-detail.is-open').count() === 1 && /Goa/.test(await page.locator('.sp-detail-head .customer-name-title').innerText()));
     check(`${tag} phone: back arrow labelled, bottom bar hidden`, await page.locator('.sp-back[aria-label]').count() === 1 && await page.evaluate(() => getComputedStyle(document.querySelector('.mobile-bottom-nav')).display === 'none'));
     check(`${tag} phone: no horizontal scroll in the detail`, await noHScroll());
     await page.locator('.sp-back').click(); await wait(500);
@@ -107,12 +107,14 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
     await page.locator('[data-sp-act="new-inquiry"]').click(); await wait(900);
     check(`${tag} New inquiry opens Add Inquiry with the destination filled in`, await page.locator('.wiz-sheet').count() === 1 && (await page.locator('.wiz-sheet input[value="Kashmir"]').count()) === 1);
     await page.keyboard.press('Escape'); await wait(600);
+    if (await page.locator('.confirm-card').count()) { await page.locator('.confirm-card [data-confirm="yes"]').click(); await wait(600); } // the prefilled destination counts as entered data
+    check(`${tag} the wizard closes again`, await page.locator('.wiz-sheet').count() === 0);
   }
 
   // other pages still work, and the placeholders are calm
   if (!m) await page.locator(`${slot} #nav-dashboard`).click(); else { await page.locator('.mobile-bottom-nav [data-route="dashboard"]').click(); }
   await wait(900);
-  check(`${tag} Dashboard shows the coming-soon card`, /is on its way/.test(await page.locator('.sp-soon').innerText()));
+  check(`${tag} Dashboard shows the coming-soon card`, /is coming soon/.test(await page.locator('.sp-soon').innerText()));
   if (!m) await page.locator(`${slot} #nav-bookings`).click(); else await page.locator('.mobile-bottom-nav [data-route="bookings"]').click();
   await wait(1200);
   check(`${tag} Bookings still opens (host hidden)`, await page.locator(`${slot} #mobile-cards-list .list-row-card, ${slot} #desktop-compact-list-items .list-row-card`).count() > 0 && await page.locator('.sp:visible').count() === 0);

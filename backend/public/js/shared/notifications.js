@@ -18,6 +18,7 @@ export function notificationsHtml() {
     <div class="notifications-header">
       <h4>Notifications</h4>
       <button type="button" class="notifications-mark-read-btn" data-notif-mark-all>Mark all as read</button>
+      <button type="button" class="sheet-close-btn notif-close" data-notif-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button>
     </div>
     <div class="notifications-list" role="list">
       ${ITEMS.map((n, i) => `
@@ -59,6 +60,7 @@ export function bindNotifications({ bell, panel, dot, backdrop = null }) {
   bell.addEventListener('click', (e) => { e.stopPropagation(); set(!open); });
   panel.addEventListener('click', (e) => {
     e.stopPropagation();
+    if (e.target.closest('[data-notif-close]')) { set(false); return; }
     if (e.target.closest('[data-notif-mark-all]')) {
       state.unread.clear();
       paintAll();

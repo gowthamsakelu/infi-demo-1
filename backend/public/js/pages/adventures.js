@@ -4,13 +4,23 @@ import { createSplitPage } from '../shared/split-page.js';
 import { getJson } from '../shared/http.js';
 import { esc } from '../shared/ui.js';
 import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, money } from '../shared/page-ui.js';
-import { card, optionsOf, place } from './catalog-ui.js';
+import { card, optionsOf, place, filled, inclusionsCard, bulletCard } from './catalog-ui.js';
 
 // ADVENTURE is purple, SIGHTSEEING teal, WATER blue, CULTURE yellow, the rest green (the shared tag colours)
 const TAG_KIND = { adventure: 'tour', sightseeing: 'activity', water: 'resort', culture: 'villa', food: 'transport', nature: 'transport' };
 const MAIN = ['adventure', 'sightseeing', 'water', 'culture'];
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const duration = (m) => (m == null ? '' : m < 60 ? `${m} min` : m === 60 ? '1 hr' : `${+(m / 60).toFixed(1)} hrs`);
+
+/** About this activity: only the facts the record has, then the description. */
+function aboutCard(a) {
+  const grid = filled([
+    ['Duration', duration(a.minutes)], ['Difficulty', a.difficulty || ''], ['Best time', a.bestTime || ''], ['Meeting point', a.meetingPoint || ''],
+    ['Min. age', a.minAge || ''], ['Partner', a.partner || ''],
+  ]);
+  const about = a.description ? `<p class="ad-about">${esc(a.description)}</p>` : '';
+  return grid.length || about ? card('mountain', 'About this activity', `${grid.length ? detailGrid(grid) : ''}${about}`) : '';
+}
 
 const tierRow = (title, sub, price) => `
   <div class="sp-linkrow">
@@ -63,11 +73,9 @@ export default {
             { icon: 'briefcase', label: 'Bookings', value: a.bookings, tone: 'green' },
             { icon: 'star', label: 'Rating', value: a.rating != null ? a.rating : '—', tone: 'amber' },
           ])}
-          ${card('mountain', 'Details', `${detailGrid([
-            ['Duration', duration(a.minutes)], ['Difficulty', a.difficulty || ''], ['Best time', a.bestTime || ''], ['Meeting point', a.meetingPoint || ''],
-            ['Min. age', a.minAge || ''], ['Partner', a.partner || ''],
-          ])}${a.description ? `<p class="ad-about">${esc(a.description)}</p>` : ''}`)}
-          ${tiers}`;
+          ${aboutCard(a)}
+          ${bulletCard('star', 'Highlights', a.highlights)}
+          ${inclusionsCard(a.inclusions, a.exclusions)}`;
         return {
           head: {
             avatar: tile('mountain', 26),

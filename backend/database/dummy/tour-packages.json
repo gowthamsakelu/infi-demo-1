@@ -1,0 +1,3459 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "name": "Kashmir Valley & Gulmarg Tour",
+            "destinationId": 1,
+            "destination": "Kashmir",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": false,
+            "days": 5,
+            "nights": 4,
+            "price": 15000,
+            "bookings": 14
+        },
+        {
+            "id": 2,
+            "name": "Srinagar Houseboat Escape",
+            "destinationId": 1,
+            "destination": "Kashmir",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": false,
+            "days": 4,
+            "nights": 3,
+            "price": 12500,
+            "bookings": 11
+        },
+        {
+            "id": 3,
+            "name": "Goa Beach Villa Getaway",
+            "destinationId": 2,
+            "destination": "Goa",
+            "tag": "villa",
+            "status": "published",
+            "seasonal": false,
+            "days": 3,
+            "nights": 2,
+            "price": 11000,
+            "bookings": 9
+        },
+        {
+            "id": 4,
+            "name": "Manali Snow Escape",
+            "destinationId": 3,
+            "destination": "Manali",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": true,
+            "days": 6,
+            "nights": 5,
+            "price": 18500,
+            "bookings": 7
+        },
+        {
+            "id": 5,
+            "name": "Kerala Backwaters",
+            "destinationId": 4,
+            "destination": "Kerala",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": false,
+            "days": 6,
+            "nights": 5,
+            "price": 21000,
+            "bookings": 5
+        },
+        {
+            "id": 6,
+            "name": "Rishikesh Rafting Weekend",
+            "destinationId": 6,
+            "destination": "Rishikesh",
+            "tag": "activity",
+            "status": "published",
+            "seasonal": false,
+            "days": 2,
+            "nights": 1,
+            "price": 4500,
+            "bookings": 12
+        },
+        {
+            "id": 7,
+            "name": "Spiti Valley Road Trip",
+            "destinationId": 15,
+            "destination": "Spiti Valley",
+            "tag": "tour",
+            "status": "draft",
+            "seasonal": true,
+            "days": 8,
+            "nights": 7,
+            "price": 26000,
+            "bookings": 0
+        },
+        {
+            "id": 8,
+            "name": "Bali Escape",
+            "destinationId": 5,
+            "destination": "Bali",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": false,
+            "days": 6,
+            "nights": 5,
+            "price": 48000,
+            "bookings": 3
+        },
+        {
+            "id": 9,
+            "name": "Kashmir Winter Special",
+            "destinationId": 1,
+            "destination": "Kashmir",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": true,
+            "days": 6,
+            "nights": 5,
+            "price": 22000,
+            "bookings": 6
+        },
+        {
+            "id": 10,
+            "name": "Goa Beaches and Nightlife",
+            "destinationId": 2,
+            "destination": "Goa",
+            "tag": "tour",
+            "status": "draft",
+            "seasonal": false,
+            "days": 4,
+            "nights": 3,
+            "price": 9500,
+            "bookings": 0
+        }
+    ],
+    "detail": {
+        "1": {
+            "id": 1,
+            "name": "Kashmir Valley & Gulmarg Tour",
+            "destinationId": 1,
+            "destination": "Kashmir",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": false,
+            "days": 5,
+            "nights": 4,
+            "price": 15000,
+            "bookings": 14,
+            "description": "5 days and 4 nights in Kashmir. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 18800
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 15000
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 13800
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 12800
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with daily breakfast",
+                "Airport pickup and drop",
+                "Private AC cab for sightseeing",
+                "Sightseeing and entry tickets as listed",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Arrival in Srinagar",
+                    "location": "Srinagar",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG1-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Airport pickup to Srinagar hotel",
+                            "subtitle": "11:30 AM • Private cab",
+                            "time": "11:30 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Airport pickup to Srinagar hotel",
+                                    "mode": "Cab",
+                                    "vehicle": "Private cab",
+                                    "dep": "11:30",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D1-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Hotel Lake View",
+                            "subtitle": "02:00 PM • Srinagar",
+                            "time": "02:00 PM",
+                            "location": "Srinagar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Hotel Lake View",
+                                    "city": "Srinagar",
+                                    "checkInTime": "14:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "bb",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D1-3",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Shikara ride on Dal Lake",
+                            "subtitle": "04:30 PM • Srinagar • 90 min",
+                            "time": "04:30 PM",
+                            "location": "Srinagar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Shikara ride on Dal Lake",
+                                    "time": "16:30",
+                                    "place": "Srinagar",
+                                    "duration": "90 min",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Gulmarg day trip",
+                    "location": "Gulmarg",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG1-D2-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Srinagar to Gulmarg drive",
+                            "subtitle": "08:30 AM • SUV",
+                            "time": "08:30 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Srinagar to Gulmarg drive",
+                                    "mode": "Cab",
+                                    "vehicle": "SUV",
+                                    "dep": "08:30",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D2-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Gulmarg Gondola Phase 1 and 2",
+                            "subtitle": "09:00 AM • Gulmarg • 3 hrs",
+                            "time": "09:00 AM",
+                            "location": "Gulmarg",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Gulmarg Gondola Phase 1 and 2",
+                                    "time": "09:00",
+                                    "place": "Gulmarg",
+                                    "duration": "3 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D2-3",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Lunch at Gulmarg",
+                            "subtitle": "01:00 PM • Kashmiri wazwan",
+                            "time": "01:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Lunch",
+                                    "time": "13:00",
+                                    "place": "Gulmarg",
+                                    "diet": "Kashmiri wazwan",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Pahalgam",
+                    "location": "Pahalgam",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG1-D3-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Srinagar to Pahalgam",
+                            "subtitle": "09:00 AM • SUV",
+                            "time": "09:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Srinagar to Pahalgam",
+                                    "mode": "Cab",
+                                    "vehicle": "SUV",
+                                    "dep": "09:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D3-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Betaab Valley and Aru Valley",
+                            "subtitle": "12:00 PM • Pahalgam • 4 hrs",
+                            "time": "12:00 PM",
+                            "location": "Pahalgam",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Betaab Valley and Aru Valley",
+                                    "time": "12:00",
+                                    "place": "Pahalgam",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D3-3",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at hotel",
+                            "subtitle": "08:00 PM • Veg and non-veg",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Pahalgam",
+                                    "diet": "Veg and non-veg",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 4",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Sonamarg excursion",
+                    "location": "Sonamarg",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG1-D4-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Pahalgam to Sonamarg",
+                            "subtitle": "08:00 AM • SUV",
+                            "time": "08:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Pahalgam to Sonamarg",
+                                    "mode": "Cab",
+                                    "vehicle": "SUV",
+                                    "dep": "08:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D4-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Thajiwas Glacier pony ride",
+                            "subtitle": "11:30 AM • Sonamarg • 2 hrs",
+                            "time": "11:30 AM",
+                            "location": "Sonamarg",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Thajiwas Glacier pony ride",
+                                    "time": "11:30",
+                                    "place": "Sonamarg",
+                                    "duration": "2 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D4-3",
+                            "type": "note",
+                            "icon": "note",
+                            "title": "Note",
+                            "subtitle": "Carry warm clothes; the road closes at dusk.",
+                            "visibleToCustomer": true,
+                            "details": {
+                                "b": {
+                                    "role": "note",
+                                    "text": "Carry warm clothes; the road closes at dusk.",
+                                    "visible": true
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 5",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Departure",
+                    "location": "Srinagar",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG1-D5-1",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Breakfast at hotel",
+                            "subtitle": "08:00 AM",
+                            "time": "08:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Breakfast",
+                                    "time": "08:00",
+                                    "place": "Srinagar",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG1-D5-2",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Hotel to Srinagar airport",
+                            "subtitle": "11:00 AM • Private cab",
+                            "time": "11:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Hotel to Srinagar airport",
+                                    "mode": "Cab",
+                                    "vehicle": "Private cab",
+                                    "dep": "11:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1001",
+                    "name": "Rohan Malhotra",
+                    "trip": "Kashmir Valley & Gulmarg Tour",
+                    "status": "hot",
+                    "travelDate": "2026-12-15",
+                    "pax": 3
+                }
+            ]
+        },
+        "2": {
+            "id": 2,
+            "name": "Srinagar Houseboat Escape",
+            "destinationId": 1,
+            "destination": "Kashmir",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": false,
+            "days": 4,
+            "nights": 3,
+            "price": 12500,
+            "bookings": 11,
+            "description": "4 days and 3 nights in Kashmir. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 15600
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 12500
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 11500
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 10600
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with daily breakfast",
+                "Airport pickup and drop",
+                "Private AC cab for sightseeing",
+                "Sightseeing and entry tickets as listed",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Houseboat check-in",
+                    "location": "Srinagar",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG2-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Airport pickup",
+                            "subtitle": "12:00 PM • Sedan",
+                            "time": "12:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Airport pickup",
+                                    "mode": "Cab",
+                                    "vehicle": "Sedan",
+                                    "dep": "12:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG2-D1-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Houseboat Golden Crown",
+                            "subtitle": "02:00 PM • Srinagar",
+                            "time": "02:00 PM",
+                            "location": "Srinagar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Houseboat Golden Crown",
+                                    "city": "Srinagar",
+                                    "checkInTime": "14:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "map",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG2-D1-3",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Sunset shikara ride",
+                            "subtitle": "05:00 PM • Srinagar • 90 min",
+                            "time": "05:00 PM",
+                            "location": "Srinagar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Sunset shikara ride",
+                                    "time": "17:00",
+                                    "place": "Srinagar",
+                                    "duration": "90 min",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Mughal gardens",
+                    "location": "Srinagar",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG2-D2-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Mughal Gardens tour",
+                            "subtitle": "10:00 AM • Srinagar • 3 hrs",
+                            "time": "10:00 AM",
+                            "location": "Srinagar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Mughal Gardens tour",
+                                    "time": "10:00",
+                                    "place": "Srinagar",
+                                    "duration": "3 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG2-D2-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Shankaracharya Temple visit",
+                            "subtitle": "03:00 PM • Srinagar • 2 hrs",
+                            "time": "03:00 PM",
+                            "location": "Srinagar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Shankaracharya Temple visit",
+                                    "time": "15:00",
+                                    "place": "Srinagar",
+                                    "duration": "2 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Old city walk",
+                    "location": "Srinagar",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG2-D3-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Old City heritage walk",
+                            "subtitle": "09:30 AM • Srinagar • 150 min",
+                            "time": "09:30 AM",
+                            "location": "Srinagar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Old City heritage walk",
+                                    "time": "09:30",
+                                    "place": "Srinagar",
+                                    "duration": "150 min",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG2-D3-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Wazwan dinner",
+                            "subtitle": "08:00 PM • Traditional feast",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Srinagar",
+                                    "diet": "Traditional feast",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 4",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 4 in Kashmir",
+                    "location": "Kashmir",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG2-D4-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Kashmir • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Kashmir",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Kashmir",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG2-D4-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Kashmir",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1001",
+                    "name": "Rohan Malhotra",
+                    "trip": "Kashmir Valley & Gulmarg Tour",
+                    "status": "hot",
+                    "travelDate": "2026-12-15",
+                    "pax": 3
+                }
+            ]
+        },
+        "3": {
+            "id": 3,
+            "name": "Goa Beach Villa Getaway",
+            "destinationId": 2,
+            "destination": "Goa",
+            "tag": "villa",
+            "status": "published",
+            "seasonal": false,
+            "days": 3,
+            "nights": 2,
+            "price": 11000,
+            "bookings": 9,
+            "description": "3 days and 2 nights in Goa. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 13800
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 11000
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 10100
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 9400
+                }
+            ],
+            "inclusions": [
+                "Villa stay with daily breakfast",
+                "Airport pickup and drop",
+                "Welcome drink on arrival",
+                "Local sightseeing by cab",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Arrive and settle in",
+                    "location": "Calangute",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG3-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Dabolim airport to villa",
+                            "subtitle": "12:00 PM • Sedan",
+                            "time": "12:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Dabolim airport to villa",
+                                    "mode": "Cab",
+                                    "vehicle": "Sedan",
+                                    "dep": "12:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG3-D1-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Calangute Beach Villa",
+                            "subtitle": "02:00 PM • Calangute",
+                            "time": "02:00 PM",
+                            "location": "Calangute",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Calangute Beach Villa",
+                                    "city": "Calangute",
+                                    "checkInTime": "14:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "bb",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG3-D1-3",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Sunset at Baga beach",
+                            "subtitle": "05:30 PM • Calangute • 2 hrs",
+                            "time": "05:30 PM",
+                            "location": "Calangute",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Sunset at Baga beach",
+                                    "time": "17:30",
+                                    "place": "Calangute",
+                                    "duration": "2 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "North Goa",
+                    "location": "North Goa",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG3-D2-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Fort Aguada and Chapora",
+                            "subtitle": "10:00 AM • North Goa • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "North Goa",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Fort Aguada and Chapora",
+                                    "time": "10:00",
+                                    "place": "North Goa",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG3-D2-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Lunch at a beach shack",
+                            "subtitle": "01:30 PM • Goan thali",
+                            "time": "01:30 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Lunch",
+                                    "time": "13:30",
+                                    "place": "North Goa",
+                                    "diet": "Goan thali",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Departure",
+                    "location": "Goa",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG3-D3-1",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Breakfast at the villa",
+                            "subtitle": "08:30 AM",
+                            "time": "08:30 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Breakfast",
+                                    "time": "08:30",
+                                    "place": "Goa",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG3-D3-2",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Villa to Dabolim airport",
+                            "subtitle": "11:00 AM • Sedan",
+                            "time": "11:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Villa to Dabolim airport",
+                                    "mode": "Cab",
+                                    "vehicle": "Sedan",
+                                    "dep": "11:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1003",
+                    "name": "Kavita Roy",
+                    "trip": "Goa Beach Villa Getaway",
+                    "status": "ongoing",
+                    "travelDate": "2026-12-04",
+                    "pax": 6
+                }
+            ]
+        },
+        "4": {
+            "id": 4,
+            "name": "Manali Snow Escape",
+            "destinationId": 3,
+            "destination": "Manali",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": true,
+            "days": 6,
+            "nights": 5,
+            "price": 18500,
+            "bookings": 7,
+            "description": "6 days and 5 nights in Manali. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 23100
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 18500
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 17000
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 15700
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with daily breakfast",
+                "Airport pickup and drop",
+                "Private AC cab for sightseeing",
+                "Sightseeing and entry tickets as listed",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Delhi to Manali",
+                    "location": "Manali",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG4-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Overnight Volvo to Manali",
+                            "subtitle": "07:00 PM • Volvo",
+                            "time": "07:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Overnight Volvo to Manali",
+                                    "mode": "Cab",
+                                    "vehicle": "Volvo",
+                                    "dep": "19:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG4-D1-2",
+                            "type": "note",
+                            "icon": "note",
+                            "title": "Note",
+                            "subtitle": "Pick-up from Kashmere Gate.",
+                            "visibleToCustomer": true,
+                            "details": {
+                                "b": {
+                                    "role": "note",
+                                    "text": "Pick-up from Kashmere Gate.",
+                                    "visible": true
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Manali sightseeing",
+                    "location": "Manali",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG4-D2-1",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Snow Peak Resort",
+                            "subtitle": "10:00 AM • Manali",
+                            "time": "10:00 AM",
+                            "location": "Manali",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Snow Peak Resort",
+                                    "city": "Manali",
+                                    "checkInTime": "10:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "bb",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG4-D2-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Hadimba Temple and Old Manali",
+                            "subtitle": "02:00 PM • Manali • 3 hrs",
+                            "time": "02:00 PM",
+                            "location": "Manali",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Hadimba Temple and Old Manali",
+                                    "time": "14:00",
+                                    "place": "Manali",
+                                    "duration": "3 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Solang Valley",
+                    "location": "Solang",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG4-D3-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Solang Valley snow activities",
+                            "subtitle": "10:00 AM • Solang • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Solang",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Solang Valley snow activities",
+                                    "time": "10:00",
+                                    "place": "Solang",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG4-D3-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Lunch at Solang",
+                            "subtitle": "02:00 PM • Veg thali",
+                            "time": "02:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Lunch",
+                                    "time": "14:00",
+                                    "place": "Solang",
+                                    "diet": "Veg thali",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 4",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Rohtang or Atal Tunnel",
+                    "location": "Sissu",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG4-D4-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Manali to Atal Tunnel and Sissu",
+                            "subtitle": "09:00 AM • SUV",
+                            "time": "09:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Manali to Atal Tunnel and Sissu",
+                                    "mode": "Cab",
+                                    "vehicle": "SUV",
+                                    "dep": "09:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG4-D4-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Snow point",
+                            "subtitle": "11:30 AM • Sissu • 2 hrs",
+                            "time": "11:30 AM",
+                            "location": "Sissu",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Snow point",
+                                    "time": "11:30",
+                                    "place": "Sissu",
+                                    "duration": "2 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 5",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Kullu and rafting",
+                    "location": "Kullu",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG4-D5-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "River rafting at Kullu",
+                            "subtitle": "11:00 AM • Kullu • 90 min",
+                            "time": "11:00 AM",
+                            "location": "Kullu",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "River rafting at Kullu",
+                                    "time": "11:00",
+                                    "place": "Kullu",
+                                    "duration": "90 min",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG4-D5-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Shawl factory visit",
+                            "subtitle": "03:00 PM • Kullu • 1 hr",
+                            "time": "03:00 PM",
+                            "location": "Kullu",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Shawl factory visit",
+                                    "time": "15:00",
+                                    "place": "Kullu",
+                                    "duration": "1 hr",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 6",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Departure",
+                    "location": "Manali",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG4-D6-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Manali to Delhi Volvo",
+                            "subtitle": "05:00 PM • Volvo",
+                            "time": "05:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Manali to Delhi Volvo",
+                                    "mode": "Cab",
+                                    "vehicle": "Volvo",
+                                    "dep": "17:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1004",
+                    "name": "Neha Kapoor",
+                    "trip": "Manali Snow Escape",
+                    "status": "new",
+                    "travelDate": "2027-01-10",
+                    "pax": 4
+                }
+            ]
+        },
+        "5": {
+            "id": 5,
+            "name": "Kerala Backwaters",
+            "destinationId": 4,
+            "destination": "Kerala",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": false,
+            "days": 6,
+            "nights": 5,
+            "price": 21000,
+            "bookings": 5,
+            "description": "6 days and 5 nights in Kerala. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 26300
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 21000
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 19300
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 17900
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with daily breakfast",
+                "Airport pickup and drop",
+                "Private AC cab for sightseeing",
+                "Sightseeing and entry tickets as listed",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Kochi arrival",
+                    "location": "Kochi",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG5-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Airport pickup",
+                            "subtitle": "12:00 PM • Sedan",
+                            "time": "12:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Airport pickup",
+                                    "mode": "Cab",
+                                    "vehicle": "Sedan",
+                                    "dep": "12:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG5-D1-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Fort Kochi Heritage Hotel",
+                            "subtitle": "02:00 PM • Kochi",
+                            "time": "02:00 PM",
+                            "location": "Kochi",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Fort Kochi Heritage Hotel",
+                                    "city": "Kochi",
+                                    "checkInTime": "14:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "bb",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG5-D1-3",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Chinese fishing nets and Fort Kochi walk",
+                            "subtitle": "04:00 PM • Kochi • 2 hrs",
+                            "time": "04:00 PM",
+                            "location": "Kochi",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Chinese fishing nets and Fort Kochi walk",
+                                    "time": "16:00",
+                                    "place": "Kochi",
+                                    "duration": "2 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Munnar",
+                    "location": "Munnar",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG5-D2-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Kochi to Munnar",
+                            "subtitle": "08:30 AM • SUV",
+                            "time": "08:30 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Kochi to Munnar",
+                                    "mode": "Cab",
+                                    "vehicle": "SUV",
+                                    "dep": "08:30",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG5-D2-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Munnar Tea Valley Resort",
+                            "subtitle": "02:00 PM • Munnar",
+                            "time": "02:00 PM",
+                            "location": "Munnar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Munnar Tea Valley Resort",
+                                    "city": "Munnar",
+                                    "checkInTime": "14:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "map",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG5-D2-3",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Tea estate visit",
+                            "subtitle": "04:00 PM • Munnar • 90 min",
+                            "time": "04:00 PM",
+                            "location": "Munnar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Tea estate visit",
+                                    "time": "16:00",
+                                    "place": "Munnar",
+                                    "duration": "90 min",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Munnar sightseeing",
+                    "location": "Munnar",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG5-D3-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Eravikulam National Park",
+                            "subtitle": "09:00 AM • Munnar • 3 hrs",
+                            "time": "09:00 AM",
+                            "location": "Munnar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Eravikulam National Park",
+                                    "time": "09:00",
+                                    "place": "Munnar",
+                                    "duration": "3 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG5-D3-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Lunch with a view",
+                            "subtitle": "01:00 PM • Kerala meals",
+                            "time": "01:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Lunch",
+                                    "time": "13:00",
+                                    "place": "Munnar",
+                                    "diet": "Kerala meals",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 4",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Thekkady",
+                    "location": "Thekkady",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG5-D4-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Munnar to Thekkady",
+                            "subtitle": "09:00 AM • SUV",
+                            "time": "09:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Munnar to Thekkady",
+                                    "mode": "Cab",
+                                    "vehicle": "SUV",
+                                    "dep": "09:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG5-D4-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Periyar boat ride",
+                            "subtitle": "04:00 PM • Thekkady • 1 hr",
+                            "time": "04:00 PM",
+                            "location": "Thekkady",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Periyar boat ride",
+                                    "time": "16:00",
+                                    "place": "Thekkady",
+                                    "duration": "1 hr",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 5",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Alleppey houseboat",
+                    "location": "Alleppey",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG5-D5-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Thekkady to Alleppey",
+                            "subtitle": "09:00 AM • SUV",
+                            "time": "09:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Thekkady to Alleppey",
+                                    "mode": "Cab",
+                                    "vehicle": "SUV",
+                                    "dep": "09:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG5-D5-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Alleppey houseboat",
+                            "subtitle": "12:30 PM • Alleppey",
+                            "time": "12:30 PM",
+                            "location": "Alleppey",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Alleppey houseboat",
+                                    "city": "Alleppey",
+                                    "checkInTime": "12:30",
+                                    "checkOutTime": "11:00",
+                                    "plan": "all",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG5-D5-3",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Backwater cruise",
+                            "subtitle": "01:00 PM • Alleppey • 24 hrs",
+                            "time": "01:00 PM",
+                            "location": "Alleppey",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Backwater cruise",
+                                    "time": "13:00",
+                                    "place": "Alleppey",
+                                    "duration": "24 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 6",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Departure",
+                    "location": "Kochi",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG5-D6-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Alleppey to Kochi airport",
+                            "subtitle": "10:00 AM • Sedan",
+                            "time": "10:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Alleppey to Kochi airport",
+                                    "mode": "Cab",
+                                    "vehicle": "Sedan",
+                                    "dep": "10:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": []
+        },
+        "6": {
+            "id": 6,
+            "name": "Rishikesh Rafting Weekend",
+            "destinationId": 6,
+            "destination": "Rishikesh",
+            "tag": "activity",
+            "status": "published",
+            "seasonal": false,
+            "days": 2,
+            "nights": 1,
+            "price": 4500,
+            "bookings": 12,
+            "description": "2 days and 1 nights in Rishikesh. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 5600
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 4500
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 4100
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 3800
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with breakfast",
+                "Activity fees and safety gear",
+                "Trained guides",
+                "Local transfers",
+                "First-aid support"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Arrive and Ganga aarti",
+                    "location": "Rishikesh",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG6-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Dehradun airport to Rishikesh",
+                            "subtitle": "11:00 AM • Sedan",
+                            "time": "11:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Dehradun airport to Rishikesh",
+                                    "mode": "Cab",
+                                    "vehicle": "Sedan",
+                                    "dep": "11:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG6-D1-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Ganga View Hotel",
+                            "subtitle": "01:00 PM • Rishikesh",
+                            "time": "01:00 PM",
+                            "location": "Rishikesh",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Ganga View Hotel",
+                                    "city": "Rishikesh",
+                                    "checkInTime": "13:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "bb",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG6-D1-3",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Triveni Ghat Ganga aarti",
+                            "subtitle": "06:00 PM • Rishikesh • 90 min",
+                            "time": "06:00 PM",
+                            "location": "Rishikesh",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Triveni Ghat Ganga aarti",
+                                    "time": "18:00",
+                                    "place": "Rishikesh",
+                                    "duration": "90 min",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "River rafting",
+                    "location": "Shivpuri",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG6-D2-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "River rafting, Shivpuri",
+                            "subtitle": "09:00 AM • Shivpuri • 3 hrs",
+                            "time": "09:00 AM",
+                            "location": "Shivpuri",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "River rafting, Shivpuri",
+                                    "time": "09:00",
+                                    "place": "Shivpuri",
+                                    "duration": "3 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG6-D2-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Riverside lunch",
+                            "subtitle": "01:00 PM • Veg thali",
+                            "time": "01:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Lunch",
+                                    "time": "13:00",
+                                    "place": "Shivpuri",
+                                    "diet": "Veg thali",
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG6-D2-3",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Rishikesh to Dehradun airport",
+                            "subtitle": "04:00 PM • Sedan",
+                            "time": "04:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Rishikesh to Dehradun airport",
+                                    "mode": "Cab",
+                                    "vehicle": "Sedan",
+                                    "dep": "16:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1002",
+                    "name": "Amit Verma",
+                    "trip": "Haridwar - Kashi Trip",
+                    "status": "warm",
+                    "travelDate": "2026-11-28",
+                    "pax": 12
+                },
+                {
+                    "id": "INQ-1005",
+                    "name": "Sanjay Bhatia",
+                    "trip": "Rishikesh Rafting Weekend",
+                    "status": "hot",
+                    "travelDate": "2026-11-14",
+                    "pax": 8
+                }
+            ]
+        },
+        "7": {
+            "id": 7,
+            "name": "Spiti Valley Road Trip",
+            "destinationId": 15,
+            "destination": "Spiti Valley",
+            "tag": "tour",
+            "status": "draft",
+            "seasonal": true,
+            "days": 8,
+            "nights": 7,
+            "price": 26000,
+            "bookings": 0,
+            "description": "8 days and 7 nights in Spiti Valley. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 32500
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 26000
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 23900
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 22100
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with daily breakfast",
+                "Airport pickup and drop",
+                "Private AC cab for sightseeing",
+                "Sightseeing and entry tickets as listed",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Shimla to Kalpa",
+                    "location": "Kalpa",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG7-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Shimla to Kalpa",
+                            "subtitle": "07:00 AM • Tempo Traveller",
+                            "time": "07:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Shimla to Kalpa",
+                                    "mode": "Cab",
+                                    "vehicle": "Tempo Traveller",
+                                    "dep": "07:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Kalpa to Kaza",
+                    "location": "Kaza",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG7-D2-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Kalpa to Kaza via Nako",
+                            "subtitle": "07:30 AM • Tempo Traveller",
+                            "time": "07:30 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Kalpa to Kaza via Nako",
+                                    "mode": "Cab",
+                                    "vehicle": "Tempo Traveller",
+                                    "dep": "07:30",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG7-D2-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Nako Lake",
+                            "subtitle": "11:00 AM • Kaza • 1 hr",
+                            "time": "11:00 AM",
+                            "location": "Kaza",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Nako Lake",
+                                    "time": "11:00",
+                                    "place": "Kaza",
+                                    "duration": "1 hr",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 3 in Spiti Valley",
+                    "location": "Spiti Valley",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG7-D3-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Spiti Valley • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Spiti Valley",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Spiti Valley",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG7-D3-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Spiti Valley",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 4",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 4 in Spiti Valley",
+                    "location": "Spiti Valley",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG7-D4-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Spiti Valley • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Spiti Valley",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Spiti Valley",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG7-D4-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Spiti Valley",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 5",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 5 in Spiti Valley",
+                    "location": "Spiti Valley",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG7-D5-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Spiti Valley • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Spiti Valley",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Spiti Valley",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG7-D5-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Spiti Valley",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 6",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 6 in Spiti Valley",
+                    "location": "Spiti Valley",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG7-D6-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Spiti Valley • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Spiti Valley",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Spiti Valley",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG7-D6-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Spiti Valley",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 7",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 7 in Spiti Valley",
+                    "location": "Spiti Valley",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG7-D7-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Spiti Valley • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Spiti Valley",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Spiti Valley",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG7-D7-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Spiti Valley",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 8",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 8 in Spiti Valley",
+                    "location": "Spiti Valley",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG7-D8-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Spiti Valley • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Spiti Valley",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Spiti Valley",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG7-D8-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Spiti Valley",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": []
+        },
+        "8": {
+            "id": 8,
+            "name": "Bali Escape",
+            "destinationId": 5,
+            "destination": "Bali",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": false,
+            "days": 6,
+            "nights": 5,
+            "price": 48000,
+            "bookings": 3,
+            "description": "6 days and 5 nights in Bali. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 60000
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 48000
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 44200
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 40800
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with daily breakfast",
+                "Airport pickup and drop",
+                "Private AC cab for sightseeing",
+                "Sightseeing and entry tickets as listed",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Arrive in Denpasar",
+                    "location": "Seminyak",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG8-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Airport transfer",
+                            "subtitle": "01:00 PM • Private car",
+                            "time": "01:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Airport transfer",
+                                    "mode": "Cab",
+                                    "vehicle": "Private car",
+                                    "dep": "13:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG8-D1-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Seminyak Beach Resort",
+                            "subtitle": "03:00 PM • Seminyak",
+                            "time": "03:00 PM",
+                            "location": "Seminyak",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Seminyak Beach Resort",
+                                    "city": "Seminyak",
+                                    "checkInTime": "15:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "bb",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG8-D1-3",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Sunset at Seminyak beach",
+                            "subtitle": "05:30 PM • Seminyak • 2 hrs",
+                            "time": "05:30 PM",
+                            "location": "Seminyak",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Sunset at Seminyak beach",
+                                    "time": "17:30",
+                                    "place": "Seminyak",
+                                    "duration": "2 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Ubud",
+                    "location": "Ubud",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG8-D2-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Tegallalang rice terraces",
+                            "subtitle": "09:00 AM • Ubud • 2 hrs",
+                            "time": "09:00 AM",
+                            "location": "Ubud",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Tegallalang rice terraces",
+                                    "time": "09:00",
+                                    "place": "Ubud",
+                                    "duration": "2 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG8-D2-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Ubud monkey forest",
+                            "subtitle": "12:00 PM • Ubud • 90 min",
+                            "time": "12:00 PM",
+                            "location": "Ubud",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Ubud monkey forest",
+                                    "time": "12:00",
+                                    "place": "Ubud",
+                                    "duration": "90 min",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Nusa Penida",
+                    "location": "Nusa Penida",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG8-D3-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Fast boat to Nusa Penida",
+                            "subtitle": "08:00 AM • Boat",
+                            "time": "08:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Fast boat to Nusa Penida",
+                                    "mode": "Cab",
+                                    "vehicle": "Boat",
+                                    "dep": "08:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG8-D3-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Kelingking beach",
+                            "subtitle": "11:00 AM • Nusa Penida • 3 hrs",
+                            "time": "11:00 AM",
+                            "location": "Nusa Penida",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Kelingking beach",
+                                    "time": "11:00",
+                                    "place": "Nusa Penida",
+                                    "duration": "3 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 4",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 4 in Bali",
+                    "location": "Bali",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG8-D4-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Bali • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Bali",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Bali",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG8-D4-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Bali",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 5",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 5 in Bali",
+                    "location": "Bali",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG8-D5-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Bali • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Bali",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Bali",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG8-D5-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Bali",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 6",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 6 in Bali",
+                    "location": "Bali",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG8-D6-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Bali • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Bali",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Bali",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG8-D6-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Bali",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": []
+        },
+        "9": {
+            "id": 9,
+            "name": "Kashmir Winter Special",
+            "destinationId": 1,
+            "destination": "Kashmir",
+            "tag": "tour",
+            "status": "published",
+            "seasonal": true,
+            "days": 6,
+            "nights": 5,
+            "price": 22000,
+            "bookings": 6,
+            "description": "6 days and 5 nights in Kashmir. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 27500
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 22000
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 20200
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 18700
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with daily breakfast",
+                "Airport pickup and drop",
+                "Private AC cab for sightseeing",
+                "Sightseeing and entry tickets as listed",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Arrival in Srinagar",
+                    "location": "Srinagar",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG9-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Airport pickup",
+                            "subtitle": "11:00 AM • SUV",
+                            "time": "11:00 AM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Airport pickup",
+                                    "mode": "Cab",
+                                    "vehicle": "SUV",
+                                    "dep": "11:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG9-D1-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Hotel Lalit Grand Palace",
+                            "subtitle": "02:00 PM • Srinagar",
+                            "time": "02:00 PM",
+                            "location": "Srinagar",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Hotel Lalit Grand Palace",
+                                    "city": "Srinagar",
+                                    "checkInTime": "14:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "map",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Gulmarg snow day",
+                    "location": "Gulmarg",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG9-D2-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Gulmarg Gondola Phase 1 and 2",
+                            "subtitle": "09:00 AM • Gulmarg • 3 hrs",
+                            "time": "09:00 AM",
+                            "location": "Gulmarg",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Gulmarg Gondola Phase 1 and 2",
+                                    "time": "09:00",
+                                    "place": "Gulmarg",
+                                    "duration": "3 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG9-D2-2",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Skiing lesson",
+                            "subtitle": "01:00 PM • Gulmarg • 2 hrs",
+                            "time": "01:00 PM",
+                            "location": "Gulmarg",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Skiing lesson",
+                                    "time": "13:00",
+                                    "place": "Gulmarg",
+                                    "duration": "2 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 3 in Kashmir",
+                    "location": "Kashmir",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG9-D3-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Kashmir • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Kashmir",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Kashmir",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG9-D3-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Kashmir",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 4",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 4 in Kashmir",
+                    "location": "Kashmir",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG9-D4-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Kashmir • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Kashmir",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Kashmir",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG9-D4-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Kashmir",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 5",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 5 in Kashmir",
+                    "location": "Kashmir",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG9-D5-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Kashmir • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Kashmir",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Kashmir",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG9-D5-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Kashmir",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 6",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 6 in Kashmir",
+                    "location": "Kashmir",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG9-D6-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Kashmir • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Kashmir",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Kashmir",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG9-D6-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Kashmir",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1001",
+                    "name": "Rohan Malhotra",
+                    "trip": "Kashmir Valley & Gulmarg Tour",
+                    "status": "hot",
+                    "travelDate": "2026-12-15",
+                    "pax": 3
+                }
+            ]
+        },
+        "10": {
+            "id": 10,
+            "name": "Goa Beaches and Nightlife",
+            "destinationId": 2,
+            "destination": "Goa",
+            "tag": "tour",
+            "status": "draft",
+            "seasonal": false,
+            "days": 4,
+            "nights": 3,
+            "price": 9500,
+            "bookings": 0,
+            "description": "4 days and 3 nights in Goa. Hotels, transfers and sightseeing are planned day by day and can be edited for each inquiry.",
+            "minPax": null,
+            "priceTiers": [
+                {
+                    "label": "Solo traveller",
+                    "note": "Per person, single room",
+                    "price": 11900
+                },
+                {
+                    "label": "Couple",
+                    "note": "Per person, 2 travellers",
+                    "price": 9500
+                },
+                {
+                    "label": "Family of 4",
+                    "note": "Per person",
+                    "price": 8700
+                },
+                {
+                    "label": "Group of 6 or more",
+                    "note": "Per person",
+                    "price": 8100
+                }
+            ],
+            "inclusions": [
+                "Hotel stay with daily breakfast",
+                "Airport pickup and drop",
+                "Private AC cab for sightseeing",
+                "Sightseeing and entry tickets as listed",
+                "Driver allowance, tolls and parking"
+            ],
+            "exclusions": [
+                "Flights and train tickets",
+                "Lunch and dinner unless listed",
+                "Personal expenses and tips",
+                "Anything not listed under Inclusions",
+                "GST as applicable"
+            ],
+            "itinerary": [
+                {
+                    "day": "Day 1",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Arrival",
+                    "location": "Calangute",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG10-D1-1",
+                            "type": "transport",
+                            "icon": "bus",
+                            "title": "Airport pickup",
+                            "subtitle": "12:00 PM • Sedan",
+                            "time": "12:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "transport",
+                                    "title": "Airport pickup",
+                                    "mode": "Cab",
+                                    "vehicle": "Sedan",
+                                    "dep": "12:00",
+                                    "days": 1,
+                                    "arrangedBy": "agency"
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG10-D1-2",
+                            "type": "stay",
+                            "icon": "bed",
+                            "title": "Check-in: Candolim Beach Hotel",
+                            "subtitle": "02:00 PM • Calangute",
+                            "time": "02:00 PM",
+                            "location": "Calangute",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "check_in",
+                                    "name": "Candolim Beach Hotel",
+                                    "city": "Calangute",
+                                    "checkInTime": "14:00",
+                                    "checkOutTime": "11:00",
+                                    "plan": "bb",
+                                    "rooms": 1,
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 2",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 2 in Goa",
+                    "location": "Goa",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG10-D2-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Goa • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Goa",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Goa",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG10-D2-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Goa",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 3",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 3 in Goa",
+                    "location": "Goa",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG10-D3-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Goa • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Goa",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Goa",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG10-D3-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Goa",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "day": "Day 4",
+                    "date": "TBD",
+                    "isoDate": null,
+                    "title": "Day 4 in Goa",
+                    "location": "Goa",
+                    "locationMode": "same",
+                    "items": [
+                        {
+                            "id": "PKG10-D4-1",
+                            "type": "activity",
+                            "icon": "camera",
+                            "title": "Local sightseeing",
+                            "subtitle": "10:00 AM • Goa • 4 hrs",
+                            "time": "10:00 AM",
+                            "location": "Goa",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "activity",
+                                    "title": "Local sightseeing",
+                                    "time": "10:00",
+                                    "place": "Goa",
+                                    "duration": "4 hrs",
+                                    "inclusion": "included",
+                                    "tickets": 1
+                                }
+                            }
+                        },
+                        {
+                            "id": "PKG10-D4-2",
+                            "type": "meal",
+                            "icon": "restaurant",
+                            "title": "Dinner at the hotel",
+                            "subtitle": "08:00 PM",
+                            "time": "08:00 PM",
+                            "inclusion": "included",
+                            "details": {
+                                "b": {
+                                    "role": "meal",
+                                    "kind": "Dinner",
+                                    "time": "20:00",
+                                    "place": "Goa",
+                                    "diet": "",
+                                    "inclusion": "included"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1003",
+                    "name": "Kavita Roy",
+                    "trip": "Goa Beach Villa Getaway",
+                    "status": "ongoing",
+                    "travelDate": "2026-12-04",
+                    "pax": 6
+                }
+            ]
+        }
+    }
+}

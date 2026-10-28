@@ -38,12 +38,14 @@
 .sp-quick { grid-template-columns: repeat(var(--sp-cols, 4), minmax(0, 1fr)); }
 .sp-detail-skel i { display: block; height: 64px; margin-bottom: 12px; border-radius: 14px; background: var(--bg-hover); animation: placeSkel 1s ease-in-out infinite; }
 
-/* ---- phone: the detail opens full screen, the bottom bar hides ---- */
+/* ---- phone: the detail is the same bottom sheet as the Bookings detail (92% high, 26px corners, handle, round X), the bottom bar hides ---- */
 .sp-detail-screen { display: none; }
-.sp-detail-screen.is-open { display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 400; background: #FFFFFF; padding-top: var(--safe-top); }
-.sp-detail-screen .sp-detail-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 18px 20px; }
-.sp-phone-top { flex: 0 0 auto; padding: 8px 10px 0; }
-.sp-back { margin-left: 0; }
+.sp-detail-screen.is-open { display: flex; flex-direction: column; position: fixed; left: 0; right: 0; bottom: 0; height: 92%; z-index: 400; background: #FFFFFF; border-radius: 26px 26px 0 0; box-shadow: var(--shadow-sheet); overflow: hidden; animation: spSheetIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+.sp-detail-screen .sp-detail-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 12px 16px 20px; }
+.sp-sheet-backdrop { position: fixed; inset: 0; z-index: 399; }
+body.sp-detail-open .sp-sheet-backdrop { opacity: 1; pointer-events: auto; }
+@keyframes spSheetIn { from { transform: translateY(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sp-detail-screen.is-open { animation: none; } }
 .sp-phone .sp-list { padding-bottom: 8px; }
 body.sp-detail-open .mobile-bottom-nav, body.sp-detail-open #mobile-page-add { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .sp-detail-skel i { animation: none; } }
@@ -106,3 +108,21 @@ body.sp-detail-open .mobile-bottom-nav, body.sp-detail-open #mobile-page-add { d
 .more-tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .more-ico { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; background: #EFF6FF; color: #2563EB; }
 .more-label { font-size: 13.5px; font-weight: 600; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+
+/* Pages the signed-in person cannot view are left out of the navigation */
+.sidebar-nav-item[hidden], .nav-section-title[hidden], .more-tile[hidden] { display: none !important; }
+
+/* Inclusions & Exclusions, Highlights, Extra charges: lists inside the "Short Details" style card (js/pages/catalog-ui.js) */
+.ie-lists { display: flex; flex-direction: column; gap: 14px; }
+:where(html[data-layout="desktop"]) .ie-lists { flex-direction: row; }
+.ie-lists > div { flex: 1 1 0; min-width: 0; }
+.ie-title { margin: 0 0 8px; font-size: 12.5px; font-weight: 700; color: #0F172A; }
+.ie-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ie-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; color: #475569; min-width: 0; }
+.ie-list li > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.ie-ico { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; }
+.ie-ico.check { background: #DCFCE7; color: #166534; }
+.ie-ico.no { background: #FEE2E2; color: #B91C1C; }
+.ie-ico.dot { background: transparent; }
+.ie-ico.dot::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #94A3B8; }
+.sp-content > .short-details-card { margin-top: 0; }

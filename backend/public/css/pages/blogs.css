@@ -36,17 +36,17 @@
   .bg-head { display: none; }
   .bg-table { background: transparent; border: 0; border-radius: 0; overflow: visible; }
   .bg-list { display: flex; flex-direction: column; gap: 12px; }
-  .bg-row { grid-template-columns: 44px minmax(0, 1fr) auto auto; grid-template-areas: "tile art status menu" "tile author author author" "tile cat nums nums"; gap: 4px 10px; padding: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; }
+  .bg-row { grid-template-columns: 44px minmax(0, 1fr) auto auto; grid-template-areas: "tile art art menu" "tile author status status" "tile cat nums nums"; gap: 4px 10px; padding: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; }
   .bg-row + .bg-row { border-top: 1px solid #E2E8F0; }
   .bg-tile { grid-area: tile; align-self: start; width: 44px; height: 44px; }
   .bg-art { grid-area: art; }
   .bg-art small { display: none; }
-  .bg-status { grid-area: status; }
+  .bg-status { grid-area: status; justify-self: end; }
   .bg-menu { grid-area: menu; width: 32px; height: 32px; }
   .bg-author { grid-area: author; font-size: 13.5px; color: #64748B; }
   .bg-cat { grid-area: cat; }
   .bg-nums { grid-area: nums; display: flex; gap: 12px; align-items: center; min-width: 0; white-space: nowrap; overflow: hidden; }
   .bg-views::after, .bg-leads::after { content: " " attr(data-unit); font-weight: 400; color: #64748B; }
 }
-:where(html[data-layout="mobile"]) .sp[data-sp="blogs"] .sp-body { overflow: visible; padding: 12px 16px calc(var(--safe-bottom) + 140px); }
+:where(html[data-layout="mobile"]) .sp[data-sp="blogs"] .sp-body { overflow: visible; padding: 12px 0 calc(var(--safe-bottom) + 140px); }
 

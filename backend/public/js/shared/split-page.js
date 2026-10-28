@@ -3,12 +3,13 @@
 // the detail pane with its header, tabs, body and footer bar; on the phone the brand header, the search row and the card list),
 // so a new page is the same product, not a lookalike. A page only describes its data and what goes in each part.
 // PC: the first record is selected on load and the pane is never empty; the choice lives in the URL (?selected=ID).
-// Phone: tapping a card opens the detail full screen with a back arrow; the browser Back button closes it again.
+// Phone: tapping a card opens the detail as the same bottom sheet as the Bookings detail (X or backdrop closes it; the browser Back button too).
 import { icon } from './icons.js';
 import { esc, searchBox, skeletonCards, errorState, emptyState } from './ui.js';
 import { renderTabs } from './list-ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { confirmDialog } from './sheet.js';
+import { detailHeaderHtml, sheetHandleHtml } from './detail-sheet.js';
 import { chooseRecord, bindListKeys } from './split-view.js';
 import { getParams, setParams, subscribe } from './page-state.js';
 
@@ -32,21 +33,9 @@ const phoneHeader = (line) => `
     </div>
   </div>`;
 
-const META_ICONS = { people: 'user', time: 'clock', date: 'calendar', place: 'pin', money: 'chart', bed: 'bed', car: 'car' };
 
-/** The detail header, the same as the customer header on Inquiries: avatar, name and pill, subtitle, a row of small facts. */
-function headerHtml(h) {
-  if (typeof h === 'string') return h; // a page that draws its own header
-  const chips = (h.chips || []).filter((c) => c && c.text);
-  return `<div class="sheet-customer-header">
-      <div class="customer-avatar-badge">${h.avatar || ''}</div>
-      <div class="customer-header-info">
-        <div class="customer-title-row"><h2 class="customer-name-title">${esc(h.title)}</h2>${h.pill || ''}</div>
-        ${h.subtitle ? `<p class="customer-trip-subtitle">${esc(h.subtitle)}</p>` : ''}
-        ${chips.length ? `<div class="customer-meta-chips">${chips.map((c) => `<span class="meta-chip">${icon(META_ICONS[c.icon] || c.icon || 'clock', { size: 14 })}${esc(c.text)}</span>`).join('<span class="meta-dot">•</span>')}</div>` : ''}
-      </div>
-    </div>`;
-}
+/** The detail header: the shared sheet header (shared/detail-sheet.js), with the round X on the phone. */
+const headerHtml = (h) => detailHeaderHtml(h, isPhone() ? { close: 'data-sp-back', closeCls: 'sp-back' } : {});
 
 const TONES = ['call', 'msg', 'fwd', 'more'];
 /** The footer bar, the same as Confirm + Call / Message / Forward / More: one full-width primary button over a row of quick actions. */
@@ -54,8 +43,8 @@ function footerHtml(f) {
   if (!f) return '';
   if (typeof f === 'string') return f; // a page that draws its own footer
   const quick = (f.quick || []).slice(0, 4);
-  return `${f.primary ? `<button type="button" class="btn-confirm-booking" ${f.primary.act ? `data-sp-act="${esc(f.primary.act)}"` : ''}>${f.primary.icon ? icon(f.primary.icon, { size: 16, stroke: 2.4 }) : ''}${esc(f.primary.label)}</button>` : ''}
-    ${quick.length ? `<div class="sheet-quick-actions-grid sp-quick" style="--sp-cols:${quick.length}">${quick.map((q, i) => `<button type="button" class="quick-action-col-btn btn-act-${q.tone || TONES[i % 4]}" ${q.act ? `data-sp-act="${esc(q.act)}"` : ''} title="${esc(q.label)}">${icon(q.icon || 'more', { size: 20, stroke: 2.2 })}<span>${esc(q.label)}</span></button>`).join('')}</div>` : ''}`;
+  return `${f.primary ? `<button type="button" class="btn-confirm-booking" ${f.primary.act ? `data-sp-act="${esc(f.primary.act)}"` : ''} ${f.primary.disabled ? 'disabled' : ''}>${f.primary.icon ? icon(f.primary.icon, { size: 16, stroke: 2.4 }) : ''}${esc(f.primary.label)}</button>` : ''}
+    ${quick.length ? `<div class="sheet-quick-actions-grid sp-quick" style="--sp-cols:${quick.length}">${quick.map((q, i) => `<button type="button" class="quick-action-col-btn btn-act-${q.tone || TONES[i % 4]}" ${q.act ? `data-sp-act="${esc(q.act)}"` : ''} ${q.disabled ? 'disabled' : ''} title="${esc(q.label)}">${icon(q.icon || 'more', { size: 20, stroke: 2.2 })}<span>${esc(q.label)}</span></button>`).join('')}</div>` : ''}`;
 }
 
 /* ------------------------------------------------------------------------------------------------
@@ -145,9 +134,10 @@ export function createSplitPage(host, ctx, cfg) {
           <div class="mobile-search-row">${searchBox({ id: `sp-search-${key}`, placeholder: cfg.searchPlaceholder, variant: 'mobile' })}<span class="sp-filter-slot"></span></div>
           <div class="sp-tabs"></div>
           <div class="bookings-cards-list row-list sp-list" role="listbox" tabindex="0" aria-label="${esc(cfg.plural)}"></div>
+          <div class="sheet-backdrop sp-sheet-backdrop" data-sp-back></div>
           <div class="sp-detail sp-detail-screen" aria-live="polite">
-            <div class="sp-phone-top"><button type="button" class="dialog-back sp-back" data-sp-back aria-label="Back to ${esc(cfg.plural)}">${icon('arrowLeft', { size: 20, stroke: 2.2 })}</button></div>
-            <div class="sp-detail-head"></div><div class="sheet-tabs-nav sp-detail-tabs" role="tablist"></div>
+            ${sheetHandleHtml()}
+            <div class="sp-detail-head"></div><div class="sheet-tabs-nav sp-detail-tabs scroll-row" role="tablist"></div>
             <div class="sheet-body-scroll sp-detail-body"></div><div class="sheet-sticky-footer sp-detail-foot"></div>
           </div>
         </section>`
@@ -166,7 +156,7 @@ export function createSplitPage(host, ctx, cfg) {
           </div>
           <aside class="desktop-details-drawer open sp-detail" aria-live="polite">
             <div class="desktop-drawer-header-box sp-detail-head"></div>
-            <div class="sheet-tabs-nav desktop-tabs-nav sp-detail-tabs" role="tablist"></div>
+            <div class="sheet-tabs-nav desktop-tabs-nav sp-detail-tabs scroll-row" role="tablist"></div>
             <div class="sheet-body-scroll desktop-body-scroll sp-detail-body"></div>
             <div class="sheet-sticky-footer desktop-drawer-footer sp-detail-foot"></div>
           </aside>
@@ -189,7 +179,7 @@ export function createSplitPage(host, ctx, cfg) {
     input.addEventListener('input', (e) => {
       clearTimeout(timer);
       const v = e.target.value.trim();
-      timer = setTimeout(() => setParams({ q: v || null }, { push: false }), 200);
+      timer = setTimeout(() => setParams({ q: v || null }, { push: false }), 300);
     });
     bindListKeys($('.sp-list'), { getList: visible, getActiveId: () => state.selected, onSelect: (item) => select(item.id, { push: false }) });
   }
@@ -205,14 +195,15 @@ export function createSplitPage(host, ctx, cfg) {
   /* ---------- rendering ---------- */
   function renderTabsRow() {
     const base = searched();
-    const tabs = cfg.tabs.map((t) => ({ key: t.key, label: t.label, count: base.filter(t.test).length }));
+    // While the list is loading there is nothing to count: the tabs show only their names, never "(0)".
+    const tabs = cfg.tabs.map((t) => ({ key: t.key, label: t.label, count: state.status === 'ready' ? base.filter(t.test).length : null }));
     renderTabs($('.sp-tabs'), { tabs, active: state.tab, variant: phone ? 'mobile' : 'compact', attr: 'data-sp-tab' });
   }
 
   function renderList() {
     const listEl = $('.sp-list');
     if (state.status === 'loading') { listEl.innerHTML = skeletonCards(6); return; }
-    if (state.status === 'error') { listEl.innerHTML = errorState({ title: `Could not load ${cfg.plural}`, text: 'Check your connection and try again.', retryId: 'sp-retry' }); return; }
+    if (state.status === 'error') { listEl.innerHTML = errorState({ title: `Could not load ${cfg.plural}`, error: state.error, what: cfg.plural, retryId: 'sp-retry' }); return; }
     const rows = visible();
     if (!state.items.length) { listEl.innerHTML = `<div class="sp-empty-all">${emptyState({ title: `No ${cfg.plural} yet`, text: `${cap(cfg.plural)} you add will show up here.`, resetId: 'sp-reset' })}</div>`; return; }
     if (!rows.length) { listEl.innerHTML = emptyState({ title: `No ${cfg.plural} found`, text: 'Nothing matches your search. Try resetting the filters.', resetId: 'sp-reset' }); return; }
@@ -372,8 +363,9 @@ export function createSplitPage(host, ctx, cfg) {
     try {
       state.items = (await cfg.load()).map((i) => ({ ...i, id: String(i.id) })); // ids are strings everywhere: the URL's are
       state.status = 'ready';
-    } catch {
+    } catch (err) {
       state.status = 'error';
+      state.error = err;
     }
     if (!alive) return;
     readParams();

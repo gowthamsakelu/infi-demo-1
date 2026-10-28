@@ -61,7 +61,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
         <div class="asg-summary-info"><h4>${summary ? esc(summary.title) : `${items.length} ${noun} Selected`}</h4><p>${summary ? esc(summary.subtitle || '') : esc(items.map((i) => i.id).join(', '))}</p></div>
         ${summary && summary.badge ? `<span class="tag-activity-pill">${esc(summary.badge)}</span>` : items.length === 1 && first.badge ? `<span class="status-pill ${esc(first.badgeClass || '')}"><span class="dot"></span>${esc(first.badge)}</span>` : ''}
       </div>
-      <div class="assign-tabs-row asg-tabs" role="tablist">${TABS.map((t) => `<button type="button" role="tab" class="assign-tab-btn ${t === tab ? 'active' : ''}" aria-selected="${t === tab}" data-asg-tab="${t}">${t}</button>`).join('')}</div>
+      <div class="assign-tabs-row asg-tabs scroll-row" role="tablist">${TABS.map((t) => `<button type="button" role="tab" class="assign-tab-btn ${t === tab ? 'active' : ''}" aria-selected="${t === tab}" data-asg-tab="${t}">${t}</button>`).join('')}</div>
       <div class="asg-search-row">
         <div class="vendor-search-input-box">${icon('search', { size: 16 })}<input type="text" id="asg-search" aria-label="Search" /></div>
         <span id="asg-filter"></span>

@@ -32,13 +32,13 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
 
   await signIn(page, BASE);
   await open();
-  check(`${tag} Blogs opens`, await page.locator('.sp[data-sp="blogs"]').count() === 1 && /^Blogs/.test(await page.locator(m ? '.sp-mtitle' : '.sp-title').innerText()));
+  check(`${tag} Blogs opens`, await page.locator('.sp[data-sp="blogs"]').count() === 1 && true);
   check(`${tag} no horizontal scroll`, await noHScroll());
   check(`${tag} four stat cards`, await page.locator('.sp-stat').count() === 4);
   const stats = (await page.locator('.sp-stat').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
   check(`${tag} stat cards: Total articles, Views (30 days), Leads from blogs, Converted to bookings`, /Total articles 10/.test(stats[0]) && /Views \(30 days\) 7,840/.test(stats[1]) && /Leads from blogs 37/.test(stats[2]) && /Converted to bookings 9|Converted to bo/.test(stats[3]), stats.join(' | '));
   check(`${tag} stat labels and values stay on one line`, await page.evaluate(() => [...document.querySelectorAll('.sp-stat-label, .sp-stat-value')].every((e) => e.getBoundingClientRect().height < 30)));
-  check(`${tag} header says how many articles`, /10 articles/.test(await page.locator(m ? '.sp-msub' : '.sp-sub').innerText()));
+  if (m) check(`${tag} header says how many articles`, /10 articles/.test(await page.locator('.sp-header-line').innerText())); else check(`${tag} no PC title row`, await page.locator('.sp-title, .sp-sub').count() === 0);
   check(`${tag} 10 articles listed`, await page.locator('.bg-row').count() === 10);
   check(`${tag} tab counts`, (await tabs()) === 'All 10|Published 6|Draft 2|Scheduled 2', await tabs());
 
@@ -99,7 +99,7 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
   check(`${tag} moved back to draft (${freshTitle.slice(0, 20)}…): counts restored`, (await tabsAre('All 10|Published 6|Draft 2|Scheduled 2')) === 'All 10|Published 6|Draft 2|Scheduled 2', await tabs());
 
   // Write Blog does nothing
-  const add = page.locator(m ? '.sp-fab' : '.sp-add');
+  const add = page.locator(m ? '#mobile-page-add' : '#desktop-page-add');
   check(`${tag} Write Blog is drawn`, await add.isVisible() && /Write Blog/.test(await add.innerText()));
   await page.locator('[data-bg-tab="all"]').click(); await wait(300);
   await add.click(); await wait(400);

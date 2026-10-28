@@ -1,0 +1,886 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "name": "Hotel Lake View",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.5,
+            "reviews": 312,
+            "roomsCount": 24,
+            "price": 4200,
+            "bookings": 22
+        },
+        {
+            "id": 2,
+            "name": "Calangute Beach Villa",
+            "city": "Goa",
+            "region": "Goa",
+            "tag": "villa",
+            "status": "active",
+            "rating": 4.6,
+            "reviews": 188,
+            "roomsCount": 5,
+            "price": 9500,
+            "bookings": 15
+        },
+        {
+            "id": 3,
+            "name": "Snow Peak Resort",
+            "city": "Manali",
+            "region": "Himachal Pradesh",
+            "tag": "resort",
+            "status": "active",
+            "rating": 4.4,
+            "reviews": 241,
+            "roomsCount": 42,
+            "price": 5600,
+            "bookings": 8
+        },
+        {
+            "id": 4,
+            "name": "Backwater Haven",
+            "city": "Kerala",
+            "region": "Kerala",
+            "tag": "resort",
+            "status": "active",
+            "rating": 4.7,
+            "reviews": 156,
+            "roomsCount": 18,
+            "price": 7200,
+            "bookings": 11
+        },
+        {
+            "id": 5,
+            "name": "Ganga View Hotel",
+            "city": "Rishikesh",
+            "region": "Uttarakhand",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.2,
+            "reviews": 97,
+            "roomsCount": 20,
+            "price": 2900,
+            "bookings": 13
+        },
+        {
+            "id": 6,
+            "name": "Lake Pichola Villa",
+            "city": "Udaipur",
+            "region": "Rajasthan",
+            "tag": "villa",
+            "status": "active",
+            "rating": 4.8,
+            "reviews": 205,
+            "roomsCount": 6,
+            "price": 12000,
+            "bookings": 20
+        },
+        {
+            "id": 7,
+            "name": "Houseboat Golden Crown",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "villa",
+            "status": "active",
+            "rating": 4.6,
+            "reviews": 540,
+            "roomsCount": 32,
+            "price": 6500,
+            "bookings": 19
+        },
+        {
+            "id": 8,
+            "name": "Hotel Lalit Grand Palace",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.7,
+            "reviews": 2100,
+            "roomsCount": 27,
+            "price": 12000,
+            "bookings": 6
+        },
+        {
+            "id": 9,
+            "name": "Hotel Heevan",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.4,
+            "reviews": 980,
+            "roomsCount": 19,
+            "price": 5200,
+            "bookings": 13
+        },
+        {
+            "id": 10,
+            "name": "Zabarwan Residency",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.1,
+            "reviews": 410,
+            "roomsCount": 38,
+            "price": 3200,
+            "bookings": 13
+        }
+    ],
+    "detail": {
+        "1": {
+            "id": 1,
+            "name": "Hotel Lake View",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.5,
+            "reviews": 312,
+            "roomsCount": 24,
+            "price": 4200,
+            "bookings": 22,
+            "address": null,
+            "phone": "+91 194 250 1234",
+            "email": "stay@hotellakeview.example.com",
+            "description": "Hotel Lake View in Srinagar. Rates below are per room per night.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Room service"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 184800,
+            "rooms": [
+                {
+                    "id": 1,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 3400,
+                        "breakfast": 3900,
+                        "map": 4600,
+                        "all": 5200
+                    }
+                },
+                {
+                    "id": 2,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 4200,
+                        "breakfast": 4700,
+                        "map": 5400,
+                        "all": 6000
+                    }
+                },
+                {
+                    "id": 3,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 5700,
+                        "breakfast": 6200,
+                        "map": 6900,
+                        "all": 7500
+                    }
+                },
+                {
+                    "id": 4,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 7800,
+                        "breakfast": 8300,
+                        "map": 9000,
+                        "all": 9600
+                    }
+                }
+            ]
+        },
+        "2": {
+            "id": 2,
+            "name": "Calangute Beach Villa",
+            "city": "Goa",
+            "region": "Goa",
+            "tag": "villa",
+            "status": "active",
+            "rating": 4.6,
+            "reviews": 188,
+            "roomsCount": 5,
+            "price": 9500,
+            "bookings": 15,
+            "address": null,
+            "phone": "+91 832 227 6655",
+            "email": "stay@calangutebeachvilla.example.com",
+            "description": "Calangute Beach Villa in Goa. Rates below are per room per night.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Room service"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 285000,
+            "rooms": [
+                {
+                    "id": 5,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 7600,
+                        "breakfast": 8100,
+                        "map": 8800,
+                        "all": 9400
+                    }
+                },
+                {
+                    "id": 6,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 9500,
+                        "breakfast": 10000,
+                        "map": 10700,
+                        "all": 11300
+                    }
+                },
+                {
+                    "id": 7,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 12800,
+                        "breakfast": 13300,
+                        "map": 14000,
+                        "all": 14600
+                    }
+                },
+                {
+                    "id": 8,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 17600,
+                        "breakfast": 18100,
+                        "map": 18800,
+                        "all": 19400
+                    }
+                }
+            ]
+        },
+        "3": {
+            "id": 3,
+            "name": "Snow Peak Resort",
+            "city": "Manali",
+            "region": "Himachal Pradesh",
+            "tag": "resort",
+            "status": "active",
+            "rating": 4.4,
+            "reviews": 241,
+            "roomsCount": 42,
+            "price": 5600,
+            "bookings": 8,
+            "address": null,
+            "phone": "+91 1902 252 120",
+            "email": "stay@snowpeakresort.example.com",
+            "description": "Snow Peak Resort in Manali. Rates below are per room per night.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Pool"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 89600,
+            "rooms": [
+                {
+                    "id": 9,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 4500,
+                        "breakfast": 5000,
+                        "map": 5700,
+                        "all": 6300
+                    }
+                },
+                {
+                    "id": 10,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 5600,
+                        "breakfast": 6100,
+                        "map": 6800,
+                        "all": 7400
+                    }
+                },
+                {
+                    "id": 11,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 7600,
+                        "breakfast": 8100,
+                        "map": 8800,
+                        "all": 9400
+                    }
+                },
+                {
+                    "id": 12,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 10400,
+                        "breakfast": 10900,
+                        "map": 11600,
+                        "all": 12200
+                    }
+                }
+            ]
+        },
+        "4": {
+            "id": 4,
+            "name": "Backwater Haven",
+            "city": "Kerala",
+            "region": "Kerala",
+            "tag": "resort",
+            "status": "active",
+            "rating": 4.7,
+            "reviews": 156,
+            "roomsCount": 18,
+            "price": 7200,
+            "bookings": 11,
+            "address": null,
+            "phone": "+91 477 223 4411",
+            "email": "stay@backwaterhaven.example.com",
+            "description": "Backwater Haven in Kerala. Rates below are per room per night.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Pool"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 158400,
+            "rooms": [
+                {
+                    "id": 13,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 5800,
+                        "breakfast": 6300,
+                        "map": 7000,
+                        "all": 7600
+                    }
+                },
+                {
+                    "id": 14,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 7200,
+                        "breakfast": 7700,
+                        "map": 8400,
+                        "all": 9000
+                    }
+                },
+                {
+                    "id": 15,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 9700,
+                        "breakfast": 10200,
+                        "map": 10900,
+                        "all": 11500
+                    }
+                },
+                {
+                    "id": 16,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 13300,
+                        "breakfast": 13800,
+                        "map": 14500,
+                        "all": 15100
+                    }
+                }
+            ]
+        },
+        "5": {
+            "id": 5,
+            "name": "Ganga View Hotel",
+            "city": "Rishikesh",
+            "region": "Uttarakhand",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.2,
+            "reviews": 97,
+            "roomsCount": 20,
+            "price": 2900,
+            "bookings": 13,
+            "address": null,
+            "phone": "+91 135 243 0088",
+            "email": "stay@gangaviewhotel.example.com",
+            "description": "Ganga View Hotel in Rishikesh. Rates below are per room per night.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Room service"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 78000,
+            "rooms": [
+                {
+                    "id": 17,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 2300,
+                        "breakfast": 2800,
+                        "map": 3500,
+                        "all": 4100
+                    }
+                },
+                {
+                    "id": 18,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 2900,
+                        "breakfast": 3400,
+                        "map": 4100,
+                        "all": 4700
+                    }
+                },
+                {
+                    "id": 19,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 3900,
+                        "breakfast": 4400,
+                        "map": 5100,
+                        "all": 5700
+                    }
+                },
+                {
+                    "id": 20,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 5400,
+                        "breakfast": 5900,
+                        "map": 6600,
+                        "all": 7200
+                    }
+                }
+            ]
+        },
+        "6": {
+            "id": 6,
+            "name": "Lake Pichola Villa",
+            "city": "Udaipur",
+            "region": "Rajasthan",
+            "tag": "villa",
+            "status": "active",
+            "rating": 4.8,
+            "reviews": 205,
+            "roomsCount": 6,
+            "price": 12000,
+            "bookings": 20,
+            "address": null,
+            "phone": "+91 294 242 2200",
+            "email": "stay@lakepicholavilla.example.com",
+            "description": "Lake Pichola Villa in Udaipur. Rates below are per room per night.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Room service"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 480000,
+            "rooms": [
+                {
+                    "id": 21,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 9600,
+                        "breakfast": 10100,
+                        "map": 10800,
+                        "all": 11400
+                    }
+                },
+                {
+                    "id": 22,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 12000,
+                        "breakfast": 12500,
+                        "map": 13200,
+                        "all": 13800
+                    }
+                },
+                {
+                    "id": 23,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 16200,
+                        "breakfast": 16700,
+                        "map": 17400,
+                        "all": 18000
+                    }
+                },
+                {
+                    "id": 24,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 22200,
+                        "breakfast": 22700,
+                        "map": 23400,
+                        "all": 24000
+                    }
+                }
+            ]
+        },
+        "7": {
+            "id": 7,
+            "name": "Houseboat Golden Crown",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "villa",
+            "status": "active",
+            "rating": 4.6,
+            "reviews": 540,
+            "roomsCount": 32,
+            "price": 6500,
+            "bookings": 19,
+            "address": "Dal Lake, Srinagar",
+            "phone": "+91 9286522771",
+            "email": "stay@houseboatgoldencrown.example.com",
+            "description": "Carved-cedar houseboat with shikara pick-up and meals.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Room service"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 247000,
+            "rooms": [
+                {
+                    "id": 25,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 5200,
+                        "breakfast": 5700,
+                        "map": 6400,
+                        "all": 7000
+                    }
+                },
+                {
+                    "id": 26,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 6500,
+                        "breakfast": 7000,
+                        "map": 7700,
+                        "all": 8300
+                    }
+                },
+                {
+                    "id": 27,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 8800,
+                        "breakfast": 9300,
+                        "map": 10000,
+                        "all": 10600
+                    }
+                },
+                {
+                    "id": 28,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 12000,
+                        "breakfast": 12500,
+                        "map": 13200,
+                        "all": 13800
+                    }
+                }
+            ]
+        },
+        "8": {
+            "id": 8,
+            "name": "Hotel Lalit Grand Palace",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.7,
+            "reviews": 2100,
+            "roomsCount": 27,
+            "price": 12000,
+            "bookings": 6,
+            "address": "Gupkar Road, Srinagar",
+            "phone": "+91 9107851742",
+            "email": "stay@hotellalitgrandpalace.example.com",
+            "description": "Palace hotel above the lake with a spa.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Room service"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 144000,
+            "rooms": [
+                {
+                    "id": 29,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 9600,
+                        "breakfast": 10100,
+                        "map": 10800,
+                        "all": 11400
+                    }
+                },
+                {
+                    "id": 30,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 12000,
+                        "breakfast": 12500,
+                        "map": 13200,
+                        "all": 13800
+                    }
+                },
+                {
+                    "id": 31,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 16200,
+                        "breakfast": 16700,
+                        "map": 17400,
+                        "all": 18000
+                    }
+                },
+                {
+                    "id": 32,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 22200,
+                        "breakfast": 22700,
+                        "map": 23400,
+                        "all": 24000
+                    }
+                }
+            ]
+        },
+        "9": {
+            "id": 9,
+            "name": "Hotel Heevan",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.4,
+            "reviews": 980,
+            "roomsCount": 19,
+            "price": 5200,
+            "bookings": 13,
+            "address": "Rajbagh, Srinagar",
+            "phone": "+91 9576135602",
+            "email": "stay@hotelheevan.example.com",
+            "description": "Comfortable rooms near the Boulevard.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Room service"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 135200,
+            "rooms": [
+                {
+                    "id": 33,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 4200,
+                        "breakfast": 4700,
+                        "map": 5400,
+                        "all": 6000
+                    }
+                },
+                {
+                    "id": 34,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 5200,
+                        "breakfast": 5700,
+                        "map": 6400,
+                        "all": 7000
+                    }
+                },
+                {
+                    "id": 35,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 7000,
+                        "breakfast": 7500,
+                        "map": 8200,
+                        "all": 8800
+                    }
+                },
+                {
+                    "id": 36,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 9600,
+                        "breakfast": 10100,
+                        "map": 10800,
+                        "all": 11400
+                    }
+                }
+            ]
+        },
+        "10": {
+            "id": 10,
+            "name": "Zabarwan Residency",
+            "city": "Srinagar",
+            "region": "Jammu & Kashmir",
+            "tag": "hotel",
+            "status": "active",
+            "rating": 4.1,
+            "reviews": 410,
+            "roomsCount": 38,
+            "price": 3200,
+            "bookings": 13,
+            "address": "Boulevard Road, Srinagar",
+            "phone": "+91 9894425157",
+            "email": "stay@zabarwanresidency.example.com",
+            "description": "Simple rooms a short walk from Dal Lake.",
+            "amenities": [
+                "Wi-Fi",
+                "Heater",
+                "Restaurant",
+                "Airport pickup",
+                "Room service"
+            ],
+            "inclusions": [],
+            "exclusions": [],
+            "extraCharges": [],
+            "priceNote": null,
+            "revenue": 83200,
+            "rooms": [
+                {
+                    "id": 37,
+                    "name": "Standard",
+                    "occupancy": "2 adults",
+                    "rates": {
+                        "stay": 2600,
+                        "breakfast": 3100,
+                        "map": 3800,
+                        "all": 4400
+                    }
+                },
+                {
+                    "id": 38,
+                    "name": "Deluxe",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 3200,
+                        "breakfast": 3700,
+                        "map": 4400,
+                        "all": 5000
+                    }
+                },
+                {
+                    "id": 39,
+                    "name": "Premium room",
+                    "occupancy": "2 adults + 1 child",
+                    "rates": {
+                        "stay": 4300,
+                        "breakfast": 4800,
+                        "map": 5500,
+                        "all": 6100
+                    }
+                },
+                {
+                    "id": 40,
+                    "name": "Suite",
+                    "occupancy": "3 adults",
+                    "rates": {
+                        "stay": 5900,
+                        "breakfast": 6400,
+                        "map": 7100,
+                        "all": 7700
+                    }
+                }
+            ]
+        }
+    }
+}

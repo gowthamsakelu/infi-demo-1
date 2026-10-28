@@ -1,11 +1,11 @@
 // Stays: hotels, villas and resorts, shared with the itinerary builder's hotel search. List on the left, detail on the right
-// (Overview / Rooms & Rates / Meal plans). Add room type and Edit are drawn as designed and do nothing yet; Call opens the phone's dialler.
+// (Overview / Rooms & Rates; the meal plans sit under the rooms). Add room type and Edit are drawn as designed and do nothing yet; Call opens the phone's dialler.
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson } from '../shared/http.js';
-import { esc } from '../shared/ui.js';
+import { esc, errorState } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, linkRow, chip, money, moneyShort, plural } from '../shared/page-ui.js';
-import { card, optionsOf, place } from './catalog-ui.js';
+import { card, optionsOf, place, filled, inclusionsCard, bulletCard } from './catalog-ui.js';
 
 // HOTEL is blue, VILLA yellow, RESORT teal (the shared tag colours)
 const TAG_KIND = { hotel: 'resort', villa: 'villa', resort: 'activity' };
@@ -27,15 +27,15 @@ export default {
       loading.add(item.id);
       try {
         cache.set(item.id, await getJson(`/api/stays/${encodeURIComponent(item.id)}`));
-      } catch {
-        cache.set(item.id, { failed: true });
+      } catch (error) {
+        cache.set(item.id, { failed: true, error });
       }
       loading.delete(item.id);
       if (page && page.api.current()?.id === item.id) page.api.refresh();
     }
 
     const empty = (text) => `<p class="sp-none">${esc(text)}</p>`;
-    const pending = (d, what) => (d?.failed ? `<p class="sp-none">Could not load ${what}. <button type="button" class="bld-link" data-st-retry>Try again</button></p>` : empty('Loading…'));
+    const pending = (d, what) => (d?.failed ? errorState({ title: `Could not load ${what}`, error: d.error, what, retryAttr: 'data-st-retry' }) : '<div class="sp-detail-skel" aria-hidden="true"><i></i><i></i><i></i></div>');
 
     function roomCard(r) {
       return `<div class="st-room">
@@ -52,12 +52,29 @@ export default {
           { icon: 'bed', label: 'Room types', value: ready ? d.rooms.length : '…', tone: 'green' },
           { icon: 'chart', label: 'Revenue', value: ready ? moneyShort(d.revenue) : '…', tone: 'amber' },
         ])}
+        ${about(item, d)}
         ${card('phone', 'Contact', detailGrid([
           ['Phone', ready ? d.phone || '' : '…'], ['Email', ready ? d.email || '' : '…'],
           ['City', item.city || ''], ['Address', ready ? d.address || '' : '…'],
         ]))}
-        ${ready && d.description ? `<p class="st-about">${esc(d.description)}</p>` : ''}
-        ${ready && d.amenities.length ? `<div class="sp-chips"><span class="sp-chips-label">Amenities</span>${d.amenities.map(chip).join('')}</div>` : ''}`;
+        ${ready && d.amenities.length ? `<div class="sp-chips scroll-row"><span class="sp-chips-label">Amenities</span>${d.amenities.map(chip).join('')}</div>` : ''}
+        ${ready ? inclusionsCard(d.inclusions, d.exclusions) : ''}
+        ${ready ? bulletCard('chart', 'Extra charges', d.extraCharges) : ''}`;
+    }
+
+    /** About this stay: type, location with a map link, description and the price note. Only what the record has. */
+    function about(item, d) {
+      const ready = d && !d.failed;
+      const where = [ready ? d.address : '', place(item)].filter(Boolean).join(', ');
+      const map = where ? `<a class="bld-link st-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${item.name}, ${where}`)}" target="_blank" rel="noopener">Show on map</a>` : '';
+      const grid = filled([['Type', TAG_LABEL[item.tag] || item.tag || '']]);
+      const parts = [
+        grid.length ? detailGrid(grid) : '',
+        where ? `<p class="st-where">${icon('pin', { size: 14 })}<span>${esc(where)}</span>${map}</p>` : '',
+        ready && d.description ? `<p class="st-about">${esc(d.description)}</p>` : '',
+        ready && d.priceNote ? `<p class="st-note">${icon('info', { size: 16 })}<span>${esc(d.priceNote)}</span></p>` : '',
+      ].filter(Boolean).join('');
+      return parts ? card('bed', 'About this stay', parts) : '';
     }
 
     page = createSplitPage(host, ctx, {
@@ -90,16 +107,15 @@ export default {
       detail: (item, ui) => {
         const d = cache.get(item.id);
         const ready = d && !d.failed;
-        const tabs = [{ key: 'overview', label: 'Overview' }, { key: 'rooms', label: 'Rooms & Rates' }, { key: 'plans', label: 'Meal plans' }];
+        const tabs = [{ key: 'overview', label: 'Overview' }, { key: 'rooms', label: 'Rooms & Rates' }];
         let body;
         if (ui.tab === 'rooms') {
+          const plans = ready && d.rooms.length
+            ? `<section>${sectionTitle('Meal plans', '<span class="sp-hint">Starting rate per room per night</span>')}${rowGroup(PLANS.map(([k, label]) => linkRow({ ico: 'utensils', title: label, right: money(Math.min(...d.rooms.map((r) => r.rates[k]).filter((x) => x != null))), rightSub: 'From' })))}</section>`
+            : '';
           body = ready ? (d.rooms.length
-            ? `${d.rooms.map(roomCard).join('')}<p class="st-note">${icon('info', { size: 16 })}<span>Rates are per room per night. When an agent adds this hotel in the itinerary builder, these rates fill in automatically and can be edited per trip.</span></p>`
+            ? `${d.rooms.map(roomCard).join('')}<p class="st-note">${icon('info', { size: 16 })}<span>Rates are per room per night. When an agent adds this hotel in the itinerary builder, these rates fill in automatically and can be edited per trip.</span></p>${plans}`
             : empty('No rooms and rates yet.')) : pending(d, 'the rooms');
-        } else if (ui.tab === 'plans') {
-          body = ready ? (d.rooms.length
-            ? `<section>${sectionTitle('Starting rate per room per night')}${rowGroup(PLANS.map(([k, label]) => linkRow({ ico: 'utensils', title: label, right: money(Math.min(...d.rooms.map((r) => r.rates[k]).filter((x) => x != null))), rightSub: 'From' })))}</section>`
-            : empty('No meal plan rates yet.')) : pending(d, 'the meal plans');
         } else body = overview(item, d);
         return {
           head: {

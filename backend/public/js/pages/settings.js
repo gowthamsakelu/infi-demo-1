@@ -4,7 +4,7 @@
 // The Google Places key never reaches the browser: the server only says whether one is configured.
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson, sendJson } from '../shared/http.js';
-import { esc, toast } from '../shared/ui.js';
+import { esc, toast, errorState } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { pill, sectionTitle, detailGrid, rowGroup, linkRow, toggle, flipToggle } from '../shared/page-ui.js';
 
@@ -33,7 +33,7 @@ export default {
   mount(host, ctx) {
     const cache = new Map();   // section id -> payload from /api/settings/{id}
     const loading = new Set();
-    const failed = new Set();
+    const failed = new Map(); // section id -> the ApiError (picks the sentence under "Could not load")
     const drafts = new Map();  // section id -> the editable part, only after the person changed something
     const errors = new Map();  // section id -> { 'values.name': 'message' } from the last failed save
     let saving = false;
@@ -53,9 +53,9 @@ export default {
     const settle = (id) => { if (drafts.has(id) && same(drafts.get(id), savedPart(id))) drafts.delete(id); };
 
     async function ensureDetail(item) {
-      if (cache.has(item.id) || loading.has(item.id)) return;
-      loading.add(item.id); failed.delete(item.id);
-      try { cache.set(item.id, await getJson(`/api/settings/${encodeURIComponent(item.id)}`)); } catch { failed.add(item.id); }
+      if (cache.has(item.id) || loading.has(item.id) || failed.has(item.id)) return; // a failed section waits for "Try again" instead of refetching on every redraw
+      loading.add(item.id);
+      try { cache.set(item.id, await getJson(`/api/settings/${encodeURIComponent(item.id)}`)); } catch (err) { failed.set(item.id, err); }
       loading.delete(item.id);
       if (page && page.api.current()?.id === item.id) page.api.refresh();
     }
@@ -155,16 +155,16 @@ export default {
       row: (s) => ({ tile: `<span class="st-ico st-${esc(s.id)}">${glyph(s.icon)}</span>`, name: s.name, sub: s.description }),
       detail: (item) => {
         const d = cache.get(item.id);
-        const head = `<span class="sp-tile st-head-ico"><span class="st-ico st-${esc(item.id)}">${glyph(item.icon, 26)}</span></span>
-          <div class="sp-head-text"><div class="sp-head-name"><h2>${esc(item.name)}</h2></div><p class="sp-head-sub">${esc(HEAD_SUB[item.id] || item.description)}</p></div>`;
+        const head = { avatar: `<span class="st-ico st-${esc(item.id)}">${glyph(item.icon, 24)}</span>`, title: item.name, subtitle: HEAD_SUB[item.id] || item.description };
         let body;
         if (d) body = bodies[item.id](item.id, d);
-        else if (failed.has(item.id)) body = `<div class="state-box is-error" role="alert"><h4>Could not load ${esc(item.name)}</h4><p>Check your connection and try again.</p><button type="button" class="btn-secondary-desktop" data-st-retry style="height:36px;">Try again</button></div>`;
+        else if (failed.has(item.id)) body = errorState({ title: `Could not load ${item.name.toLowerCase()}`, error: failed.get(item.id), what: 'settings', retryAttr: 'data-st-retry' });
         else body = '<div class="sp-detail-skel" aria-hidden="true"><i></i><i></i><i></i></div>';
         const dirty = drafts.has(item.id) && !same(drafts.get(item.id), savedPart(item.id));
-        const foot = d && EDIT[item.id] ? `
-          <button type="button" class="btn-secondary-desktop sp-foot-btn" data-sp-act="discard" ${dirty && !saving ? '' : 'disabled'}>Discard</button>
-          <button type="button" class="btn-primary-desktop sp-foot-btn" data-sp-act="save" ${dirty && !saving ? '' : 'disabled'}>${saving ? 'Saving…' : 'Save changes'}</button>` : '';
+        const foot = d && EDIT[item.id] ? {
+          primary: { label: saving ? 'Saving…' : 'Save changes', icon: 'check', act: 'save', disabled: !dirty || saving },
+          quick: [{ label: 'Discard changes', icon: 'close', tone: 'more', act: 'discard', disabled: !dirty || saving }],
+        } : '';
         return { head, body, foot };
       },
       afterDetail: (_el, item) => { ensureDetail(item); },

@@ -131,6 +131,25 @@ class UsersTest extends TestCase
         $this->actingAs($editor)->putJson("/api/users/{$editor->id}/permissions", ['permissions' => $this->matrix([], ['system', 'website'])])->assertForbidden();
     }
 
+    public function test_the_page_apis_follow_the_matrix(): void
+    {
+        $person = User::factory()->create();
+        Permissions::save($person, $this->matrix(['website', 'catalog'], ['travel']));
+        $this->actingAs($person);
+
+        $this->getJson('/api/banners')->assertOk();
+        $this->getJson('/api/destinations')->assertOk();
+        $this->getJson('/api/transport')->assertOk();
+        $this->postJson('/api/banners/reorder', [])->assertForbidden();
+        $this->getJson('/api/users')->assertForbidden();
+
+        Permissions::save($person, $this->matrix());
+        foreach (['banners', 'blogs', 'destinations', 'tour-packages', 'transport', 'stays', 'adventures', 'users', 'settings'] as $page) {
+            $this->getJson("/api/{$page}")->assertForbidden();
+        }
+        $this->assertFalse($this->getJson('/api/me/permissions')->json('data.pages.banners.view'));
+    }
+
     public function test_deactivating_sets_the_status_and_locks_the_person_out_of_the_modules(): void
     {
         $riya = User::factory()->create();

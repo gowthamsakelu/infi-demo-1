@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Support\Permissions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Users & Permissions. The list is light; the detail carries the module matrix, the numbers and the recent work of the open person.
@@ -77,8 +78,13 @@ class UserController extends Controller
     public function me(Request $request): JsonResponse
     {
         $user = $request->user();
-        if (!$user->last_active_at || $user->last_active_at->lt(now()->subMinutes(5))) {
-            $user->forceFill(['last_active_at' => now()])->saveQuietly();
+        // "last active" is a nicety: a database that has not had the access migration yet must not turn this call into a 500.
+        if (Schema::hasColumn('users', 'last_active_at') && (!$user->last_active_at || $user->last_active_at->lt(now()->subMinutes(5)))) {
+            try {
+                $user->forceFill(['last_active_at' => now()])->saveQuietly();
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         return response()->json(['success' => true, 'data' => [

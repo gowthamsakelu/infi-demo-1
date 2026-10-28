@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateSettingsRequest;
 use App\Models\AppSetting;
 use App\Models\Inquiry;
+use App\Support\DummyData;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -34,6 +35,10 @@ class SettingsController extends Controller
 
     public function index(): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::list('settings')]);
+        }
+
         return response()->json(['success' => true, 'data' => collect(self::SECTIONS)->map(fn (array $s, string $id) => [
             'id' => $id, 'name' => $s[0], 'description' => $s[1], 'icon' => $s[2], 'editable' => $s[3],
         ])->values()]);
@@ -42,6 +47,10 @@ class SettingsController extends Controller
     public function show(string $section): JsonResponse
     {
         abort_unless(isset(self::SECTIONS[$section]), 404);
+
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::detail('settings', $section) ?? abort(404)]);
+        }
 
         return response()->json(['success' => true, 'data' => $this->payload($section)]);
     }

@@ -1,13 +1,13 @@
-// Tour Packages: the trips we sell. List on the left, detail on the right (Overview / Itinerary / Pricing / Inclusions / Inquiries).
+// Tour Packages: the trips we sell. List on the left, detail on the right (Overview / Itinerary / Pricing).
+// The overview holds About, Inclusions & Exclusions and the recent inquiries.
 // Same shape as destinations.js. The Add and Edit buttons are drawn as designed and do nothing yet; "Use as itinerary for an inquiry"
 // opens the itinerary builder prefilled with this package (see tour-packages-builder.js).
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson } from '../shared/http.js';
-import { esc } from '../shared/ui.js';
-import { icon } from '../shared/icons.js';
+import { esc, errorState } from '../shared/ui.js';
 import { itemIconHtml, itemPills } from '../shared/itinerary.js';
 import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, linkRow, money, plural } from '../shared/page-ui.js';
-import { card, optionsOf } from './catalog-ui.js';
+import { card, optionsOf, filled, inclusionsCard } from './catalog-ui.js';
 import { useAsItinerary } from './tour-packages-builder.js';
 
 const TAGS = { tour: 'tour', villa: 'villa', activity: 'activity' };
@@ -41,10 +41,6 @@ function timeline(days) {
     </div>`).join('')}</div>`;
 }
 
-const checks = (list, ico) => (list.length
-  ? `<ul class="tp-list">${list.map((t) => `<li><span class="tp-list-ico ${ico}">${icon(ico === 'no' ? 'close' : 'check', { size: 14, stroke: 3 })}</span><span>${esc(t)}</span></li>`).join('')}</ul>`
-  : '<p class="sp-none">Nothing listed.</p>');
-
 export default {
   css: true,
   mount(host, ctx) {
@@ -59,15 +55,15 @@ export default {
       loading.add(item.id);
       try {
         cache.set(item.id, await getJson(`/api/tour-packages/${encodeURIComponent(item.id)}`));
-      } catch {
-        cache.set(item.id, { failed: true });
+      } catch (error) {
+        cache.set(item.id, { failed: true, error });
       }
       loading.delete(item.id);
       if (page && page.api.current()?.id === item.id) page.api.refresh();
     }
 
     const empty = (text) => `<p class="sp-none">${esc(text)}</p>`;
-    const pending = (d, what) => (d?.failed ? `<p class="sp-none">Could not load ${what}. <button type="button" class="bld-link" data-tp-retry>Try again</button></p>` : empty('Loading…'));
+    const pending = (d, what) => (d?.failed ? errorState({ title: `Could not load ${what}`, error: d.error, what, retryAttr: 'data-tp-retry' }) : '<div class="sp-detail-skel" aria-hidden="true"><i></i><i></i><i></i></div>');
 
     function overview(item, d) {
       const ready = d && !d.failed;
@@ -78,10 +74,26 @@ export default {
           { icon: 'briefcase', label: 'Bookings', value: item.bookings, tone: 'purple' },
           { icon: 'note', label: 'Inquiries', value: ready ? d.inquiries.length : '…', tone: 'amber' },
         ])}
-        ${card('layers', 'About this package', `${detailGrid([
-          ['Destination', item.destination || ''], ['Duration', `${plural(item.days, 'day')} / ${plural(item.nights, 'night')}`],
-          ['Type', TYPE[item.tag] || ''], ['Season', item.seasonal ? 'Seasonal' : 'All year'],
-        ])}${ready && d.description ? `<p class="tp-about">${esc(d.description)}</p>` : ''}`)}`;
+        ${aboutCard(item, d)}
+        ${ready ? inclusionsCard(d.inclusions, d.exclusions) : ''}
+        ${ready ? recent(d) : ''}`;
+    }
+
+    function aboutCard(item, d) {
+      const ready = d && !d.failed;
+      const grid = filled([
+        ['Destination', item.destination || ''], ['Duration', `${plural(item.days, 'day')} / ${plural(item.nights, 'night')}`],
+        ['Type', TYPE[item.tag] || ''], ['Season', item.seasonal ? 'Seasonal' : 'All year'],
+        ['Group size', ready && d.minPax ? `Min. ${plural(d.minPax, 'person')}` : ''],
+      ]);
+      const about = ready && d.description ? `<p class="tp-about">${esc(d.description)}</p>` : '';
+      return card('layers', 'About this package', `${grid.length ? detailGrid(grid) : ''}${about}`);
+    }
+
+    /** The three newest inquiries for this destination; the full list is on the Inquiries page. */
+    function recent(d) {
+      if (!d.inquiries.length) return '';
+      return `<section>${sectionTitle('Recent inquiries', '<a class="bld-link" href="#inquiries">View all</a>')}${rowGroup(d.inquiries.slice(0, 3).map((q) => linkRow({ ico: 'message', title: q.name, sub: [q.trip, day(q.travelDate)].filter(Boolean).join(' · '), right: q.status ? q.status[0].toUpperCase() + q.status.slice(1) : '' })))}</section>`;
     }
 
     page = createSplitPage(host, ctx, {
@@ -118,14 +130,10 @@ export default {
           { key: 'overview', label: 'Overview' },
           { key: 'itinerary', label: 'Itinerary' },
           { key: 'pricing', label: 'Pricing' },
-          { key: 'inclusions', label: 'Inclusions' },
-          { key: 'inquiries', label: `Inquiries${ready ? ` (${d.inquiries.length})` : ''}` },
         ];
         let body;
         if (ui.tab === 'itinerary') body = ready ? card('calendar', 'Day-wise Schedule', timeline(d.itinerary)) : pending(d, 'the itinerary');
         else if (ui.tab === 'pricing') body = ready ? (d.priceTiers.length ? `<section>${sectionTitle('Price per person', '<span class="sp-hint">By group size</span>')}${rowGroup(d.priceTiers.map((t) => linkRow({ ico: 'users', title: t.label, sub: t.note, right: money(t.price) })))}</section>` : empty('No price tiers yet.')) : pending(d, 'the pricing');
-        else if (ui.tab === 'inclusions') body = ready ? `${card('check', 'Included', checks(d.inclusions, 'check'))}${card('close', 'Not included', checks(d.exclusions, 'no'))}` : pending(d, 'the inclusions');
-        else if (ui.tab === 'inquiries') body = ready ? (d.inquiries.length ? rowGroup(d.inquiries.map((q) => linkRow({ ico: 'message', title: q.name, sub: [q.trip, day(q.travelDate)].filter(Boolean).join(' · '), right: q.status ? q.status[0].toUpperCase() + q.status.slice(1) : '' }))) : empty('No inquiries yet.')) : pending(d, 'the inquiries');
         else body = overview(item, d);
         return {
           head: {

@@ -22,7 +22,8 @@ export const selected = (page) => new URL(page.url()).searchParams.get('selected
 /**
  * @param {object} cfg
  *   key, label (the page title), addLabel, plural ("packages"), rows (how many records are seeded), first (name of the first record),
- *   hit { q, name } a search that finds exactly one record, tabs [{ key, count }], api (path to fail / empty), extra(env) for page specifics
+ *   hit { q, name } a search that finds exactly one record, tabs [{ key, count }], api (path to fail / empty), extra(env) for page specifics,
+ *   filter (optional) { labels: ['Any AC', 'AC', 'Non-AC'], value: 'ac', count } for the labelled filter dropdown beside the search box
  */
 export async function runCatalogSuite(cfg) {
   const browser = await chromium.launch({ channel: 'chrome' });
@@ -47,8 +48,8 @@ export async function runCatalogSuite(cfg) {
     const noHScroll = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1 && document.body.scrollWidth <= innerWidth + 1);
     const open = async (query = '') => { await page.goto('about:blank'); await page.goto(`${BASE}${query}#${cfg.key}`, { waitUntil: 'networkidle' }); await page.locator('.sp-row, .sp-list .state-box').first().waitFor().catch(() => {}); await wait(900); };
     const slot = m ? '#mobile-view-slot' : '#desktop-view-slot';
-    const name = () => page.locator('.customer-name-title').innerText();
-    const search = '.compact-search-bar input, .search-input-wrapper input';
+    const name = () => page.locator('.sp-detail-head .customer-name-title').innerText();
+    const search = '.sp .compact-search-bar input, .sp .search-input-wrapper input';
 
     await signIn(page, BASE);
 
@@ -61,6 +62,7 @@ export async function runCatalogSuite(cfg) {
     check(`${tag} no horizontal scroll`, await noHScroll());
     check(`${tag} ${cfg.rows} ${cfg.plural} listed`, await page.locator('.sp-row').count() === cfg.rows, String(await page.locator('.sp-row').count()));
     if (m) check(`${tag} header shows the count`, new RegExp(`${cfg.label} • ${cfg.rows} Total`).test(await page.locator('.sp-header-line').innerText()), await page.locator('.sp-header-line').innerText());
+    else check(`${tag} no title row (Add lives in the top bar)`, await page.locator('.sp-titlebar, .sp-sub, .sp-add, .sp-export, .sp-search-row').count() === 0);
     check(`${tag} the keyboard did not open`, await page.evaluate(() => !/INPUT|TEXTAREA/.test(document.activeElement.tagName)));
 
     if (!m) {
@@ -77,7 +79,7 @@ export async function runCatalogSuite(cfg) {
       await page.locator('.sp-row').nth(1).click(); await wait(500);
       check(`${tag} phone: tapping a card opens the detail full screen`, !!selected(page) && await page.locator('.sp-detail.is-open').count() === 1);
       check(`${tag} phone: no horizontal scroll in the detail`, await noHScroll());
-      check(`${tag} phone: no text overlap in the header`, await page.evaluate(() => { const r = (s) => document.querySelector(s)?.getBoundingClientRect(); const a = r('.customer-name-title'); const b = r('.sp-back'); return !a || !b || a.left >= b.right - 1; }));
+      check(`${tag} phone: no text overlap in the header`, await page.evaluate(() => { const r = (s) => document.querySelector(s)?.getBoundingClientRect(); const a = r('.sp-detail-head .customer-name-title'); const b = r('.sp-back'); return !a || !b || a.right <= b.left + 1; }));
       await page.locator('.sp-back').click(); await wait(500);
       check(`${tag} phone: back arrow returns to the list`, selected(page) === null && await page.locator('.sp-detail.is-open').count() === 0);
       await page.locator('.sp-row').nth(2).click(); await wait(400);
@@ -100,7 +102,19 @@ export async function runCatalogSuite(cfg) {
     }
     await page.locator('[data-sp-tab="all"]').click(); await wait(400);
 
-    // text never wraps, Add does nothing, Export downloads
+    // the labelled filter beside the search box (cfg.filter: { labels: [all, ...options], value, count })
+    if (cfg.filter) {
+      await page.locator('.sp-filter-slot .dd-trigger').click(); await wait(200);
+      const opts = (await page.locator('.sp-filter-slot li').allInnerTexts()).map((t) => t.trim());
+      check(`${tag} filter options`, opts.join('|') === cfg.filter.labels.join('|'), opts.join('|'));
+      await page.locator(`.sp-filter-slot li[data-value="${cfg.filter.value}"]`).click(); await wait(600);
+      check(`${tag} filter ${cfg.filter.value} lists ${cfg.filter.count}`, await page.locator('.sp-row').count() === cfg.filter.count, String(await page.locator('.sp-row').count()));
+      await page.locator('.sp-filter-slot .dd-trigger').click(); await wait(200);
+      await page.locator('.sp-filter-slot li[data-value=""]').click(); await wait(600);
+      check(`${tag} ${cfg.filter.labels[0]} brings them all back`, await page.locator('.sp-row').count() === cfg.rows);
+    }
+
+    // text never wraps, Add does nothing
     check(`${tag} single-line names with ellipsis`, await page.evaluate(() => [...document.querySelectorAll('.sp-row .card-title, .sp-row .row-trip')].every((e) => e.getBoundingClientRect().height < 24)));
     check(`${tag} pills and tags never wrap`, await page.evaluate(() => [...document.querySelectorAll('.sp-row .status-pill, .sp-row .card-type-badge')].every((e) => e.getBoundingClientRect().height < 26)));
     const add = m ? '#mobile-page-add' : '#desktop-page-add';

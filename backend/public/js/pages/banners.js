@@ -76,10 +76,10 @@ export default {
     function render() {
       const ready = state.status === 'ready';
       frame.setTitle('Banners', ready ? `${plural(state.items.length, 'banner')} · ${live()} live on the website · leads are tracked per banner` : '', ready ? `${plural(state.items.length, 'banner')} · ${live()} live` : '');
-      renderTabs(tabsEl, { tabs: TABS.map(([key, label]) => ({ key, label, count: key === 'all' ? state.items.length : state.items.filter((b) => b.status === key).length })), active: state.tab, variant: 'mobile', attr: 'data-bn-tab' });
+      renderTabs(tabsEl, { tabs: TABS.map(([key, label]) => ({ key, label, count: state.status !== 'ready' ? null : key === 'all' ? state.items.length : state.items.filter((b) => b.status === key).length })), active: state.tab, variant: 'mobile', attr: 'data-bn-tab' });
       frame.body.querySelectorAll('[data-bn-mode]').forEach((b) => { const on = b.dataset.bnMode === state.mode; b.classList.toggle('active', on); b.setAttribute('aria-pressed', String(on)); });
       if (state.status === 'loading') { content.innerHTML = skeletonCards(6); return; }
-      if (state.status === 'error') { content.innerHTML = errorState({ title: 'Could not load banners', text: 'Check your connection and try again.', retryId: 'bn-retry' }); return; }
+      if (state.status === 'error') { content.innerHTML = errorState({ title: 'Could not load banners', error: state.error, what: 'banners', retryId: 'bn-retry' }); return; }
       if (!state.items.length) { content.innerHTML = emptyState({ title: 'No banners yet', text: 'Banners you add will show up here.', resetId: 'bn-reset' }); return; }
       const rows = state.items.filter(inTab);
       if (!rows.length) { content.innerHTML = emptyState({ title: 'No banners found', text: 'Nothing in this tab yet.', resetId: 'bn-reset' }); return; }
@@ -90,7 +90,7 @@ export default {
 
     async function load() {
       state.status = 'loading'; render();
-      try { state.items = await getJson('/api/banners'); state.status = 'ready'; } catch { state.status = 'error'; }
+      try { state.items = await getJson('/api/banners'); state.status = 'ready'; } catch (err) { state.status = 'error'; state.error = err; }
       if (alive) render();
     }
 

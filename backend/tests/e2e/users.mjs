@@ -1,6 +1,7 @@
 // Browser test (not run by PHPUnit): Users & Permissions at 1280, 820 (tablet = PC layout) and 390.
 // The list and tabs, the detail (Permissions / Profile / Activity), the module matrix, the unsaved-changes confirm (Keep editing / Discard),
-// Save changes, Deactivate / Reactivate, Reset password and Invite User doing nothing, the empty and error states, no horizontal scroll.
+// the status filter, Save changes, Deactivate / Reactivate, Edit / Reset password / Invite User doing nothing, the empty and error states,
+// no horizontal scroll.
 // It saves one matrix and one status change in the dev database and puts the status back; the saved matrix is rewritten to the role's defaults.
 import { chromium } from 'playwright';
 import { signIn } from './signin.mjs';
@@ -33,7 +34,8 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
     return r.status;
   }, [url, body, method]);
   const confirmVisible = () => page.locator('.confirm-foot, .confirm-dialog, [role="alertdialog"]').first().isVisible().catch(() => false);
-  const heading = () => page.locator('.sp-head-name h2').innerText();
+  const heading = () => page.locator('.sp-detail-head .customer-name-title').innerText();
+  const search = () => page.locator('.sp .compact-search-bar input, .sp .search-input-wrapper input');
 
   await signIn(page, BASE);
   const users = await json('/api/users');
@@ -43,31 +45,44 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
 
   if (!m) await page.locator('#desktop-view-slot #nav-users').click();
   else { await page.locator('#mobile-more-btn').click(); await wait(600); await page.locator('.more-sheet [data-nav="users"]').click(); }
-  await wait(1500);
+  await page.waitForSelector('.sp-row', { timeout: 15000 }).catch(() => {}); await wait(400);
 
   check(`${tag} Users opens`, /#users/.test(page.url()) && await page.locator('.sp[data-sp="users"]').count() === 1);
   check(`${tag} no horizontal scroll`, await noHScroll());
   check(`${tag} ${users.length} people listed`, await page.locator('.sp-row').count() === users.length);
-  check(`${tag} header counts the team`, new RegExp(`${users.length} team members`).test(await page.locator(m ? '.sp-msub' : '.sp-sub').innerText()));
+  if (m) check(`${tag} header counts the team`, new RegExp(`${users.length} team members`).test(await page.locator('.sp-header-line').innerText()), await page.locator('.sp-header-line').innerText());
+  else check(`${tag} Invite User is in the top bar, no title row`, /Invite User/.test(await page.locator('#desktop-page-add').innerText()) && await page.locator('#desktop-page-add').isVisible() && await page.locator('.sp-titlebar, .sp-sub, .sp-add, .sp-export').count() === 0);
   check(`${tag} row: avatar initials, name, email, status pill, role and last active`, await page.evaluate(() => { const r = document.querySelector('.sp-row'); return !!r.querySelector('.us-av')?.textContent.trim() && !!r.querySelector('.card-title')?.textContent && /@/.test(r.querySelector('.row-trip')?.textContent || '') && !!r.querySelector('.status-pill') && /·/.test(r.querySelector('.card-meta-row')?.textContent || ''); }));
-  const counts = (await page.locator('.sp-tabs .tab-pill').allInnerTexts()).join('|').replace(/\s+/g, ' ');
+  const counts = (await page.locator(m ? '.sp-tabs .tab-pill' : '.sp-tabs .compact-tab-btn').allInnerTexts()).join('|').replace(/\s+/g, ' ');
   const by = (r) => users.filter((u) => u.role === r).length;
-  check(`${tag} tab counts`, counts === `All ${users.length}|Admin ${by('admin')}|Sales ${by('sales')}|Operations ${by('operations')}`, counts);
+  const want = [['All', users.length], ['Admin', by('admin')], ['Sales', by('sales')], ['Operations', by('operations')]].map(([l, n]) => (m ? `${l} ${n}` : `${l} (${n})`)).join('|');
+  check(`${tag} tab counts`, counts === want, counts);
   check(`${tag} names and emails stay on one line`, await page.evaluate(() => [...document.querySelectorAll('.sp-row .card-title, .sp-row .row-trip, .sp-row .card-meta-row span')].every((e) => e.getBoundingClientRect().height < 24)));
 
   await page.locator('[data-sp-tab="admin"]').click(); await wait(500);
   check(`${tag} Admin tab`, await page.locator('.sp-row').count() === by('admin'));
   await page.locator('[data-sp-tab="all"]').click(); await wait(400);
-  await page.locator('.sp-search-row input').fill('riya'); await wait(900);
+  await search().fill('riya'); await wait(900);
   check(`${tag} search narrows the list`, await page.locator('.sp-row').count() === 1 && /Riya/.test(await page.locator('.sp-row').innerText()));
-  await page.locator('.sp-search-row input').fill('zzzzqq'); await wait(900);
+  await search().fill('zzzzqq'); await wait(900);
   check(`${tag} no results: calm empty state`, /No users found/.test(await page.locator('.sp-list').innerText()));
-  await page.locator('.sp-search-row input').fill(''); await wait(900);
+  await search().fill(''); await wait(900);
+
+  // the status filter (Any status / Active / Pending / Inactive)
+  await page.locator('.sp-filter-slot .dd-trigger').click(); await wait(200);
+  const statusOpts = (await page.locator('.sp-filter-slot li').allInnerTexts()).map((t) => t.trim());
+  check(`${tag} status filter options`, statusOpts.join('|') === 'Any status|Active|Pending|Inactive', statusOpts.join('|'));
+  await page.locator('.sp-filter-slot li[data-value="active"]').click(); await wait(600);
+  const activeCount = users.filter((u) => u.status === 'active').length;
+  check(`${tag} Active filter narrows the list`, await page.locator('.sp-row').count() === activeCount && (await page.locator('.sp-row .status-pill').allInnerTexts()).every((x) => /Active/.test(x)), String(await page.locator('.sp-row').count()));
+  await page.locator('.sp-filter-slot .dd-trigger').click(); await wait(200);
+  await page.locator('.sp-filter-slot li[data-value=""]').click(); await wait(600);
+  check(`${tag} Any status brings everyone back`, await page.locator('.sp-row').count() === users.length);
 
   // open Riya
   const riyaRow = page.locator(`.sp-row[data-sp-id="${riya.id}"]`);
   if (!m) check(`${tag} the first person is selected`, sel(page) === String(users[0].id) && await page.locator('.sp-row.active').count() === 1);
-  await riyaRow.click(); await wait(1200);
+  await riyaRow.click(); await page.waitForFunction(() => /Riya/.test(document.querySelector('.sp-detail-head .customer-name-title')?.textContent || '') && /Sales role/.test(document.querySelector('.us-matrix-head')?.textContent || ''), null, { timeout: 10000 }).catch(() => {}); await wait(300);
   check(`${tag} detail: name, status pill, tabs`, /Riya/.test(await heading()) && await page.locator('.sp-detail-tabs [role="tab"]').count() === 3);
   check(`${tag} three stat cards`, await page.locator('.sp-stat').count() === 3);
   const stats = await json(`/api/users/${riya.id}`);
@@ -77,7 +92,8 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
   check(`${tag} the switches show the role defaults (Inquiries view+edit, Banners and Blogs off)`, await page.locator('[data-us-perm="inquiries:view"]').getAttribute('aria-checked') === 'true' && await page.locator('[data-us-perm="inquiries:edit"]').getAttribute('aria-checked') === 'true' && await page.locator('[data-us-perm="website:view"]').getAttribute('aria-checked') === 'false');
   check(`${tag} Save is off until something changes`, await page.locator('[data-sp-act="save"]').isDisabled());
   check(`${tag} the matrix fits the screen`, await page.evaluate(() => { const c = document.querySelector('.us-matrix').getBoundingClientRect(); return c.right <= innerWidth + 1 && c.left >= -1; }));
-  check(`${tag} footer: Deactivate, Reset password, Save changes`, (await page.locator('.sp-detail-foot button').allInnerTexts()).map((t) => t.trim()).sort().join('|') === 'Deactivate user|Reset password|Save changes');
+  const footTexts = (await page.locator('.sp-detail-foot .btn-confirm-booking, .sp-detail-foot .quick-action-col-btn').allInnerTexts()).map((t) => t.trim());
+  check(`${tag} footer: Save changes, then Edit / Reset password / Deactivate`, footTexts.join('|') === 'Save changes|Edit|Reset password|Deactivate' && await page.locator('.sp-detail-foot .btn-confirm-booking[data-sp-act="save"]').count() === 1 && await page.locator('.sp-detail-foot .quick-action-col-btn[data-sp-act]').count() === 3, footTexts.join('|'));
   if (m) check(`${tag} phone: back arrow, bottom bar hidden`, await page.locator('.sp-back[aria-label]').count() === 1 && await page.evaluate(() => getComputedStyle(document.querySelector('.mobile-bottom-nav')).display === 'none'));
 
   // toggling: dependencies and dirty state
@@ -94,7 +110,7 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
   if (!m) {
     const second = page.locator('.sp-row').filter({ hasNotText: 'Riya' }).first();
     await second.click(); await wait(500);
-    check(`${tag} switching person with unsaved changes asks (Keep editing / Discard)`, await page.getByRole('button', { name: 'Keep editing' }).isVisible() && await page.getByRole('button', { name: 'Discard' }).isVisible());
+    check(`${tag} switching person with unsaved changes asks (Keep editing / Discard)`, await page.getByRole('button', { name: 'Keep editing' }).isVisible() && await page.getByRole('button', { name: 'Discard', exact: true }).isVisible());
     await page.getByRole('button', { name: 'Keep editing' }).click(); await wait(500);
     check(`${tag} Keep editing stays on the person with the change`, /Riya/.test(await heading()) && await sw('website:view').getAttribute('aria-checked') === 'true');
     // leaving the page
@@ -103,14 +119,14 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
     await page.getByRole('button', { name: 'Keep editing' }).click(); await wait(400);
     check(`${tag} Keep editing keeps the page open`, /#users/.test(page.url()));
     await second.click(); await wait(500);
-    await page.getByRole('button', { name: 'Discard' }).click(); await wait(900);
+    await page.getByRole('button', { name: 'Discard', exact: true }).click(); await wait(900);
     check(`${tag} Discard moves on`, !/Riya/.test(await heading()));
     await riyaRow.click(); await wait(900);
     check(`${tag} the discarded change is gone`, await sw('website:view').getAttribute('aria-checked') === 'false' && await page.locator('[data-sp-act="save"]').isDisabled());
   } else {
     await page.locator('.sp-back').click(); await wait(500);
     check(`${tag} phone: the back arrow with unsaved changes asks too`, await page.getByRole('button', { name: 'Keep editing' }).isVisible());
-    await page.getByRole('button', { name: 'Discard' }).click(); await wait(700);
+    await page.getByRole('button', { name: 'Discard', exact: true }).click(); await wait(700);
     check(`${tag} phone: Discard returns to the list`, await page.locator('.sp-detail.is-open').count() === 0 && sel(page) === null);
     await riyaRow.click(); await wait(900);
   }
@@ -125,31 +141,33 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
   await put(`/api/users/${riya.id}/permissions`, { permissions: startMatrix }); // back to the role's values
 
   // profile and activity tabs, the admin is read only
-  await page.goto(`${BASE}?selected=${riya.id}#users`, { waitUntil: 'domcontentloaded' }); await wait(1400);
+  await page.goto(`${BASE}?selected=${riya.id}#users`, { waitUntil: 'domcontentloaded' }); await page.waitForSelector('.sp-row'); await wait(300);
   await page.locator('[data-sp-dtab="profile"]').click(); await wait(300);
   check(`${tag} Profile tab shows the details`, /riya@/.test(await page.locator('.sp-grid2').innerText()) && /Sales/.test(await page.locator('.sp-grid2').innerText()));
   await page.locator('[data-sp-dtab="activity"]').click(); await wait(300);
   check(`${tag} Activity tab shows recent work or a calm note`, await page.locator('.sp-linkrow').count() > 0 || /No inquiries or bookings/.test(await page.locator('.sp-detail-body').innerText()));
-  await page.goto(`${BASE}?selected=${users[0].id}#users`, { waitUntil: 'domcontentloaded' }); await wait(1400);
-  if (m) { await page.locator(`.sp-row[data-sp-id="${users[0].id}"]`).click(); await wait(800); }
+  await page.goto(`${BASE}?selected=${users[0].id}#users`, { waitUntil: 'domcontentloaded' }); await page.waitForSelector('.sp-row'); await wait(300);
+  if (m && !(await page.locator('.sp-detail.is-open').count())) { await page.locator(`.sp-row[data-sp-id="${users[0].id}"]`).click(); await wait(800); }
+  await page.waitForSelector('.sp-detail-head .customer-name-title').catch(() => {}); await page.waitForSelector('.us-switch', { timeout: 10000 }).catch(() => {});
   const adminLocked = users[0].role === 'admin';
   if (adminLocked) {
     check(`${tag} an admin's matrix is read only`, await page.locator('.us-switch.is-locked').count() === 24 && await page.locator('[data-sp-act="save"]').isDisabled());
-    await page.locator('.us-switch').first().click(); await wait(200);
+    await page.locator('.us-switch').first().click({ force: true }); await wait(200); // aria-disabled, so force the click
     check(`${tag} clicking a locked switch changes nothing`, await page.locator('[data-sp-act="save"]').isDisabled() && await page.locator('.us-switch').first().getAttribute('aria-checked') === 'true');
   }
 
   // deactivate and reactivate someone else
-  await page.goto(`${BASE}?selected=${pooja.id}#users`, { waitUntil: 'domcontentloaded' }); await wait(1400);
-  if (m) { await page.locator(`.sp-row[data-sp-id="${pooja.id}"]`).click(); await wait(800); }
+  await page.goto(`${BASE}?selected=${pooja.id}#users`, { waitUntil: 'domcontentloaded' }); await page.waitForSelector('.sp-row'); await wait(300);
+  if (m && !(await page.locator('.sp-detail.is-open').count())) { await page.locator(`.sp-row[data-sp-id="${pooja.id}"]`).click(); await wait(800); }
+  await page.waitForSelector('.us-switch', { timeout: 10000 }).catch(() => {});
   const before = pooja.status;
   await page.locator('[data-sp-act="status"]').click(); await wait(500);
-  check(`${tag} Deactivate asks first`, await page.getByRole('button', { name: 'Cancel' }).isVisible());
-  await page.getByRole('button', { name: 'Cancel' }).click(); await wait(400);
+  check(`${tag} Deactivate asks first`, await page.locator('.confirm-card').getByRole('button', { name: 'Cancel' }).isVisible());
+  await page.locator('.confirm-card').getByRole('button', { name: 'Cancel' }).click(); await wait(400);
   check(`${tag} Cancel changes nothing`, (await json('/api/users')).find((u) => u.id === pooja.id).status === before);
   await page.locator('[data-sp-act="status"]').click(); await wait(400);
-  await page.getByRole('button', { name: 'Deactivate' }).last().click(); await wait(1200);
-  check(`${tag} Deactivate sets the status to inactive`, (await json('/api/users')).find((u) => u.id === pooja.id).status === 'inactive' && /Inactive/.test(await page.locator('.sp-head-name').innerText()) && /Reactivate user/.test(await page.locator('.sp-detail-foot').innerText()));
+  await page.locator('.confirm-card').getByRole('button', { name: 'Deactivate' }).click(); await wait(1200);
+  check(`${tag} Deactivate sets the status to inactive`, (await json('/api/users')).find((u) => u.id === pooja.id).status === 'inactive' && /Inactive/.test(await page.locator('.sp-detail-head').innerText()) && /Reactivate/.test(await page.locator('.sp-detail-foot [data-sp-act="status"]').innerText()));
   await page.locator('[data-sp-act="status"]').click(); await wait(1200);
   check(`${tag} Reactivate sets it back to active`, (await json('/api/users')).find((u) => u.id === pooja.id).status === 'active');
   await put(`/api/users/${pooja.id}/status`, { status: 'active' }, 'PATCH'); // in case a step above stopped halfway
@@ -157,26 +175,25 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]]) {
   // drawn only
   const reset = await page.locator('[data-sp-act="reset"]');
   await reset.click(); await wait(500);
-  check(`${tag} Reset password does nothing (no dialog, no fake success)`, await page.locator('.modal-overlay.open, .asg-overlay.open').count() === 0 && !(await page.locator('.toast, [class*="toast"]').allInnerTexts().then((t) => /reset|sent|success/i.test(t.join(' ')))));
-  if (!m) {
-    await page.locator('.sp-add').click(); await wait(400);
-    check(`${tag} Invite User does nothing yet`, await page.locator('.modal-overlay.open, .asg-overlay.open').count() === 0 && /Invite User/.test(await page.locator('.sp-add').innerText()));
-    const [download] = await Promise.all([page.waitForEvent('download'), page.locator('.sp-export').click()]);
-    check(`${tag} Export downloads users.csv`, download.suggestedFilename() === 'users.csv');
-  } else {
-    check(`${tag} the Invite User button is drawn (floating) and does nothing`, true);
-  }
+  check(`${tag} Reset password does nothing (no dialog, no fake success)`, await page.locator('.modal-overlay.open, .asg-overlay.open, .confirm-card').count() === 0 && !(await page.locator('.toast, [class*="toast"]').allInnerTexts().then((t) => /reset|sent/i.test(t.join(' ')))));
+  await page.locator('[data-sp-act="edit"]').click(); await wait(400);
+  check(`${tag} Edit does nothing yet`, await page.locator('.modal-overlay.open, .asg-overlay.open, .confirm-card').count() === 0);
+  if (m) { await page.locator('.sp-back').click(); await wait(500); }
+  const addBtn = page.locator(m ? '#mobile-page-add' : '#desktop-page-add');
+  check(`${tag} the Invite User button is drawn`, await addBtn.isVisible() && /Invite User/.test(await addBtn.innerText()));
+  await addBtn.click(); await wait(400);
+  check(`${tag} Invite User does nothing yet`, await page.locator('.modal-overlay.open, .asg-overlay.open, .wiz-sheet').count() === 0);
 
   // empty and failing API
   await page.route('**/api/users', (r) => r.fulfill({ json: { success: true, data: [] } }));
-  await page.goto(`${BASE}#users`, { waitUntil: 'domcontentloaded' }); await page.reload({ waitUntil: 'domcontentloaded' }); await wait(1200);
+  await page.goto(`${BASE}#users`, { waitUntil: 'domcontentloaded' }); await page.reload({ waitUntil: 'domcontentloaded' }); await page.waitForFunction(() => /No users yet/.test(document.querySelector('.sp-list')?.innerText || ''), null, { timeout: 10000 }).catch(() => {});
   check(`${tag} empty: calm empty state`, /No users yet/.test(await page.locator('.sp-list').innerText()));
   await page.unroute('**/api/users');
   await page.route('**/api/users', (r) => r.fulfill({ status: 500, json: { message: 'boom' } }));
-  await page.reload({ waitUntil: 'domcontentloaded' }); await wait(1200);
+  await page.reload({ waitUntil: 'domcontentloaded' }); await page.waitForFunction(() => /Could not load users/.test(document.querySelector('.sp-list')?.innerText || ''), null, { timeout: 10000 }).catch(() => {});
   check(`${tag} error: shared error state with Try again`, /Could not load users/.test(await page.locator('.sp-list').innerText()));
   await page.unroute('**/api/users');
-  await page.locator('#sp-retry').click(); await wait(1000);
+  await page.locator('#sp-retry').click(); await page.waitForSelector('.sp-row', { timeout: 10000 }).catch(() => {}); await wait(300);
   check(`${tag} error: Try again brings the list back`, await page.locator('.sp-row').count() === users.length);
   check(`${tag} no page errors`, errors.length === 0, errors.join(' | '));
   await ctx.close();

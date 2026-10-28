@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReorderBannersRequest;
 use App\Http\Requests\UpdateBannerRequest;
 use App\Models\Banner;
+use App\Support\DummyData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,10 @@ class BannerController extends Controller
 {
     public function index(): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::list('banners')]);
+        }
+
         return response()->json(['success' => true, 'data' => Banner::query()->orderBy('position')->orderBy('id')->get()->map(fn (Banner $b) => $this->present($b))->values()]);
     }
 

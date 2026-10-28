@@ -1,0 +1,143 @@
+/* The one UI standard for popups, headers, buttons, toggles and fields. Loaded after style.css and pages.css.
+   Taken from Bookings. Summary for people: docs/ui-standard.md.
+   Phones (html[data-layout="mobile"]): every popup is a bottom sheet, every detail screen is a full page with a back arrow.
+   Tablets and PC use the desktop layout, where popups are centred dialogs (not changed here). */
+
+:root {
+  --ui-btn-h: 48px;
+  --ui-btn-radius: 12px;
+  --ui-field-h: 44px;
+  --ui-field-radius: 12px;
+  --ui-field-border: #E2E8F0;
+  --ui-field-bg: #F8FAFC;
+  --ui-focus-border: #3B82F6;
+  --ui-focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  --ui-sheet-radius: 26px;
+  --ui-sheet-title: 18px;
+  --ui-close-size: 32px;
+  --ui-gap: 8px;
+  --ui-switch-w: 36px;
+  --ui-switch-h: 20px;
+}
+
+/* ---- Toggles: the plain switch only, on every page and every screen size. No box, border or background around it. ---- */
+.bld-switch, .item-dialog .bld-switch, .bn-row .bld-switch { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; height: auto; min-height: 44px; }
+.bld-switch.sp-switch { width: auto; padding: 0; justify-content: flex-start; }
+.bld-switch-knob { width: var(--ui-switch-w); height: var(--ui-switch-h); }
+
+/* ---- Phone ---- */
+/* Popups: one type. The legacy centred cards (.modal-card, item dialogs, confirm dialogs) become bottom sheets, same as .asg-sheet. */
+html[data-layout="mobile"] .modal-overlay,
+html[data-layout="mobile"] .modal-overlay.item-dialog-overlay { align-items: flex-end; justify-content: center; padding: 0; }
+html[data-layout="mobile"] .modal-overlay .modal-card,
+html[data-layout="mobile"] .modal-overlay .item-dialog,
+html[data-layout="mobile"] .modal-overlay .confirm-card {
+  width: 100% !important; max-width: none !important; margin: 0 !important;
+  border-radius: var(--ui-sheet-radius) var(--ui-sheet-radius) 0 0;
+  max-height: min(92dvh, calc(var(--vvh, 100dvh) - 12px)) !important; position: relative;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.22);
+  opacity: 1; transform: translateY(100%);
+  transition: transform var(--motion-slow) var(--ease-out);
+}
+html[data-layout="mobile"] .modal-overlay.open .modal-card,
+html[data-layout="mobile"] .modal-overlay.open .item-dialog,
+html[data-layout="mobile"] .modal-overlay.open .confirm-card { transform: none; }
+html[data-layout="mobile"] .item-dialog-head .sheet-close-btn { position: static; margin-left: auto; flex: none; }
+/* the grab handle the sheets already show (.filter-handle) */
+html[data-layout="mobile"] .modal-overlay .modal-card::before { content: ""; flex: none; align-self: center; width: 40px; height: 4px; border-radius: 4px; background: #CBD5E1; margin: 8px 0 0; }
+html[data-layout="mobile"] .asg-sheet.wiz-sheet,
+html[data-layout="mobile"] .asg-sheet.bld-sheet { border-radius: var(--ui-sheet-radius) var(--ui-sheet-radius) 0 0; }
+html[data-layout="mobile"] .asg-overlay:has(.itin-sheet) { align-items: flex-end; padding: 0; }
+html[data-layout="mobile"] .asg-sheet.itin-sheet { border-radius: var(--ui-sheet-radius) var(--ui-sheet-radius) 0 0; transform: translateY(100%); opacity: 1; }
+html[data-layout="mobile"] .asg-overlay.open .asg-sheet.itin-sheet { transform: none; }
+
+/* Header: title and the X at the top right, the same size everywhere */
+html[data-layout="mobile"] :is(.asg-header, .modal-header, .item-dialog-head, .confirm-head, .wiz-title, .notifications-header) :is(h3, h4) { font-size: var(--ui-sheet-title); font-weight: 800; }
+html[data-layout="mobile"] .sheet-close-btn { width: var(--ui-close-size); height: var(--ui-close-size); border-radius: 50%; }
+
+/* The bell's panel is a bottom sheet too, with an X */
+.notif-close { display: none; }
+html[data-layout="mobile"] .mobile-notifications { left: 0; right: 0; top: auto; bottom: 0; max-height: 80dvh; border: 0; border-radius: var(--ui-sheet-radius) var(--ui-sheet-radius) 0 0; box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.22); padding-bottom: var(--safe-bottom); animation: uiSheetIn var(--motion-slow) var(--ease-out); }
+html[data-layout="mobile"] .mobile-notifications::before { content: ""; flex: none; align-self: center; width: 40px; height: 4px; border-radius: 4px; background: #CBD5E1; margin: 8px 0 0; }
+html[data-layout="mobile"] .mobile-notifications .notifications-header { align-items: center; gap: 10px; }
+html[data-layout="mobile"] .mobile-notifications .notif-close { display: flex; flex: none; position: static; margin-left: 4px; }
+@keyframes uiSheetIn { from { transform: translateY(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { html[data-layout="mobile"] .mobile-notifications { animation: none; } html[data-layout="mobile"] .modal-overlay .modal-card, html[data-layout="mobile"] .modal-overlay .item-dialog, html[data-layout="mobile"] .modal-overlay .confirm-card { transition: none; } }
+
+/* Buttons inside sheets, dialogs and footers: one height, one radius, icon left of the label on one line */
+html[data-layout="mobile"] :is(.asg-sheet, .modal-card, .bottom-sheet, .sp-detail, .sheet-sticky-footer) :is(.btn-primary-desktop, .btn-secondary-desktop, .btn-confirm-booking, .btn-cancel-assign, .btn-whatsapp-assign, .quick-action-col-btn, .modal-footer .action-pill-btn):not(.btn-sm) {
+  display: inline-flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px;
+  height: var(--ui-btn-h); min-height: var(--ui-btn-h); padding: 0 14px; border-radius: var(--ui-btn-radius);
+  font-size: 14px; font-weight: 700; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+html[data-layout="mobile"] :is(.asg-sheet, .modal-card, .bottom-sheet, .sp-detail, .sheet-sticky-footer) :is(.btn-primary-desktop, .btn-confirm-booking, .btn-whatsapp-assign):not(.btn-danger) { background: var(--primary); border: 0; color: #FFFFFF; box-shadow: none; }
+html[data-layout="mobile"] :is(.asg-sheet, .modal-card, .bottom-sheet, .sp-detail, .sheet-sticky-footer) :is(.btn-secondary-desktop, .btn-cancel-assign, .quick-action-col-btn, .modal-footer .action-pill-btn) { background: #FFFFFF; border: 1px solid #CBD5E1; color: #334155; }
+html[data-layout="mobile"] :is(.btn-primary-desktop, .btn-confirm-booking).btn-danger { background: #DC2626; border: 0; }
+html[data-layout="mobile"] .quick-action-col-btn svg { flex: none; width: 16px; height: 16px; }
+html[data-layout="mobile"] .sheet-quick-actions-grid { gap: var(--ui-gap); }
+html[data-layout="mobile"] .btn-confirm-booking { width: 100%; }
+
+/* Footers: the main action full width on top, the others side by side in equal widths below it */
+html[data-layout="mobile"] :is(.fu-footer, .bld-embed-footer, .assign-footer-actions, .modal-footer, .item-dialog-foot, .confirm-foot, .cal-foot) { display: flex; flex-wrap: wrap; align-items: stretch; gap: var(--ui-gap); padding: 12px 16px max(12px, var(--safe-bottom)); background: #FFFFFF; border-top: 1px solid #F1F5F9; }
+html[data-layout="mobile"] :is(.fu-footer, .bld-embed-footer, .assign-footer-actions, .modal-footer, .item-dialog-foot, .confirm-foot, .cal-foot) > :is(.btn-primary-desktop, .btn-confirm-booking, .btn-whatsapp-assign) { flex: 1 1 100%; order: -1; min-width: 0; width: auto; }
+html[data-layout="mobile"] :is(.fu-footer, .bld-embed-footer, .assign-footer-actions, .modal-footer, .item-dialog-foot, .confirm-foot, .cal-foot) > :not(.btn-primary-desktop):not(.btn-confirm-booking):not(.btn-whatsapp-assign) { flex: 1 1 0; min-width: 0; }
+html[data-layout="mobile"] .modal-footer { position: sticky; bottom: 0; }
+html[data-layout="mobile"] .bld-embed-footer .bld-link, html[data-layout="mobile"] .wiz-footer .bld-link { min-height: var(--ui-btn-h); display: inline-flex; align-items: center; justify-content: center; }
+
+/* Fields: inputs, dropdowns, search, pickers. One height, 12px radius, one border, one focus ring. Font: Plus Jakarta Sans. */
+html[data-layout="mobile"] :is(.dd-trigger, .compact-search-bar, .search-input-wrapper, .table-toolbar-search-box, .bld-input, .bld-money, .fu-picker, .item-dialog .bld-input, .item-dialog .bld-money, .item-dialog .fu-picker) {
+  height: var(--ui-field-h); min-height: var(--ui-field-h); border-radius: var(--ui-field-radius); border: 1px solid var(--ui-field-border); background: var(--ui-field-bg);
+}
+html[data-layout="mobile"] :is(.form-group input, .form-group select, .sp-detail-body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select)) {
+  height: var(--ui-field-h); border-radius: var(--ui-field-radius); border: 1px solid var(--ui-field-border); background: var(--ui-field-bg); font-family: var(--font-family);
+}
+html[data-layout="mobile"] :is(.form-group textarea, .sp-detail-body textarea) { border-radius: var(--ui-field-radius); border: 1px solid var(--ui-field-border); background: var(--ui-field-bg); font-family: var(--font-family); }
+html[data-layout="mobile"] :is(.dd-trigger[aria-expanded="true"], .compact-search-bar:focus-within, .search-input-wrapper:focus-within, .table-toolbar-search-box:focus-within, .bld-input:focus-within, .bld-money:focus-within, .fu-picker:focus-within, .form-group input:focus, .form-group select:focus, .form-group textarea:focus, .sp-detail-body :is(input, select, textarea):focus) {
+  border-color: var(--ui-focus-border); background: #FFFFFF; box-shadow: var(--ui-focus-ring); outline: none;
+}
+html[data-layout="mobile"] :is(.dd-trigger, .bld-input input, .bld-money input, .fu-picker input, .compact-search-bar input, .search-input-wrapper input) { font-family: var(--font-family); }
+html[data-layout="mobile"] .item-dialog-head { padding: 12px 16px; }
+html[data-layout="mobile"] .form-group .dd-trigger { width: 100%; }
+html[data-layout="mobile"] :is(.asg-sheet, .modal-card, .bottom-sheet, .sp-detail, .sheet-sticky-footer) .quick-action-col-btn:not(.btn-sm) { padding: 0 4px !important; gap: 5px !important; font-size: 12.5px !important; font-weight: 600; min-width: 0; }
+html[data-layout="mobile"] .quick-action-col-btn > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---- Round 2 (phone): stat tiles, sideways scroll ---- */
+/* Stat tiles: 2 per row, an odd last tile spans the full width */
+html[data-layout="mobile"] .sp-stats, html[data-layout="mobile"] [data-sp="users"] .sp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+html[data-layout="mobile"] .sp-stats > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* The page never scrolls sideways; rows of tabs and chips scroll by touch (they already have overflow-x: auto and a hidden scrollbar) */
+html[data-layout="mobile"] body, html[data-layout="mobile"] .app-viewport { overflow-x: clip; }
+
+/* Chip rows inside a detail sheet (amenities...) are .scroll-row: they run to the sheet edge (the sheet body has 16px padding) */
+html[data-layout="mobile"] .sp-detail-body .sp-chips.scroll-row { margin-inline: -16px; }
+
+/* A detail pane with no footer actions has no footer bar */
+.sp-detail-foot[hidden] { display: none !important; }
+
+/* ---- Detail panes, every layout: rows inside cards, stat tiles, footer actions ---- */
+/* Rows inside a bordered card keep the card's inner padding (same as the Bookings cards), toggle or value inside it */
+.sp-group > .sp-toggle-row { padding: 12px 14px; }
+.sp-linkrow { padding: 12px 14px; }
+/* N stat tiles share the row evenly and fill it; on the phone (narrow pane) it stays 2 per row, the odd last tile full width (rule above) */
+@container (min-width: 560px) {
+  .sp-stats { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+}
+/* Footer: the primary full width, the secondary buttons white with an outline, icon left of the label, equal widths filling the row.
+   (!important: the PC drawer footer in style.css sets the stacked 4-column look with !important; Bookings and Inquiries are not .sp-detail-foot and keep it.) */
+.sp-detail-foot .sp-quick { grid-template-columns: repeat(var(--sp-cols, 4), minmax(0, 1fr)) !important; gap: var(--ui-gap); }
+.sp-detail-foot .quick-action-col-btn:not(.btn-sm) {
+  display: inline-flex !important; flex-direction: row !important; align-items: center; justify-content: center; gap: 6px; min-width: 0;
+  height: var(--ui-btn-h) !important; min-height: var(--ui-btn-h) !important; padding: 0 8px; border-radius: var(--ui-btn-radius);
+  background: #FFFFFF; border: 1px solid #CBD5E1; color: #334155; font-size: 13px; font-weight: 600; line-height: 1.25; white-space: nowrap; overflow: hidden;
+}
+.sp-detail-foot .quick-action-col-btn > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-detail-foot .quick-action-col-btn svg { flex: none; width: 16px; height: 16px; }
+.sp-detail-foot .btn-confirm-booking { height: var(--ui-btn-h); border-radius: var(--ui-btn-radius); width: 100%; }
+/* Section labels: a wider gap above than between the label and its card */
+.sp-content { gap: 18px; }
+.sp-detail-foot .sp-quick { grid-auto-rows: var(--ui-btn-h); }
+/* Detail header: the Bookings header (56px avatar, room above and below) */
+.sp-detail-head .sheet-customer-header { padding: 16px 22px 14px; }
+.sp-detail-head .customer-avatar-badge { width: 56px; height: 56px; flex: none; }
+/* Cards inside a detail pane are spaced by the pane's own gap, not by their own margin as well */
+.sp-content > .details-section-card { margin-top: 0; margin-bottom: 0; }

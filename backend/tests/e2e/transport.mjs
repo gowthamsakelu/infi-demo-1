@@ -12,6 +12,7 @@ await runCatalogSuite({
       { key: 'buses', label: 'Buses', count: rows.filter((r) => r.category === 'bus' || r.key === 'bus').length },
       { key: 'rentals', label: 'Rentals', count: rows.filter((r) => ['self_drive', 'scooter_bike'].includes(r.key)).length },
     ],
+    filter: { labels: ['Any AC', 'AC', 'Non-AC'], value: 'ac', count: rows.filter((r) => !!r.ac).length },
   }),
   extra: async ({ page, m, tag, wait, noHScroll, open, name }) => {
     await open(m ? '' : '?selected=1');
@@ -21,6 +22,7 @@ await runCatalogSuite({
     check(`${tag} Rates: rate card has four rows`, await page.locator('.sp-group').first().locator('.sp-linkrow').count() === 4);
     check(`${tag} two switches, both on for the first vehicle`, await page.locator('.sp-switch.is-on').count() === 2);
     check(`${tag} no overflow in the detail`, await noHScroll());
+    check(`${tag} footer: Save changes, then Reset and Edit`, (await page.locator('.sp-detail-foot .btn-confirm-booking[data-sp-act="save"]').innerText()).includes('Save changes') && (await page.locator('.sp-detail-foot .quick-action-col-btn').evaluateAll((b) => b.map((x) => x.dataset.spAct))).join() === 'reset,edit');
 
     if (!m) {
       const first = await name();

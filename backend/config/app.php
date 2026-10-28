@@ -16,6 +16,12 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | Dummy data for the catalog pages (Destinations, Tour Packages, Transport, Stays, Adventures, Banners, Blogs, Settings):
+    | while true they are served from database/dummy/*.json and their tables are not read. Set USE_DUMMY_DATA=false for the real data.
+    */
+    'use_dummy_data' => (bool) env('USE_DUMMY_DATA', true),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------

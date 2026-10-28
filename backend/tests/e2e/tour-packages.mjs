@@ -23,10 +23,12 @@ await runCatalogSuite({
     check(`${tag} Itinerary: no overflow`, await noHScroll());
     await page.locator('[data-sp-dtab="pricing"]').click(); await wait(300);
     check(`${tag} Pricing lists the tiers`, await page.locator('.sp-detail-body .sp-linkrow').count() === 4);
-    await page.locator('[data-sp-dtab="inclusions"]').click(); await wait(300);
-    check(`${tag} Inclusions lists included and not included`, await page.locator('.tp-list li').count() >= 8);
-    await page.locator('[data-sp-dtab="inquiries"]').click(); await wait(300);
-    check(`${tag} Inquiries tab opens`, /Inquiries/.test(await page.locator('.sp-detail-tabs [aria-selected="true"]').innerText()));
+    await page.locator('[data-sp-dtab="overview"]').click(); await wait(500);
+    check(`${tag} three tabs: Overview, Itinerary, Pricing`, (await page.locator('.sp-detail-tabs .sheet-tab-btn').allInnerTexts()).map((x) => x.trim()).join('|') === 'Overview|Itinerary|Pricing');
+    check(`${tag} Overview lists inclusions and exclusions in one card`, await page.locator('.short-details-card .ie-list li').count() >= 8 && /Inclusions & Exclusions/.test(await page.locator('.sp-detail-body').innerText()));
+    await page.waitForFunction(() => ![...document.querySelectorAll('.sp-stat-value')].some((e) => e.textContent.trim() === '…'), null, { timeout: 10000 }).catch(() => {}); await wait(300);
+    const hasInq = await page.evaluate(() => { const t = [...document.querySelectorAll('.sp-stat')].find((e) => /Inquiries/.test(e.innerText)); return Number(t?.querySelector('.sp-stat-value')?.innerText) > 0; });
+    check(`${tag} Overview shows the recent inquiries with View all, only when there are some`, (await page.locator('.sp-detail-body a[href="#inquiries"]').count()) === (hasInq ? 1 : 0) && (/recent inquiries/i.test(await page.locator('.sp-detail-body').innerText()) === hasInq));
     check(`${tag} the old spelling never appears`, !/enquir/i.test(await page.locator('.sp-detail').innerText()));
 
     // the builder, prefilled
@@ -42,6 +44,6 @@ await runCatalogSuite({
     check(`${tag} the builder shows the package days`, /Day 1/.test(txt) && /Day 5/.test(txt), txt.slice(0, 300));
     check(`${tag} builder: no horizontal scroll`, await noHScroll());
     await page.keyboard.press('Escape'); await wait(500);
-    if (await page.locator('.bld-sheet').count()) { await page.getByRole('button', { name: 'Discard' }).click().catch(() => {}); await wait(400); }
+    if (await page.locator('.bld-sheet').count()) { await page.getByRole('button', { name: 'Discard', exact: true }).click().catch(() => {}); await wait(400); }
   },
 });

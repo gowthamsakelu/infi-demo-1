@@ -8,8 +8,10 @@ use App\Models\Destination;
 use App\Models\Inquiry;
 use App\Models\SavedActivity;
 use App\Models\SavedHotel;
+use App\Support\DummyData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -21,6 +23,16 @@ class DestinationController extends Controller
 {
     public function index(): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::list('destinations')]);
+        }
+
+        return response()->json(['success' => true, 'data' => Cache::remember('pages.destinations.index', 60, fn () => $this->listRows())]);
+    }
+
+    /** The list rows: the numbers every row needs, counted for all destinations in a few queries. */
+    private function listRows(): array
+    {
         $destinations = Destination::query()->orderBy('id')->get();
         $year = now()->year;
         $inquiries = Inquiry::query()->whereYear('created_at', $year)->pluck('trip');
@@ -28,7 +40,7 @@ class DestinationController extends Controller
             ? DB::table('tour_packages')->selectRaw('destination_id, count(*) as n')->groupBy('destination_id')->pluck('n', 'destination_id')
             : collect();
 
-        return response()->json(['success' => true, 'data' => $destinations->map(fn (Destination $d) => [
+        return $destinations->map(fn (Destination $d) => [
             'id' => $d->id,
             'slug' => $d->slug,
             'name' => $d->name,
@@ -38,11 +50,16 @@ class DestinationController extends Controller
             'image' => $d->image ? '/images/'.$d->image : null,
             'packages' => (int) ($packages[$d->id] ?? 0),
             'inquiries' => $this->mentions($d, $inquiries),
-        ])->values()]);
+        ])->values()->all();
     }
 
-    public function show(Destination $destination): JsonResponse
+    public function show(int $id): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::detail('destinations', $id) ?? abort(404)]);
+        }
+
+        $destination = Destination::query()->findOrFail($id);
         $year = now()->year;
         $inquiryQuery = fn () => $destination->mentioning(Inquiry::query(), 'trip');
         $thisYear = $inquiryQuery()->whereYear('created_at', $year);

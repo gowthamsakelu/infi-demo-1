@@ -1,0 +1,248 @@
+{
+    "list": [
+        {
+            "id": "company",
+            "name": "Company",
+            "description": "Name, contact and address",
+            "icon": "briefcase",
+            "editable": true
+        },
+        {
+            "id": "lead-sources",
+            "name": "Lead sources",
+            "description": "Where inquiries come from",
+            "icon": "users",
+            "editable": true
+        },
+        {
+            "id": "inquiry-stages",
+            "name": "Inquiry stages",
+            "description": "How inquiries move along",
+            "icon": "filter",
+            "editable": false
+        },
+        {
+            "id": "bookings-payments",
+            "name": "Bookings and payments",
+            "description": "Instalments, GST, currency",
+            "icon": "rupee",
+            "editable": true
+        },
+        {
+            "id": "message-templates",
+            "name": "Message templates",
+            "description": "WhatsApp and email replies",
+            "icon": "message",
+            "editable": false
+        },
+        {
+            "id": "notifications",
+            "name": "Notifications",
+            "description": "What alerts you receive",
+            "icon": "bell",
+            "editable": true
+        },
+        {
+            "id": "integrations",
+            "name": "Integrations",
+            "description": "Google Places, WhatsApp, email",
+            "icon": "layers",
+            "editable": false
+        },
+        {
+            "id": "data-backup",
+            "name": "Data and backup",
+            "description": "Export, import, backups",
+            "icon": "download",
+            "editable": false
+        }
+    ],
+    "detail": {
+        "company": {
+            "id": "company",
+            "name": "Company",
+            "description": "Name, contact and address",
+            "editable": true,
+            "values": {
+                "name": "Ruyi Travels",
+                "phone": "+91 98200 00000",
+                "email": "hello@ruyitravels.com",
+                "website": "www.ruyitravels.com",
+                "address": "Mumbai, Maharashtra, India"
+            },
+            "preferences": {
+                "autoAssign": true,
+                "sendQuoteWhatsapp": true,
+                "dailySummary": true,
+                "showGst": false
+            },
+            "services": [
+                {
+                    "key": "google-places",
+                    "name": "Google Places",
+                    "description": "Hotel and activity search in the itinerary builder",
+                    "status": "demo",
+                    "statusLabel": "Demo data",
+                    "details": {
+                        "mode": "auto",
+                        "using": "demo",
+                        "keyConfigured": false
+                    }
+                },
+                {
+                    "key": "whatsapp",
+                    "name": "WhatsApp",
+                    "description": "Send quotes and replies from the CRM",
+                    "status": "inactive",
+                    "statusLabel": "Not connected",
+                    "details": null
+                },
+                {
+                    "key": "email",
+                    "name": "Email",
+                    "description": "Send itineraries and daily summaries",
+                    "status": "inactive",
+                    "statusLabel": "Not connected",
+                    "details": null
+                }
+            ]
+        },
+        "lead-sources": {
+            "id": "lead-sources",
+            "name": "Lead sources",
+            "description": "Where inquiries come from",
+            "editable": true,
+            "sources": [
+                {
+                    "name": "Website contact form",
+                    "active": true
+                },
+                {
+                    "name": "WhatsApp",
+                    "active": true
+                },
+                {
+                    "name": "Referral",
+                    "active": true
+                },
+                {
+                    "name": "Instagram",
+                    "active": true
+                },
+                {
+                    "name": "Google Search",
+                    "active": true
+                },
+                {
+                    "name": "Facebook",
+                    "active": true
+                }
+            ]
+        },
+        "inquiry-stages": {
+            "id": "inquiry-stages",
+            "name": "Inquiry stages",
+            "description": "How inquiries move along",
+            "editable": false,
+            "stages": [
+                {
+                    "key": "new",
+                    "label": "New",
+                    "description": "Just arrived, nobody has worked it yet",
+                    "count": 2
+                },
+                {
+                    "key": "ongoing",
+                    "label": "Ongoing",
+                    "description": "Being worked: a quote is out or being prepared",
+                    "count": 2
+                },
+                {
+                    "key": "warm",
+                    "label": "Warm",
+                    "description": "Interested, talking about the details",
+                    "count": 2
+                },
+                {
+                    "key": "hot",
+                    "label": "Hot",
+                    "description": "Ready to book soon",
+                    "count": 2
+                }
+            ]
+        },
+        "bookings-payments": {
+            "id": "bookings-payments",
+            "name": "Bookings and payments",
+            "description": "Instalments, GST, currency",
+            "editable": true,
+            "values": {
+                "gstPercent": 5,
+                "advancePercent": 30,
+                "dueDays": 15
+            }
+        },
+        "message-templates": {
+            "id": "message-templates",
+            "name": "Message templates",
+            "description": "WhatsApp and email replies",
+            "editable": false,
+            "empty": true
+        },
+        "notifications": {
+            "id": "notifications",
+            "name": "Notifications",
+            "description": "What alerts you receive",
+            "editable": true,
+            "types": {
+                "payment": true,
+                "inquiry": true,
+                "followup": true,
+                "trip": true
+            }
+        },
+        "integrations": {
+            "id": "integrations",
+            "name": "Integrations",
+            "description": "Google Places, WhatsApp, email",
+            "editable": false,
+            "services": [
+                {
+                    "key": "google-places",
+                    "name": "Google Places",
+                    "description": "Hotel and activity search in the itinerary builder",
+                    "status": "demo",
+                    "statusLabel": "Demo data",
+                    "details": {
+                        "mode": "auto",
+                        "using": "demo",
+                        "keyConfigured": false
+                    }
+                },
+                {
+                    "key": "whatsapp",
+                    "name": "WhatsApp",
+                    "description": "Send quotes and replies from the CRM",
+                    "status": "inactive",
+                    "statusLabel": "Not connected",
+                    "details": null
+                },
+                {
+                    "key": "email",
+                    "name": "Email",
+                    "description": "Send itineraries and daily summaries",
+                    "status": "inactive",
+                    "statusLabel": "Not connected",
+                    "details": null
+                }
+            ]
+        },
+        "data-backup": {
+            "id": "data-backup",
+            "name": "Data and backup",
+            "description": "Export, import, backups",
+            "editable": false,
+            "empty": true
+        }
+    }
+}

@@ -17,23 +17,49 @@ export function renderTabs(host, { tabs, active, variant = 'desktop', attr = 'da
   const item = (t) => {
     const on = t.key === active;
     if (variant === 'mobile') {
-      return `<button class="tab-pill ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(t.label)} <span class="pill-badge">${t.count}</span></button>`;
+      return `<button class="tab-pill ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(t.label)}${t.count == null ? '' : ` <span class="pill-badge">${t.count}</span>`}</button>`;
     }
     const cls = variant === 'compact' ? 'compact-tab-btn' : 'desktop-tab-btn';
     const short = variant === 'compact' ? t.short || t.label : t.label;
-    return `<button class="${cls} ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(short)} (${t.count})</button>`;
+    return `<button class="${cls} ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(short)}${t.count == null ? '' : ` (${t.count})`}</button>`;
   };
   const wrap = { mobile: 'category-filter-tabs', desktop: 'toolbar-tabs-group', compact: 'compact-tabs-nav' }[variant];
-  host.innerHTML = `<div class="${wrap} tabs-scroller" role="tablist">${tabs.map(item).join('')}</div>`;
+  host.innerHTML = `<div class="${wrap} tabs-scroller scroll-row" role="tablist">${tabs.map(item).join('')}</div>`;
   const el = host.firstElementChild;
   el.scrollLeft = left;
   bindTabsScroller(el);
-  // Bring the active tab into view only when the selection changed (not on every re-render).
-  if (host.dataset.active !== String(active)) {
-    host.dataset.active = String(active);
-    const on = el.querySelector('[aria-selected="true"]');
-    if (on) el.scrollLeft = Math.max(0, on.offsetLeft - (el.clientWidth - on.offsetWidth) / 2);
-  }
+  // the active tab is kept in view by watchScrollRows (below)
+}
+
+/**
+ * Keep the active item of every .scroll-row in view, with its row's 16px edge: when a tab, pill or chip becomes active (on load, on tap, after a
+ * re-render) and is not fully visible, the row scrolls it into view smoothly. Rows the person scrolled by hand are left alone while the active item is visible.
+ * Call once at start-up; it watches the whole page.
+ */
+export function watchScrollRows() {
+  const ACTIVE = '.active, .is-selected, .is-on, [aria-selected="true"]';
+  const reveal = (row) => {
+    const on = row.querySelector(ACTIVE);
+    if (!on || row.scrollWidth <= row.clientWidth) return;
+    const edge = 16;
+    const r = row.getBoundingClientRect();
+    const o = on.getBoundingClientRect();
+    let dx = 0;
+    if (o.left < r.left + edge) dx = o.left - r.left - edge;
+    else if (o.right > r.right - edge) dx = o.right - r.right + edge;
+    if (Math.abs(dx) > 1) row.scrollTo({ left: row.scrollLeft + dx, behavior: 'smooth' });
+  };
+  const queued = new Set();
+  const flush = () => { const rows = [...queued]; queued.clear(); rows.forEach((row) => row.isConnected && reveal(row)); };
+  const queue = (node) => {
+    const el = node.nodeType === 1 ? node : node.parentElement;
+    const row = el?.closest?.('.scroll-row');
+    if (row) { if (!queued.size) requestAnimationFrame(() => requestAnimationFrame(flush)); queued.add(row); }
+    if (el?.querySelectorAll) el.querySelectorAll('.scroll-row').forEach((r) => { if (!queued.size) requestAnimationFrame(() => requestAnimationFrame(flush)); queued.add(r); });
+  };
+  new MutationObserver((list) => list.forEach((m) => queue(m.type === 'childList' ? (m.addedNodes[0] || m.target) : m.target)))
+    .observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'aria-selected'] });
+  window.addEventListener('layout-changed', () => document.querySelectorAll('.scroll-row').forEach(reveal));
 }
 
 /**

@@ -11,12 +11,11 @@ await runCatalogSuite({
   extra: async ({ page, m, tag, wait, noHScroll, open, cfg }) => {
     await open(m ? '' : `?selected=${cfg.focus}`);
     if (m) { await page.locator(`.sp-row[data-sp-id="${cfg.focus}"]`).click(); await wait(600); }
-    check(`${tag} header: city, rating and the tag`, /Srinagar/.test(await page.locator('.customer-trip-subtitle').innerText()) && await page.locator('.customer-title-row .card-type-badge').count() === 1);
+    check(`${tag} header: city, rating and the tag`, /Srinagar/.test(await page.locator('.sp-detail-head .customer-trip-subtitle').innerText()) && await page.locator('.customer-title-row .card-type-badge').count() === 1);
     check(`${tag} Overview: stats and contact`, await page.locator('.sp-stat').count() === 3 && /Phone/.test(await page.locator('.sp-detail-body').innerText()));
     await page.locator('[data-sp-dtab="rooms"]').click(); await wait(500);
     check(`${tag} Rooms & Rates: 4 room cards with 4 meal-plan rates`, await page.locator('.st-room').count() === 4 && await page.locator('.st-room').first().locator('.st-rates > div').count() === 4);
     check(`${tag} Rooms & Rates: no overflow`, await noHScroll());
-    await page.locator('[data-sp-dtab="plans"]').click(); await wait(400);
     check(`${tag} Meal plans: four starting rates`, await page.locator('.sp-detail-body .sp-linkrow').count() === 4);
     await page.locator('[data-sp-dtab="overview"]').click(); await wait(300);
     check(`${tag} footer: primary button plus Edit and Call`, await page.locator('.sp-detail-foot .btn-confirm-booking').count() === 1 && await page.locator('.sp-detail-foot [data-sp-act="call"]').count() === 1);

@@ -4,7 +4,6 @@
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson, sendJson } from '../shared/http.js';
 import { esc, toast, initials } from '../shared/ui.js';
-import { icon } from '../shared/icons.js';
 import { confirmDialog } from '../shared/sheet.js';
 import { pill, statRow, detailGrid, rowGroup, linkRow, plural } from '../shared/page-ui.js';
 
@@ -96,11 +95,14 @@ export default {
 
     function foot(item, d) {
       const off = item.status === 'inactive';
-      const dirty = isDirty();
-      return `
-        <button type="button" class="btn-secondary-desktop sp-foot-btn us-danger" data-sp-act="status" ${d ? '' : 'disabled'}>${off ? 'Reactivate user' : 'Deactivate user'}</button>
-        <button type="button" class="btn-secondary-desktop sp-foot-btn" data-sp-act="reset">Reset password</button>
-        <button type="button" class="btn-primary-desktop sp-foot-btn" data-sp-act="save" ${d?.editable && dirty && !saving ? '' : 'disabled'}>${saving ? 'Saving…' : 'Save changes'}</button>`;
+      return {
+        primary: { label: saving ? 'Saving…' : 'Save changes', icon: 'check', act: 'save', disabled: !(d?.editable && isDirty() && !saving) },
+        quick: [
+          { label: 'Edit', icon: 'edit', tone: 'fwd', act: 'edit' },
+          { label: 'Reset password', icon: 'lock', tone: 'msg', act: 'reset' },
+          { label: off ? 'Reactivate' : 'Deactivate', icon: off ? 'checkCircle' : 'alertCircle', tone: 'call', act: 'status', disabled: !d },
+        ],
+      };
     }
 
     page = createSplitPage(host, ctx, {
@@ -118,34 +120,28 @@ export default {
         { key: 'sales', label: 'Sales', test: (u) => u.role === 'sales' },
         { key: 'operations', label: 'Operations', test: (u) => u.role === 'operations' },
       ],
-      sorts: [
-        { value: '', label: 'Default order' },
-        { value: 'az', label: 'Name A–Z', compare: (a, b) => a.name.localeCompare(b.name) },
-        { value: 'recent', label: 'Last active', compare: (a, b) => String(b.lastActiveAt || '').localeCompare(String(a.lastActiveAt || '')) },
-      ],
+      filter: {
+        allLabel: 'Any status',
+        options: () => Object.entries(STATUS).map(([value, label]) => ({ value, label })),
+        test: (u, value) => u.status === value,
+      },
       searchText: (u) => `${u.name} ${u.email} ${u.roleLabel} ${u.title || ''}`,
       row: (u) => ({ tile: avatar(u), name: u.name, pill: pill(u.status, STATUS[u.status] || u.status), sub: u.email, meta: `${u.roleLabel} · ${lastSeen(u)}` }),
       detail: (item, ui) => {
         const d = cache.get(item.id);
-        const head = `<span class="sp-tile us-head-av">${avatar(item)}</span>
-          <div class="sp-head-text">
-            <div class="sp-head-name"><h2>${esc(item.name)}</h2>${pill(item.status, STATUS[item.status] || item.status)}</div>
-            <p class="sp-head-sub">${esc([item.email, item.title, `Last active ${lastSeen(item).toLowerCase()}`].filter(Boolean).join(' · '))}</p>
-          </div>
-          <div class="sp-head-actions">
-            <button type="button" class="sp-icon-btn" aria-label="Edit ${esc(item.name)}">${icon('edit', { size: 18 })}</button>
-            <button type="button" class="sp-icon-btn" aria-label="More options for ${esc(item.name)}" aria-haspopup="menu">${icon('more', { size: 18 })}</button>
-          </div>`;
+        const head = {
+          avatar: avatar(item),
+          title: item.name,
+          pill: pill(item.status, STATUS[item.status] || item.status),
+          subtitle: item.email,
+          chips: [{ icon: 'user', text: item.title || item.roleLabel }, { icon: 'time', text: lastSeen(item) === 'Online' ? 'Online' : `Last active ${lastSeen(item).toLowerCase()}` }],
+        };
         const tabs = [{ key: 'permissions', label: 'Permissions' }, { key: 'profile', label: 'Profile' }, { key: 'activity', label: 'Activity' }];
         const body = ui.tab === 'profile' ? profileTab(item, d) : ui.tab === 'activity' ? activityTab(d) : permissionsTab(item, d);
         return { head, tabs, body, foot: foot(item, d) };
       },
       afterDetail: (_el, item) => { ensureDetail(item); },
       discard: () => drafts.clear(),
-      export: { filename: 'users', columns: [
-        { label: 'Name', value: (u) => u.name }, { label: 'Email', value: (u) => u.email }, { label: 'Role', value: (u) => u.roleLabel },
-        { label: 'Status', value: (u) => STATUS[u.status] || u.status }, { label: 'Last active', value: (u) => lastSeen(u) },
-      ] },
     });
     page.api.bindDirty(isDirty);
 
@@ -222,7 +218,7 @@ export default {
       const act = e.target.closest('[data-sp-act]')?.dataset.spAct;
       if (act === 'save') save();
       else if (act === 'status') toggleStatus();
-      // "reset" (Reset password) is drawn only: it does nothing until password reset can be done safely.
+      // "edit" and "reset" (Reset password) are drawn only: they do nothing yet.
     };
     host.addEventListener('click', onClick);
 

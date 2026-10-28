@@ -49,12 +49,11 @@ export default {
         { key: 'rentals', label: 'Rentals', test: (v) => kind(v) === 'rental' },
         { key: 'other', label: 'Other', test: (v) => kind(v) === 'other' },
       ],
-      sorts: [
-        { value: '', label: 'Default order' },
-        { value: 'az', label: 'Name A–Z', compare: (a, b) => a.name.localeCompare(b.name) },
-        { value: 'rate', label: 'Rate: low to high', compare: (a, b) => (a.baseRate ?? Infinity) - (b.baseRate ?? Infinity) },
-        { value: 'trips', label: 'Most trips', compare: (a, b) => b.trips - a.trips },
-      ],
+      filter: {
+        allLabel: 'Any AC',
+        options: () => [{ value: 'ac', label: 'AC' }, { value: 'non-ac', label: 'Non-AC' }],
+        test: (v, value) => (value === 'ac' ? !!v.ac : !v.ac),
+      },
       searchText: (v) => `${v.name} ${v.description || ''} ${KIND_LABEL[kind(v)]}`,
       isDirty: changed,
       discard: () => { draft = null; },

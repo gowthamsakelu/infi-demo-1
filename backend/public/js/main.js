@@ -4,6 +4,7 @@ import { createDesktopView } from './desktop.js';
 import { INITIAL_BOOKINGS, STAFF_MEMBERS } from './data.js';
 import { refresh } from './shared/page-state.js';
 import { initKeyboard } from './shared/keyboard.js';
+import { watchScrollRows } from './shared/list-ui.js';
 import { initLayout, applyLayout } from './shared/layout.js';
 import { enhanceSelects } from './shared/dropdown-filter.js';
 import { closeRowMenu } from './shared/ui.js';
@@ -31,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const appContainer = document.getElementById('app');
   if (!appContainer) return;
   await fontsReady();
+  watchScrollRows();
 
   // Layout can change live (fold/unfold, rotate, resize). CSS swaps the layout from <html data-layout>; here we reset
   // open overlays so nothing is left in a state that does not exist in the new layout.

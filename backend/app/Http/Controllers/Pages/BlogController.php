@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pages;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateBlogPostRequest;
 use App\Models\BlogPost;
+use App\Support\DummyData;
 use Illuminate\Http\JsonResponse;
 
 /** Blogs page: the four stat cards are real sums over blog_posts, and the list is the articles, newest first. */
@@ -12,6 +13,10 @@ class BlogController extends Controller
 {
     public function index(): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::file('blogs')]);
+        }
+
         $totals = BlogPost::query()->selectRaw('count(*) as total, coalesce(sum(views), 0) as views, coalesce(sum(leads), 0) as leads, coalesce(sum(converted), 0) as converted')->first();
 
         return response()->json(['success' => true, 'data' => [

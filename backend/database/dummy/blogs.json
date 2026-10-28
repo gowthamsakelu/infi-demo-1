@@ -1,0 +1,140 @@
+{
+    "stats": {
+        "total": 10,
+        "views": 7840,
+        "leads": 37,
+        "converted": 9
+    },
+    "posts": [
+        {
+            "id": 1,
+            "title": "Top 10 places to visit in Kashmir in winter",
+            "slug": "top-10-places-to-visit-in-kashmir-in-winter",
+            "author": "Riya Sharma",
+            "category": "guide",
+            "status": "published",
+            "publishedAt": "2026-10-13",
+            "updatedAt": "2026-10-27",
+            "views": 2140,
+            "leads": 11,
+            "converted": 3
+        },
+        {
+            "id": 2,
+            "title": "5 day Kashmir itinerary for first-time visitors",
+            "slug": "5-day-kashmir-itinerary-for-first-time-visitors",
+            "author": "Karan Sapalia",
+            "category": "itinerary",
+            "status": "published",
+            "publishedAt": "2026-09-29",
+            "updatedAt": "2026-10-27",
+            "views": 1860,
+            "leads": 9,
+            "converted": 2
+        },
+        {
+            "id": 3,
+            "title": "Goa on a budget: villas vs hotels",
+            "slug": "goa-on-a-budget-villas-vs-hotels",
+            "author": "Aman Joshi",
+            "category": "guide",
+            "status": "published",
+            "publishedAt": "2026-09-16",
+            "updatedAt": "2026-10-27",
+            "views": 1230,
+            "leads": 6,
+            "converted": 1
+        },
+        {
+            "id": 4,
+            "title": "What to pack for a Manali snow trip",
+            "slug": "what-to-pack-for-a-manali-snow-trip",
+            "author": "Riya Sharma",
+            "category": "tips",
+            "status": "published",
+            "publishedAt": "2026-09-03",
+            "updatedAt": "2026-10-27",
+            "views": 980,
+            "leads": 4,
+            "converted": 1
+        },
+        {
+            "id": 5,
+            "title": "Rishikesh rafting: safety and best season",
+            "slug": "rishikesh-rafting-safety-and-best-season",
+            "author": "Aman Joshi",
+            "category": "tips",
+            "status": "published",
+            "publishedAt": "2026-08-21",
+            "updatedAt": "2026-10-27",
+            "views": 870,
+            "leads": 5,
+            "converted": 1
+        },
+        {
+            "id": 6,
+            "title": "Kerala backwaters: houseboat guide",
+            "slug": "kerala-backwaters-houseboat-guide",
+            "author": "Karan Sapalia",
+            "category": "guide",
+            "status": "published",
+            "publishedAt": "2026-08-08",
+            "updatedAt": "2026-10-27",
+            "views": 760,
+            "leads": 2,
+            "converted": 1
+        },
+        {
+            "id": 8,
+            "title": "Bali in a week: a relaxed itinerary",
+            "slug": "bali-in-a-week-a-relaxed-itinerary",
+            "author": "Karan Sapalia",
+            "category": "itinerary",
+            "status": "scheduled",
+            "publishedAt": "2026-11-08",
+            "updatedAt": "2026-10-27",
+            "views": 0,
+            "leads": 0,
+            "converted": 0
+        },
+        {
+            "id": 7,
+            "title": "Diwali holiday destinations 2026",
+            "slug": "diwali-holiday-destinations-2026",
+            "author": "Riya Sharma",
+            "category": "guide",
+            "status": "scheduled",
+            "publishedAt": "2026-11-02",
+            "updatedAt": "2026-10-27",
+            "views": 0,
+            "leads": 0,
+            "converted": 0
+        },
+        {
+            "id": 10,
+            "title": "Paragliding in Bir: what first-timers should know",
+            "slug": "paragliding-in-bir-what-first-timers-should-know",
+            "author": "Aman Joshi",
+            "category": "tips",
+            "status": "draft",
+            "publishedAt": "2026-10-27",
+            "updatedAt": "2026-10-27",
+            "views": 0,
+            "leads": 0,
+            "converted": 0
+        },
+        {
+            "id": 9,
+            "title": "Spiti Valley road trip checklist",
+            "slug": "spiti-valley-road-trip-checklist",
+            "author": "Aman Joshi",
+            "category": "tips",
+            "status": "draft",
+            "publishedAt": null,
+            "updatedAt": "2026-10-27",
+            "views": 0,
+            "leads": 0,
+            "converted": 0
+        }
+    ]
+}

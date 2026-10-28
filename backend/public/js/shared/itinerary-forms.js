@@ -1,5 +1,5 @@
 // The small "Add to Day N" dialog for hotel stays, transport, activities, meals and notes (Bookings and Inquiries share it).
-// It is the same card as "Add New Guest" (modal-card), opened on top of the itinerary popup: a back arrow instead of an X,
+// It is the same card as "Add New Guest" (modal-card), opened on top of the itinerary popup: title and close control,
 // a scrolling body and a footer that stays in view. One engine below; each kind of event only supplies its fields.
 import { icon } from './icons.js';
 import { esc, initials } from './ui.js';
@@ -51,7 +51,7 @@ const segField = (v, key, label, options, { numeric = false, stack = false } = {
 const switchField = (v, key, label, text) => group(label, `<button type="button" role="switch" aria-checked="${!!v[key]}" class="bld-switch ${v[key] ? 'is-on' : ''}" data-switch="${key}"><span class="bld-switch-knob"></span><span class="bld-switch-text">${esc(text)}</span></button>`, { key });
 const checkField = (v, key, text) => `<label class="bld-check"><input type="checkbox" data-check="${key}" ${v[key] ? 'checked' : ''}><span>${esc(text)}</span></label>`;
 const sectionTitle = (t) => `<h4 class="item-dialog-sub">${esc(t)}</h4>`;
-const tabs = (v, list) => `<div class="sheet-tabs-nav item-dialog-tabs" role="tablist">${list.map(([key, label]) => `<button type="button" role="tab" aria-selected="${v.tab === key}" class="sheet-tab-btn ${v.tab === key ? 'active' : ''}" data-tab="${key}">${esc(label)}</button>`).join('')}</div>`;
+const tabs = (v, list) => `<div class="sheet-tabs-nav item-dialog-tabs scroll-row" role="tablist">${list.map(([key, label]) => `<button type="button" role="tab" aria-selected="${v.tab === key}" class="sheet-tab-btn ${v.tab === key ? 'active' : ''}" data-tab="${key}">${esc(label)}</button>`).join('')}</div>`;
 
 /* ------------------------------------------------------------------------------------------------
    The dialog
@@ -79,8 +79,8 @@ function openItemDialog({ title, saveLabel, values, track, returnFocus, render, 
     onClose,
     beforeClose: () => snap() === initial || confirmDialog({ title: 'Discard this entry?', text: 'What you entered here has not been added yet.', confirm: 'Discard', cancel: 'Keep editing', danger: true }),
     html: `<header class="modal-header item-dialog-head">
-        <button type="button" class="dialog-back" data-sheet-close aria-label="Back">${icon('arrowLeft', { size: 20, stroke: 2.2 })}</button>
         <h3 data-dialog-title tabindex="-1">${esc(title)}</h3>
+        <button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button>
       </header>
       <div class="modal-body item-dialog-body" role="group" aria-label="${esc(title)}"></div>
       <footer class="modal-footer item-dialog-foot">

@@ -56,7 +56,7 @@
 .bn-order-btns .sp-icon-btn:disabled { opacity: 0.4; cursor: default; }
 .bn-up svg { transform: rotate(180deg); }
 
-:where(html[data-layout="mobile"]) .sp[data-sp="banners"] .sp-body { overflow: visible; padding: 12px 16px calc(var(--safe-bottom) + 140px); }
+:where(html[data-layout="mobile"]) .sp[data-sp="banners"] .sp-body { overflow: visible; padding: 12px 0 calc(var(--safe-bottom) + 140px); }
 :where(html[data-layout="mobile"]) .bn-grid { grid-template-columns: minmax(0, 1fr); }
 :where(html[data-layout="mobile"]) .bn-bar { flex-direction: column; align-items: stretch; }
 :where(html[data-layout="mobile"]) .bn-tools { justify-content: space-between; }

@@ -68,11 +68,11 @@ export default {
         { icon: 'check', label: 'Converted to bookings', value: num(s.converted), tone: 'green' },
       ]) : '';
       const base = searched();
-      renderTabs($('.bg-tabs'), { tabs: TABS.map(([key, label]) => ({ key, label, count: key === 'all' ? base.length : base.filter((p) => p.status === key).length })), active: state.tab, variant: 'mobile', attr: 'data-bg-tab' });
+      renderTabs($('.bg-tabs'), { tabs: TABS.map(([key, label]) => ({ key, label, count: state.status !== 'ready' ? null : key === 'all' ? base.length : base.filter((p) => p.status === key).length })), active: state.tab, variant: 'mobile', attr: 'data-bg-tab' });
       const table = $('.bg-table');
       table.classList.toggle('is-plain', state.status !== 'ready' || !state.posts.length);
       if (state.status === 'loading') { list.innerHTML = skeletonCards(5); return; }
-      if (state.status === 'error') { list.innerHTML = errorState({ title: 'Could not load blogs', text: 'Check your connection and try again.', retryId: 'bg-retry' }); return; }
+      if (state.status === 'error') { list.innerHTML = errorState({ title: 'Could not load blogs', error: state.error, what: 'blogs', retryId: 'bg-retry' }); return; }
       if (!state.posts.length) { list.innerHTML = emptyState({ title: 'No articles yet', text: 'Articles you write will show up here.', resetId: 'bg-reset' }); return; }
       const rows = base.filter((p) => state.tab === 'all' || p.status === state.tab);
       table.classList.toggle('is-plain', !rows.length);
@@ -84,7 +84,7 @@ export default {
       try {
         const d = await getJson('/api/blogs');
         state.posts = d.posts; state.stats = d.stats; state.status = 'ready';
-      } catch { state.status = 'error'; }
+      } catch (err) { state.status = 'error'; state.error = err; }
       if (alive) render();
     }
 
@@ -97,7 +97,7 @@ export default {
     }
 
     frame.body.querySelector('.bg-categories').addEventListener('click', () => toast('Categories are not set up yet.', 'info'));
-    input.addEventListener('input', (e) => { clearTimeout(timer); const v = e.target.value.trim(); timer = setTimeout(() => { state.q = v; render(); }, 200); });
+    input.addEventListener('input', (e) => { clearTimeout(timer); const v = e.target.value.trim(); timer = setTimeout(() => { state.q = v; render(); }, 300); });
     frame.body.addEventListener('click', (e) => {
       const tab = e.target.closest('[data-bg-tab]');
       if (tab) { state.tab = tab.dataset.bgTab; render(); return; }

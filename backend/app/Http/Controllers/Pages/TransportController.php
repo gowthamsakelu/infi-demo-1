@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pages;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateTransportRequest;
 use App\Models\VehicleType;
+use App\Support\DummyData;
 use Illuminate\Http\JsonResponse;
 
 /** Transport page. It reads and edits the itinerary builder's own `vehicle_types`; nothing is copied. */
@@ -12,6 +13,10 @@ class TransportController extends Controller
 {
     public function index(): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::list('transport')]);
+        }
+
         return response()->json(['success' => true, 'data' => VehicleType::query()->orderBy('popularity_rank')->orderBy('id')->get()->map(fn ($v) => $this->row($v))->values()]);
     }
 

@@ -1,17 +1,37 @@
 // Draws the navigation from shared/nav.js: the PC sidebar groups and the phone "More" sheet, and keeps their active state and badges.
 import { icon } from './icons.js';
+import { getJson } from './http.js';
 import { esc } from './ui.js';
 import { openSheet } from './sheet.js';
 import { NAV, NAV_ITEMS, BOTTOM_BAR } from './nav.js';
 import { goToPage } from './page-host.js';
 import { currentPage } from './page-state.js';
 
+/* Pages the signed-in person may not view (from GET /api/me/permissions). The server still refuses their data; this only keeps the links out of sight. */
+let hiddenPages = new Set();
+
+/** Hide the links to pages the person cannot view, and a group title when all of its pages are hidden. */
+function applyAccess() {
+  document.querySelectorAll('[data-nav]').forEach((el) => { el.hidden = hiddenPages.has(el.dataset.nav); });
+  document.querySelectorAll('.sidebar-nav .nav-section-title').forEach((title) => {
+    let next = title.nextElementSibling;
+    let any = false;
+    while (next && !next.classList.contains('nav-section-title')) { if (!next.hidden) any = true; next = next.nextElementSibling; }
+    title.hidden = !any;
+  });
+}
+
+getJson('/api/me/permissions').then((me) => {
+  hiddenPages = new Set(Object.entries(me.pages || {}).filter(([, a]) => !a.view).map(([key]) => key));
+  applyAccess();
+}).catch(() => {});
+
 /** The sidebar's four groups (Menu, Catalog, Website, System). */
 export function sidebarNavHtml(active) {
   return NAV.map((group) => `
-    <span class="nav-section-title">${esc(group.title)}</span>
+    <span class="nav-section-title" ${group.items.every((i) => hiddenPages.has(i.key)) ? 'hidden' : ''}>${esc(group.title)}</span>
     ${group.items.map((i) => `
-      <a class="sidebar-nav-item ${i.key === active ? 'active' : ''}" href="#${i.key}" id="nav-${i.key}" data-nav="${i.key}" ${i.key === active ? 'aria-current="page"' : ''}>
+      <a class="sidebar-nav-item ${i.key === active ? 'active' : ''}" ${hiddenPages.has(i.key) ? 'hidden' : ''} href="#${i.key}" id="nav-${i.key}" data-nav="${i.key}" ${i.key === active ? 'aria-current="page"' : ''}>
         <div class="nav-left">${icon(i.icon, { size: 20, stroke: 2 })}<span>${esc(i.label)}</span></div>
         ${i.badgeId ? `<span class="sidebar-badge" id="${i.badgeId}">${esc(i.badge)}</span>` : ''}
       </a>`).join('')}`).join('');
@@ -40,7 +60,7 @@ export function bindSidebar(root) {
 
 /** The phone's "More" screen: every page the bottom bar does not show, in the same four groups. */
 export function openMoreSheet({ returnFocus } = {}) {
-  const groups = NAV.map((g) => ({ title: g.title === 'Menu' ? 'Operations' : g.title, items: g.items.filter((i) => !BOTTOM_BAR.includes(i.key)) })).filter((g) => g.items.length);
+  const groups = NAV.map((g) => ({ title: g.title === 'Menu' ? 'Operations' : g.title, items: g.items.filter((i) => !BOTTOM_BAR.includes(i.key) && !hiddenPages.has(i.key)) })).filter((g) => g.items.length);
   const dlg = openSheet({
     label: 'More',
     cls: 'more-sheet',

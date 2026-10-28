@@ -1,0 +1,1508 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "slug": "kashmir",
+            "name": "Kashmir",
+            "region": "Jammu & Kashmir, India",
+            "status": "active",
+            "popular": true,
+            "image": null,
+            "packages": 3,
+            "inquiries": 1
+        },
+        {
+            "id": 2,
+            "slug": "goa",
+            "name": "Goa",
+            "region": "Goa, India",
+            "status": "active",
+            "popular": true,
+            "image": "/images/goa.jpg",
+            "packages": 2,
+            "inquiries": 1
+        },
+        {
+            "id": 3,
+            "slug": "manali",
+            "name": "Manali",
+            "region": "Himachal Pradesh, India",
+            "status": "active",
+            "popular": true,
+            "image": "/images/manali.jpg",
+            "packages": 1,
+            "inquiries": 1
+        },
+        {
+            "id": 4,
+            "slug": "kerala",
+            "name": "Kerala",
+            "region": "Kerala, India",
+            "status": "active",
+            "popular": true,
+            "image": null,
+            "packages": 1,
+            "inquiries": 0
+        },
+        {
+            "id": 5,
+            "slug": "bali",
+            "name": "Bali",
+            "region": "Indonesia",
+            "status": "active",
+            "popular": true,
+            "image": null,
+            "packages": 1,
+            "inquiries": 0
+        },
+        {
+            "id": 6,
+            "slug": "rishikesh",
+            "name": "Rishikesh",
+            "region": "Uttarakhand, India",
+            "status": "active",
+            "popular": false,
+            "image": "/images/paragliding.jpg",
+            "packages": 1,
+            "inquiries": 2
+        },
+        {
+            "id": 7,
+            "slug": "udaipur",
+            "name": "Udaipur",
+            "region": "Rajasthan, India",
+            "status": "active",
+            "popular": false,
+            "image": null,
+            "packages": 0,
+            "inquiries": 0
+        },
+        {
+            "id": 8,
+            "slug": "jaipur",
+            "name": "Jaipur",
+            "region": "Rajasthan, India",
+            "status": "active",
+            "popular": false,
+            "image": null,
+            "packages": 0,
+            "inquiries": 0
+        },
+        {
+            "id": 9,
+            "slug": "ladakh",
+            "name": "Ladakh",
+            "region": "Ladakh, India",
+            "status": "active",
+            "popular": false,
+            "image": null,
+            "packages": 0,
+            "inquiries": 0
+        },
+        {
+            "id": 10,
+            "slug": "andaman",
+            "name": "Andaman",
+            "region": "Andaman & Nicobar, India",
+            "status": "active",
+            "popular": false,
+            "image": null,
+            "packages": 0,
+            "inquiries": 0
+        }
+    ],
+    "detail": {
+        "1": {
+            "id": 1,
+            "name": "Kashmir",
+            "region": "Jammu & Kashmir, India",
+            "status": "active",
+            "description": "Kashmir is one of our most requested trips. Plan 5 to 7 day trips around Mar - Jun, Dec - Feb.",
+            "about": {
+                "bestSeason": "Mar - Jun, Dec - Feb",
+                "averageTrip": "5 days / 4 nights",
+                "idealDuration": "5 to 7 day trips",
+                "nearestAirport": "Srinagar (SXR)",
+                "topLeadSource": "Google Search",
+                "peakMonth": "December"
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 3,
+                "inquiries": 1,
+                "bookings": 1,
+                "revenue": 45000
+            },
+            "packages": [
+                {
+                    "id": 1,
+                    "name": "Kashmir Valley & Gulmarg Tour",
+                    "days": 5,
+                    "nights": 4,
+                    "price": 15000
+                },
+                {
+                    "id": 2,
+                    "name": "Srinagar Houseboat Escape",
+                    "days": 4,
+                    "nights": 3,
+                    "price": 12500
+                },
+                {
+                    "id": 9,
+                    "name": "Kashmir Winter Special",
+                    "days": 6,
+                    "nights": 5,
+                    "price": 22000
+                }
+            ],
+            "stays": [
+                {
+                    "id": 21,
+                    "placeId": null,
+                    "name": "Sarbal Valley Camp",
+                    "city": "Sonamarg",
+                    "address": "Sarbal, Sonamarg",
+                    "phone": "+91 9555938024"
+                },
+                {
+                    "id": 20,
+                    "placeId": null,
+                    "name": "Hotel Sonamarg Inn",
+                    "city": "Sonamarg",
+                    "address": "Sonamarg, Sonamarg",
+                    "phone": "+91 9414883509"
+                },
+                {
+                    "id": 19,
+                    "placeId": null,
+                    "name": "Hotel Glacier Heights",
+                    "city": "Sonamarg",
+                    "address": "Sonamarg, Sonamarg",
+                    "phone": "+91 9747727919"
+                },
+                {
+                    "id": 18,
+                    "placeId": null,
+                    "name": "Lidder Riverside Resort",
+                    "city": "Pahalgam",
+                    "address": "Lidder River, Pahalgam",
+                    "phone": "+91 9171618325"
+                },
+                {
+                    "id": 17,
+                    "placeId": null,
+                    "name": "Hotel Dar-ul-Khair",
+                    "city": "Pahalgam",
+                    "address": "Pahalgam Market, Pahalgam",
+                    "phone": "+91 9346373882"
+                },
+                {
+                    "id": 16,
+                    "placeId": null,
+                    "name": "Pahalgam Club",
+                    "city": "Pahalgam",
+                    "address": "Pahalgam, Pahalgam",
+                    "phone": "+91 9870710623"
+                },
+                {
+                    "id": 15,
+                    "placeId": null,
+                    "name": "Hotel Heaven Pahalgam",
+                    "city": "Pahalgam",
+                    "address": "Pahalgam, Pahalgam",
+                    "phone": "+91 9541745567"
+                },
+                {
+                    "id": 14,
+                    "placeId": null,
+                    "name": "Alpine Ridge Cottages",
+                    "city": "Gulmarg",
+                    "address": "Gulmarg, Gulmarg",
+                    "phone": "+91 9500019861"
+                },
+                {
+                    "id": 13,
+                    "placeId": null,
+                    "name": "Hotel Pine Palace",
+                    "city": "Gulmarg",
+                    "address": "Gulmarg, Gulmarg",
+                    "phone": "+91 9872767502"
+                },
+                {
+                    "id": 12,
+                    "placeId": null,
+                    "name": "Hotel Highlands Park",
+                    "city": "Gulmarg",
+                    "address": "Gulmarg, Gulmarg",
+                    "phone": "+91 9860565562"
+                },
+                {
+                    "id": 11,
+                    "placeId": null,
+                    "name": "Khyber Himalayan Resort",
+                    "city": "Gulmarg",
+                    "address": "Gulmarg, Gulmarg",
+                    "phone": "+91 9718835558"
+                },
+                {
+                    "id": 10,
+                    "placeId": null,
+                    "name": "Zabarwan Residency",
+                    "city": "Srinagar",
+                    "address": "Boulevard Road, Srinagar",
+                    "phone": "+91 9894425157"
+                },
+                {
+                    "id": 9,
+                    "placeId": null,
+                    "name": "Hotel Heevan",
+                    "city": "Srinagar",
+                    "address": "Rajbagh, Srinagar",
+                    "phone": "+91 9576135602"
+                },
+                {
+                    "id": 8,
+                    "placeId": null,
+                    "name": "Hotel Lalit Grand Palace",
+                    "city": "Srinagar",
+                    "address": "Gupkar Road, Srinagar",
+                    "phone": "+91 9107851742"
+                },
+                {
+                    "id": 7,
+                    "placeId": null,
+                    "name": "Houseboat Golden Crown",
+                    "city": "Srinagar",
+                    "address": "Dal Lake, Srinagar",
+                    "phone": "+91 9286522771"
+                },
+                {
+                    "id": 1,
+                    "placeId": null,
+                    "name": "Hotel Lake View",
+                    "city": "Srinagar",
+                    "address": null,
+                    "phone": "+91 194 250 1234"
+                }
+            ],
+            "activities": [
+                {
+                    "id": 28,
+                    "placeId": null,
+                    "name": "Trout point visit",
+                    "city": "Sonamarg",
+                    "address": "Sindh River",
+                    "phone": null,
+                    "meetingPoint": "Sindh River"
+                },
+                {
+                    "id": 27,
+                    "placeId": null,
+                    "name": "Sonamarg meadow picnic",
+                    "city": "Sonamarg",
+                    "address": "Sonamarg",
+                    "phone": null,
+                    "meetingPoint": "Sonamarg"
+                },
+                {
+                    "id": 26,
+                    "placeId": null,
+                    "name": "Krishansar and Vishansar lakes trek",
+                    "city": "Sonamarg",
+                    "address": "Nichnai",
+                    "phone": null,
+                    "meetingPoint": "Nichnai"
+                },
+                {
+                    "id": 25,
+                    "placeId": null,
+                    "name": "Sindh River rafting",
+                    "city": "Sonamarg",
+                    "address": "Sindh River",
+                    "phone": null,
+                    "meetingPoint": "Sindh River"
+                },
+                {
+                    "id": 24,
+                    "placeId": null,
+                    "name": "Zero Point excursion",
+                    "city": "Sonamarg",
+                    "address": "Zojila",
+                    "phone": null,
+                    "meetingPoint": "Zojila"
+                },
+                {
+                    "id": 23,
+                    "placeId": null,
+                    "name": "Thajiwas Glacier pony ride",
+                    "city": "Sonamarg",
+                    "address": "Thajiwas",
+                    "phone": null,
+                    "meetingPoint": "Thajiwas"
+                },
+                {
+                    "id": 22,
+                    "placeId": null,
+                    "name": "Baisaran meadow walk",
+                    "city": "Pahalgam",
+                    "address": "Baisaran",
+                    "phone": null,
+                    "meetingPoint": "Baisaran"
+                },
+                {
+                    "id": 21,
+                    "placeId": null,
+                    "name": "Trout fishing",
+                    "city": "Pahalgam",
+                    "address": "Lidder River",
+                    "phone": null,
+                    "meetingPoint": "Lidder River"
+                },
+                {
+                    "id": 20,
+                    "placeId": null,
+                    "name": "River rafting on the Lidder",
+                    "city": "Pahalgam",
+                    "address": "Lidder River",
+                    "phone": null,
+                    "meetingPoint": "Lidder River"
+                },
+                {
+                    "id": 19,
+                    "placeId": null,
+                    "name": "Chandanwari and Pahalgam trek",
+                    "city": "Pahalgam",
+                    "address": "Chandanwari",
+                    "phone": null,
+                    "meetingPoint": "Chandanwari"
+                },
+                {
+                    "id": 18,
+                    "placeId": null,
+                    "name": "Aru Valley excursion",
+                    "city": "Pahalgam",
+                    "address": "Aru",
+                    "phone": null,
+                    "meetingPoint": "Aru"
+                },
+                {
+                    "id": 17,
+                    "placeId": null,
+                    "name": "Betaab Valley visit",
+                    "city": "Pahalgam",
+                    "address": "Betaab Valley",
+                    "phone": null,
+                    "meetingPoint": "Betaab Valley"
+                },
+                {
+                    "id": 16,
+                    "placeId": null,
+                    "name": "Pahalgam pony ride",
+                    "city": "Pahalgam",
+                    "address": "Pahalgam Market",
+                    "phone": null,
+                    "meetingPoint": "Pahalgam Market"
+                },
+                {
+                    "id": 15,
+                    "placeId": null,
+                    "name": "Maharani Temple visit",
+                    "city": "Gulmarg",
+                    "address": "Gulmarg",
+                    "phone": null,
+                    "meetingPoint": "Gulmarg"
+                },
+                {
+                    "id": 14,
+                    "placeId": null,
+                    "name": "Pony ride to Khilanmarg",
+                    "city": "Gulmarg",
+                    "address": "Khilanmarg",
+                    "phone": null,
+                    "meetingPoint": "Khilanmarg"
+                },
+                {
+                    "id": 13,
+                    "placeId": null,
+                    "name": "Alpather Lake trek",
+                    "city": "Gulmarg",
+                    "address": "Apharwat Ridge",
+                    "phone": null,
+                    "meetingPoint": "Apharwat Ridge"
+                },
+                {
+                    "id": 12,
+                    "placeId": null,
+                    "name": "Sledge ride on the snow",
+                    "city": "Gulmarg",
+                    "address": "Gulmarg Meadow",
+                    "phone": null,
+                    "meetingPoint": "Gulmarg Meadow"
+                },
+                {
+                    "id": 11,
+                    "placeId": null,
+                    "name": "Skiing lessons",
+                    "city": "Gulmarg",
+                    "address": "Kongdoori Slope",
+                    "phone": null,
+                    "meetingPoint": "Kongdoori Slope"
+                },
+                {
+                    "id": 10,
+                    "placeId": null,
+                    "name": "Gulmarg Gondola Phase 2",
+                    "city": "Gulmarg",
+                    "address": "Apharwat Peak",
+                    "phone": null,
+                    "meetingPoint": "Apharwat Peak"
+                },
+                {
+                    "id": 9,
+                    "placeId": null,
+                    "name": "Gulmarg Gondola Phase 1",
+                    "city": "Gulmarg",
+                    "address": "Gulmarg Meadow",
+                    "phone": null,
+                    "meetingPoint": "Gulmarg Meadow"
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1001",
+                    "name": "Rohan Malhotra",
+                    "trip": "Kashmir Valley & Gulmarg Tour",
+                    "status": "hot",
+                    "travelDate": "2026-12-15",
+                    "pax": 3
+                }
+            ]
+        },
+        "2": {
+            "id": 2,
+            "name": "Goa",
+            "region": "Goa, India",
+            "status": "active",
+            "description": "Goa is one of our most requested trips. Plan 3 to 5 day trips around Nov - Feb.",
+            "about": {
+                "bestSeason": "Nov - Feb",
+                "averageTrip": "4 days / 3 nights",
+                "idealDuration": "3 to 5 day trips",
+                "nearestAirport": "Dabolim (GOI)",
+                "topLeadSource": "Instagram",
+                "peakMonth": "December"
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 2,
+                "inquiries": 1,
+                "bookings": 2,
+                "revenue": 30500
+            },
+            "packages": [
+                {
+                    "id": 3,
+                    "name": "Goa Beach Villa Getaway",
+                    "days": 3,
+                    "nights": 2,
+                    "price": 11000
+                },
+                {
+                    "id": 10,
+                    "name": "Goa Beaches and Nightlife",
+                    "days": 4,
+                    "nights": 3,
+                    "price": 9500
+                }
+            ],
+            "stays": [
+                {
+                    "id": 38,
+                    "placeId": null,
+                    "name": "Casa Anjuna Boutique",
+                    "city": "Goa",
+                    "address": "Anjuna, Goa",
+                    "phone": "+91 9323256935"
+                },
+                {
+                    "id": 37,
+                    "placeId": null,
+                    "name": "Hotel Baga Residency",
+                    "city": "Goa",
+                    "address": "Baga, Goa",
+                    "phone": "+91 9584332766"
+                },
+                {
+                    "id": 36,
+                    "placeId": null,
+                    "name": "Resort Rio",
+                    "city": "Goa",
+                    "address": "Arpora, Goa",
+                    "phone": "+91 9833785552"
+                },
+                {
+                    "id": 35,
+                    "placeId": null,
+                    "name": "Taj Fort Aguada Resort",
+                    "city": "Goa",
+                    "address": "Candolim, Goa",
+                    "phone": "+91 9816939186"
+                },
+                {
+                    "id": 2,
+                    "placeId": null,
+                    "name": "Calangute Beach Villa",
+                    "city": "Goa",
+                    "address": null,
+                    "phone": "+91 832 227 6655"
+                }
+            ],
+            "activities": [
+                {
+                    "id": 60,
+                    "placeId": null,
+                    "name": "Scuba diving at Grande Island",
+                    "city": "Goa",
+                    "address": "Grande Island",
+                    "phone": null,
+                    "meetingPoint": "Grande Island"
+                },
+                {
+                    "id": 59,
+                    "placeId": null,
+                    "name": "Spice plantation tour",
+                    "city": "Goa",
+                    "address": "Ponda",
+                    "phone": null,
+                    "meetingPoint": "Ponda"
+                },
+                {
+                    "id": 58,
+                    "placeId": null,
+                    "name": "Sunset cruise on the Mandovi",
+                    "city": "Goa",
+                    "address": "Panjim",
+                    "phone": null,
+                    "meetingPoint": "Panjim"
+                },
+                {
+                    "id": 57,
+                    "placeId": null,
+                    "name": "Dudhsagar Falls jeep safari",
+                    "city": "Goa",
+                    "address": "Mollem",
+                    "phone": null,
+                    "meetingPoint": "Mollem"
+                },
+                {
+                    "id": 56,
+                    "placeId": null,
+                    "name": "Old Goa churches tour",
+                    "city": "Goa",
+                    "address": "Old Goa",
+                    "phone": null,
+                    "meetingPoint": "Old Goa"
+                },
+                {
+                    "id": 55,
+                    "placeId": null,
+                    "name": "Dolphin spotting cruise",
+                    "city": "Goa",
+                    "address": "Sinquerim",
+                    "phone": null,
+                    "meetingPoint": "Sinquerim"
+                },
+                {
+                    "id": 54,
+                    "placeId": null,
+                    "name": "Parasailing at Calangute",
+                    "city": "Goa",
+                    "address": "Calangute Beach",
+                    "phone": null,
+                    "meetingPoint": "Calangute Beach"
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1003",
+                    "name": "Kavita Roy",
+                    "trip": "Goa Beach Villa Getaway",
+                    "status": "ongoing",
+                    "travelDate": "2026-12-04",
+                    "pax": 6
+                }
+            ]
+        },
+        "3": {
+            "id": 3,
+            "name": "Manali",
+            "region": "Himachal Pradesh, India",
+            "status": "active",
+            "description": "Manali is one of our most requested trips. Plan 4 to 6 day trips around Mar - Jun, Dec - Jan.",
+            "about": {
+                "bestSeason": "Mar - Jun, Dec - Jan",
+                "averageTrip": "5 days / 4 nights",
+                "idealDuration": "4 to 6 day trips",
+                "nearestAirport": "Bhuntar (KUU)",
+                "topLeadSource": "Website",
+                "peakMonth": "January"
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 1,
+                "inquiries": 1,
+                "bookings": 1,
+                "revenue": 26500
+            },
+            "packages": [
+                {
+                    "id": 4,
+                    "name": "Manali Snow Escape",
+                    "days": 6,
+                    "nights": 5,
+                    "price": 18500
+                }
+            ],
+            "stays": [
+                {
+                    "id": 34,
+                    "placeId": null,
+                    "name": "Backpackers Hostel Old Manali",
+                    "city": "Manali",
+                    "address": "Old Manali, Manali",
+                    "phone": "+91 9868374463"
+                },
+                {
+                    "id": 33,
+                    "placeId": null,
+                    "name": "Johnson Lodge",
+                    "city": "Manali",
+                    "address": "Circuit House Road, Manali",
+                    "phone": "+91 9116552054"
+                },
+                {
+                    "id": 32,
+                    "placeId": null,
+                    "name": "Hotel Snow Valley Resorts",
+                    "city": "Manali",
+                    "address": "The Mall, Manali",
+                    "phone": "+91 9443512930"
+                },
+                {
+                    "id": 31,
+                    "placeId": null,
+                    "name": "The Himalayan",
+                    "city": "Manali",
+                    "address": "Hadimba Road, Manali",
+                    "phone": "+91 9652212104"
+                },
+                {
+                    "id": 3,
+                    "placeId": null,
+                    "name": "Snow Peak Resort",
+                    "city": "Manali",
+                    "address": null,
+                    "phone": "+91 1902 252 120"
+                }
+            ],
+            "activities": [
+                {
+                    "id": 53,
+                    "placeId": null,
+                    "name": "Jogini Waterfall trek",
+                    "city": "Manali",
+                    "address": "Vashisht",
+                    "phone": null,
+                    "meetingPoint": "Vashisht"
+                },
+                {
+                    "id": 52,
+                    "placeId": null,
+                    "name": "Atal Tunnel and Sissu drive",
+                    "city": "Manali",
+                    "address": "Sissu",
+                    "phone": null,
+                    "meetingPoint": "Sissu"
+                },
+                {
+                    "id": 51,
+                    "placeId": null,
+                    "name": "River rafting on the Beas",
+                    "city": "Manali",
+                    "address": "Kullu",
+                    "phone": null,
+                    "meetingPoint": "Kullu"
+                },
+                {
+                    "id": 50,
+                    "placeId": null,
+                    "name": "Hadimba Temple and Old Manali walk",
+                    "city": "Manali",
+                    "address": "Old Manali",
+                    "phone": null,
+                    "meetingPoint": "Old Manali"
+                },
+                {
+                    "id": 49,
+                    "placeId": null,
+                    "name": "Paragliding at Solang",
+                    "city": "Manali",
+                    "address": "Solang Valley",
+                    "phone": null,
+                    "meetingPoint": "Solang Valley"
+                },
+                {
+                    "id": 48,
+                    "placeId": null,
+                    "name": "Rohtang Pass snow point trip",
+                    "city": "Manali",
+                    "address": "Rohtang",
+                    "phone": null,
+                    "meetingPoint": "Rohtang"
+                },
+                {
+                    "id": 47,
+                    "placeId": null,
+                    "name": "Solang Valley adventure package",
+                    "city": "Manali",
+                    "address": "Solang Valley",
+                    "phone": null,
+                    "meetingPoint": "Solang Valley"
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1004",
+                    "name": "Neha Kapoor",
+                    "trip": "Manali Snow Escape",
+                    "status": "new",
+                    "travelDate": "2027-01-10",
+                    "pax": 4
+                }
+            ]
+        },
+        "4": {
+            "id": 4,
+            "name": "Kerala",
+            "region": "Kerala, India",
+            "status": "active",
+            "description": "Kerala is one of our most requested trips. Plan 5 to 7 day trips around Sep - Mar.",
+            "about": {
+                "bestSeason": "Sep - Mar",
+                "averageTrip": "6 days / 5 nights",
+                "idealDuration": "5 to 7 day trips",
+                "nearestAirport": "Kochi (COK)",
+                "topLeadSource": null,
+                "peakMonth": null
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 1,
+                "inquiries": 0,
+                "bookings": 1,
+                "revenue": 48000
+            },
+            "packages": [
+                {
+                    "id": 5,
+                    "name": "Kerala Backwaters",
+                    "days": 6,
+                    "nights": 5,
+                    "price": 21000
+                }
+            ],
+            "stays": [
+                {
+                    "id": 46,
+                    "placeId": null,
+                    "name": "Hotel Residency Tower",
+                    "city": "Kerala",
+                    "address": "Thiruvananthapuram, Kerala",
+                    "phone": "+91 9695425633"
+                },
+                {
+                    "id": 45,
+                    "placeId": null,
+                    "name": "Brunton Boatyard",
+                    "city": "Kerala",
+                    "address": "Fort Kochi, Kerala",
+                    "phone": "+91 9149302800"
+                },
+                {
+                    "id": 44,
+                    "placeId": null,
+                    "name": "Munnar Tea Valley Resort",
+                    "city": "Kerala",
+                    "address": "Munnar, Kerala",
+                    "phone": "+91 9838170271"
+                },
+                {
+                    "id": 43,
+                    "placeId": null,
+                    "name": "Kumarakom Lake Resort",
+                    "city": "Kerala",
+                    "address": "Kumarakom, Kerala",
+                    "phone": "+91 9248844224"
+                },
+                {
+                    "id": 4,
+                    "placeId": null,
+                    "name": "Backwater Haven",
+                    "city": "Kerala",
+                    "address": null,
+                    "phone": "+91 477 223 4411"
+                }
+            ],
+            "activities": [
+                {
+                    "id": 75,
+                    "placeId": null,
+                    "name": "Cochin cultural heritage walk",
+                    "city": "Kerala",
+                    "address": "Fort Kochi",
+                    "phone": null,
+                    "meetingPoint": "Fort Kochi"
+                },
+                {
+                    "id": 74,
+                    "placeId": null,
+                    "name": "Ayurvedic massage",
+                    "city": "Kerala",
+                    "address": "Kovalam",
+                    "phone": null,
+                    "meetingPoint": "Kovalam"
+                },
+                {
+                    "id": 73,
+                    "placeId": null,
+                    "name": "Kumarakom bird sanctuary visit",
+                    "city": "Kerala",
+                    "address": "Kumarakom",
+                    "phone": null,
+                    "meetingPoint": "Kumarakom"
+                },
+                {
+                    "id": 72,
+                    "placeId": null,
+                    "name": "Kathakali performance",
+                    "city": "Kerala",
+                    "address": "Fort Kochi",
+                    "phone": null,
+                    "meetingPoint": "Fort Kochi"
+                },
+                {
+                    "id": 71,
+                    "placeId": null,
+                    "name": "Periyar wildlife boat safari",
+                    "city": "Kerala",
+                    "address": "Thekkady",
+                    "phone": null,
+                    "meetingPoint": "Thekkady"
+                },
+                {
+                    "id": 70,
+                    "placeId": null,
+                    "name": "Munnar tea plantation tour",
+                    "city": "Kerala",
+                    "address": "Munnar",
+                    "phone": null,
+                    "meetingPoint": "Munnar"
+                },
+                {
+                    "id": 69,
+                    "placeId": null,
+                    "name": "Alleppey houseboat day cruise",
+                    "city": "Kerala",
+                    "address": "Alappuzha",
+                    "phone": null,
+                    "meetingPoint": "Alappuzha"
+                }
+            ],
+            "inquiries": []
+        },
+        "5": {
+            "id": 5,
+            "name": "Bali",
+            "region": "Indonesia",
+            "status": "active",
+            "description": "Bali is one of our most requested trips. Plan 5 to 7 day trips around Apr - Oct.",
+            "about": {
+                "bestSeason": "Apr - Oct",
+                "averageTrip": "6 days / 5 nights",
+                "idealDuration": "5 to 7 day trips",
+                "nearestAirport": "Denpasar (DPS)",
+                "topLeadSource": null,
+                "peakMonth": null
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 1,
+                "inquiries": 0,
+                "bookings": 0,
+                "revenue": 0
+            },
+            "packages": [
+                {
+                    "id": 8,
+                    "name": "Bali Escape",
+                    "days": 6,
+                    "nights": 5,
+                    "price": 48000
+                }
+            ],
+            "stays": [
+                {
+                    "id": 57,
+                    "placeId": null,
+                    "name": "Seminyak Boutique Villa",
+                    "city": "Bali",
+                    "address": "Seminyak, Bali",
+                    "phone": "+91 9378860809"
+                },
+                {
+                    "id": 56,
+                    "placeId": null,
+                    "name": "Kuta Beach Hotel",
+                    "city": "Bali",
+                    "address": "Kuta, Bali",
+                    "phone": "+91 9260779861"
+                },
+                {
+                    "id": 55,
+                    "placeId": null,
+                    "name": "Ubud Village Hotel",
+                    "city": "Bali",
+                    "address": "Ubud, Bali",
+                    "phone": "+91 9131264246"
+                },
+                {
+                    "id": 54,
+                    "placeId": null,
+                    "name": "The Mulia Bali",
+                    "city": "Bali",
+                    "address": "Nusa Dua, Bali",
+                    "phone": "+91 9278756089"
+                }
+            ],
+            "activities": [
+                {
+                    "id": 95,
+                    "placeId": null,
+                    "name": "Balinese cooking class",
+                    "city": "Bali",
+                    "address": "Ubud",
+                    "phone": null,
+                    "meetingPoint": "Ubud"
+                },
+                {
+                    "id": 94,
+                    "placeId": null,
+                    "name": "Snorkelling at Blue Lagoon",
+                    "city": "Bali",
+                    "address": "Padang Bai",
+                    "phone": null,
+                    "meetingPoint": "Padang Bai"
+                },
+                {
+                    "id": 93,
+                    "placeId": null,
+                    "name": "Ubud Monkey Forest visit",
+                    "city": "Bali",
+                    "address": "Ubud",
+                    "phone": null,
+                    "meetingPoint": "Ubud"
+                },
+                {
+                    "id": 92,
+                    "placeId": null,
+                    "name": "Nusa Penida day trip",
+                    "city": "Bali",
+                    "address": "Nusa Penida",
+                    "phone": null,
+                    "meetingPoint": "Nusa Penida"
+                },
+                {
+                    "id": 91,
+                    "placeId": null,
+                    "name": "Mount Batur sunrise trek",
+                    "city": "Bali",
+                    "address": "Kintamani",
+                    "phone": null,
+                    "meetingPoint": "Kintamani"
+                },
+                {
+                    "id": 90,
+                    "placeId": null,
+                    "name": "Uluwatu Temple and Kecak dance",
+                    "city": "Bali",
+                    "address": "Uluwatu",
+                    "phone": null,
+                    "meetingPoint": "Uluwatu"
+                },
+                {
+                    "id": 89,
+                    "placeId": null,
+                    "name": "Tegallalang rice terrace swing",
+                    "city": "Bali",
+                    "address": "Ubud",
+                    "phone": null,
+                    "meetingPoint": "Ubud"
+                }
+            ],
+            "inquiries": []
+        },
+        "6": {
+            "id": 6,
+            "name": "Rishikesh",
+            "region": "Uttarakhand, India",
+            "status": "active",
+            "description": "Rishikesh is one of our most requested trips. Plan 2 to 4 day trips around Sep - Nov, Feb - Apr.",
+            "about": {
+                "bestSeason": "Sep - Nov, Feb - Apr",
+                "averageTrip": "3 days / 2 nights",
+                "idealDuration": "2 to 4 day trips",
+                "nearestAirport": "Dehradun (DED)",
+                "topLeadSource": "WhatsApp",
+                "peakMonth": "November"
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 1,
+                "inquiries": 2,
+                "bookings": 2,
+                "revenue": 45000
+            },
+            "packages": [
+                {
+                    "id": 6,
+                    "name": "Rishikesh Rafting Weekend",
+                    "days": 2,
+                    "nights": 1,
+                    "price": 4500
+                }
+            ],
+            "stays": [
+                {
+                    "id": 53,
+                    "placeId": null,
+                    "name": "Hotel Surya",
+                    "city": "Haridwar",
+                    "address": "Railway Road, Haridwar",
+                    "phone": "+91 9508328238"
+                },
+                {
+                    "id": 52,
+                    "placeId": null,
+                    "name": "Hotel Ganga Lahari",
+                    "city": "Haridwar",
+                    "address": "Upper Road, Haridwar",
+                    "phone": "+91 9495496561"
+                },
+                {
+                    "id": 51,
+                    "placeId": null,
+                    "name": "Haveli Hari Ganga",
+                    "city": "Haridwar",
+                    "address": "Pili Kothi, Haridwar",
+                    "phone": "+91 9232883127"
+                },
+                {
+                    "id": 42,
+                    "placeId": null,
+                    "name": "Aloha on the Ganges",
+                    "city": "Rishikesh",
+                    "address": "Tapovan, Rishikesh",
+                    "phone": "+91 9273818415"
+                },
+                {
+                    "id": 41,
+                    "placeId": null,
+                    "name": "Zostel Rishikesh",
+                    "city": "Rishikesh",
+                    "address": "Tapovan, Rishikesh",
+                    "phone": "+91 9349213920"
+                },
+                {
+                    "id": 40,
+                    "placeId": null,
+                    "name": "Hotel Ganga View",
+                    "city": "Rishikesh",
+                    "address": "Laxman Jhula, Rishikesh",
+                    "phone": "+91 9104638816"
+                },
+                {
+                    "id": 39,
+                    "placeId": null,
+                    "name": "Ganga Kinare Resort",
+                    "city": "Rishikesh",
+                    "address": "Tapovan, Rishikesh",
+                    "phone": "+91 9386426685"
+                },
+                {
+                    "id": 5,
+                    "placeId": null,
+                    "name": "Ganga View Hotel",
+                    "city": "Rishikesh",
+                    "address": null,
+                    "phone": "+91 135 243 0088"
+                }
+            ],
+            "activities": [
+                {
+                    "id": 88,
+                    "placeId": null,
+                    "name": "Haridwar street food walk",
+                    "city": "Haridwar",
+                    "address": "Moti Bazaar",
+                    "phone": null,
+                    "meetingPoint": "Moti Bazaar"
+                },
+                {
+                    "id": 87,
+                    "placeId": null,
+                    "name": "Patanjali Yogpeeth tour",
+                    "city": "Haridwar",
+                    "address": "Bahadrabad",
+                    "phone": null,
+                    "meetingPoint": "Bahadrabad"
+                },
+                {
+                    "id": 86,
+                    "placeId": null,
+                    "name": "Rajaji National Park jungle safari",
+                    "city": "Haridwar",
+                    "address": "Chilla",
+                    "phone": null,
+                    "meetingPoint": "Chilla"
+                },
+                {
+                    "id": 85,
+                    "placeId": null,
+                    "name": "Chandi Devi temple visit",
+                    "city": "Haridwar",
+                    "address": "Neel Parvat",
+                    "phone": null,
+                    "meetingPoint": "Neel Parvat"
+                },
+                {
+                    "id": 84,
+                    "placeId": null,
+                    "name": "Mansa Devi temple ropeway",
+                    "city": "Haridwar",
+                    "address": "Mansa Devi Hill",
+                    "phone": null,
+                    "meetingPoint": "Mansa Devi Hill"
+                },
+                {
+                    "id": 83,
+                    "placeId": null,
+                    "name": "Ganga Aarti at Har Ki Pauri",
+                    "city": "Haridwar",
+                    "address": "Har Ki Pauri",
+                    "phone": null,
+                    "meetingPoint": "Har Ki Pauri"
+                },
+                {
+                    "id": 68,
+                    "placeId": null,
+                    "name": "Elephant Safari",
+                    "city": "Rishikesh",
+                    "address": "Rajaji National Park",
+                    "phone": null,
+                    "meetingPoint": "Rajaji National Park"
+                },
+                {
+                    "id": 67,
+                    "placeId": null,
+                    "name": "Cliff jumping and body surfing",
+                    "city": "Rishikesh",
+                    "address": "Shivpuri",
+                    "phone": null,
+                    "meetingPoint": "Shivpuri"
+                },
+                {
+                    "id": 66,
+                    "placeId": null,
+                    "name": "Neer Garh waterfall trek",
+                    "city": "Rishikesh",
+                    "address": "Neelkanth Road",
+                    "phone": null,
+                    "meetingPoint": "Neelkanth Road"
+                },
+                {
+                    "id": 65,
+                    "placeId": null,
+                    "name": "Yoga and meditation class",
+                    "city": "Rishikesh",
+                    "address": "Tapovan",
+                    "phone": null,
+                    "meetingPoint": "Tapovan"
+                },
+                {
+                    "id": 64,
+                    "placeId": null,
+                    "name": "Beatles Ashram visit",
+                    "city": "Rishikesh",
+                    "address": "Swarg Ashram",
+                    "phone": null,
+                    "meetingPoint": "Swarg Ashram"
+                },
+                {
+                    "id": 63,
+                    "placeId": null,
+                    "name": "Ganga Aarti at Triveni Ghat",
+                    "city": "Rishikesh",
+                    "address": "Triveni Ghat",
+                    "phone": null,
+                    "meetingPoint": "Triveni Ghat"
+                },
+                {
+                    "id": 62,
+                    "placeId": null,
+                    "name": "Bungee jumping at Mohan Chatti",
+                    "city": "Rishikesh",
+                    "address": "Mohan Chatti",
+                    "phone": null,
+                    "meetingPoint": "Mohan Chatti"
+                },
+                {
+                    "id": 61,
+                    "placeId": null,
+                    "name": "River rafting in Rishikesh",
+                    "city": "Rishikesh",
+                    "address": "Shivpuri",
+                    "phone": null,
+                    "meetingPoint": "Shivpuri"
+                }
+            ],
+            "inquiries": [
+                {
+                    "id": "INQ-1002",
+                    "name": "Amit Verma",
+                    "trip": "Haridwar - Kashi Trip",
+                    "status": "warm",
+                    "travelDate": "2026-11-28",
+                    "pax": 12
+                },
+                {
+                    "id": "INQ-1005",
+                    "name": "Sanjay Bhatia",
+                    "trip": "Rishikesh Rafting Weekend",
+                    "status": "hot",
+                    "travelDate": "2026-11-14",
+                    "pax": 8
+                }
+            ]
+        },
+        "7": {
+            "id": 7,
+            "name": "Udaipur",
+            "region": "Rajasthan, India",
+            "status": "active",
+            "description": "Udaipur is one of our most requested trips. Plan 3 to 5 day trips around Oct - Mar.",
+            "about": {
+                "bestSeason": "Oct - Mar",
+                "averageTrip": "4 days / 3 nights",
+                "idealDuration": "3 to 5 day trips",
+                "nearestAirport": "Udaipur (UDR)",
+                "topLeadSource": null,
+                "peakMonth": null
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 0,
+                "inquiries": 0,
+                "bookings": 1,
+                "revenue": 52000
+            },
+            "packages": [],
+            "stays": [
+                {
+                    "id": 50,
+                    "placeId": null,
+                    "name": "Moustache Hostel Udaipur",
+                    "city": "Udaipur",
+                    "address": "Old City, Udaipur",
+                    "phone": "+91 9250800061"
+                },
+                {
+                    "id": 49,
+                    "placeId": null,
+                    "name": "Jaiwana Haveli",
+                    "city": "Udaipur",
+                    "address": "Lal Ghat, Udaipur",
+                    "phone": "+91 9818597034"
+                },
+                {
+                    "id": 48,
+                    "placeId": null,
+                    "name": "Hotel Lalghat Haveli",
+                    "city": "Udaipur",
+                    "address": "Lalghat, Udaipur",
+                    "phone": "+91 9754814097"
+                },
+                {
+                    "id": 47,
+                    "placeId": null,
+                    "name": "Taj Lake Palace",
+                    "city": "Udaipur",
+                    "address": "Lake Pichola, Udaipur",
+                    "phone": "+91 9354733491"
+                },
+                {
+                    "id": 6,
+                    "placeId": null,
+                    "name": "Lake Pichola Villa",
+                    "city": "Udaipur",
+                    "address": null,
+                    "phone": "+91 294 242 2200"
+                }
+            ],
+            "activities": [
+                {
+                    "id": 82,
+                    "placeId": null,
+                    "name": "Vintage car museum visit",
+                    "city": "Udaipur",
+                    "address": "Gulab Bagh",
+                    "phone": null,
+                    "meetingPoint": "Gulab Bagh"
+                },
+                {
+                    "id": 81,
+                    "placeId": null,
+                    "name": "Folk dance show at Bagore Ki Haveli",
+                    "city": "Udaipur",
+                    "address": "Gangaur Ghat",
+                    "phone": null,
+                    "meetingPoint": "Gangaur Ghat"
+                },
+                {
+                    "id": 80,
+                    "placeId": null,
+                    "name": "Rajasthani cooking class",
+                    "city": "Udaipur",
+                    "address": "Old City",
+                    "phone": null,
+                    "meetingPoint": "Old City"
+                },
+                {
+                    "id": 79,
+                    "placeId": null,
+                    "name": "Kumbhalgarh Fort day trip",
+                    "city": "Udaipur",
+                    "address": "Kumbhalgarh",
+                    "phone": null,
+                    "meetingPoint": "Kumbhalgarh"
+                },
+                {
+                    "id": 78,
+                    "placeId": null,
+                    "name": "Sajjangarh Monsoon Palace sunset",
+                    "city": "Udaipur",
+                    "address": "Sajjangarh",
+                    "phone": null,
+                    "meetingPoint": "Sajjangarh"
+                },
+                {
+                    "id": 77,
+                    "placeId": null,
+                    "name": "Lake Pichola boat ride",
+                    "city": "Udaipur",
+                    "address": "Lake Pichola",
+                    "phone": null,
+                    "meetingPoint": "Lake Pichola"
+                },
+                {
+                    "id": 76,
+                    "placeId": null,
+                    "name": "City Palace tour",
+                    "city": "Udaipur",
+                    "address": "Old City",
+                    "phone": null,
+                    "meetingPoint": "Old City"
+                }
+            ],
+            "inquiries": []
+        },
+        "8": {
+            "id": 8,
+            "name": "Jaipur",
+            "region": "Rajasthan, India",
+            "status": "active",
+            "description": "Jaipur is one of our most requested trips. Plan 2 to 4 day trips around Oct - Mar.",
+            "about": {
+                "bestSeason": "Oct - Mar",
+                "averageTrip": "3 days / 2 nights",
+                "idealDuration": "2 to 4 day trips",
+                "nearestAirport": "Jaipur (JAI)",
+                "topLeadSource": null,
+                "peakMonth": null
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 0,
+                "inquiries": 0,
+                "bookings": 0,
+                "revenue": 0
+            },
+            "packages": [],
+            "stays": [],
+            "activities": [],
+            "inquiries": []
+        },
+        "9": {
+            "id": 9,
+            "name": "Ladakh",
+            "region": "Ladakh, India",
+            "status": "active",
+            "description": "Ladakh is one of our most requested trips. Plan 6 to 8 day trips around Jun - Sep.",
+            "about": {
+                "bestSeason": "Jun - Sep",
+                "averageTrip": "7 days / 6 nights",
+                "idealDuration": "6 to 8 day trips",
+                "nearestAirport": "Leh (IXL)",
+                "topLeadSource": null,
+                "peakMonth": null
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 0,
+                "inquiries": 0,
+                "bookings": 0,
+                "revenue": 0
+            },
+            "packages": [],
+            "stays": [],
+            "activities": [],
+            "inquiries": []
+        },
+        "10": {
+            "id": 10,
+            "name": "Andaman",
+            "region": "Andaman & Nicobar, India",
+            "status": "active",
+            "description": "Andaman is one of our most requested trips. Plan 4 to 6 day trips around Oct - May.",
+            "about": {
+                "bestSeason": "Oct - May",
+                "averageTrip": "5 days / 4 nights",
+                "idealDuration": "4 to 6 day trips",
+                "nearestAirport": "Port Blair (IXZ)",
+                "topLeadSource": null,
+                "peakMonth": null
+            },
+            "year": 2026,
+            "stats": {
+                "packages": 0,
+                "inquiries": 0,
+                "bookings": 0,
+                "revenue": 0
+            },
+            "packages": [],
+            "stays": [],
+            "activities": [],
+            "inquiries": []
+        }
+    }
+}

@@ -215,7 +215,7 @@ export function mountBuilder(root, state, { embedded = false, scroller = null, s
         <h4 class="bld-h" id="bld-h2">Build your itinerary</h4>
         <p class="bld-help">Add or edit each day. You can add hotels, transport, activities and meals.</p>
         ${warns.length ? `<div class="bld-warn" role="status">${icon('alertCircle', { size: 16 })}<ul>${warns.slice(0, 6).map((w) => `<li>${esc(w.text)}</li>`).join('')}</ul></div>` : ''}
-        ${model.days.length ? `<div class="bld-daychips" role="tablist" aria-label="Days">${chips}</div><div class="bld-accs">${acc}</div>` : '<div class="state-box"><h4>No days yet</h4><p>Set the trip dates in step 1.</p></div>'}
+        ${model.days.length ? `<div class="bld-daychips scroll-row" role="tablist" aria-label="Days">${chips}</div><div class="bld-accs">${acc}</div>` : '<div class="state-box"><h4>No days yet</h4><p>Set the trip dates in step 1.</p></div>'}
       </section>`;
   }
 

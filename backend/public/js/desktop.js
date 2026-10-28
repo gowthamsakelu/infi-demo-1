@@ -158,7 +158,7 @@ export function createDesktopView(container) {
                 </div>
 
                 <!-- Navigation Tabs -->
-                <div class="sheet-tabs-nav desktop-tabs-nav">
+                <div class="sheet-tabs-nav desktop-tabs-nav scroll-row">
                   <button class="sheet-tab-btn ${activeDetailTab === 'customer-details' ? 'active' : ''}" data-dt-tab="customer-details">Customer Details</button>
                   <button class="sheet-tab-btn ${activeDetailTab === 'guests' ? 'active' : ''}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">0</span>)</button>
                   <button class="sheet-tab-btn ${activeDetailTab === 'itinerary' ? 'active' : ''}" data-dt-tab="itinerary">Itinerary</button>
