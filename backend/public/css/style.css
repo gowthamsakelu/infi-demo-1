@@ -6382,6 +6382,114 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
   flex-shrink: 0;
 }
 
+/* Operations Team Search Row & Add Member Button */
+.team-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.team-add-member-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  background: #2563EB;
+  color: #FFFFFF;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.22);
+}
+
+.team-add-member-btn:hover {
+  background: #1D4ED8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.32);
+}
+
+.team-add-member-btn:active {
+  background: #1E40AF;
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+}
+
+.team-add-member-btn svg {
+  display: block;
+  stroke: currentColor;
+}
+
+/* Add Team Member Modal Form styling */
+.team-modal .modal-card {
+  width: 520px;
+  max-width: min(520px, calc(100vw - 32px));
+}
+
+.team-modal .modal-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: calc(85vh - 130px);
+  overflow-y: auto;
+}
+
+.team-modal .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.team-modal .form-group label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.team-modal .form-group input,
+.team-modal .form-group select,
+.team-modal .form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: #0F172A;
+  background: #FFFFFF;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.team-modal .form-group input:focus,
+.team-modal .form-group select:focus,
+.team-modal .form-group textarea:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.team-modal .form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.team-modal .modal-footer {
+  padding: 14px 24px;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+
 .team-roster-list {
   flex: 1;
   overflow-y: auto;

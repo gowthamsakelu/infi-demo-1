@@ -20,6 +20,246 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
     return null;
   }
 
+  function ensureAddMemberModal() {
+    let modal = document.getElementById('modal-add-team-member');
+    if (modal) return modal;
+
+    modal = document.createElement('div');
+    modal.className = 'modal-overlay team-modal';
+    modal.id = 'modal-add-team-member';
+    modal.innerHTML = `
+      <div class="modal-card">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center;">
+              ${icon('userPlus', { size: 17, stroke: 2.2 })}
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #0F172A;">Add Team Member</h3>
+              <p style="margin: 0; font-size: 12px; color: #64748B;">Add a new personnel to the operations roster</p>
+            </div>
+          </div>
+          <button type="button" class="sheet-close-btn" data-team-modal-close aria-label="Close modal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <form id="form-add-team-member">
+          <div class="modal-body">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="team-add-name">Full Name *</label>
+                <input type="text" id="team-add-name" placeholder="e.g. Sameer Verma" required />
+              </div>
+              <div class="form-group">
+                <label for="team-add-empid">Employee ID</label>
+                <input type="text" id="team-add-empid" placeholder="e.g. EMP-2024-088" />
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="team-add-role">Role / Designation *</label>
+                <input type="text" id="team-add-role" placeholder="e.g. Tour Operations Manager" required />
+              </div>
+              <div class="form-group">
+                <label for="team-add-status">Status *</label>
+                <select id="team-add-status" required>
+                  <option value="available" selected>Available (On Duty)</option>
+                  <option value="in-transit">In Transit (Active Trip)</option>
+                  <option value="on-leave">On Leave</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="team-add-dept">Department</label>
+              <input type="text" id="team-add-dept" placeholder="e.g. Inbound Operations & Luxury Tours" value="Operations & Dispatch Hub" />
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="team-add-phone">Phone Number *</label>
+                <input type="tel" id="team-add-phone" placeholder="e.g. +91 98765 43210" required />
+              </div>
+              <div class="form-group">
+                <label for="team-add-email">Email Address *</label>
+                <input type="email" id="team-add-email" placeholder="e.g. sameer.verma@ruyitravel.com" required />
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="team-add-location">Hub / Location</label>
+                <input type="text" id="team-add-location" placeholder="e.g. Mumbai HQ — 4th Floor" value="Mumbai HQ" />
+              </div>
+              <div class="form-group">
+                <label for="team-add-experience">Experience</label>
+                <input type="text" id="team-add-experience" placeholder="e.g. 3.5 Years" value="2.0 Years" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="team-add-bio">Operational Bio / Notes</label>
+              <textarea id="team-add-bio" rows="2" placeholder="Brief overview of operational duties, routes handled, or specializations..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary-desktop" data-team-modal-close>Cancel</button>
+            <button type="submit" class="btn-primary-desktop" id="team-submit-add-btn">Add Member</button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeBtns = modal.querySelectorAll('[data-team-modal-close]');
+    closeBtns.forEach(b => b.addEventListener('click', () => closeAddMemberModal()));
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeAddMemberModal();
+    });
+
+    const form = modal.querySelector('#form-add-team-member');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = modal.querySelector('#team-add-name').value.trim();
+      const role = modal.querySelector('#team-add-role').value.trim();
+      const statusType = modal.querySelector('#team-add-status').value;
+      const phone = modal.querySelector('#team-add-phone').value.trim();
+      const email = modal.querySelector('#team-add-email').value.trim();
+      let empId = modal.querySelector('#team-add-empid').value.trim();
+      const dept = modal.querySelector('#team-add-dept').value.trim() || 'Operations & Dispatch Hub';
+      const loc = modal.querySelector('#team-add-location').value.trim() || 'Mumbai HQ';
+      const exp = modal.querySelector('#team-add-experience').value.trim() || '1.0 Year';
+      const bio = modal.querySelector('#team-add-bio').value.trim();
+
+      if (!name || !role) {
+        toast('Please enter name and role.', 'warning');
+        return;
+      }
+
+      if (!empId) {
+        const nextNum = String(OPERATIONS_TEAM_MEMBERS.length + 1).padStart(3, '0');
+        empId = `EMP-2024-${nextNum}`;
+      }
+
+      const statusMap = {
+        'available': { label: 'Available', note: 'On duty • Active in Dispatch Hub' },
+        'in-transit': { label: 'In Transit', note: 'On-ground trip execution active' },
+        'on-leave': { label: 'On Leave', note: 'Approved time off' },
+      };
+
+      const newId = `ST-${String(OPERATIONS_TEAM_MEMBERS.length + 1).padStart(2, '0')}`;
+      const newMember = {
+        id: newId,
+        name,
+        employeeId: empId,
+        role,
+        department: dept,
+        status: statusMap[statusType]?.label || 'Available',
+        statusType,
+        statusNote: statusMap[statusType]?.note || 'Active in Dispatch Hub',
+        avatar: '',
+        email,
+        phone,
+        joiningDate: 'Today',
+        experience: exp,
+        reportingManager: 'Karan Sapalia (Head of Operations)',
+        officeLocation: loc,
+        bio: bio || `${role} coordinating travel operations, logistics and safety compliance.`,
+        metrics: {
+          totalTrips: 0,
+          activeTrips: statusType === 'in-transit' ? 1 : 0,
+          completedTrips: 0,
+          avgRating: '5.0',
+          reviewCount: 0,
+          onTimeDelivery: '100%'
+        },
+        workload: {
+          totalTasks: 0,
+          completedTasks: 0,
+          pendingTasks: 0,
+          overdueTasks: 0,
+          completionRate: 100,
+          workingHours: '09:00 AM – 06:30 PM IST',
+          workingDays: 'Monday – Saturday',
+          shift: 'Day Shift (Active)',
+          upcomingAssignment: 'Onboarding & Hub Induction'
+        },
+        responsibilities: [
+          'Tour dispatch and on-ground logistics execution',
+          'Driver and local guide communications',
+          'Operational safety and emergency response'
+        ],
+        expertise: [
+          dept,
+          loc
+        ],
+        skills: [
+          'Travel Operations',
+          'Incident Escalation',
+          'Route Coordination'
+        ],
+        servicesHandled: [
+          'General Operations'
+        ],
+        assignedBookingIds: [],
+        taskAssignments: {},
+        recentActivity: [
+          {
+            timestamp: 'Just now',
+            title: 'Team Member Added',
+            description: `Onboarded as ${role} in ${dept}.`,
+            reference: empId,
+            badge: 'New Member',
+            type: 'info'
+          }
+        ]
+      };
+
+      OPERATIONS_TEAM_MEMBERS.unshift(newMember);
+      form.reset();
+      closeAddMemberModal();
+      searchQuery = '';
+      activeStatusFilter = 'ALL';
+      selectMember(newMember.id);
+      toast(`Team member "${name}" added successfully!`, 'success');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) {
+        closeAddMemberModal();
+      }
+    });
+
+    return modal;
+  }
+
+  function openAddMemberModal() {
+    const modal = ensureAddMemberModal();
+    const empInput = modal.querySelector('#team-add-empid');
+    if (empInput) {
+      empInput.value = `EMP-2024-${String(OPERATIONS_TEAM_MEMBERS.length + 1).padStart(3, '0')}`;
+    }
+    modal.classList.add('open');
+    const firstInput = modal.querySelector('#team-add-name');
+    if (firstInput) {
+      setTimeout(() => firstInput.focus(), 60);
+    }
+  }
+
+  function closeAddMemberModal() {
+    const modal = document.getElementById('modal-add-team-member');
+    if (modal) {
+      modal.classList.remove('open');
+    }
+  }
+
+  window.addEventListener('open-add-team-member-modal', () => {
+    openAddMemberModal();
+  });
+
   function activate(targetId = null) {
     const fromUrl = getUrlMemberId();
     // Do NOT automatically select any member if no specific member was requested
@@ -121,10 +361,15 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
           </div>
         </div>
 
-        <div class="compact-search-bar" style="width: 100%;">
-          ${icon('search', { size: 14 })}
-          <input type="text" id="team-roster-search-input" placeholder="Search team members..." value="${esc(searchQuery)}" aria-label="Search team members" />
-          ${searchQuery ? `<button id="team-roster-search-clear" style="background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 13px; padding: 0 4px;" title="Clear search">✕</button>` : ''}
+        <div class="team-search-row">
+          <div class="compact-search-bar">
+            ${icon('search', { size: 14 })}
+            <input type="text" id="team-roster-search-input" placeholder="Search team members..." value="${esc(searchQuery)}" aria-label="Search team members" />
+            ${searchQuery ? `<button id="team-roster-search-clear" style="background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 13px; padding: 0 4px;" title="Clear search">✕</button>` : ''}
+          </div>
+          <button type="button" class="team-add-member-btn" id="btn-add-team-member" title="Add Team Member" aria-label="Add Team Member">
+            ${icon('userPlus', { size: 16, stroke: 2.2 })}
+          </button>
         </div>
 
         <div class="compact-tabs-nav tabs-scroller" id="team-status-tabs-row" style="margin: 0; padding-bottom: 2px;">
@@ -200,6 +445,15 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
   }
 
   function bindLeftPanelEvents() {
+    const addMemberBtn = colHost.querySelector('#btn-add-team-member');
+    if (addMemberBtn) {
+      addMemberBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openAddMemberModal();
+      });
+    }
+
     const searchInput = colHost.querySelector('#team-roster-search-input');
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {

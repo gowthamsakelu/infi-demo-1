@@ -14,8 +14,13 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
   host.innerHTML = `
     <div class="mobile-team-page">
       <!-- Search Row -->
-      <div class="mobile-team-search-row">
-        ${searchBox({ id: 'mobile-team-search-input', placeholder: 'Search members by name or role...', value: searchQuery, variant: 'mobile' })}
+      <div class="mobile-team-search-row" style="display: flex; align-items: center; gap: 8px;">
+        <div style="flex: 1;">
+          ${searchBox({ id: 'mobile-team-search-input', placeholder: 'Search members by name or role...', value: searchQuery, variant: 'mobile' })}
+        </div>
+        <button type="button" class="team-add-member-btn" id="mobile-btn-add-team-member" title="Add Member" aria-label="Add Member" style="height: 42px; width: 42px; min-width: 42px; border-radius: 12px;">
+          ${icon('userPlus', { size: 18, stroke: 2.2 })}
+        </button>
       </div>
 
       <!-- Status Filter Tabs / Pills -->
@@ -712,6 +717,13 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value.trim();
       renderCards();
+    });
+  }
+
+  const mobileAddBtn = host.querySelector('#mobile-btn-add-team-member');
+  if (mobileAddBtn) {
+    mobileAddBtn.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('open-add-team-member-modal'));
     });
   }
 
