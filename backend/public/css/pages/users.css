@@ -1474,6 +1474,37 @@
   letter-spacing: -0.2px !important;
 }
 
+[data-sp="users"] .compact-header-top {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+[data-sp="users"] .compact-search-bar {
+  flex: 1 !important;
+  height: 38px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 8px !important;
+}
+
+[data-sp="users"] .compact-search-bar input {
+  height: 100% !important;
+  font-size: 13px !important;
+}
+
+[data-sp="users"] .sp-filter-slot {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
 .us-header-add-btn {
   display: inline-flex;
   align-items: center;
