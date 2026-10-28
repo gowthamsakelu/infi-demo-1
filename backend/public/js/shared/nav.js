@@ -6,7 +6,7 @@ export const NAV = [
   {
     title: 'Menu',
     items: [
-      { key: 'dashboard', label: 'Dashboard', icon: 'grid', kind: 'soon' },
+      { key: 'dashboard', label: 'Dashboard', icon: 'grid', kind: 'page' },
       { key: 'inquiries', label: 'Inquiries', icon: 'message', kind: 'app', badgeId: 'sidebar-inquiries-badge', badge: '8' },
       { key: 'bookings', label: 'Bookings', icon: 'briefcase', kind: 'app', badgeId: 'sidebar-total-badge', badge: '28' },
       { key: 'calendar', label: 'Calendar', icon: 'calendar', kind: 'app' },

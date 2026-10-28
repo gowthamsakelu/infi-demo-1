@@ -1325,6 +1325,7 @@ export function createMobileView(container, options = {}) {
       container.querySelector('#mobile-add-inquiry').hidden = page !== 'inquiries';
       container.querySelector('#mobile-bookings-page').hidden = page === 'calendar';
       container.querySelector('#mobile-calendar-page').hidden = page !== 'calendar';
+      container.querySelector('#mobile-screen-scroll')?.classList.toggle('calendar-mode', page === 'calendar');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
       if (subtitleEl) subtitleEl.textContent = page === 'calendar' ? 'Calendar' : page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');

@@ -10,7 +10,13 @@ class User extends Authenticatable
 {
     use HasFactory;
 
-    public const ROLES = ['admin' => 'Admin', 'sales' => 'Sales', 'operations' => 'Operations'];
+    public const ROLES = [
+        'admin' => 'Admin',
+        'operations' => 'Manager',
+        'sales' => 'Staff',
+        'manager' => 'Manager',
+        'staff' => 'Staff',
+    ];
     public const STATUSES = ['active', 'pending', 'inactive'];
 
     protected $fillable = ['name', 'email', 'password', 'role', 'title', 'phone', 'status', 'last_active_at'];

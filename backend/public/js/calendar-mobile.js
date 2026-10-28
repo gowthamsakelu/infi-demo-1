@@ -99,10 +99,75 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
     });
   }
 
+  let isScrollingProgrammatically = false;
+  let programmaticScrollTimer = null;
+  let scrollTicking = false;
+
+  function onPaneScroll(e) {
+    if (isScrollingProgrammatically || scrollTicking) return;
+    scrollTicking = true;
+
+    requestAnimationFrame(() => {
+      scrollTicking = false;
+      if (isScrollingProgrammatically) return;
+
+      const pane = e.target;
+      const sections = pane.querySelectorAll('.cal-section[data-cal-date]');
+      if (!sections.length) return;
+
+      const scrollTop = pane.scrollTop;
+      let activeSection = sections[0];
+
+      if (pane.scrollHeight - pane.scrollTop <= pane.clientHeight + 15) {
+        activeSection = sections[sections.length - 1];
+      } else {
+        for (let i = 0; i < sections.length; i++) {
+          const sec = sections[i];
+          if (sec.offsetTop - pane.offsetTop <= scrollTop + 50) {
+            activeSection = sec;
+          } else {
+            break;
+          }
+        }
+      }
+
+      const activeDate = activeSection?.dataset.calDate;
+      if (!activeDate) return;
+
+      const s = store.getState();
+      if (activeDate !== s.selected) {
+        lastSelected = activeDate;
+        s.selected = activeDate;
+
+        weekVp.querySelectorAll('.cal-pill').forEach((p) => {
+          const on = p.dataset.calDay === activeDate;
+          p.classList.toggle('is-selected', on);
+          p.setAttribute('aria-pressed', String(on));
+        });
+
+        pane.querySelectorAll('.cal-section').forEach((sec) => {
+          sec.classList.toggle('is-selected', sec.dataset.calDate === activeDate);
+        });
+
+        const targetWeek = weekOfSelected();
+        if (targetWeek !== -1 && targetWeek !== currentWeek()) {
+          showWeek(targetWeek, true);
+        }
+      }
+    });
+  }
+
   function scrollPaneToSelected(smooth) {
     const pane = panes.children[paneIndex];
     const el = pane?.querySelector(`[data-cal-date="${store.getState().selected}"]`);
-    if (el) pane.scrollTo({ top: el.offsetTop - pane.offsetTop, behavior: smooth ? 'smooth' : 'auto' });
+    if (el) {
+      if (smooth) {
+        isScrollingProgrammatically = true;
+        clearTimeout(programmaticScrollTimer);
+        programmaticScrollTimer = setTimeout(() => { isScrollingProgrammatically = false; }, 700);
+      }
+      pane.scrollTo({ top: el.offsetTop - pane.offsetTop, behavior: smooth ? 'smooth' : 'auto' });
+    }
   }
 
   function goToPane(i, smooth = true) {
@@ -181,7 +246,13 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
 
   host.addEventListener('click', (e) => {
     const day = e.target.closest('[data-cal-day]');
-    if (day) { store.select(day.dataset.calDay); return; }
+    if (day) {
+      isScrollingProgrammatically = true;
+      clearTimeout(programmaticScrollTimer);
+      programmaticScrollTimer = setTimeout(() => { isScrollingProgrammatically = false; }, 700);
+      store.select(day.dataset.calDay);
+      return;
+    }
     const week = e.target.closest('[data-cal-week]');
     if (week) {
       const n = currentWeek() + Number(week.dataset.calWeek);
@@ -219,7 +290,10 @@ export function createMobileCalendar(host, { onOpen, isActive }) {
       if (i !== paneIndex && store.CATEGORIES[i]) { paneIndex = i; store.setCategory(store.CATEGORIES[i].key); }
     });
   }, { root: panes, threshold: 0.6 });
-  panes.querySelectorAll('.cal-pane').forEach((el) => paneSeen.observe(el));
+  panes.querySelectorAll('.cal-pane').forEach((el) => {
+    paneSeen.observe(el);
+    el.addEventListener('scroll', onPaneScroll, { passive: true });
+  });
 
   return {
     activate() { lastMonth = null; lastSelected = null; render(); store.load().then(() => requestAnimationFrame(() => scrollPaneToSelected(false))); },

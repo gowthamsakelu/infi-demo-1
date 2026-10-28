@@ -9,6 +9,8 @@ Route::get('/me/permissions', [UserController::class, 'me']);
 
 // Users & Permissions: the Users and Settings module (view to read, edit to change).
 Route::get('/users', [UserController::class, 'index'])->middleware(Permissions::can('system', 'view'));
+Route::post('/users', [UserController::class, 'store'])->middleware(Permissions::can('system', 'edit'));
 Route::get('/users/{user}', [UserController::class, 'show'])->whereNumber('user')->middleware(Permissions::can('system', 'view'));
+Route::put('/users/{user}', [UserController::class, 'update'])->whereNumber('user')->middleware(Permissions::can('system', 'edit'));
 Route::put('/users/{user}/permissions', [UserController::class, 'permissions'])->whereNumber('user')->middleware(Permissions::can('system', 'edit'));
 Route::patch('/users/{user}/status', [UserController::class, 'status'])->whereNumber('user')->middleware(Permissions::can('system', 'edit'));

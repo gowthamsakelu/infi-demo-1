@@ -214,8 +214,8 @@ export function createSplitPage(host, ctx, cfg) {
         <div class="row-lead-col"><div class="row-avatar" aria-hidden="true">${r.tile}</div></div>
         <div class="card-info-col">
           <div class="row-name-line"><h3 class="card-title">${esc(r.name)}</h3>${r.pill || ''}</div>
-          ${r.sub ? `<p class="row-trip">${esc(r.sub)}</p>` : ''}
-          ${r.meta ? `<div class="card-meta-row"><span>${esc(r.meta)}</span></div>` : ''}
+          ${r.sub ? `<p class="row-trip">${r.raw ? r.sub : esc(r.sub)}</p>` : ''}
+          ${r.meta ? `<div class="card-meta-row">${r.raw ? r.meta : `<span>${esc(r.meta)}</span>`}</div>` : ''}
         </div>
       </div>`;
     }).join('');

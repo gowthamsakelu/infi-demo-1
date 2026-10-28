@@ -6263,8 +6263,42 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
 .cal-pill.is-selected .cal-pill-day { color: rgba(255, 255, 255, 0.9); }
 .cal-pill.is-selected .cal-pill-date { color: #FFFFFF; }
 .cal-month-btn { flex: 0 0 44px; min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 1px solid #E2E8F0; border-radius: var(--radius-md); background: var(--bg-hover); font: inherit; font-size: 11px; font-weight: 700; color: #0F172A; cursor: pointer; }
-.cal-panes { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; height: max(320px, calc(100dvh - 380px)); margin-top: 6px; }
-.cal-pane { flex: 0 0 100%; min-width: 100%; scroll-snap-align: start; overflow-y: auto; contain: layout paint; padding: 2px 0 16px; scrollbar-width: none; }
+.mobile-screen-content.calendar-mode,
+.mobile-screen-content:has(#mobile-calendar-page:not([hidden])) {
+  display: flex !important;
+  flex-direction: column !important;
+  padding-bottom: 0 !important;
+  overflow: hidden !important;
+  height: 100% !important;
+}
+#mobile-calendar-page:not([hidden]) {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.cal-panes {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  margin-top: 6px;
+}
+.cal-pane {
+  flex: 0 0 100%;
+  min-width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  overflow-y: auto;
+  contain: layout paint;
+  padding: 2px 0 calc(84px + var(--safe-bottom));
+  scrollbar-width: none;
+}
 .cal-month-body { padding: 4px 20px max(20px, var(--safe-bottom)); display: flex; flex-direction: column; gap: 14px; }
 .cal-year-row { justify-content: center; gap: 14px; font-size: 15px; }
 .cal-month-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
