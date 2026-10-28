@@ -314,6 +314,8 @@ export default {
         ? `<img src="${esc(u.avatar)}" alt="${esc(u.name)}" class="team-avatar-img" />`
         : `<div class="team-avatar-initials">${esc(inits)}</div>`;
 
+      const showRoleBadge = u.roleLabel && u.roleLabel.toLowerCase() !== jobRole.toLowerCase();
+
       const customHtml = `
         <div class="team-card-left">
           <div class="team-avatar-container">
@@ -324,15 +326,15 @@ export default {
             <div class="team-card-title-line">
               <span class="team-card-name card-title">${esc(u.name)}</span>
               <span class="team-emp-tag">${esc(empId)}</span>
-              <span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>
             </div>
             <div class="team-card-status-line">
+              <span class="team-card-role">${esc(jobRole)}</span>
+              ${showRoleBadge ? `<span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>` : ''}
               <span class="status-pill is-${sKey} ${pillCls}">
                 <span class="dot"></span>
                 ${esc(statusLabel)}
               </span>
             </div>
-            <p class="team-card-role">${esc(jobRole)}</p>
             <div class="team-card-meta-line">
               <span class="badge-trips-pill">${tripsCount} Trips</span>
               <span class="team-meta-dot">•</span>
@@ -345,13 +347,13 @@ export default {
 
         <div class="team-card-actions">
           <button type="button" class="circle-action-btn" data-action-call="${esc(phone)}" title="Call ${esc(u.name)}" aria-label="Call ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='tel:${esc(phone)}';">
-            ${icon('phone', { size: 14, stroke: 2.2 })}
+            ${icon('phone', { size: 12, stroke: 2.2 })}
           </button>
           <button type="button" class="circle-action-btn" data-action-mail="${esc(email)}" title="Email ${esc(u.name)}" aria-label="Email ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='mailto:${esc(email)}';">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </button>
           <span class="circle-action-btn is-chevron" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </span>
         </div>
       `;

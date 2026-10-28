@@ -205,24 +205,25 @@
 }
 
 /* Card inner left content */
+/* Card inner left content */
 [data-sp="users"] .team-card-left {
   display: flex !important;
   align-items: center !important;
-  gap: 12px !important;
+  gap: 10px !important;
   min-width: 0 !important;
   flex: 1 1 auto !important;
 }
 
 [data-sp="users"] .team-avatar-container {
   position: relative !important;
-  width: 44px !important;
-  height: 44px !important;
+  width: 38px !important;
+  height: 38px !important;
   flex-shrink: 0 !important;
 }
 
 [data-sp="users"] .team-avatar-img {
-  width: 44px !important;
-  height: 44px !important;
+  width: 38px !important;
+  height: 38px !important;
   border-radius: 50% !important;
   object-fit: cover !important;
   border: 1px solid #E2E8F0 !important;
@@ -230,13 +231,13 @@
 }
 
 [data-sp="users"] .team-avatar-initials {
-  width: 44px !important;
-  height: 44px !important;
+  width: 38px !important;
+  height: 38px !important;
   border-radius: 50% !important;
   background: #EFF6FF !important;
   color: #2563EB !important;
   font-weight: 700 !important;
-  font-size: 15px !important;
+  font-size: 13.5px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -247,8 +248,8 @@
   position: absolute !important;
   bottom: 0 !important;
   right: 0 !important;
-  width: 12px !important;
-  height: 12px !important;
+  width: 10px !important;
+  height: 10px !important;
   border-radius: 50% !important;
   border: 2px solid #FFFFFF !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
@@ -262,7 +263,7 @@
 [data-sp="users"] .team-card-info {
   display: flex !important;
   flex-direction: column !important;
-  gap: 2.5px !important;
+  gap: 2px !important;
   min-width: 0 !important;
   flex: 1 1 auto !important;
 }
@@ -271,72 +272,110 @@
   display: flex !important;
   align-items: center !important;
   gap: 6px !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important;
+  min-width: 0 !important;
 }
 
 [data-sp="users"] .team-card-name {
-  font-size: 14px !important;
+  font-size: 13.5px !important;
   font-weight: 700 !important;
   color: #0F172A !important;
   white-space: nowrap !important;
-  line-height: 1.3 !important;
+  line-height: 1.25 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 [data-sp="users"] .team-emp-tag {
-  font-size: 11px !important;
-  font-weight: 700 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
   color: #475569 !important;
   background: #F1F5F9 !important;
   border: 1px solid #E2E8F0 !important;
-  padding: 1px 6px !important;
+  padding: 1.5px 6px !important;
   border-radius: 5px !important;
   letter-spacing: 0.2px !important;
-  line-height: 1.3 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 [data-sp="users"] .team-card-status-line {
   display: flex !important;
   align-items: center !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+  min-width: 0 !important;
   margin-top: 1px !important;
   margin-bottom: 1px !important;
+  overflow: hidden !important;
 }
 
 [data-sp="users"] .team-card-role {
-  font-size: 12.5px !important;
-  color: #64748B !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  color: #475569 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   margin: 0 !important;
-  line-height: 1.35 !important;
+  line-height: 1.25 !important;
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+}
+
+[data-sp="users"] .us-role-badge {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  padding: 1.5px 6px !important;
+  border-radius: 9999px !important;
+  flex-shrink: 0 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+[data-sp="users"] .status-pill {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  padding: 1.5px 7px !important;
+  border-radius: 9999px !important;
+  flex-shrink: 0 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+[data-sp="users"] .status-pill .dot {
+  width: 5px !important;
+  height: 5px !important;
 }
 
 [data-sp="users"] .team-card-meta-line {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
-  font-size: 11.5px !important;
+  gap: 5px !important;
+  font-size: 11px !important;
   color: #64748B !important;
-  margin-top: 3px !important;
+  margin-top: 2px !important;
   white-space: nowrap !important;
   flex-wrap: nowrap !important;
   overflow: hidden !important;
   min-width: 0 !important;
+  line-height: 1.2 !important;
 }
 
 [data-sp="users"] .badge-trips-pill {
   display: inline-flex !important;
   align-items: center !important;
-  padding: 1.5px 7px !important;
+  padding: 1px 6px !important;
   border-radius: 9999px !important;
   background: #EFF6FF !important;
   color: #2563EB !important;
-  font-size: 11px !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
   border: 1px solid #DBEAFE !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
-  line-height: 1.25 !important;
+  line-height: 1.2 !important;
   letter-spacing: 0.1px !important;
 }
 
@@ -350,7 +389,7 @@
 
 [data-sp="users"] .team-meta-dot {
   color: #CBD5E1 !important;
-  font-size: 10px !important;
+  font-size: 9px !important;
   flex-shrink: 0 !important;
 }
 
@@ -363,13 +402,14 @@
 [data-sp="users"] .team-card-actions {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 4px !important;
   flex-shrink: 0 !important;
+  margin-left: 6px !important;
 }
 
 [data-sp="users"] .circle-action-btn {
-  width: 32px !important;
-  height: 32px !important;
+  width: 28px !important;
+  height: 28px !important;
   border-radius: 50% !important;
   border: 1px solid #E2E8F0 !important;
   background: #FFFFFF !important;
