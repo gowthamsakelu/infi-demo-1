@@ -4,8 +4,15 @@
 const listeners = new Set();
 const notify = () => listeners.forEach((fn) => fn());
 
-const PAGES = ['bookings', 'inquiries', 'calendar'];
-const ALIASES = { enquiries: 'inquiries', enquiry: 'inquiries', inquiry: 'inquiries' };
+const PAGES = ['bookings', 'inquiries', 'calendar', 'team'];
+const ALIASES = {
+  enquiries: 'inquiries',
+  enquiry: 'inquiries',
+  inquiry: 'inquiries',
+  operations: 'team',
+  'operations-team': 'team',
+  team: 'team'
+};
 
 export function currentPage() {
   const raw = location.hash.replace(/^#/, '').split('?')[0].toLowerCase();
