@@ -377,3 +377,6 @@ html[data-layout="mobile"] .team-card-actions { gap: 6px; }
 /* Desktop: the detail panel of the catalog pages has no big cover photo (the header keeps the small thumbnail); the phone sheet keeps its cover */
 html[data-layout="desktop"] .sp-desk .sp-detail .cat-hero { display: none; }
 .team-search-row .compact-search-bar { flex: 1 1 auto; width: 100%; min-width: 0; }
+
+/* long lists: rows that are off screen are not laid out until they are near (the row height is known, so nothing jumps) */
+.row-list > .list-row-card { content-visibility: auto; contain-intrinsic-size: auto 90px; }

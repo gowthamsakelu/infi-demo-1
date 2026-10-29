@@ -39,3 +39,20 @@ export function slideIn(el, dir = 1) {
   const ms = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--motion-base')) || 200;
   el.animate([{ opacity: 0.35, transform: `translateX(${dir * 18}px)` }, { opacity: 1, transform: 'none' }], { duration: ms, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
 }
+
+/**
+ * Phone lists with a pill chip row: swiping the LIST sideways moves to the next / previous chip (the chip is tapped for you, so the page's own
+ * filter runs: no second code path). Stops at the first and last chip. The chip row itself, fields, buttons and sideways-scrolling parts are ignored by bindSwipe.
+ */
+export function bindChipSwipe(listEl, rowHost, { enabled = () => true } = {}) {
+  const phone = () => document.documentElement.dataset.layout === 'mobile';
+  const blocked = () => document.body.classList.contains('sp-detail-open') || !!document.querySelector('.asg-overlay, .modal-overlay.open, .row-floating-menu, #mobile-bottom-sheet.open, #mobile-team-sheet.open, .notifications-panel:not([hidden])');
+  const step = (dir) => {
+    const pills = [...rowHost.querySelectorAll('.tab-pill')];
+    const to = pills[pills.findIndex((p) => p.classList.contains('active')) + dir];
+    if (!to || pills.findIndex((p) => p.classList.contains('active')) === -1) return;
+    to.click();
+    slideIn(listEl, dir);
+  };
+  bindSwipe(listEl, { enabled: () => phone() && !blocked() && enabled(), onNext: () => step(1), onPrev: () => step(-1) });
+}

@@ -605,9 +605,19 @@ export default {
       ];
     }
 
+    /** "₹36,000" -> "₹36K" (sub-stats only, so three amounts always fit one card); plain counts stay as they are. */
+    function compactAmount(v) {
+      const text = String(v ?? '');
+      if (!text.startsWith('₹')) return text;
+      const n = Number(text.replace(/[^0-9.]/g, ''));
+      if (!Number.isFinite(n)) return text;
+      const f = (x, u) => `₹${String(Math.round(x * 10) / 10).replace(/\.0$/, '')}${u}`;
+      return n >= 1e7 ? f(n / 1e7, 'Cr') : n >= 1e5 ? f(n / 1e5, 'L') : n >= 1e3 ? f(n / 1e3, 'K') : `₹${Math.round(n)}`;
+    }
+
     function renderCard(c) {
       return `
-        <article class="dash-kpi-card ${c.cardClass || ''}" data-dash-nav="${esc(c.navTarget)}" role="button" tabindex="0" title="Click to view ${esc(c.title)}">
+        <article class="dash-kpi-card ${c.cardClass || ''}" data-dash-nav="${esc(c.navTarget)}" role="button" tabindex="0">
           <div class="dash-kpi-top">
             <div class="dash-kpi-left">
               <div class="dash-kpi-icon ${c.iconBgClass}">
@@ -635,23 +645,10 @@ export default {
                   <span class="dash-status-dot ${ind.dotClass}"></span>
                   <span class="dash-ind-label">${esc(ind.label)}</span>
                 </div>
-                <span class="dash-ind-val">${esc(String(ind.value))}</span>
+                <span class="dash-ind-val">${esc(compactAmount(ind.value))}</span>
               </div>
             `).join('')}
           </div>
-          ${c.id === 'revenue' ? `
-            <div class="dash-kpi-action-box">
-              <button type="button" class="dash-kpi-trend-btn" data-dash-act="open-revenue-trend" title="Tap to view revenue trend">
-                <div class="dash-kpi-trend-btn-left">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-                  </svg>
-                  <span>Tap to view revenue trend</span>
-                </div>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
-          ` : ''}
         </article>
       `;
     }
@@ -945,7 +942,7 @@ export default {
       startClock();
     }
 
-    async function loadData({ isFilter = false } = {}) {
+    async function loadData({ isFilter = false, fresh = false } = {}) {
       const fetchId = ++currentFetchId;
       const isInitial = !state.data;
 
@@ -959,7 +956,7 @@ export default {
 
       try {
         const query = state.period ? `?period=${encodeURIComponent(state.period)}` : '';
-        const res = await getJson(`/api/dashboard${query}`);
+        const res = await getJson(`/api/dashboard${query}`, { fresh });
         if (fetchId !== currentFetchId) return;
 
         state.data = res;
@@ -1015,7 +1012,7 @@ export default {
       // Act buttons
       const act = e.target.closest('[data-dash-act]')?.dataset.dashAct;
       if (act === 'reload') {
-        loadData({ isFilter: Boolean(state.data) });
+        loadData({ isFilter: Boolean(state.data), fresh: true }); // the Refresh button always asks the server
         return;
       }
       if (act === 'export') {

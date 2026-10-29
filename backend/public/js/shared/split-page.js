@@ -11,7 +11,7 @@ import { createDropdown } from './dropdown-filter.js';
 import { confirmDialog } from './sheet.js';
 import { detailHeaderHtml, sheetHandleHtml } from './detail-sheet.js';
 import { bindListKeys } from './split-view.js';
-import { bindSwipe, slideIn } from './swipe.js';
+import { bindSwipe, bindChipSwipe, slideIn } from './swipe.js';
 import { hasOpenLayer } from './sheet.js';
 import { getParams, setParams, subscribe } from './page-state.js';
 
@@ -194,6 +194,7 @@ export function createSplitPage(host, ctx, cfg) {
         const to = tabs[tabs.findIndex((t) => t.classList.contains('active')) + step];
         if (to) { to.click(); slideIn($('.sp-detail-body'), step); }
       };
+      bindChipSwipe($('.sp-list'), $('.sp-tabs')); // swipe the list: next / previous chip
       bindSwipe($('.sp-detail-body'), { enabled: open, onNext: () => goTab(1), onPrev: () => goTab(-1) });
       if (cfg.swipeRecords) {
         const goRecord = async (step) => {

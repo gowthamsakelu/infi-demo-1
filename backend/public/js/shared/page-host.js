@@ -6,6 +6,7 @@ import { currentPage, getParams, setParams, navigate } from './page-state.js';
 import { toast } from './ui.js';
 import { confirmDialog } from './sheet.js';
 import { setAddAction } from './add-button.js';
+import { getJson } from './http.js';
 
 let current = null; // { key, host, instance, token }
 let token = 0;
@@ -24,6 +25,23 @@ function loadPageCss(key) {
 
 /** The Add button of the open page (shared/add-button.js): its wording, and what it does; null hides it. */
 const setAddButton = setAddAction;
+
+/** Once the app is idle, fetch the other pages' scripts and styles one at a time, so the first visit to a page is as fast as the second. */
+let prefetched = false;
+const WARM = { dashboard: '/api/dashboard?period=today', destinations: '/api/destinations', 'tour-packages': '/api/tour-packages', transport: '/api/transport', stays: '/api/stays', adventures: '/api/adventures', banners: '/api/banners', blogs: '/api/blogs', users: '/api/users' };
+export function prefetchPages(except) {
+  if (prefetched) return;
+  prefetched = true;
+  const keys = ['dashboard', 'destinations', 'tour-packages', 'transport', 'stays', 'adventures', 'banners', 'blogs', 'users', 'settings'].filter((k) => k !== except);
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 300));
+  const next = () => {
+    const key = keys.shift();
+    if (!key) return;
+    if (WARM[key]) getJson(WARM[key]).catch(() => {}); // the page's data too, so its list is on screen the moment it opens
+    import(`../pages/${key}.js`).then((m) => { if (m.default?.css) loadPageCss(key); }).catch(() => {}).finally(() => idle(next));
+  };
+  idle(next);
+}
 
 export async function mountPage(key, host) {
   if (current && current.key === key && current.host === host) return; // already showing it
@@ -47,6 +65,7 @@ export async function mountPage(key, host) {
   const instance = await mod.mount(host, ctx);
   if (mine !== token) { instance?.destroy?.(); return; }
   current = { key, host, instance };
+  prefetchPages(key);
 }
 
 export function unmountPage() {

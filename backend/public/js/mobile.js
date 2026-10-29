@@ -3,7 +3,7 @@ import { icon } from './shared/icons.js';
 import { createMobileCalendar } from './calendar-mobile.js';
 import { createMobileTeam } from './team-mobile.js';
 import { OPERATIONS_TEAM_MEMBERS } from './shared/team-data.js';
-import { bindSwipe, slideIn } from './shared/swipe.js';
+import { bindSwipe, bindChipSwipe, slideIn } from './shared/swipe.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
@@ -1514,105 +1514,7 @@ export function createMobileView(container, options = {}) {
 
     // Category Tabs click
 
-    // Left and Right Swipe / Scroll Gesture Handling
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-    let isTouchSwiping = false;
-
-    const cardsArea = container.querySelector('#mobile-cards-list');
-    const screenArea = container.querySelector('.bookings-screen') || container;
-
-    // Touch event listeners (Mobile swipe left/right)
-    // The swipe-to-change-tab gesture belongs to the Bookings / Inquiries list only: on the Calendar page (or in the
-    // header and nav) a horizontal swipe is the page's own scrolling and must never switch a list tab.
-    const inList = (t) => page !== 'calendar' && !!t.closest('#mobile-bookings-page');
-    screenArea.addEventListener('touchstart', (e) => {
-      if (isModalOpen || isAssignSheetOpen || !inList(e.target) || e.target.closest('.tabs-scroller')) { isTouchSwiping = false; return; }
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchEndX = touchStartX;
-      touchEndY = touchStartY;
-      isTouchSwiping = true;
-    }, { passive: true });
-
-    screenArea.addEventListener('touchmove', (e) => {
-      if (!isTouchSwiping || isModalOpen || isAssignSheetOpen) return;
-      touchEndX = e.touches[0].clientX;
-      touchEndY = e.touches[0].clientY;
-    }, { passive: true });
-
-    screenArea.addEventListener('touchend', (e) => {
-      if (!isTouchSwiping || isModalOpen || isAssignSheetOpen) return;
-      isTouchSwiping = false;
-      const diffX = touchEndX - touchStartX;
-      const diffY = touchEndY - touchStartY;
-      const minDistance = 35; // threshold in pixels
-
-      if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX < 0) {
-          // Swiped left -> Filters New Bookings (or moves left)
-          switchCategoryByDirection('left');
-        } else {
-          // Swiped right -> Filters Assigned / Ongoing (moves right)
-          switchCategoryByDirection('right');
-        }
-      }
-    });
-
-    // Mouse drag gesture listeners (for testing on desktop browser / mobile simulator)
-    let isMouseDownDrag = false;
-    let mouseStartX = 0;
-    let mouseStartY = 0;
-    let mouseEndX = 0;
-    let mouseEndY = 0;
-
-    screenArea.addEventListener('mousedown', (e) => {
-      if (isModalOpen || isAssignSheetOpen || e.button !== 0 || !inList(e.target)) return;
-      if (e.target.closest('button, input, select, textarea, .custom-checkbox, .card-select-checkbox')) return;
-      isMouseDownDrag = true;
-      mouseStartX = e.clientX;
-      mouseStartY = e.clientY;
-      mouseEndX = mouseStartX;
-      mouseEndY = mouseStartY;
-    });
-
-    screenArea.addEventListener('mousemove', (e) => {
-      if (!isMouseDownDrag) return;
-      mouseEndX = e.clientX;
-      mouseEndY = e.clientY;
-    });
-
-    const endMouseDrag = () => {
-      if (!isMouseDownDrag) return;
-      isMouseDownDrag = false;
-      const diffX = mouseEndX - mouseStartX;
-      const diffY = mouseEndY - mouseStartY;
-      const minDistance = 35;
-
-      if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX < 0) {
-          switchCategoryByDirection('left');
-        } else {
-          switchCategoryByDirection('right');
-        }
-      }
-    };
-
-    screenArea.addEventListener('mouseup', endMouseDrag);
-
-    // Trackpad / Horizontal wheel scroll (left and right)
-    screenArea.addEventListener('wheel', (e) => {
-      if (isModalOpen || isAssignSheetOpen) return;
-      if (Math.abs(e.deltaX) > 25 && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        if (e.deltaX < 0) {
-          switchCategoryByDirection('left');
-        } else {
-          switchCategoryByDirection('right');
-        }
-      }
-    }, { passive: true });
+    // Swiping the Bookings / Inquiries list moves to the next / previous chip: see bindChipSwipe below (one shared gesture for every list page).
 
     // Modal Sheet Left and Right Swipe / Scroll Gesture Handling (Customer Details <-> Guests <-> Itinerary <-> Updates)
     const sheetEl = container.querySelector('#mobile-bottom-sheet');
@@ -1658,6 +1560,7 @@ export function createMobileView(container, options = {}) {
       slideIn(container.querySelector('#sheet-header-card-content'), step);
       slideIn(bodyEl2, step);
     }
+    bindChipSwipe(container.querySelector('#mobile-cards-list'), container.querySelector('#mobile-tabs-host'), { enabled: () => page === 'bookings' || page === 'inquiries' });
     const swipeOk = () => isModalOpen && !isAssignSheetOpen && !document.querySelector('.asg-overlay, .modal-overlay.open, .row-floating-menu');
     bindSwipe(container.querySelector('#sheet-body-content'), { enabled: swipeOk, onNext: () => switchModalTabByDirection('right'), onPrev: () => switchModalTabByDirection('left') });
     bindSwipe(container.querySelector('#sheet-header-card-content'), { enabled: swipeOk, onNext: () => swipeRecord(1), onPrev: () => swipeRecord(-1) });

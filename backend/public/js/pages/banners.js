@@ -8,6 +8,7 @@ import { esc, toast, skeletonCards, errorState, emptyState, openRowMenu } from '
 import { icon } from '../shared/icons.js';
 import { renderTabs } from '../shared/list-ui.js';
 import { pill, plural } from '../shared/page-ui.js';
+import { bindChipSwipe } from '../shared/swipe.js';
 
 const LABEL = { active: 'Active', scheduled: 'Scheduled', draft: 'Draft' };
 const short = (iso) => (iso ? new Date(`${iso}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '');
@@ -89,6 +90,7 @@ export default {
       <div class="bn-content"></div>`;
     const tabsEl = frame.body.querySelector('.bn-tabs');
     const content = frame.body.querySelector('.bn-content');
+    bindChipSwipe(content, tabsEl);
 
     const TABS = [['all', 'All'], ['active', 'Active'], ['scheduled', 'Scheduled'], ['draft', 'Draft']];
     const inTab = (b) => state.tab === 'all' || b.status === state.tab;

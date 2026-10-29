@@ -10,6 +10,7 @@ import { icon } from '../shared/icons.js';
 import { renderTabs } from '../shared/list-ui.js';
 import { pill, tag } from '../shared/page-ui.js';
 import { heroImage } from './catalog-ui.js';
+import { bindChipSwipe } from '../shared/swipe.js';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const LABEL = { published: 'Published', draft: 'Draft', scheduled: 'Scheduled' };
@@ -83,6 +84,7 @@ export default {
       <div class="bg-more" hidden><button type="button" class="btn-secondary-desktop" data-bg-more>Load More</button></div>`;
     const $ = (s) => frame.body.querySelector(s);
     const grid = $('.bg-grid');
+    bindChipSwipe(grid, $('.bg-tabs'));
     const input = $('.bg-search input');
 
     const TABS = [['all', 'All'], ['published', 'Published'], ['draft', 'Draft'], ['scheduled', 'Scheduled']];

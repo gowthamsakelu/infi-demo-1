@@ -12,7 +12,7 @@ import { closeAssign } from './shared/assign-sheet.js';
 import { closeFollowUpModal } from './shared/followup-modal.js';
 import { initAccountMenu } from './shared/account-menu.js';
 import { isHostedPage } from './shared/nav.js';
-import { mountPage, unmountPage } from './shared/page-host.js';
+import { mountPage, unmountPage, prefetchPages } from './shared/page-host.js';
 import { syncNavActive } from './shared/nav-ui.js';
 import { currentPage, subscribe as subscribePage } from './shared/page-state.js';
 
@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   subscribePage(syncHostedPage);
   window.addEventListener('layout-changed', syncHostedPage);
   syncHostedPage();
+  prefetchPages(currentPage()); // once idle: the other pages' scripts, styles and data
 
   enhanceSelects(document); // no unstyled OS lists: every <select> uses the shared dropdown
 

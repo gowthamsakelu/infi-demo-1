@@ -6,7 +6,7 @@ import { icon } from './shared/icons.js';
 import { esc, initials, toast, searchBox } from './shared/ui.js';
 import { renderTabs } from './shared/list-ui.js';
 import { personActionsHtml, bindPersonActions } from './shared/person-actions.js';
-import { bindSwipe, slideIn } from './shared/swipe.js';
+import { bindSwipe, bindChipSwipe, slideIn } from './shared/swipe.js';
 
 export function createMobileTeam(host, { onViewBooking } = {}) {
   let searchQuery = '';
@@ -971,6 +971,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
     $('#mobile-team-sheet-tabs .sheet-tab-btn.active')?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     slideIn($('#mobile-team-sheet-body'), step);
   }
+  bindChipSwipe(cardsListContainer, filterTabsContainer);
   bindSwipe($('#mobile-team-sheet-body'), { enabled: () => isDetailSheetOpen && !document.querySelector('.asg-overlay, .modal-overlay.open, .row-floating-menu'), onNext: () => stepDetailTab(1), onPrev: () => stepDetailTab(-1) });
 
   // Initial render
