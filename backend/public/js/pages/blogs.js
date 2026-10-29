@@ -8,7 +8,7 @@ import { esc, toast, searchBox, skeletonCards, errorState, emptyState, openRowMe
 import { openSheet, confirmDialog } from '../shared/sheet.js';
 import { icon } from '../shared/icons.js';
 import { renderTabs } from '../shared/list-ui.js';
-import { pill, tag, statRow } from '../shared/page-ui.js';
+import { pill, tag } from '../shared/page-ui.js';
 import { heroImage } from './catalog-ui.js';
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -75,8 +75,6 @@ export default {
     let timer = null;
     const frame = pageFrame(host, ctx, { title: 'Blogs', subtitle: '', addLabel: 'Write Blog', onAdd: () => crud.add({ returnFocus: () => document.querySelector('#desktop-page-add, #mobile-page-add') }) });
     frame.body.innerHTML = `
-      <div class="bg-heading"><h2>Trending Blogs</h2><p>Stories that bring in inquiries.</p></div>
-      <div class="bg-stats"></div>
       <div class="bg-bar">
         <div class="bg-tabs sp-tabs"></div>
         <div class="bg-search">${searchBox({ id: 'bg-search', placeholder: 'Search blogs...', variant: 'desktop' })}</div>
@@ -96,14 +94,7 @@ export default {
 
     function render() {
       const ready = state.status === 'ready';
-      const s = state.stats;
-      frame.setTitle('Blogs', `Blogs • ${s ? num(s.total) : state.posts.length} Total`);
-      $('.bg-stats').innerHTML = ready && s ? statRow([
-        { icon: 'note', label: 'Total articles', value: num(s.total), tone: 'blue' },
-        { icon: 'eye', label: 'Views (30 days)', value: num(s.views), tone: 'green' },
-        { icon: 'user', label: 'Leads from blogs', value: num(s.leads), tone: 'purple' },
-        { icon: 'check', label: 'Converted to bookings', value: num(s.converted), tone: 'green' },
-      ]) : '';
+      frame.setTitle('Blogs', `Blogs • ${num(state.posts.length)} Total`);
       const base = searched();
       renderTabs($('.bg-tabs'), { tabs: TABS.map(([key, label]) => ({ key, label, count: !ready ? null : key === 'all' ? base.length : base.filter((p) => p.status === key).length })), active: state.tab, variant: 'mobile', attr: 'data-bg-tab' });
       const more = $('.bg-more');

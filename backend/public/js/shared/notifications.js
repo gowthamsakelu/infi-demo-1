@@ -68,7 +68,8 @@ export function bindNotifications({ bell, panel, dot, backdrop = null }) {
     }
   });
   backdrop?.addEventListener('click', () => set(false));
-  document.addEventListener('click', (e) => { if (open && !panel.contains(e.target) && !bell.contains(e.target)) set(false); });
+  // The bells that pages draw in their own header (data-sp-bell, data-dash-bell) press this bell for you; the same tap must not count as "outside" and close the panel it just opened.
+  document.addEventListener('click', (e) => { if (open && !panel.contains(e.target) && !bell.contains(e.target) && !e.target.closest?.('[data-sp-bell], [data-dash-bell]')) set(false); });
   document.addEventListener('keydown', (e) => { if (open && e.key === 'Escape') { e.preventDefault(); set(false); bell.focus({ preventScroll: true }); } });
   // Moving to another page or another layout closes it.
   window.addEventListener('hashchange', () => set(false));

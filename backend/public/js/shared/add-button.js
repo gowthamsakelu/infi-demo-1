@@ -2,6 +2,10 @@
 // the page says what it adds (aria-label "Add inquiry", tooltip on PC) and what it does. Every page uses setAddAction; none draws its own.
 import { icon } from './icons.js';
 
+// Two owners, one button: the app shell (Inquiries, Bookings, Team) and a hosted catalog page. A hosted page wins while it is open;
+// when it unmounts the shell's own Add (if any) is shown again, so leaving a page never leaves a stale or missing button.
+let shell = null;
+let hosted = null;
 let action = null;
 let bound = false;
 
@@ -17,7 +21,20 @@ const sentence = (label) => label.replace(/^\s*(add|new|write)\s+/i, '').trim().
  * null hides it. `onClick` runs when it is pressed (a page that cannot add yet passes nothing: the button is shown but quiet).
  */
 export function setAddAction(label, onClick = null) {
-  action = label ? onClick : null;
+  hosted = label ? { label, onClick } : null;
+  apply();
+}
+
+/** Same as setAddAction, for the pages the app shell draws itself (Inquiries, Bookings, Team). */
+export function setShellAddAction(label, onClick = null) {
+  shell = label ? { label, onClick } : null;
+  apply();
+}
+
+function apply() {
+  const cur = hosted || shell;
+  const label = cur?.label || null;
+  action = cur ? cur.onClick : null;
   document.querySelectorAll('[data-add-button]').forEach((b) => {
     b.hidden = !label;
     if (!label) return;

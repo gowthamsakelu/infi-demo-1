@@ -1,17 +1,17 @@
-# Graph Report - Admin_Project_LARAVEL  (2026-10-28)
+# Graph Report - Admin_Project_LARAVEL  (2026-10-29)
 
 ## Corpus Check
-- 318 files · ~517,897 words
+- 320 files · ~523,439 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 48 file(s) not represented in the graph (top: .css 15, (none) 14, .woff2 8)
 
 ## Summary
-- 7634 nodes · 18243 edges · 256 communities (221 shown, 35 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 1076 edges (avg confidence: 0.85)
+- 7659 nodes · 18330 edges · 268 communities (217 shown, 51 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 1078 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2145068c`
+- Built from commit: `255bbd17`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -25,25 +25,25 @@
 - livewire.esm.js
 - tour-packages.js
 - TestCase
-- createSplitPage
+- icon
 - "node_modules/alpinejs/dist/module.cjs.js"
 - n
-- "node_modules/@vue/reactivity/dist/reactivity.cjs.js"
+- "node_modules/@vue/shared/dist/shared.cjs.js"
 - "node_modules/@alpinejs/csp/dist/module.cjs.js"
 - "node_modules/@alpinejs/csp/dist/module.cjs.js"
-- Controller
-- start
 - Illuminate\Http\JsonResponse
-- itinerary-builder-ui.js
+- start
+- User
+- openAddInquiry
 - esc
 - "node_modules/@alpinejs/anchor/dist/module.cjs.js"
 - "node_modules/@alpinejs/anchor/dist/module.cjs.js"
-- toast
+- createMobileTeam
 - i
-- User
+- UsersTest
 - get
 - r
-- Illuminate\Database\Eloquent\Model
+- ItineraryWriter
 - Ruyi Admin
 - findComponentByEl
 - ih
@@ -54,13 +54,13 @@
 - composer.json
 - v
 - Inquiry
-- DemoPlacesProvider
+- GooglePlacesProvider
 - itinerary-builder.js
 - cleanup
 - createDesktopView
 - "node_modules/@alpinejs/sort/dist/module.cjs.js"
 - "node_modules/@alpinejs/sort/dist/module.cjs.js"
-- V
+- Ir
 - getBoundingClientRect
 - DemoPlacesTest
 - getBoundingClientRect
@@ -69,12 +69,12 @@
 - navigate_default
 - navigate_default
 - frontend/js/desktop.js
-- public/js/shared/ui.js
+- toast
 - findComponentByEl
 - getRect
 - getRect
 - bookings-manager.blade.php
-- Illuminate\Foundation\Http\FormRequest
+- CRM pages: how a page is built
 - Illuminate\Database\Seeder
 - SettingsTest
 - start2
@@ -83,15 +83,15 @@
 - get
 - Illuminate\Database\Schema\Blueprint
 - noTracking
-- mm
+- V
 - start2
 - createDesktopTeam
-- esc
-- n
+- users.js
+- od
 - createMobileCalendar
 - bind
 - tt
-- Carbon\CarbonImmutable
+- Booking
 - cl
 - toRaw2
 - vt
@@ -99,49 +99,49 @@
 - constructor
 - start
 - toRaw2
-- start
+- sendMessages
 - toRaw2
 - ba
 - cleanup
 - Le
-- BannerController.php
-- openAddInquiry
+- Illuminate\Foundation\Http\FormRequest
+- public/js/main.js
 - constructor
 - loop
 - start2
 - match
 - fn
 - constructor
-- Destination
+- DestinationController.php
 - Illuminate\Database\Migrations\Migration
 - constructor
 - evaluateActionExpression
 - lp
 - fy
 - openWizard
-- get
+- track
 - evaluateActionExpression
 - findComponentByEl
 - get
 - findComponentByEl
 - frontend/js/shared/itinerary-dialog.js
-- TransportController.php
+- loop
 - evaluateActionExpression
 - evaluateActionExpression
 - Illuminate\Support\Facades\Schema
 - cleanup
 - cleanup
-- UsersTest
+- TransportController.php
 - sendMessages
 - sendMessages
 - Ke
-- AuthController.php
+- e
 - mount
-- getElementBoundUtilities
+- AuthController.php
 - dispatchEvent
 - fn
 - dispatchEvent
-- banners.js
+- TourPackageController.php
 - mergeNewHead
 - fn
 - mergeNewHead
@@ -149,7 +149,7 @@
 - Gi
 - mergeNewHead
 - services
-- Illuminate\Support\Facades\DB
+- 2026_10_23_000001_add_list_indexes.php
 - watch2
 - bindAttribute
 - bindAttribute
@@ -161,20 +161,20 @@
 - watch2
 - PlacesTest
 - registerListeners
-- registerListeners
+- "node_modules/@vue/reactivity/dist/reactivity.cjs.js"
 - registerListeners
 - "node_modules/@alpinejs/focus/dist/module.cjs.js"
 - closestDataStack
 - registerListeners
 - "node_modules/@alpinejs/focus/dist/module.cjs.js"
-- pv
+- pd
 - PlacesProvider
 - 2026_10_26_000001_create_itinerary_tables.php
-- CRM pages: how a page is built
+- DashboardController.php
 - closestDataStack
 - "node_modules/nprogress/nprogress.js"
-- Qr
-- directives
+- co
+- e
 - "node_modules/nprogress/nprogress.js"
 - getElementBoundUtilities
 - "node_modules/nprogress/nprogress.js"
@@ -189,19 +189,19 @@
 - "node_modules/@alpinejs/morph/dist/module.cjs.js"
 - jg
 - Deploying Ruyi Admin on Render
-- on
+- DemoPlacesProvider
 - cancel
 - cancel
-- on3
+- cancel
 - on4
 - cancel
-- compareJobs
+- coordinateNetworkInteractions
 - cancel
 - catalog-pages-kit.mjs
 - signIn
 - ItineraryTest
 - transitionPageSwap
-- transitionPageSwap
+- on3
 - whenTargetsArePartOfRequest
 - dispatchEvent
 - fetchHtml
@@ -214,25 +214,25 @@
 - AddInquiryTest
 - ItineraryBuilderTest
 - app
-- _regenerator
-- jl
-- _regenerator
+- Ct
+- on3
+- sf
 - places-client.js
 - track
-- coordinateNetworkInteractions
-- coordinateNetworkInteractions
-- warn
+- 0001_01_01_000002_create_jobs_table.php
+- registerListeners
+- FollowUpTest
 - schedule-layout.mjs
 - add-inquiry.mjs
 - itinerary-dialogs.mjs
 - reading-pane.mjs
 - bootstrap/app.php
 - 2026_11_07_000001_add_destination_and_vehicle_overview_fields.php
-- r
-- r
+- GooglePlacesProvider.php
+- PlacesProvider
 - settings.mjs
-- 0001_01_01_000002_create_jobs_table.php
-- 2026_11_02_000003_add_stays_page_columns_to_saved_hotels.php
+- cleanupDeps
+- 2026_11_04_000001_add_access_columns_to_users.php
 - cleanupDeps
 - cleanupDeps
 - input-audit.mjs
@@ -244,10 +244,10 @@
 - 2026_11_02_000004_add_adventures_page_columns_to_saved_activities.php
 - ref_playwright
 - frontend/js/shared/keyboard.js
-- 2026_01_01_000004_create_bookings_table.php
+- 2026_11_08_000001_add_wizard_fields_to_tour_packages.php
+- 2026_01_01_000001_create_staff_table.php
 - 2026_10_21_000001_create_inquiries_table.php
-- 2026_11_01_000001_create_destinations_table.php
-- 2026_11_04_000004_create_app_settings_table.php
+- PlacesException
 - "node_modules/@alpinejs/collapse/dist/module.cjs.js"
 - normalizeStyle
 - ld
@@ -260,15 +260,27 @@
 - manifest.json
 - CLAUDE.md
 - docker/start.sh
+- warn
+- 0001_01_01_000000_create_users_table.php
+- 2026_11_06_000001_add_catalog_page_indexes.php
+- UI standard (round 1: popups, headers, buttons, toggles, fields)
+- 2026_11_04_000002_create_permission_tables.php
+- 2026_11_09_000001_add_catalog_images.php
+- 2026_11_09_000002_add_blog_content_fields.php
+- public/js/shared/keyboard.js
+- createMorphContext
+- 2026_01_01_000002_create_vendors_table.php
+- 2026_01_01_000003_create_contacts_table.php
+- 2026_10_21_000002_create_follow_ups_table.php
 
 ## God Nodes (most connected - your core abstractions)
 1. `"node_modules/@alpinejs/csp/dist/module.cjs.js"()` - 275 edges
 2. `"node_modules/@alpinejs/csp/dist/module.cjs.js"()` - 275 edges
 3. `"node_modules/alpinejs/dist/module.cjs.js"()` - 274 edges
-4. `esc()` - 189 edges
-5. `icon()` - 144 edges
-6. `createDesktopView()` - 98 edges
-7. `createMobileView()` - 84 edges
+4. `esc()` - 190 edges
+5. `icon()` - 147 edges
+6. `createDesktopView()` - 97 edges
+7. `createMobileView()` - 83 edges
 8. `r()` - 79 edges
 9. `toast()` - 76 edges
 10. `createDesktopView()` - 70 edges
@@ -276,19 +288,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `API` --references--> `VehicleTypeSeeder`  [INFERRED]
   README.md → backend/database/seeders/VehicleTypeSeeder.php
+- `Split pages (list left, detail right, phone: full-screen detail)` --references--> `createSplitPage()`  [INFERRED]
+  backend/docs/pages.md → backend/public/js/shared/split-page.js
 - `API` --references--> `to()`  [INFERRED]
   README.md → backend/public/vendor/livewire/livewire.csp.min.js
 - `renderCards()` --indirect_call--> `rowCard()`  [INFERRED]
   frontend/js/mobile.js → backend/public/js/shared/list-ui.js
 - `Building blocks (use these, do not restyle them)` --references--> `confirmDialog()`  [INFERRED]
   backend/docs/pages.md → backend/public/js/shared/sheet.js
-- `Reuse` --references--> `pageFrame()`  [INFERRED]
-  backend/docs/ui-standard.md → backend/public/js/shared/split-page.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (256 total, 35 thin omitted)
+## Communities (268 total, 51 thin omitted)
 
 ### Community 0 - "livewire.js"
 Cohesion: 0.01
@@ -296,19 +308,19 @@ Nodes (93): activeMessageMatchingScope(), activeMessagesMatchingScope(), allScop
 
 ### Community 1 - "livewire.csp.min.js"
 Cohesion: 0.01
-Nodes (110): activeMessageMatchingScope(), activeMessagesMatchingScope(), add(), af(), allScopedMessages(), As(), Bs(), cancel() (+102 more)
+Nodes (81): activeMessageMatchingScope(), activeMessagesMatchingScope(), add(), allScopedMessages(), Bs(), Cv(), Dc(), ef() (+73 more)
 
 ### Community 2 - "livewire.min.js"
 Cohesion: 0.01
-Nodes (70): activeMessageMatchingScope(), activeMessagesMatchingScope(), allScopedMessages(), Bn(), Bo(), ca(), Cm(), dl() (+62 more)
+Nodes (66): activeMessageMatchingScope(), activeMessagesMatchingScope(), add(), allScopedMessages(), bc(), bg(), Bn(), Dg() (+58 more)
 
 ### Community 3 - "livewire.csp.js"
 Cohesion: 0.01
-Nodes (74): activeMessageMatchingScope(), activeMessagesMatchingScope(), allScopedMessages(), _arrayLikeToArray(), _arrayWithoutHoles(), closestIsland(), containsTargets(), createElement() (+66 more)
+Nodes (81): activeMessageMatchingScope(), activeMessagesMatchingScope(), allScopedMessages(), _arrayLikeToArray(), _arrayWithoutHoles(), closestIsland(), containsTargets(), _createForOfIteratorHelper() (+73 more)
 
 ### Community 4 - "public/js/desktop.js"
 Cohesion: 0.04
-Nodes (162): CONTACTS_LIST, getSpecialReqIconSvg(), SPECIAL_REQUIREMENTS_PRESETS, STAFF_MEMBERS, VENDORS_LIST, createDesktopView(), assignItineraryItem(), bindEvents() (+154 more)
+Nodes (150): CONTACTS_LIST, getSpecialReqIconSvg(), SPECIAL_REQUIREMENTS_PRESETS, STAFF_MEMBERS, VENDORS_LIST, createDesktopView(), assignItineraryItem(), bindEvents() (+142 more)
 
 ### Community 5 - "livewire.csp.esm.js"
 Cohesion: 0.02
@@ -320,27 +332,27 @@ Nodes (43): activeMessageMatchingScope(), activeMessagesMatchingScope(), allScop
 
 ### Community 7 - "tour-packages.js"
 Cohesion: 0.05
-Nodes (135): Building blocks (use these, do not restyle them), aboutCard(), AD_TAGS, cap(), duration(), MAIN, mount(), TAG_KIND (+127 more)
+Nodes (138): Building blocks (use these, do not restyle them), aboutCard(), AD_TAGS, cap(), duration(), MAIN, mount(), TAG_KIND (+130 more)
 
 ### Community 8 - "TestCase"
-Cohesion: 0.02
-Nodes (14): AdventuresTest, AuthTest, BannersTest, BlogsTest, BookingPaymentTest, BulkAssignTest, CalendarTest, CatalogWizardSaveTest (+6 more)
+Cohesion: 0.03
+Nodes (13): BlogPostSeeder, AuthTest, BannersTest, BlogsTest, BookingPaymentTest, BulkAssignTest, CalendarTest, CatalogWizardSaveTest (+5 more)
 
-### Community 9 - "createSplitPage"
-Cohesion: 0.06
-Nodes (73): Split pages (list left, detail right, phone: full-screen detail), The page contract, ensureView(), syncHostedPage(), mount(), sheetHandleHtml(), initKeyboard(), measure() (+65 more)
+### Community 9 - "icon"
+Cohesion: 0.08
+Nodes (60): Reuse, applyParams(), setCategory(), switchCategoryByDirection(), renderCards(), BN_PLACEMENTS, BN_TONES, card() (+52 more)
 
 ### Community 10 - ""node_modules/alpinejs/dist/module.cjs.js""
 Cohesion: 0.03
-Nodes (35): "node_modules/alpinejs/dist/module.cjs.js"(), addDebounceOrThrottle(), addSub(), camelCase2(), cleanupDeps(), closestHide(), debounce2(), dotSyntax() (+27 more)
+Nodes (23): "node_modules/alpinejs/dist/module.cjs.js"(), addSub(), closestHide(), commitTransaction(), compareJobs(), findAndIncrementId(), flushJobs(), getElementDepth() (+15 more)
 
 ### Community 11 - "n"
-Cohesion: 0.04
-Nodes (85): ac(), addActionContext(), ao(), aw(), Bc(), bm(), Bu(), Bv() (+77 more)
-
-### Community 12 - ""node_modules/@vue/reactivity/dist/reactivity.cjs.js""
 Cohesion: 0.05
-Nodes (70): A(), addInterceptor(), invokeOnSuccess(), "node_modules/@vue/reactivity/dist/reactivity.cjs.js"(), a(), Ar(), At(), Ba() (+62 more)
+Nodes (67): ac(), addActionContext(), ao(), Bc(), bm(), _c(), call(), cd() (+59 more)
+
+### Community 12 - ""node_modules/@vue/shared/dist/shared.cjs.js""
+Cohesion: 0.15
+Nodes (13): A(), "node_modules/@vue/shared/dist/shared.cjs.js"(), Ci(), Da(), gn(), He(), ne(), Ni() (+5 more)
 
 ### Community 13 - ""node_modules/@alpinejs/csp/dist/module.cjs.js""
 Cohesion: 0.03
@@ -350,25 +362,25 @@ Nodes (29): "node_modules/@alpinejs/csp/dist/module.cjs.js"(), addSub(), closest
 Cohesion: 0.03
 Nodes (29): "node_modules/@alpinejs/csp/dist/module.cjs.js"(), addSub(), closestHide(), commitTransaction(), compareJobs(), findAndIncrementId(), flushJobs(), getElementDepth() (+21 more)
 
-### Community 15 - "Controller"
-Cohesion: 0.05
-Nodes (15): Controller, AdventureController, {closure#1}(), DestinationController, {closure#2}(), StayController, {closure#1}(), {closure#2}() (+7 more)
+### Community 15 - "Illuminate\Http\JsonResponse"
+Cohesion: 0.04
+Nodes (19): BookingController, Controller, PageController, AdventureController, SettingsController, {closure#2}(), StayController, {closure#1}() (+11 more)
 
 ### Community 16 - "start"
-Cohesion: 0.04
-Nodes (75): add(), addScopeToNode(), allSelectors(), applyBindingsObject(), attributesOnly(), bind2(), byPriority(), cleanupAttributes() (+67 more)
+Cohesion: 0.05
+Nodes (56): allSelectors(), applyBindingsObject(), attributesOnly(), bind2(), byPriority(), cleanupElement(), clone(), cloneIfObject() (+48 more)
 
-### Community 17 - "Illuminate\Http\JsonResponse"
+### Community 17 - "User"
 Cohesion: 0.06
-Nodes (10): BookingController, CalendarController, {closure#2}(), ItineraryController, DashboardController, {closure#1}(), {closure#2}(), PlacesController (+2 more)
+Nodes (10): {closure#1}(), {closure#2}(), {closure#5}(), UserController, UpdateUserPermissionsRequest, Booking, User, {closure#6}() (+2 more)
 
-### Community 18 - "itinerary-builder-ui.js"
-Cohesion: 0.07
-Nodes (64): openMonthPicker(), day(), openBuilder(), useAsItinerary(), STROKE, base, builderSession(), builderShell() (+56 more)
+### Community 18 - "openAddInquiry"
+Cohesion: 0.08
+Nodes (52): remove(), day(), openBuilder(), useAsItinerary(), blank(), DESTINATION_CHIPS, field(), FIELDS (+44 more)
 
 ### Community 19 - "esc"
-Cohesion: 0.09
-Nodes (65): list(), subtitle(), timeline(), detailHeaderHtml(), META_ICONS, sheetCloseHtml(), icon(), mountBuilder() (+57 more)
+Cohesion: 0.13
+Nodes (50): mountBuilder(), addOrEdit(), applyHotel(), changeDates(), dayBody(), duplicateTo(), finish(), openKebab() (+42 more)
 
 ### Community 20 - ""node_modules/@alpinejs/anchor/dist/module.cjs.js""
 Cohesion: 0.09
@@ -378,17 +390,13 @@ Nodes (67): "node_modules/@alpinejs/anchor/dist/module.cjs.js"(), autoUpdate(), 
 Cohesion: 0.09
 Nodes (67): "node_modules/@alpinejs/anchor/dist/module.cjs.js"(), autoUpdate(), frameLoop(), computeCoordsFromPlacement(), convertOffsetParentRelativeRectToViewportRelativeRect(), convertValueToCoords(), detectOverflow(), evaluate() (+59 more)
 
-### Community 22 - "toast"
-Cohesion: 0.07
-Nodes (61): INITIAL_BOOKINGS, ACTION_LABELS, ACTIONS, ALL_ACTIONS, buildDefaultFeatureMatrix(), clone(), extractFeatureMatrix(), formatCardLocation() (+53 more)
+### Community 22 - "createMobileTeam"
+Cohesion: 0.15
+Nodes (33): INITIAL_BOOKINGS, buildTeamMember(), getTeamMemberAssignments(), getTeamMemberById(), OPERATIONS_TEAM_MEMBERS, initials(), createDesktopTeam(), activate() (+25 more)
 
 ### Community 23 - "i"
 Cohesion: 0.08
-Nodes (57): x(), ay(), f(), b(), Br(), bv(), c(), cn() (+49 more)
-
-### Community 24 - "User"
-Cohesion: 0.06
-Nodes (10): {closure#1}(), {closure#2}(), {closure#5}(), UserController, UpdateUserPermissionsRequest, Booking, User, {closure#6}() (+2 more)
+Nodes (55): x(), ay(), f(), b(), Br(), bv(), c(), cn() (+47 more)
 
 ### Community 25 - "get"
 Cohesion: 0.05
@@ -396,23 +404,23 @@ Nodes (59): addSub(), apply(), assetIsPendingFor(), checkDirty(), checkIdentityK
 
 ### Community 26 - "r"
 Cohesion: 0.05
-Nodes (57): ad(), addInterceptor(), an(), As(), bs(), cancelUpload(), cd(), o() (+49 more)
+Nodes (54): Ve(), ac(), addInterceptor(), an(), As(), bl(), bm(), bp() (+46 more)
 
-### Community 27 - "Illuminate\Database\Eloquent\Model"
+### Community 27 - "ItineraryWriter"
 Cohesion: 0.06
-Nodes (11): Contact, Itinerary, ItineraryDay, ItineraryItem, PackageDay, SavedActivity, SavedHotel, StayRoom (+3 more)
+Nodes (12): Contact, Itinerary, ItineraryDay, ItineraryItem, PackageDay, SavedActivity, SavedHotel, Staff (+4 more)
 
 ### Community 28 - "Ruyi Admin"
-Cohesion: 0.05
-Nodes (36): context, context, getFirstNode(), getNextSibling(), to(), Xc(), seedingMatchingId(), shouldSkip() (+28 more)
+Cohesion: 0.06
+Nodes (35): context, context, getFirstNode(), getNextSibling(), to(), seedingMatchingId(), shouldSkip(), shouldSkipChildren() (+27 more)
 
 ### Community 29 - "findComponentByEl"
-Cohesion: 0.06
-Nodes (54): addCleanup(), clearTransitionNames(), closestFragment(), componentIsMissingProperty(), decodeMetadata(), destroyComponent(), disableRootTransition(), dispatch() (+46 more)
+Cohesion: 0.09
+Nodes (36): clearTransitionNames(), closestFragment(), componentIsMissingProperty(), decodeMetadata(), disableRootTransition(), elementsForAttribute(), endMarkerNode(), extractFragmentMetadataFromHtml() (+28 more)
 
 ### Community 30 - "ih"
-Cohesion: 0.05
-Nodes (54): bp(), Ce(), Ct(), cu(), Dm(), dp(), $e(), eh() (+46 more)
+Cohesion: 0.06
+Nodes (45): ca(), Ce(), cu(), Dm(), $e(), eh(), ei(), Ep() (+37 more)
 
 ### Community 31 - "frontend/js/shared/ui.js"
 Cohesion: 0.11
@@ -432,47 +440,43 @@ Nodes (48): pestphp/pest-plugin, php-http/discovery, autoload, autoload-dev, psr
 
 ### Community 36 - "v"
 Cohesion: 0.06
-Nodes (45): by(), checkForDangerousKeywords(), checkForDangerousValues(), cm(), d(), Du(), Dv(), endMarkerNode() (+37 more)
+Nodes (43): checkForDangerousKeywords(), checkForDangerousValues(), cm(), d(), Du(), Dv(), endMarkerNode(), evaluate() (+35 more)
 
 ### Community 37 - "Inquiry"
-Cohesion: 0.08
-Nodes (12): {closure#2}(), {closure#3}(), {closure#4}(), {closure#5}(), InquiryController, {closure#4}(), StoreFollowUpRequest, StoreInquiryRequest (+4 more)
-
-### Community 38 - "DemoPlacesProvider"
 Cohesion: 0.07
-Nodes (8): {closure#1}(), {closure#2}(), DemoPlacesProvider, {closure#1}(), {closure#7}(), {closure#9}(), GooglePlacesProvider, PlacesException
+Nodes (13): {closure#2}(), {closure#3}(), {closure#4}(), {closure#5}(), InquiryController, ItineraryController, {closure#4}(), SaveItineraryRequest (+5 more)
+
+### Community 38 - "GooglePlacesProvider"
+Cohesion: 0.23
+Nodes (4): {closure#1}(), {closure#1}(), {closure#9}(), GooglePlacesProvider
 
 ### Community 39 - "itinerary-builder.js"
 Cohesion: 0.08
 Nodes (44): addDaysIso(), applyResize(), blankDay(), clip(), copyDay(), createModel(), dayCount(), daysBetween() (+36 more)
 
 ### Community 40 - "cleanup"
-Cohesion: 0.05
-Nodes (48): assetIsPendingFor(), checkDirty(), cleanup(), cloneIfObject(), crawlSiblingsUp(), dataDelete(), dataGet(), dimensions() (+40 more)
+Cohesion: 0.06
+Nodes (43): assetIsPendingFor(), checkDirty(), cleanup(), cloneIfObject(), crawlSiblingsUp(), dataDelete(), dataGet(), dimensions() (+35 more)
 
 ### Community 41 - "createDesktopView"
 Cohesion: 0.10
 Nodes (47): getSpecialReqIconSvg(), createDesktopView(), assignItineraryItem(), bindEvents(), applyParams(), assignSelected(), route(), runRowMenu() (+39 more)
 
 ### Community 42 - ""node_modules/@alpinejs/sort/dist/module.cjs.js""
-Cohesion: 0.09
-Nodes (36): "node_modules/@alpinejs/sort/dist/module.cjs.js"(), A2(), b(), D(), e(), f(), Ft(), G() (+28 more)
+Cohesion: 0.08
+Nodes (35): i(), "node_modules/@alpinejs/sort/dist/module.cjs.js"(), A2(), b(), C(), D(), e(), f() (+27 more)
 
 ### Community 43 - ""node_modules/@alpinejs/sort/dist/module.cjs.js""
-Cohesion: 0.09
-Nodes (36): rt(), "node_modules/@alpinejs/sort/dist/module.cjs.js"(), A2(), b(), D(), e(), f(), Ft() (+28 more)
+Cohesion: 0.08
+Nodes (36): asyncGeneratorStep(), _asyncToGenerator(), _next(), _throw(), "node_modules/@alpinejs/sort/dist/module.cjs.js"(), a(), A2(), b() (+28 more)
 
-### Community 44 - "V"
-Cohesion: 0.06
-Nodes (46): Kr(), Aa(), add(), be(), concat(), deleteProperty(), dirty(), Ea() (+38 more)
+### Community 44 - "Ir"
+Cohesion: 0.09
+Nodes (27): bu(), Co(), deleteProperty(), dirty(), Ea(), hm(), Ir(), kh() (+19 more)
 
 ### Community 45 - "getBoundingClientRect"
 Cohesion: 0.12
 Nodes (44): autoUpdate(), frameLoop(), convertOffsetParentRelativeRectToViewportRelativeRect(), getBoundingClientRect(), getClientRectFromClippingAncestor(), getClippingElementAncestors(), getClippingRect(), getComputedStyle2() (+36 more)
-
-### Community 46 - "DemoPlacesTest"
-Cohesion: 0.06
-Nodes (4): SaveItineraryRequest, ItineraryWriter, DemoPlacesTest, TransportPricingTest
 
 ### Community 47 - "getBoundingClientRect"
 Cohesion: 0.12
@@ -495,12 +499,12 @@ Cohesion: 0.08
 Nodes (40): autofocusElementsWithTheAutofocusAttribute(), cleanupAlpineElementsOnThePageThatArentInsideAPersistedElement(), createUrlObjectFromString2(), extractDestinationFromLink(), finishAndHideProgressBar(), fireEventForOtherLibrariesToHookInto(), getFragmentTarget(), isPersistedElement() (+32 more)
 
 ### Community 52 - "frontend/js/desktop.js"
-Cohesion: 0.11
-Nodes (23): CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, STAFF_MEMBERS, VENDORS_LIST, matchesCategory(), phoneKey(), applyInquiryUpdates(), BADGE (+15 more)
+Cohesion: 0.09
+Nodes (32): CONTACTS_LIST, SPECIAL_REQUIREMENTS_PRESETS, STAFF_MEMBERS, VENDORS_LIST, matchesCategory(), followUpsFor(), journeyFor(), listeners (+24 more)
 
-### Community 53 - "public/js/shared/ui.js"
-Cohesion: 0.11
-Nodes (35): initAccountMenu(), signOut(), CATEGORY_OPTIONS, createDropdown(), bind(), closeList(), openList(), place() (+27 more)
+### Community 53 - "toast"
+Cohesion: 0.06
+Nodes (72): openMonthPicker(), runRowMenu(), setPayment(), runRowMenu(), setPayment(), ADD_LABEL, added, closeAssign() (+64 more)
 
 ### Community 54 - "findComponentByEl"
 Cohesion: 0.08
@@ -518,89 +522,89 @@ Nodes (37): AnimationStateManager(), AutoScrollPlugin(), calculateRealTime(), ca
 Cohesion: 0.05
 Nodes (36): addCustomRequirement, addNote, addPresetRequirement, bulkAssign, bulkMarkPaid, bulkMarkUnpaid, clearSearch, clearSelection (+28 more)
 
-### Community 58 - "Illuminate\Foundation\Http\FormRequest"
-Cohesion: 0.09
-Nodes (9): BlogController, {closure#1}(), CatalogRequest, PlaceSearchRequest, SaveBlogPostRequest, StoreSavedPlaceRequest, UpdateBlogPostRequest, UpdateUserStatusRequest (+1 more)
+### Community 58 - "CRM pages: how a page is built"
+Cohesion: 0.25
+Nodes (6): API calls, CRM pages: how a page is built, Data, Files a page owns (and nothing else), Running it locally (without touching the real database), ApiError
 
 ### Community 59 - "Illuminate\Database\Seeder"
-Cohesion: 0.08
-Nodes (9): DatabaseSeeder, AdventureSeeder, BannerSeeder, BlogPostSeeder, DemoPlaces, StaySeeder, TourPackageSeeder, TransportSeeder (+1 more)
+Cohesion: 0.06
+Nodes (9): AdventureSeeder, BannerSeeder, DemoPlaces, StaySeeder, TourPackageSeeder, TransportSeeder, VehicleTypeSeeder, AdventuresTest (+1 more)
 
 ### Community 60 - "SettingsTest"
-Cohesion: 0.07
-Nodes (5): SettingsController, UpdateSettingsRequest, AppSetting, SettingSeeder, SettingsTest
+Cohesion: 0.12
+Nodes (3): AppSetting, SettingSeeder, SettingsTest
 
 ### Community 61 - "start2"
-Cohesion: 0.08
-Nodes (36): intercept(), allSelectors(), applyBindingsObject(), attributesOnly(), bind2(), byPriority(), clone(), cloneNode() (+28 more)
+Cohesion: 0.09
+Nodes (31): intercept(), allSelectors(), applyBindingsObject(), attributesOnly(), bind2(), byPriority(), clone(), cloneNode() (+23 more)
 
 ### Community 62 - "Vp"
-Cohesion: 0.06
-Nodes (36): sy(), Vd(), Vp(), Wi(), addCleanup(), ai(), Ao(), av() (+28 more)
+Cohesion: 0.08
+Nodes (27): addCleanup(), ai(), Ao(), dc(), dl(), ec(), extractTypeModifiersAndValue(), fl() (+19 more)
 
 ### Community 63 - "y"
-Cohesion: 0.08
-Nodes (35): An(), bd(), db(), Et(), fb(), gb(), Gl(), Gv() (+27 more)
+Cohesion: 0.10
+Nodes (27): bd(), Et(), Gd(), Gl(), Gv(), Jo(), Ke(), ly() (+19 more)
 
 ### Community 64 - "get"
 Cohesion: 0.08
-Nodes (35): applyUpdates(), Bt(), constructor(), Cu(), Ds(), each(), extractTypeModifiersAndValue(), Ge() (+27 more)
+Nodes (35): addCleanup(), applyUpdates(), Bt(), constructor(), Cu(), Ds(), each(), Ge() (+27 more)
 
 ### Community 65 - "Illuminate\Database\Schema\Blueprint"
-Cohesion: 0.10
-Nodes (21): {closure#1}(), {closure#2}(), {closure#3}(), {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}(), {closure#5}() (+13 more)
+Cohesion: 0.11
+Nodes (17): {closure#1}(), {closure#2}(), {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}(), {closure#5}(), {closure#6}() (+9 more)
 
 ### Community 66 - "noTracking"
 Cohesion: 0.07
 Nodes (34): batch(), cleanupDeps(), cleanupEffect(), dirty(), endBatch(), getOptions(), has(), history() (+26 more)
 
-### Community 67 - "mm"
-Cohesion: 0.07
-Nodes (34): bg(), cc(), co(), ct(), df(), dm(), em(), gg() (+26 more)
+### Community 67 - "V"
+Cohesion: 0.28
+Nodes (16): G(), N2(), q(), bg(), gt(), it(), rt(), wg() (+8 more)
 
 ### Community 68 - "start2"
-Cohesion: 0.08
-Nodes (34): intercept(), allSelectors(), applyBindingsObject(), attributesOnly(), bind2(), byPriority(), clone(), cloneNode() (+26 more)
+Cohesion: 0.07
+Nodes (38): intercept(), allSelectors(), applyBindingsObject(), attributesOnly(), bind2(), byPriority(), clone(), cloneNode() (+30 more)
 
 ### Community 69 - "createDesktopTeam"
-Cohesion: 0.15
-Nodes (30): INITIAL_BOOKINGS, getTeamMemberAssignments(), getTeamMemberById(), OPERATIONS_TEAM_MEMBERS, initials(), createDesktopTeam(), activate(), bindLeftPanelEvents() (+22 more)
+Cohesion: 0.10
+Nodes (53): INITIAL_BOOKINGS, bookingRow(), inquiryRow(), renderList(), renderJourneyItems(), icon(), avatar(), bindTabsScroller() (+45 more)
 
-### Community 70 - "esc"
+### Community 70 - "users.js"
+Cohesion: 0.10
+Nodes (29): ACTION_LABELS, ACTIONS, ALL_ACTIONS, buildDefaultFeatureMatrix(), clone(), extractFeatureMatrix(), formatCardLocation(), mount() (+21 more)
+
+### Community 71 - "od"
 Cohesion: 0.12
-Nodes (32): bookingRow(), inquiryRow(), renderList(), followUpsFor(), journeyFor(), listeners, loadFollowUps(), notify() (+24 more)
-
-### Community 71 - "n"
-Cohesion: 0.07
-Nodes (33): ac(), addActionContext(), ar(), bl(), bm(), by(), call(), Dg() (+25 more)
+Nodes (26): ad(), bs(), cd(), dd(), ed(), fd(), Is(), kn() (+18 more)
 
 ### Community 72 - "createMobileCalendar"
-Cohesion: 0.17
-Nodes (26): createDesktopCalendar(), render(), renderAgenda(), renderGrid(), scrollToSelected(), GRID_DAYS, createMobileCalendar(), glideX() (+18 more)
+Cohesion: 0.09
+Nodes (46): createDesktopCalendar(), render(), renderAgenda(), renderGrid(), scrollToSelected(), GRID_DAYS, createMobileCalendar(), glideX() (+38 more)
 
 ### Community 73 - "bind"
-Cohesion: 0.07
-Nodes (32): attributeShouldntBePreservedIfFalsy(), bind(), bindAttribute(), bindAttributeAndProperty(), bindClasses(), bindInputValue(), bindStyles(), camelCase() (+24 more)
+Cohesion: 0.06
+Nodes (37): attributeShouldntBePreservedIfFalsy(), bind(), bindAttribute(), bindAttributeAndProperty(), bindClasses(), bindInputValue(), bindStyles(), camelCase() (+29 more)
 
 ### Community 74 - "tt"
-Cohesion: 0.16
-Nodes (32): aa(), ae(), ai(), Al(), at(), ca(), ep(), fa() (+24 more)
+Cohesion: 0.12
+Nodes (38): aa(), ae(), ai(), Al(), at(), by(), ca(), ct() (+30 more)
 
-### Community 75 - "Carbon\CarbonImmutable"
-Cohesion: 0.09
-Nodes (9): {closure#1}(), {closure#1}(), HasItinerary, TripDates, {closure#1}(), {closure#2}(), {closure#3}(), {closure#13}() (+1 more)
+### Community 75 - "Booking"
+Cohesion: 0.11
+Nodes (5): CalendarController, {closure#2}(), {closure#1}(), {closure#1}(), HasItinerary
 
 ### Community 76 - "cl"
-Cohesion: 0.09
-Nodes (31): bf(), applyUpdates(), at(), bt(), cl(), Co(), constructor(), cp() (+23 more)
+Cohesion: 0.10
+Nodes (27): bf(), At(), applyUpdates(), at(), bt(), cl(), constructor(), cp() (+19 more)
 
 ### Community 77 - "toRaw2"
 Cohesion: 0.09
 Nodes (31): apply(), checkIdentityKeys(), createInstrumentationGetter(), createInstrumentations(), createIterableMethod(), createReactiveObject(), createReadonlyMethod(), hasOwnProperty() (+23 more)
 
 ### Community 78 - "vt"
-Cohesion: 0.11
-Nodes (31): En(), Ff(), fv(), Gf(), gs(), jv(), kf(), kv() (+23 more)
+Cohesion: 0.13
+Nodes (27): En(), Ff(), fv(), Gf(), gs(), jv(), kf(), Mf() (+19 more)
 
 ### Community 79 - "calendar-store.js"
 Cohesion: 0.12
@@ -615,36 +619,36 @@ Cohesion: 0.08
 Nodes (30): addCleanup(), cleanupModal(), contentIsFromDump(), destroyComponent(), discardIfSuperseded(), dispatch(), ensureLivewireScriptIsntMisplaced(), extractDirective() (+22 more)
 
 ### Community 82 - "toRaw2"
-Cohesion: 0.10
-Nodes (30): apply(), checkIdentityKeys(), createInstrumentationGetter(), createInstrumentations(), createIterableMethod(), createReactiveObject(), createReadonlyMethod(), hasOwnProperty() (+22 more)
+Cohesion: 0.09
+Nodes (31): apply(), checkIdentityKeys(), createInstrumentationGetter(), createInstrumentations(), createIterableMethod(), createReactiveObject(), createReadonlyMethod(), hasOwnProperty() (+23 more)
 
-### Community 83 - "start"
-Cohesion: 0.08
-Nodes (30): addCleanup(), cleanupModal(), contentIsFromDump(), destroyComponent(), discardIfSuperseded(), dispatch(), ensureLivewireScriptIsntMisplaced(), extractDirective() (+22 more)
+### Community 83 - "sendMessages"
+Cohesion: 0.10
+Nodes (22): cleanupModal(), componentHasBoundChildren(), constructAction(), contentIsFromDump(), coordinateNetworkInteractions(), createOrAddToOutstandingMessage(), discardIfSuperseded(), extractStreamObjects() (+14 more)
 
 ### Community 84 - "toRaw2"
-Cohesion: 0.10
-Nodes (30): apply(), checkIdentityKeys(), createInstrumentationGetter(), createInstrumentations(), createIterableMethod(), createReactiveObject(), createReadonlyMethod(), hasOwnProperty() (+22 more)
+Cohesion: 0.09
+Nodes (32): apply(), checkIdentityKeys(), createInstrumentationGetter(), createInstrumentations(), createIterableMethod(), createReactiveObject(), createReadonlyMethod(), hasOwnProperty() (+24 more)
 
 ### Community 85 - "ba"
 Cohesion: 0.08
-Nodes (29): Ne(), sp(), Ve(), Z(), ba(), bh(), bu(), ch() (+21 more)
+Nodes (27): Ne(), sp(), ba(), bh(), Bo(), ch(), Cm(), dh() (+19 more)
 
 ### Community 86 - "cleanup"
 Cohesion: 0.09
 Nodes (28): cacheIdByNameOnElement(), cleanup(), cloneIfObject2(), crawlSiblingsUp(), dimensions(), disableScrolling(), formatInput(), generateEntangleFunction() (+20 more)
 
 ### Community 87 - "Le"
-Cohesion: 0.10
-Nodes (28): addCleanup(), bi(), cf(), eh(), ff(), Ga(), hn(), Iu() (+20 more)
+Cohesion: 0.07
+Nodes (39): An(), bi(), db(), eh(), extractTypeModifiersAndValue(), fb(), Ga(), gb() (+31 more)
 
-### Community 88 - "BannerController.php"
-Cohesion: 0.13
-Nodes (8): BannerController, {closure#1}(), {closure#2}(), ReorderBannersRequest, SaveBannerRequest, UpdateBannerRequest, Banner, DataUrlImage
+### Community 88 - "Illuminate\Foundation\Http\FormRequest"
+Cohesion: 0.07
+Nodes (12): BannerController, {closure#1}(), {closure#2}(), CatalogRequest, LoginRequest, ReorderBannersRequest, SaveBannerRequest, StoreFollowUpRequest (+4 more)
 
-### Community 89 - "openAddInquiry"
-Cohesion: 0.16
-Nodes (25): blank(), DESTINATION_CHIPS, field(), FIELDS, openAddInquiry(), go(), mountStepBuilder(), paintChrome() (+17 more)
+### Community 89 - "public/js/main.js"
+Cohesion: 0.08
+Nodes (35): syncHostedPage(), initAccountMenu(), signOut(), apply(), sentence(), setAddAction(), applyLayout(), initLayout() (+27 more)
 
 ### Community 90 - "constructor"
 Cohesion: 0.10
@@ -655,120 +659,120 @@ Cohesion: 0.08
 Nodes (27): cleanupAttributes(), cleanupElement(), cloneIfObject2(), dequeueJob(), destroyTree(), directiveExists(), entangle(), flushAndStopDeferringMutations() (+19 more)
 
 ### Community 92 - "start2"
-Cohesion: 0.09
-Nodes (27): intercept(), allSelectors(), clone2(), cloneNode(), cloneTree(), closestRoot(), deferHandlingDirectives(), directiveExists() (+19 more)
+Cohesion: 0.08
+Nodes (34): intercept(), allSelectors(), applyBindingsObject(), attributesOnly(), bind2(), byPriority(), clone2(), cloneNode() (+26 more)
 
 ### Community 93 - "match"
 Cohesion: 0.24
 Nodes (27): advance(), check(), checkIdentifierName(), checkType(), consume(), consumeIdentifierName(), current(), isAtEnd() (+19 more)
 
 ### Community 94 - "fn"
-Cohesion: 0.12
-Nodes (27): _b(), cy(), dy(), Er(), fn(), fy(), Hd(), hp() (+19 more)
+Cohesion: 0.11
+Nodes (28): _b(), cy(), Dl(), dy(), Er(), fn(), fy(), Hd() (+20 more)
 
 ### Community 95 - "constructor"
-Cohesion: 0.10
-Nodes (27): applyUpdates(), batch(), constructor(), dataSet(), deepClone(), deeplyEqual(), diff(), diffAndConsolidate() (+19 more)
+Cohesion: 0.08
+Nodes (32): addCleanup(), applyUpdates(), batch(), constructor(), dataDelete(), dataSet(), deepClone(), deeplyEqual() (+24 more)
 
-### Community 96 - "Destination"
-Cohesion: 0.10
-Nodes (5): {closure#2}(), {closure#1}(), Destination, DestinationSeeder, TourPackagesTest
+### Community 96 - "DestinationController.php"
+Cohesion: 0.07
+Nodes (8): {closure#1}(), {closure#2}(), DestinationController, SaveDestinationRequest, {closure#1}(), Destination, DestinationSeeder, DestinationsTest
 
 ### Community 97 - "Illuminate\Database\Migrations\Migration"
-Cohesion: 0.08
-Nodes (7): {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}(), {closure#2}()
+Cohesion: 0.12
+Nodes (4): {closure#1}(), {closure#1}(), {closure#1}(), {closure#1}()
 
 ### Community 98 - "constructor"
 Cohesion: 0.11
 Nodes (26): applyUpdates(), batch2(), constructor(), dataSet(), deepClone(), deeplyEqual(), diff(), diffAndConsolidate() (+18 more)
 
 ### Community 99 - "evaluateActionExpression"
-Cohesion: 0.08
-Nodes (26): addActionContext(), [attribute2](), callAndClearComponentDebounces(), contextualizeExpression(), evaluateActionExpression(), evaluateExpression(), evaluateJsEffects(), evaluateReactiveExpression() (+18 more)
+Cohesion: 0.07
+Nodes (36): addActionContext(), [attribute2](), callAndClearComponentDebounces(), cancelUpload(), contextualizeExpression(), evaluateActionExpression(), evaluateReactiveExpression(), getActionTargetOffset() (+28 more)
 
 ### Community 100 - "lp"
-Cohesion: 0.11
-Nodes (26): ab(), bb(), bp(), ci(), cn(), di(), Dl(), dp() (+18 more)
+Cohesion: 0.12
+Nodes (25): ab(), bb(), bp(), ci(), cn(), di(), dp(), fi() (+17 more)
 
 ### Community 101 - "fy"
-Cohesion: 0.11
-Nodes (25): fo(), Te(), bc(), bd(), bg(), bi(), cy(), _d() (+17 more)
+Cohesion: 0.12
+Nodes (23): fo(), Nr(), Ia(), Te(), bd(), bi(), cy(), _d() (+15 more)
 
 ### Community 102 - "openWizard"
 Cohesion: 0.20
 Nodes (23): clone(), bindSelects(), display(), iconBtn(), inputBox(), isEmpty(), labelHtml(), optionsOf() (+15 more)
 
-### Community 103 - "get"
-Cohesion: 0.09
-Nodes (25): add(), assetIsPendingFor(), checkDirty(), cloneIfObject(), dataDelete(), dataGet(), each(), generateEntangleFunction() (+17 more)
+### Community 103 - "track"
+Cohesion: 0.25
+Nodes (9): add(), has(), history(), missing(), push(), queryStringUtils(), replace(), track() (+1 more)
 
 ### Community 104 - "evaluateActionExpression"
 Cohesion: 0.09
 Nodes (25): addActionContext(), [attribute2](), callAndClearComponentDebounces(), contextualizeExpression(), evaluateActionExpression(), evaluateExpression(), evaluateJsEffects(), evaluateReactiveExpression() (+17 more)
 
 ### Community 105 - "findComponentByEl"
-Cohesion: 0.13
-Nodes (25): closestFragment(), componentIsMissingProperty(), decodeMetadata(), endMarkerNode(), extractFragmentMetadataFromHtml(), extractFragmentMetadataFromMarkerNode(), extractInnerHtmlFromFragmentHtml(), findComponent() (+17 more)
+Cohesion: 0.09
+Nodes (36): clearTransitionNames(), closestFragment(), componentIsMissingProperty(), decodeMetadata(), disableRootTransition(), elementsForAttribute(), endMarkerNode(), extractFragmentMetadataFromHtml() (+28 more)
 
 ### Community 106 - "get"
-Cohesion: 0.09
-Nodes (25): add(), assetIsPendingFor(), checkDirty(), cloneIfObject(), dataDelete(), dataGet(), each(), generateEntangleFunction() (+17 more)
+Cohesion: 0.13
+Nodes (17): add(), destroyComponent(), dispatch(), ensureLivewireScriptIsntMisplaced(), extractDirective(), extractTypeModifiersAndValue(), has(), hasComponent() (+9 more)
 
 ### Community 107 - "findComponentByEl"
-Cohesion: 0.13
-Nodes (25): closestFragment(), componentIsMissingProperty(), decodeMetadata(), endMarkerNode(), extractFragmentMetadataFromHtml(), extractFragmentMetadataFromMarkerNode(), extractInnerHtmlFromFragmentHtml(), findComponent() (+17 more)
+Cohesion: 0.11
+Nodes (31): closestFragment(), componentIsMissingProperty(), decodeMetadata(), endMarkerNode(), extractFragmentMetadataFromHtml(), extractFragmentMetadataFromMarkerNode(), extractInnerHtmlFromFragmentHtml(), findComponent() (+23 more)
 
 ### Community 108 - "frontend/js/shared/itinerary-dialog.js"
 Cohesion: 0.22
 Nodes (23): base, clone(), dateForDay(), dayName(), daysOf(), commit(), dayLabel(), header() (+15 more)
 
-### Community 109 - "TransportController.php"
-Cohesion: 0.12
-Nodes (4): {closure#1}(), TransportController, SaveVehicleRequest, UpdateTransportRequest
+### Community 109 - "loop"
+Cohesion: 0.07
+Nodes (35): add(), addScopeToNode(), cleanupAttributes(), closestDataStack(), deferInit(), destroyTree(), flushAndStopDeferringMutations(), flushObserver() (+27 more)
 
 ### Community 110 - "evaluateActionExpression"
 Cohesion: 0.09
 Nodes (24): addActionContext(), [attribute2](), callAndClearComponentDebounces(), contextualizeExpression(), evaluateActionExpression(), evaluateExpression(), evaluateJsEffects(), evaluateReactiveExpression() (+16 more)
 
 ### Community 111 - "evaluateActionExpression"
-Cohesion: 0.09
-Nodes (24): addActionContext(), [attribute2](), callAndClearComponentDebounces(), contextualizeExpression(), evaluateActionExpression(), evaluateExpression(), evaluateJsEffects(), evaluateReactiveExpression() (+16 more)
+Cohesion: 0.08
+Nodes (26): addActionContext(), [attribute2](), callAndClearComponentDebounces(), contextualizeExpression(), evaluateActionExpression(), evaluateExpression(), evaluateJsEffects(), evaluateReactiveExpression() (+18 more)
 
 ### Community 112 - "Illuminate\Support\Facades\Schema"
-Cohesion: 0.09
-Nodes (7): {closure#1}(), {closure#2}(), {closure#1}(), {closure#2}(), {closure#1}(), {closure#2}(), {closure#3}()
+Cohesion: 0.11
+Nodes (5): {closure#1}(), {closure#3}(), {closure#1}(), {closure#2}(), {closure#1}()
 
 ### Community 113 - "cleanup"
-Cohesion: 0.16
-Nodes (22): cleanup(), cacheIdByNameOnElement(), cleanupEffect(), "node_modules/@alpinejs/intersect/dist/module.cjs.js"(), getDwellDuration(), getLengthValue(), getRootMargin(), getThreshold() (+14 more)
+Cohesion: 0.08
+Nodes (38): assetIsPendingFor(), checkDirty(), cleanup(), cloneIfObject(), dataDelete(), dataGet(), each(), generateEntangleFunction() (+30 more)
 
 ### Community 114 - "cleanup"
-Cohesion: 0.16
-Nodes (22): cleanup(), cacheIdByNameOnElement(), cleanupEffect(), "node_modules/@alpinejs/intersect/dist/module.cjs.js"(), getDwellDuration(), getLengthValue(), getRootMargin(), getThreshold() (+14 more)
+Cohesion: 0.09
+Nodes (36): assetIsPendingFor(), checkDirty(), cleanup(), cloneIfObject(), dataGet(), each(), generateEntangleFunction(), generateWatchFunction() (+28 more)
+
+### Community 115 - "TransportController.php"
+Cohesion: 0.07
+Nodes (11): {closure#1}(), BlogController, {closure#1}(), {closure#1}(), TransportController, SaveBlogPostRequest, SaveVehicleRequest, UpdateBlogPostRequest (+3 more)
 
 ### Community 116 - "sendMessages"
-Cohesion: 0.10
-Nodes (22): cleanupModal(), componentHasBoundChildren(), constructAction(), contentIsFromDump(), coordinateNetworkInteractions(), createOrAddToOutstandingMessage(), discardIfSuperseded(), extractStreamObjects() (+14 more)
+Cohesion: 0.06
+Nodes (40): addCleanup(), cleanupModal(), componentHasBoundChildren(), constructAction(), contentIsFromDump(), coordinateNetworkInteractions(), createOrAddToOutstandingMessage(), destroyComponent() (+32 more)
 
 ### Community 117 - "sendMessages"
 Cohesion: 0.10
 Nodes (22): cleanupModal(), componentHasBoundChildren(), constructAction(), contentIsFromDump(), coordinateNetworkInteractions(), createOrAddToOutstandingMessage(), discardIfSuperseded(), extractStreamObjects() (+14 more)
 
 ### Community 118 - "Ke"
-Cohesion: 0.13
-Nodes (22): entries(), every(), Fe(), filter(), find(), findIndex(), findLast(), findLastIndex() (+14 more)
+Cohesion: 0.07
+Nodes (39): Kr(), Aa(), be(), concat(), entries(), every(), Fe(), filter() (+31 more)
 
-### Community 119 - "AuthController.php"
-Cohesion: 0.12
-Nodes (3): AuthController, PageController, LoginRequest
+### Community 119 - "e"
+Cohesion: 0.09
+Nodes (26): jl(), xp(), addActionContext(), Ap(), ar(), cb(), o(), cr() (+18 more)
 
 ### Community 120 - "mount"
-Cohesion: 0.22
-Nodes (21): mount(), formatLocalTime(), getCardsConfig(), loadData(), openRevenueModal(), renderAttentionSection(), renderCard(), renderMobileAppHeader() (+13 more)
-
-### Community 121 - "getElementBoundUtilities"
-Cohesion: 0.11
-Nodes (21): cleanupElement(), cloneIfObject(), dequeueJob(), dontAutoEvaluateFunctions(), effect(), elementBoundEffect(), entangle(), evaluate() (+13 more)
+Cohesion: 0.20
+Nodes (23): mount(), formatLocalTime(), getCardsConfig(), getTimeGreeting(), loadData(), openRevenueModal(), renderAttentionSection(), renderCard() (+15 more)
 
 ### Community 122 - "dispatchEvent"
 Cohesion: 0.12
@@ -782,17 +786,17 @@ Nodes (21): clamp(), computeCoordsFromPlacement(), convertValueToCoords(), detec
 Cohesion: 0.12
 Nodes (21): componentsByName(), _defineProperty2(), dispatch2(), dispatchEl(), dispatchEvent(), dispatchEvent2(), dispatchEvents(), dispatchGlobal() (+13 more)
 
-### Community 125 - "banners.js"
+### Community 125 - "TourPackageController.php"
 Cohesion: 0.18
-Nodes (19): BN_PLACEMENTS, BN_TONES, card(), hero(), isPicture(), LABEL, meta(), mount() (+11 more)
+Nodes (6): {closure#1}(), {closure#2}(), {closure#3}(), TourPackageController, SaveTourPackageRequest, TourPackage
 
 ### Community 126 - "mergeNewHead"
 Cohesion: 0.14
 Nodes (20): addAssetsToHeadTagOfPage(), cloneScriptTag(), extractUriAndQueryString(), getNonce(), ifTheQueryStringChangedSinceLastRequest(), ignoreAttributes(), injectScriptTagAndWaitForItToFullyLoad(), injectStyles() (+12 more)
 
 ### Community 127 - "fn"
-Cohesion: 0.19
-Nodes (20): clamp(), computeCoordsFromPlacement(), convertValueToCoords(), detectOverflow(), evaluate2(), expandPaddingObject(), fn(), getAlignment() (+12 more)
+Cohesion: 0.10
+Nodes (32): addDebounceOrThrottle(), camelCase2(), clamp(), computeCoordsFromPlacement(), convertValueToCoords(), debounce(), detectOverflow(), dotSyntax() (+24 more)
 
 ### Community 128 - "mergeNewHead"
 Cohesion: 0.14
@@ -803,8 +807,8 @@ Cohesion: 0.14
 Nodes (20): addAssetsToHeadTagOfPage(), cloneScriptTag(), extractUriAndQueryString(), getNonce(), ifTheQueryStringChangedSinceLastRequest(), ignoreAttributes(), injectScriptTagAndWaitForItToFullyLoad(), injectStyles() (+12 more)
 
 ### Community 130 - "Gi"
-Cohesion: 0.11
-Nodes (20): eg(), eo(), Fc(), Gi(), is(), jc(), lc(), Mg() (+12 more)
+Cohesion: 0.07
+Nodes (32): cc(), df(), eg(), eo(), Fc(), gg(), Gi(), is() (+24 more)
 
 ### Community 131 - "mergeNewHead"
 Cohesion: 0.14
@@ -814,13 +818,13 @@ Nodes (20): addAssetsToHeadTagOfPage(), cloneScriptTag(), extractUriAndQueryStri
 Cohesion: 0.10
 Nodes (19): generateValue, key, value, destination, source, type, services, buildCommand (+11 more)
 
-### Community 133 - "Illuminate\Support\Facades\DB"
-Cohesion: 0.11
-Nodes (6): {closure#1}(), {closure#3}(), {closure#1}(), {closure#2}(), {closure#1}(), {closure#2}()
+### Community 133 - "2026_10_23_000001_add_list_indexes.php"
+Cohesion: 0.22
+Nodes (6): {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}(), {closure#5}(), {closure#6}()
 
 ### Community 134 - "watch2"
-Cohesion: 0.13
-Nodes (19): call(), createRef(), endBatch(), getCurrentScope(), isRef(), noTracking(), onWatcherCleanup(), pauseTracking() (+11 more)
+Cohesion: 0.14
+Nodes (18): call(), createRef(), endBatch(), getCurrentScope(), isRef(), noTracking(), pauseTracking(), propertyToRef() (+10 more)
 
 ### Community 135 - "bindAttribute"
 Cohesion: 0.12
@@ -835,16 +839,16 @@ Cohesion: 0.11
 Nodes (19): cleanupAttributes(), cleanupElement(), cloneIfObject2(), dequeueJob(), destroyTree(), entangle(), flushAndStopDeferringMutations(), flushObserver() (+11 more)
 
 ### Community 138 - "watch2"
-Cohesion: 0.13
-Nodes (19): call(), createRef(), endBatch(), getCurrentScope(), isRef(), noTracking(), onWatcherCleanup(), pauseTracking() (+11 more)
+Cohesion: 0.15
+Nodes (17): call(), createRef(), endBatch(), getCurrentScope(), isRef(), noTracking(), pauseTracking(), ref() (+9 more)
 
 ### Community 139 - "bindAttribute"
 Cohesion: 0.12
 Nodes (19): attributeShouldntBePreservedIfFalsy(), bind(), bindAttribute(), bindAttributeAndProperty(), bindClasses(), bindInputValue(), camelCase(), checkedAttrLooseCompare() (+11 more)
 
 ### Community 140 - "loop"
-Cohesion: 0.11
-Nodes (19): cleanupAttributes(), cleanupElement(), cloneIfObject2(), dequeueJob(), destroyTree(), entangle(), flushAndStopDeferringMutations(), flushObserver() (+11 more)
+Cohesion: 0.07
+Nodes (28): cleanupAttributes(), cleanupElement(), cloneIfObject2(), deferInit2(), dequeueJob(), destroyTree(), entangle(), flushAndStopDeferringMutations() (+20 more)
 
 ### Community 141 - "cancel"
 Cohesion: 0.14
@@ -858,17 +862,17 @@ Nodes (18): call(), createRef(), endBatch(), getCurrentScope(), isRef(), noTrack
 Cohesion: 0.16
 Nodes (17): cancelUpload(), getCsrfToken(), getUploadManager(), handleFileUpload(), handleS3PreSignedUrl(), handleSignedUrl(), makeRequest(), markUploadErrored() (+9 more)
 
-### Community 145 - "registerListeners"
-Cohesion: 0.16
-Nodes (17): cancelUpload(), getCsrfToken(), getUploadManager(), handleFileUpload(), handleS3PreSignedUrl(), handleSignedUrl(), makeRequest(), markUploadErrored() (+9 more)
+### Community 145 - ""node_modules/@vue/reactivity/dist/reactivity.cjs.js""
+Cohesion: 0.07
+Nodes (50): te(), "node_modules/@vue/reactivity/dist/reactivity.cjs.js"(), a(), Ar(), Ba(), bn(), C(), Cr() (+42 more)
 
 ### Community 146 - "registerListeners"
 Cohesion: 0.16
 Nodes (17): cancelUpload(), getCsrfToken(), getUploadManager(), handleFileUpload(), handleS3PreSignedUrl(), handleSignedUrl(), makeRequest(), markUploadErrored() (+9 more)
 
 ### Community 147 - ""node_modules/@alpinejs/focus/dist/module.cjs.js""
-Cohesion: 0.22
-Nodes (17): "node_modules/@alpinejs/focus/dist/module.cjs.js"(), _arrayLikeToArray(), _arrayWithoutHoles(), crawlSiblingsUp(), _createForOfIteratorHelper(), _defineProperty(), disableScrolling(), _iterableToArray() (+9 more)
+Cohesion: 0.12
+Nodes (26): "node_modules/@alpinejs/focus/dist/module.cjs.js"(), _arrayLikeToArray(), _arrayWithoutHoles(), asyncGeneratorStep(), _asyncToGenerator(), _next(), _throw(), crawlSiblingsUp() (+18 more)
 
 ### Community 148 - "closestDataStack"
 Cohesion: 0.15
@@ -879,40 +883,32 @@ Cohesion: 0.16
 Nodes (17): cancelUpload(), getCsrfToken(), getUploadManager(), handleFileUpload(), handleS3PreSignedUrl(), handleSignedUrl(), makeRequest(), markUploadErrored() (+9 more)
 
 ### Community 150 - ""node_modules/@alpinejs/focus/dist/module.cjs.js""
-Cohesion: 0.22
-Nodes (17): "node_modules/@alpinejs/focus/dist/module.cjs.js"(), _arrayLikeToArray(), _arrayWithoutHoles(), crawlSiblingsUp(), _createForOfIteratorHelper(), _defineProperty(), disableScrolling(), _iterableToArray() (+9 more)
-
-### Community 151 - "pv"
-Cohesion: 0.14
-Nodes (17): Df(), eo(), fn(), gv(), Hf(), hv(), jf(), lv() (+9 more)
-
-### Community 152 - "PlacesProvider"
 Cohesion: 0.13
-Nodes (3): AppServiceProvider, {closure#2}(), PlacesProvider
+Nodes (23): "node_modules/@alpinejs/focus/dist/module.cjs.js"(), _arrayLikeToArray(), _arrayWithoutHoles(), crawlSiblingsUp(), _createForOfIteratorHelper(), _defineProperty(), disableScrolling(), _iterableToArray() (+15 more)
+
+### Community 151 - "pd"
+Cohesion: 0.08
+Nodes (28): av(), cv(), Df(), Dn(), eo(), fn(), gv(), Hf() (+20 more)
 
 ### Community 153 - "2026_10_26_000001_create_itinerary_tables.php"
-Cohesion: 0.14
-Nodes (9): {closure#1}(), {closure#2}(), {closure#3}(), {closure#6}(), {closure#7}(), {closure#8}(), {closure#9}(), copy() (+1 more)
-
-### Community 154 - "CRM pages: how a page is built"
-Cohesion: 0.12
-Nodes (12): API calls, CRM pages: how a page is built, Data, Files a page owns (and nothing else), Running it locally (without touching the real database), Not covered (round 2), Reuse, Round 2: tabs, scroll, tiles, text, spacing (+4 more)
+Cohesion: 0.09
+Nodes (14): TripDates, {closure#1}(), {closure#2}(), {closure#3}(), {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}() (+6 more)
 
 ### Community 155 - "closestDataStack"
-Cohesion: 0.17
-Nodes (15): addScopeToNode(), closestDataStack(), cspEvaluator(), cspRawEvaluator(), generateDataStack(), generateEvaluator(), generateEvaluatorFromFunction(), generateRuntimeFunction() (+7 more)
+Cohesion: 0.15
+Nodes (17): addScopeToNode(), closestDataStack(), cspEvaluator(), cspRawEvaluator(), deferInit2(), flushPendingMutations(), generateDataStack(), generateEvaluator() (+9 more)
 
 ### Community 156 - ""node_modules/nprogress/nprogress.js""
 Cohesion: 0.24
 Nodes (11): "node_modules/nprogress/nprogress.js"(), addClass(), applyCss(), barPositionCSS(), camelCase(), classList(), getStyleProp(), getVendorProp() (+3 more)
 
-### Community 157 - "Qr"
-Cohesion: 0.15
-Nodes (14): Av(), cp(), hf(), jf(), Ml(), Mt(), nl(), Qr() (+6 more)
+### Community 157 - "co"
+Cohesion: 0.17
+Nodes (13): co(), hf(), hm(), jf(), jm(), km(), kn(), Ml() (+5 more)
 
-### Community 158 - "directives"
-Cohesion: 0.19
-Nodes (14): applyBindingsObject(), attributesOnly(), bind2(), byPriority(), closestIdRoot(), directives(), findClosest(), getArrayOfRefObject() (+6 more)
+### Community 158 - "e"
+Cohesion: 0.06
+Nodes (41): addInterceptor(), Av(), aw(), Bu(), Bv(), cp(), dm(), eb() (+33 more)
 
 ### Community 159 - ""node_modules/nprogress/nprogress.js""
 Cohesion: 0.24
@@ -963,16 +959,12 @@ Cohesion: 0.29
 Nodes (12): "node_modules/@alpinejs/morph/dist/module.cjs.js"(), createElement(), createMorphContext(), getFirstNode(), getNextSibling(), monkeyPatchDomSetAttributeToAllowAtSymbols(), morph3(), morphBetween() (+4 more)
 
 ### Community 171 - "jg"
-Cohesion: 0.15
-Nodes (13): Ga(), Ge(), Gg(), Ig(), jg(), Lg(), ml(), of() (+5 more)
+Cohesion: 0.10
+Nodes (21): Ga(), Ge(), Gg(), Ig(), jg(), kv(), lf(), Lg() (+13 more)
 
 ### Community 172 - "Deploying Ruyi Admin on Render"
 Cohesion: 0.15
 Nodes (12): 📋 Architecture Overview, 🗄️ Database Options, Deploying Ruyi Admin on Render, Deploying the Frontend (Optional Standalone):, Deploying the Laravel Backend:, 🐳 Local Container Testing, 🚀 Method 1: 1-Click Deployment via Render Blueprint (Recommended), 🛠️ Method 2: Manual Setup on Render Dashboard (+4 more)
-
-### Community 173 - "on"
-Cohesion: 0.20
-Nodes (12): addDebounceOrThrottle(), camelCase2(), debounce(), dotSyntax(), isClickEvent(), isKeyEvent(), isListeningForASpecificKeyThatHasntBeenPressed(), isNumeric2() (+4 more)
 
 ### Community 174 - "cancel"
 Cohesion: 0.23
@@ -982,9 +974,9 @@ Nodes (12): cancel(), complete(), emit(), finish(), invokeOnCancel(), invokeOnEr
 Cohesion: 0.23
 Nodes (12): cancel(), complete(), emit(), finish(), invokeOnCancel(), invokeOnError(), invokeOnFailure(), invokeOnFinish() (+4 more)
 
-### Community 176 - "on3"
-Cohesion: 0.20
-Nodes (12): addDebounceOrThrottle(), camelCase2(), debounce2(), dotSyntax(), isClickEvent(), isKeyEvent(), isListeningForASpecificKeyThatHasntBeenPressed(), isNumeric2() (+4 more)
+### Community 176 - "cancel"
+Cohesion: 0.23
+Nodes (12): cancel(), complete(), emit(), finish(), invokeOnCancel(), invokeOnError(), invokeOnFailure(), invokeOnFinish() (+4 more)
 
 ### Community 177 - "on4"
 Cohesion: 0.20
@@ -994,9 +986,9 @@ Nodes (12): addDebounceOrThrottle(), camelCase2(), debounce2(), dotSyntax(), isC
 Cohesion: 0.23
 Nodes (12): cancel(), complete(), emit(), finish(), invokeOnCancel(), invokeOnError(), invokeOnFailure(), invokeOnFinish() (+4 more)
 
-### Community 179 - "compareJobs"
-Cohesion: 0.17
-Nodes (12): commitTransaction(), compareJobs(), flushJobs(), getElementDepth(), isStructural(), queueFlush(), queueJob(), scheduler() (+4 more)
+### Community 179 - "coordinateNetworkInteractions"
+Cohesion: 0.25
+Nodes (9): componentHasBoundChildren(), constructAction(), coordinateNetworkInteractions(), createOrAddToOutstandingMessage(), fireAction(), fireActionInstance(), interceptAction(), interceptComponentAction() (+1 more)
 
 ### Community 180 - "cancel"
 Cohesion: 0.23
@@ -1014,9 +1006,9 @@ Nodes (5): fail, results, fail, results, signIn()
 Cohesion: 0.25
 Nodes (11): clearTransitionNames(), disableRootTransition(), elementsForAttribute(), findNavigateTransitions(), selectorForAttribute(), setNavigateTransitionNames(), setTransitionNames(), skipTransitionWhenTopLayerOpens() (+3 more)
 
-### Community 185 - "transitionPageSwap"
-Cohesion: 0.25
-Nodes (11): clearTransitionNames(), disableRootTransition(), elementsForAttribute(), findNavigateTransitions(), selectorForAttribute(), setNavigateTransitionNames(), setTransitionNames(), skipTransitionWhenTopLayerOpens() (+3 more)
+### Community 185 - "on3"
+Cohesion: 0.20
+Nodes (12): addDebounceOrThrottle(), camelCase2(), debounce2(), dotSyntax(), isClickEvent(), isKeyEvent(), isListeningForASpecificKeyThatHasntBeenPressed(), isNumeric2() (+4 more)
 
 ### Community 186 - "whenTargetsArePartOfRequest"
 Cohesion: 0.18
@@ -1031,8 +1023,8 @@ Cohesion: 0.24
 Nodes (11): createUrlObjectFromString(), fetchHtml(), fetchHtmlOrUsePrefetchedHtml(), getDestination(), getPretchedHtmlOr(), getUriStringFromUrlObject(), performFetch(), prefetchHtml() (+3 more)
 
 ### Community 189 - "getElementBoundUtilities"
-Cohesion: 0.20
-Nodes (11): dontAutoEvaluateFunctions(), elementBoundEffect(), evaluate(), evaluateLater(), extractProp(), getAttributeBinding(), getBinding(), getDirectiveHandler() (+3 more)
+Cohesion: 0.15
+Nodes (14): dontAutoEvaluateFunctions(), elementBoundEffect(), evaluate(), evaluateLater(), extractProp(), getAttributeBinding(), getBinding(), getDirectiveHandler() (+6 more)
 
 ### Community 190 - "getElementBoundUtilities"
 Cohesion: 0.20
@@ -1058,17 +1050,17 @@ Nodes (11): createUrlObjectFromString(), fetchHtml(), fetchHtmlOrUsePrefetchedHt
 Cohesion: 0.18
 Nodes (10): build, container_name, environment, ports, restart, volumes, context, dockerfile (+2 more)
 
-### Community 198 - "_regenerator"
-Cohesion: 0.27
-Nodes (6): _regenerator(), f(), GeneratorFunctionPrototype(), i(), _regeneratorDefine(), t()
+### Community 198 - "Ct"
+Cohesion: 0.25
+Nodes (9): As(), og(), Ct(), Hr(), jp(), Jr(), ql(), qp() (+1 more)
 
-### Community 199 - "jl"
-Cohesion: 0.27
-Nodes (10): jl(), xp(), Ap(), cb(), getUpdates(), mergeQueuedUpdates(), Op(), Tp() (+2 more)
+### Community 199 - "on3"
+Cohesion: 0.20
+Nodes (12): addDebounceOrThrottle(), camelCase2(), debounce2(), dotSyntax(), isClickEvent(), isKeyEvent(), isListeningForASpecificKeyThatHasntBeenPressed(), isNumeric2() (+4 more)
 
-### Community 200 - "_regenerator"
-Cohesion: 0.27
-Nodes (6): _regenerator(), f(), GeneratorFunctionPrototype(), i(), _regeneratorDefine(), t()
+### Community 200 - "sf"
+Cohesion: 0.25
+Nodes (8): af(), Fs(), ho(), Hr(), Ks(), pr(), sf(), Ee()
 
 ### Community 201 - "places-client.js"
 Cohesion: 0.25
@@ -1078,17 +1070,13 @@ Nodes (4): createSearcher(), run(), JSON_HEADERS, newSession()
 Cohesion: 0.25
 Nodes (9): add(), has(), history(), missing(), push(), queryStringUtils(), replace(), track() (+1 more)
 
-### Community 203 - "coordinateNetworkInteractions"
-Cohesion: 0.25
-Nodes (9): componentHasBoundChildren(), constructAction(), coordinateNetworkInteractions(), createOrAddToOutstandingMessage(), fireAction(), fireActionInstance(), interceptAction(), interceptComponentAction() (+1 more)
+### Community 203 - "0001_01_01_000002_create_jobs_table.php"
+Cohesion: 0.33
+Nodes (3): {closure#1}(), {closure#2}(), {closure#3}()
 
-### Community 204 - "coordinateNetworkInteractions"
-Cohesion: 0.25
-Nodes (9): componentHasBoundChildren(), constructAction(), coordinateNetworkInteractions(), createOrAddToOutstandingMessage(), fireAction(), fireActionInstance(), interceptAction(), interceptComponentAction() (+1 more)
-
-### Community 205 - "warn"
-Cohesion: 0.22
-Nodes (9): directive2(), directiveExists(), getTarget(), magic(), skipDuringClone(), warn(), warnAboutMissingPlugins(), warnMissingPluginDirective() (+1 more)
+### Community 204 - "registerListeners"
+Cohesion: 0.24
+Nodes (10): handleS3PreSignedUrl(), handleSignedUrl(), makeRequest(), markUploadErrored(), markUploadFinished(), registerListeners(), setUpload(), startUpload() (+2 more)
 
 ### Community 206 - "schedule-layout.mjs"
 Cohesion: 0.22
@@ -1110,25 +1098,13 @@ Nodes (3): fail, failed, results
 Cohesion: 0.29
 Nodes (4): {closure#1}(), {closure#2}(), {closure#3}(), {closure#4}()
 
-### Community 212 - "r"
-Cohesion: 0.48
-Nodes (7): asyncGeneratorStep(), _asyncToGenerator(), _next(), _throw(), a(), C(), r()
-
-### Community 213 - "r"
-Cohesion: 0.48
-Nodes (7): asyncGeneratorStep(), _asyncToGenerator(), _next(), _throw(), a(), C(), r()
-
 ### Community 214 - "settings.mjs"
 Cohesion: 0.29
 Nodes (3): fail, IDS, results
 
-### Community 215 - "0001_01_01_000002_create_jobs_table.php"
+### Community 215 - "cleanupDeps"
 Cohesion: 0.33
-Nodes (3): {closure#1}(), {closure#2}(), {closure#3}()
-
-### Community 216 - "2026_11_02_000003_add_stays_page_columns_to_saved_hotels.php"
-Cohesion: 0.33
-Nodes (3): {closure#1}(), {closure#2}(), {closure#3}()
+Nodes (6): cleanupDeps(), isDirty(), prepareDeps(), refreshComputed(), removeDep(), removeSub()
 
 ### Community 217 - "cleanupDeps"
 Cohesion: 0.33
@@ -1174,25 +1150,45 @@ Nodes (4): "node_modules/@alpinejs/collapse/dist/module.cjs.js"(), modifierValue
 Cohesion: 0.50
 Nodes (4): normalizeClass(), normalizeProps(), normalizeStyle(), parseStringStyle()
 
+### Community 258 - "warn"
+Cohesion: 0.29
+Nodes (7): directiveExists(), getTarget(), magic(), skipDuringClone(), warn(), warnAboutMissingPlugins(), warnMissingPluginMagic()
+
+### Community 259 - "0001_01_01_000000_create_users_table.php"
+Cohesion: 0.33
+Nodes (3): {closure#1}(), {closure#2}(), {closure#3}()
+
+### Community 261 - "UI standard (round 1: popups, headers, buttons, toggles, fields)"
+Cohesion: 0.33
+Nodes (5): Not covered (round 2), Round 2: tabs, scroll, tiles, text, spacing, Rules, Tokens (`:root`), UI standard (round 1: popups, headers, buttons, toggles, fields)
+
+### Community 268 - "public/js/shared/keyboard.js"
+Cohesion: 0.80
+Nodes (4): initKeyboard(), measure(), reveal(), track()
+
+### Community 269 - "createMorphContext"
+Cohesion: 0.50
+Nodes (5): createElement(), createMorphContext(), monkeyPatchDomSetAttributeToAllowAtSymbols(), morph(), morphBetween()
+
 ## Knowledge Gaps
 - **36 isolated node(s):** `clearSearch`, `showToast`, `setTab`, `toggleSelectAll`, `toggleBulkMore` (+31 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1771 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **35 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1777 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **51 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `to()` connect `Ruyi Admin` to `livewire.csp.min.js`, `v`, `Qr`, `V`?**
-  _High betweenness centrality (0.370) - this node is a cross-community bridge._
+- **Why does `snapshot()` connect `public/js/desktop.js` to `noTracking`, `track`, `track`, `get`, `openAddInquiry`?**
+  _High betweenness centrality (0.338) - this node is a cross-community bridge._
 - **Are the 60 inferred relationships involving `"node_modules/@alpinejs/csp/dist/module.cjs.js"()` (e.g. with `addInitSelector()` and `addRootSelector()`) actually correct?**
   _`"node_modules/@alpinejs/csp/dist/module.cjs.js"()` has 60 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `clearSearch`, `showToast`, `setTab` to the rest of the system?**
   _36 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `livewire.js` be split into smaller, more focused modules?**
   _Cohesion score 0.010069640504423114 - nodes in this community are weakly interconnected._
-- **Why does `snapshot()` connect `itinerary-builder-ui.js` to `track`, `noTracking`, `get`, `get`?**
-  _High betweenness centrality (0.324) - this node is a cross-community bridge._
+- **Why does `to()` connect `Ruyi Admin` to `livewire.csp.min.js`, `v`, `co`, `Ke`?**
+  _High betweenness centrality (0.277) - this node is a cross-community bridge._
 - **Are the 60 inferred relationships involving `"node_modules/@alpinejs/csp/dist/module.cjs.js"()` (e.g. with `addInitSelector()` and `addRootSelector()`) actually correct?**
   _`"node_modules/@alpinejs/csp/dist/module.cjs.js"()` has 60 INFERRED edges - model-reasoned connections that need verification._
 - **Should `livewire.csp.min.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.011133603238866396 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.011729713878765029 - nodes in this community are weakly interconnected._

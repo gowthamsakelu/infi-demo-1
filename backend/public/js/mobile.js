@@ -2,6 +2,7 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { createMobileCalendar } from './calendar-mobile.js';
 import { createMobileTeam } from './team-mobile.js';
+import { OPERATIONS_TEAM_MEMBERS } from './shared/team-data.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
@@ -20,7 +21,7 @@ import { openMoreSheet } from './shared/nav-ui.js';
 import { goToPage } from './shared/page-host.js';
 import { matchesCategory } from './shared/booking-filters.js';
 import { openAddInquiry } from './shared/add-inquiry.js';
-import { addButtonHtml, setAddAction } from './shared/add-button.js';
+import { addButtonHtml, setShellAddAction } from './shared/add-button.js';
 
 export function createMobileView(container, options = {}) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -1318,15 +1319,17 @@ export function createMobileView(container, options = {}) {
         needRestore = true;
       }
       container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
-      if (page === 'calendar') setAddAction(null);
-      else setAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') })); // Bookings has no add flow of its own: it opens the same one
+      // The shell draws Inquiries, Bookings (no add flow of its own: it opens the Inquiry one), Calendar and Team; other pages are hosted and set their own.
+      if (page === 'team') setShellAddAction('Add Member', () => window.dispatchEvent(new CustomEvent('open-add-team-member-modal')));
+      else if (page === 'inquiries' || page === 'bookings') setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') }));
+      else setShellAddAction(null);
       container.querySelector('#mobile-bookings-page').hidden = page === 'calendar' || page === 'team';
       container.querySelector('#mobile-calendar-page').hidden = page !== 'calendar';
       container.querySelector('#mobile-team-page').hidden = page !== 'team';
       container.querySelector('#mobile-screen-scroll')?.classList.toggle('calendar-mode', page === 'calendar');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
       if (page === 'team') { if (changed) team.activate(); else team.render(); }
-      if (subtitleEl) subtitleEl.textContent = page === 'calendar' ? 'Calendar' : page === 'team' ? 'Operations Team' : page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
+      if (subtitleEl) subtitleEl.textContent = page === 'calendar' ? 'Calendar' : page === 'team' ? `Operations Team • ${OPERATIONS_TEAM_MEMBERS.length} Total` : page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
       if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking';
       applyParams();
@@ -1345,6 +1348,17 @@ export function createMobileView(container, options = {}) {
       if (isModalOpen && activeModalTab === 'customer-details' && activeModalBooking) renderSheetBody();
     });
     window.addEventListener('layout-changed', () => { if (isModalOpen) closeModal(); });
+    // The itinerary event popups (View Details, Edit) close with a tap on the dimmed backdrop and with Esc, like every other popup
+    container.querySelector('#mobile-activity-details-modal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeActivityDetailsModal(); });
+    container.querySelector('#mobile-edit-activity-modal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeEditActivityModal(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const edit = container.querySelector('#mobile-edit-activity-modal.open');
+      const details = container.querySelector('#mobile-activity-details-modal.open');
+      if (!edit && !details) return;
+      e.stopImmediatePropagation(); // Esc closes the popup only; the booking sheet under it stays on the Itinerary tab
+      if (edit) closeEditActivityModal(); else closeActivityDetailsModal();
+    }, true);
     window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
     loadFollowUps();
     loadInquiries();

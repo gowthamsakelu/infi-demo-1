@@ -52,6 +52,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
   const first = items[0];
   const ov = document.createElement('div');
   ov.className = 'asg-overlay';
+  if (kind === 'itinerary' && document.documentElement.dataset.layout === 'mobile') ov.dataset.centered = ''; // phone: a centred popup for an itinerary event
   ov.innerHTML = `
     <div class="asg-sheet" role="dialog" aria-modal="true" aria-labelledby="asg-title">
       <div class="filter-handle" aria-hidden="true"></div>

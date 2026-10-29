@@ -1,4 +1,4 @@
-// Banners: the pictures on the website, as a card grid (or a simple order list). Tabs All / Active / Scheduled / Draft, an on / off switch per card
+// Banners: the pictures on the website, as a card grid. Tabs All / Active / Scheduled / Draft, an on / off switch per card
 // that saves at once, and Move earlier / later to change the order. The Add Banner button is drawn as designed and does nothing yet.
 import { pageFrame } from '../shared/split-page.js';
 import { getJson, sendJson } from '../shared/http.js';
@@ -41,16 +41,6 @@ const card = (b, fresh = false) => `<article class="bn-card" data-bn-id="${esc(b
     ${stats(b)}
   </div></article>`;
 
-const orderRow = (b, i, n) => `<div class="bn-order-row" data-bn-id="${esc(b.id)}">
-  <span class="bn-order-no">${i + 1}</span>${hero(b, { thumb: true })}
-  <div class="bn-order-text"><b>${esc(b.name)}</b><small>${esc(meta(b))}</small></div>
-  ${pill(b.status, LABEL[b.status])}
-  <div class="bn-order-btns">
-    <button type="button" class="sp-icon-btn bn-up" data-bn-move="up" data-bn-id-move="${esc(b.id)}" aria-label="Move ${esc(b.name)} earlier" ${i === 0 ? 'disabled' : ''}>${icon('chevronDown', { size: 18 })}</button>
-    <button type="button" class="sp-icon-btn" data-bn-move="down" data-bn-id-move="${esc(b.id)}" aria-label="Move ${esc(b.name)} later" ${i === n - 1 ? 'disabled' : ''}>${icon('chevronDown', { size: 18 })}</button>
-  </div>
-</div>`;
-
 /** Add / Edit a banner: the shared catalog wizard, described by config only (see shared/wizard.js). */
 const BN_TONES = ['blue', 'green', 'amber', 'indigo', 'rose', 'sky', 'teal', 'violet'].map((t) => ({ value: t, label: t[0].toUpperCase() + t.slice(1) }));
 const BN_PLACEMENTS = ['Home hero', 'Destinations page', 'Adventures page', 'Not placed yet'].map((p) => ({ value: p, label: p }));
@@ -86,7 +76,7 @@ function wizardConfig() {
 export default {
   css: true,
   mount(host, ctx) {
-    const state = { items: [], status: 'loading', tab: 'all', mode: 'grid' };
+    const state = { items: [], status: 'loading', tab: 'all' };
     let alive = true;
     const frame = pageFrame(host, ctx, { title: 'Banners', subtitle: '', addLabel: 'Add Banner', onAdd: () => crud.add({ returnFocus: () => document.querySelector('#desktop-page-add, #mobile-page-add') }) });
     frame.body.innerHTML = `
@@ -94,9 +84,6 @@ export default {
         <div class="bn-tabs sp-tabs"></div>
         <div class="bn-tools">
           <button type="button" class="btn-secondary-desktop bn-preview">${icon('eye', { size: 16 })}Preview website</button>
-          <div class="bn-seg" role="group" aria-label="View">
-            <button type="button" data-bn-mode="grid">Grid</button><button type="button" data-bn-mode="order">Order</button>
-          </div>
         </div>
       </div>
       <div class="bn-content"></div>`;
@@ -105,21 +92,17 @@ export default {
 
     const TABS = [['all', 'All'], ['active', 'Active'], ['scheduled', 'Scheduled'], ['draft', 'Draft']];
     const inTab = (b) => state.tab === 'all' || b.status === state.tab;
-    const live = () => state.items.filter((b) => b.status === 'active').length;
 
     function render() {
       const ready = state.status === 'ready';
-      frame.setTitle('Banners', ready ? `${plural(state.items.length, 'banner')} · ${live()} live on the website · leads are tracked per banner` : '', ready ? `${plural(state.items.length, 'banner')} · ${live()} live` : '');
+      frame.setTitle('Banners', ready ? `Banners • ${state.items.length} Total` : '');
       renderTabs(tabsEl, { tabs: TABS.map(([key, label]) => ({ key, label, count: state.status !== 'ready' ? null : key === 'all' ? state.items.length : state.items.filter((b) => b.status === key).length })), active: state.tab, variant: 'mobile', attr: 'data-bn-tab' });
-      frame.body.querySelectorAll('[data-bn-mode]').forEach((b) => { const on = b.dataset.bnMode === state.mode; b.classList.toggle('active', on); b.setAttribute('aria-pressed', String(on)); });
       if (state.status === 'loading') { content.innerHTML = skeletonCards(6); return; }
       if (state.status === 'error') { content.innerHTML = errorState({ title: 'Could not load banners', error: state.error, what: 'banners', retryId: 'bn-retry' }); return; }
       if (!state.items.length) { content.innerHTML = emptyState({ title: 'No banners yet', text: 'Banners you add will show up here.', resetId: 'bn-reset' }); return; }
       const rows = state.items.filter(inTab);
       if (!rows.length) { content.innerHTML = emptyState({ title: 'No banners found', text: 'Nothing in this tab yet.', resetId: 'bn-reset' }); return; }
-      content.innerHTML = state.mode === 'order'
-        ? `<div class="bn-order">${state.items.map((b, i) => orderRow(b, i, state.items.length)).join('')}</div>`
-        : `<div class="bn-grid">${rows.map((b) => card(b, crud.isFresh(b.id))).join('')}</div>`;
+      content.innerHTML = `<div class="bn-grid">${rows.map((b) => card(b, crud.isFresh(b.id))).join('')}</div>`;
     }
 
     const crud = createCatalogCrud({
@@ -191,12 +174,8 @@ export default {
     frame.body.addEventListener('click', (e) => {
       const tab = e.target.closest('[data-bn-tab]');
       if (tab) { state.tab = tab.dataset.bnTab; render(); return; }
-      const mode = e.target.closest('[data-bn-mode]');
-      if (mode) { state.mode = mode.dataset.bnMode; render(); return; }
       const sw = e.target.closest('[data-bn-toggle]');
       if (sw) { setActive(sw.dataset.bnToggle, sw.getAttribute('aria-checked') !== 'true'); return; }
-      const mv = e.target.closest('[data-bn-move]');
-      if (mv) { move(mv.dataset.bnIdMove, mv.dataset.bnMove); return; }
       const more = e.target.closest('[data-bn-more]');
       if (more) {
         const b = find(more.dataset.bnMore); if (!b) return;

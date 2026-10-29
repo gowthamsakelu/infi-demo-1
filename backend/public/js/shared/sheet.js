@@ -33,7 +33,7 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
  *   (Esc, backdrop, swipe, a [data-sheet-close] button); return false to keep it open. close() never asks.
  * @returns {{ ov: HTMLElement, sheet: HTMLElement, $: (s: string) => HTMLElement, close: () => void }}
  */
-export function openSheet({ html, cls = '', label = 'Dialog', beforeClose = null, returnFocus = null, modal = false, onClose = null, overlayCls = '', cardCls = 'item-dialog', history: useHistory = modal }) {
+export function openSheet({ html, cls = '', label = 'Dialog', beforeClose = null, returnFocus = null, modal = false, onClose = null, overlayCls = '', cardCls = 'item-dialog', history: useHistory = modal, standalone = false }) {
   const trigger = document.activeElement;
   const ov = document.createElement('div');
   // `modal` = the small centred dialog (same card as "Add New Guest") that sits on top of a sheet; otherwise a sheet.
@@ -42,7 +42,7 @@ export function openSheet({ html, cls = '', label = 'Dialog', beforeClose = null
     ? `<div class="modal-card ${cardCls} ${cls}" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1">${html}</div>`
     : `<div class="asg-sheet ${cls}" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1"><div class="filter-handle" aria-hidden="true"></div>${html}</div>`;
   document.body.appendChild(ov);
-  if (!modal) placeAsPushed(ov);
+  if (!modal && !standalone) placeAsPushed(ov); // `standalone`: always its own centred dialog, never taking over the sheet or panel behind it
   const sheet = ov.querySelector(modal ? '.modal-card' : '.asg-sheet');
   const unlock = lockScroll();
   afterPaint(() => ov.classList.add('open'));

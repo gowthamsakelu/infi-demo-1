@@ -18,7 +18,7 @@ import { sidebarNavHtml, bindSidebar } from './shared/nav-ui.js';
 import { matchesCategory } from './shared/booking-filters.js';
 import { createDesktopCalendar } from './calendar-desktop.js';
 import { openAddInquiry } from './shared/add-inquiry.js';
-import { addButtonHtml, setAddAction } from './shared/add-button.js';
+import { addButtonHtml, setShellAddAction } from './shared/add-button.js';
 import { paneLayout, selectedParam, writeSelected, chooseRecord, bindListKeys } from './shared/split-view.js';
 import { createDesktopTeam } from './team-desktop.js';
 
@@ -1361,8 +1361,8 @@ export function createDesktopView(container) {
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
       container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
       container.querySelector('#nav-team')?.classList.toggle('active', page === 'team');
-      if (page === 'calendar') setAddAction(null);
-      else setAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') })); // Bookings has no add flow of its own: it opens the same one
+      if (page !== 'inquiries' && page !== 'bookings') setShellAddAction(null); // Team keeps its own Add Member button in the roster header; hosted pages set their own
+      else setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') })); // Bookings has no add flow of its own: it opens the same one
       container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
       container.querySelector('#desktop-workspace-split')?.classList.toggle('team-mode', page === 'team');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }

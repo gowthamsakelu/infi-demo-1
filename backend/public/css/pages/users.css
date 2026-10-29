@@ -1180,7 +1180,7 @@
   z-index: 399 !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: opacity var(--motion-slow, 280ms) var(--ease-out, ease-out) !important;
 }
 
 :where(html[data-layout="mobile"]) body.sp-detail-open [data-sp="users"] .us-sheet-backdrop {
@@ -1202,15 +1202,10 @@
   z-index: 400 !important;
   display: flex !important;
   flex-direction: column !important;
-  transform: translateY(105%) !important;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
   padding: 0 !important;
   overflow: hidden !important;
 }
 
-:where(html[data-layout="mobile"]) [data-sp="users"] .sp-detail-screen.is-open {
-  transform: translateY(0) !important;
-}
 
 /* Completely hide duplicate extra drag handle */
 .us-drag-handle,

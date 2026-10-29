@@ -1,7 +1,10 @@
-import { OPERATIONS_TEAM_MEMBERS, getTeamMemberById, getTeamMemberAssignments } from './shared/team-data.js';
+import { OPERATIONS_TEAM_MEMBERS, getTeamMemberById, getTeamMemberAssignments, buildTeamMember } from './shared/team-data.js';
+import { openSheet } from './shared/sheet.js';
+import { enhanceSelects } from './shared/dropdown-filter.js';
 import { INITIAL_BOOKINGS } from './data.js';
 import { icon } from './shared/icons.js';
 import { esc, initials, toast, searchBox } from './shared/ui.js';
+import { renderTabs } from './shared/list-ui.js';
 
 export function createMobileTeam(host, { onViewBooking } = {}) {
   let searchQuery = '';
@@ -14,28 +17,10 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
   // Mount the basic DOM structure
   host.innerHTML = `
     <div class="mobile-team-page">
-      <div class="team-roster-header">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
-          <h3 style="font-size: 15px; font-weight: 700; color: #0F172A; margin: 0;">Operations Team</h3>
-          <span class="mobile-team-duty-pill" style="font-size: 11.5px; font-weight: 600; color: #2563EB; background: #EFF6FF; padding: 2px 8px; border-radius: 9999px;">${OPERATIONS_TEAM_MEMBERS.length} on duty</span>
-        </div>
-
-        <div class="team-search-row">
-          <div class="compact-search-bar" style="flex: 1;">
-            ${icon('search', { size: 14 })}
-            <input type="text" id="mobile-team-search-input" placeholder="Search team members..." value="${esc(searchQuery)}" aria-label="Search team members" />
-            <button id="mobile-team-search-clear" style="background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 13px; padding: 0 4px; display: none;" title="Clear search">✕</button>
-          </div>
-          <button type="button" class="team-add-member-btn" id="mobile-btn-add-team-member" title="Add Member" aria-label="Add Member">
-            ${icon('plus', { size: 15, stroke: 2.4 })}
-            <span>Add Member</span>
-          </button>
-        </div>
-
-        <div class="compact-tabs-nav tabs-scroller" id="mobile-team-filter-tabs" style="margin-top: 4px; margin-bottom: 2px; padding-bottom: 2px;">
-          <!-- Rendered dynamically -->
-        </div>
+      <div class="mobile-search-row">
+        ${searchBox({ id: 'mobile-team-search-input', placeholder: 'Search team members...', value: searchQuery, variant: 'mobile' })}
       </div>
+      <div id="mobile-team-filter-tabs"></div>
 
       <div class="team-roster-list" id="mobile-team-cards-list">
         <!-- Rendered dynamically -->
@@ -135,15 +120,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
       { key: 'on-leave', label: 'On Leave', count: counts['on-leave'] },
     ];
 
-    filterTabsContainer.innerHTML = tabs
-      .map(
-        (t) => `
-        <button type="button" class="compact-tab-btn ${activeStatusFilter === t.key ? 'active' : ''}" data-team-filter="${t.key}">
-          ${t.label} (${t.count})
-        </button>
-      `
-      )
-      .join('');
+    renderTabs(filterTabsContainer, { tabs, active: activeStatusFilter, variant: 'mobile', attr: 'data-team-filter' });
 
     filterTabsContainer.querySelectorAll('[data-team-filter]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -196,12 +173,12 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
                   ${m.employeeId ? `<span class="team-emp-tag">${esc(m.employeeId)}</span>` : ''}
                 </div>
                 <div class="team-card-status-line">
+                  <span class="team-card-role">${esc(m.role)}</span>
                   <span class="status-pill ${status.cls}">
                     <span class="dot"></span>
                     ${esc(status.label)}
                   </span>
                 </div>
-                <p class="team-card-role">${esc(m.role)}</p>
                 <div class="team-card-meta-line">
                   <span class="badge-trips-pill">${m.metrics?.activeTrips ?? 0} Trips</span>
                   <span class="team-meta-dot">•</span>
@@ -974,12 +951,36 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
     });
   }
 
-  const mobileAddBtn = host.querySelector('#mobile-btn-add-team-member');
-  if (mobileAddBtn) {
-    mobileAddBtn.addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('open-add-team-member-modal'));
+  /** Add Member (the shared floating Add button): a bottom sheet with the essentials; nothing is focused, so no keyboard pops up. */
+  function openAddMember() {
+    const dlg = openSheet({
+      label: 'Add team member',
+      html: `<header class="asg-header"><h3 data-dialog-title tabindex="-1">Add Team Member</h3>
+          <button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
+        <form class="tm-add-form" id="tm-add-form" novalidate>
+          <div class="form-group"><label for="tm-name">Full Name *</label><input type="text" id="tm-name" placeholder="e.g. Sameer Verma" autocomplete="off" /></div>
+          <div class="form-group"><label for="tm-role">Role *</label><input type="text" id="tm-role" placeholder="e.g. Trip Coordinator" autocomplete="off" /></div>
+          <div class="form-group"><label for="tm-phone">Phone</label><input type="tel" id="tm-phone" placeholder="+91 98765 43210" autocomplete="off" /></div>
+          <div class="form-group"><label for="tm-email">Email</label><input type="email" id="tm-email" placeholder="name@ruyi.in" autocomplete="off" /></div>
+          <div class="form-group"><label for="tm-status">Status</label><select id="tm-status"><option value="available">Available</option><option value="in-transit">In Transit</option><option value="on-leave">On Leave</option></select></div>
+        </form>
+        <footer class="fu-footer"><button type="button" class="btn-secondary-desktop" data-sheet-close>Cancel</button><button type="button" class="btn-primary-desktop" id="tm-save">Add Member</button></footer>`,
+    });
+    enhanceSelects(dlg.sheet);
+    dlg.$('#tm-save').addEventListener('click', () => {
+      const val = (id) => dlg.$(id).value.trim();
+      if (!val('#tm-name') || !val('#tm-role')) { toast('Please enter name and role.', 'warning'); return; }
+      const member = buildTeamMember({ name: val('#tm-name'), role: val('#tm-role'), statusType: val('#tm-status'), phone: val('#tm-phone'), email: val('#tm-email'), empId: '', dept: 'Operations & Dispatch Hub', loc: 'Mumbai HQ', exp: '1.0 Year', bio: '' });
+      OPERATIONS_TEAM_MEMBERS.unshift(member);
+      dlg.close();
+      searchQuery = '';
+      activeStatusFilter = 'ALL';
+      renderFilterTabs();
+      renderCards();
+      toast(`Team member "${member.name}" added successfully!`, 'success');
     });
   }
+  window.addEventListener('open-add-team-member-modal', () => { if (document.documentElement.dataset.layout === 'mobile') openAddMember(); });
 
   // Initial render
   renderFilterTabs();

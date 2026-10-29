@@ -78,7 +78,7 @@ export default {
             </div>
             <div class="brand-text-col">
               <h2>Ruyi Admin</h2>
-              <p class="dash-header-subtitle">Travel CRM</p>
+              <p class="dash-header-subtitle">Dashboard</p>
             </div>
           </div>
           <div class="app-header-right">
@@ -523,9 +523,9 @@ export default {
           `,
           navTarget: 'bookings',
           indicators: [
-            { label: 'Upcoming', value: m.bookings.upcoming, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Next', value: m.bookings.upcoming, dotClass: 'dot-orange', filterTarget: 'bookings' },
             { label: 'Ongoing', value: m.bookings.ongoing, dotClass: 'dot-blue', filterTarget: 'bookings' },
-            { label: 'Completed', value: m.bookings.completed, dotClass: 'dot-green', filterTarget: 'bookings' },
+            { label: 'Done', value: m.bookings.completed, dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
         {
@@ -541,15 +541,15 @@ export default {
           `,
           navTarget: 'revenue-trend',
           indicators: [
-            { label: 'Tour revenue', value: m.revenue.tour_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
-            { label: 'Activity revenue', value: m.revenue.activity_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
-            { label: 'Other revenue', value: m.revenue.other_formatted, dotClass: 'dot-green', filterTarget: 'bookings' },
+            { label: 'Tour', value: m.revenue.tour_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Activity', value: m.revenue.activity_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
+            { label: 'Other', value: m.revenue.other_formatted, dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
         {
           id: 'team',
-          title: 'Team Performance',
-          subtitle: 'Total inquiries handled',
+          title: 'Team',
+          subtitle: 'Handled',
           value: m.team.total,
           iconBgClass: 'dash-ico-violet',
           iconSvg: `
@@ -560,15 +560,15 @@ export default {
           `,
           navTarget: 'inquiries',
           indicators: [
-            { label: 'New leads', value: m.team.new, dotClass: 'dot-orange', filterTarget: 'inquiries' },
-            { label: 'In progress', value: m.team.in_progress, dotClass: 'dot-blue', filterTarget: 'inquiries' },
-            { label: 'Converted', value: m.team.converted, dotClass: 'dot-green', filterTarget: 'inquiries' },
+            { label: 'New', value: m.team.new, dotClass: 'dot-orange', filterTarget: 'inquiries' },
+            { label: 'Active', value: m.team.in_progress, dotClass: 'dot-blue', filterTarget: 'inquiries' },
+            { label: 'Won', value: m.team.converted, dotClass: 'dot-green', filterTarget: 'inquiries' },
           ],
         },
         {
           id: 'calendar',
           title: 'Calendar',
-          subtitle: "Today's schedule",
+          subtitle: 'Today',
           value: m.calendar.total,
           iconBgClass: 'dash-ico-amber',
           iconSvg: `
@@ -579,15 +579,15 @@ export default {
           `,
           navTarget: 'calendar',
           indicators: [
-            { label: 'Total events', value: m.calendar.total, dotClass: 'dot-orange', filterTarget: 'calendar' },
+            { label: 'Events', value: m.calendar.total, dotClass: 'dot-orange', filterTarget: 'calendar' },
             { label: 'Tours', value: m.calendar.tours, dotClass: 'dot-blue', filterTarget: 'calendar' },
-            { label: 'Activities', value: m.calendar.activities, dotClass: 'dot-green', filterTarget: 'calendar' },
+            { label: 'Activity', value: m.calendar.activities, dotClass: 'dot-green', filterTarget: 'calendar' },
           ],
         },
         {
           id: 'payments',
           title: 'Payments',
-          subtitle: 'Total revenue received',
+          subtitle: 'Received',
           value: m.payments.received_formatted || '₹79,000',
           iconBgClass: 'dash-ico-teal',
           iconSvg: `
@@ -597,9 +597,9 @@ export default {
           `,
           navTarget: 'bookings',
           indicators: [
-            { label: 'Received', value: m.payments.received_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
-            { label: 'Pending', value: m.payments.pending_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
-            { label: 'Refunds', value: m.payments.refunds_formatted || '₹0.00', dotClass: 'dot-green', filterTarget: 'bookings' },
+            { label: 'Paid', value: m.payments.received_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Due', value: m.payments.pending_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
+            { label: 'Refund', value: m.payments.refunds_formatted || '₹0.00', dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
       ];
@@ -843,6 +843,14 @@ export default {
       toast(`Exporting ${state.period} report...`, 'success');
     }
 
+    /** New numbers fade in over the old layout (opacity only: nothing moves, nothing flashes). */
+    function swapFade(el) {
+      if (!el) return;
+      el.classList.remove('dash-swap');
+      void el.offsetWidth;
+      el.classList.add('dash-swap');
+    }
+
     function updateDynamicContent(d) {
       const m = d.metrics;
 
@@ -868,18 +876,21 @@ export default {
       if (cardsGrid) {
         const cards = getCardsConfig(m);
         cardsGrid.innerHTML = cards.map((c) => renderCard(c)).join('');
+        swapFade(cardsGrid);
       }
 
       // 5. Update Priority Action Center in place
       const attSection = container.querySelector('.dash-attention-section');
       if (attSection) {
         attSection.outerHTML = renderAttentionSection(d, m);
+        swapFade(container.querySelector('.dash-attention-section'));
       }
 
       // 6. Update Upcoming Trips table in place
       const tripsSection = container.querySelector('.dash-trips-section');
       if (tripsSection) {
         tripsSection.outerHTML = renderTripsSection(d, m);
+        swapFade(container.querySelector('.dash-trips-section'));
       }
     }
 

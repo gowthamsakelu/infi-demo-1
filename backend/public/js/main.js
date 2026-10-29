@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Global Toast Dispatcher
   window.addEventListener('show-toast', (e) => {
     const { message, type, action } = e.detail;
+    if ((type === 'success' || !type || type === 'info') && !action) return; // the screen shows the result itself; only warnings and errors speak up
     showToast(message, type, action);
   });
 

@@ -1,4 +1,4 @@
-import { OPERATIONS_TEAM_MEMBERS, getTeamMemberById, getTeamMemberAssignments } from './shared/team-data.js';
+import { OPERATIONS_TEAM_MEMBERS, getTeamMemberById, getTeamMemberAssignments, buildTeamMember } from './shared/team-data.js';
 import { INITIAL_BOOKINGS } from './data.js';
 import { icon } from './shared/icons.js';
 import { esc, initials, toast } from './shared/ui.js';
@@ -128,7 +128,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
       const statusType = modal.querySelector('#team-add-status').value;
       const phone = modal.querySelector('#team-add-phone').value.trim();
       const email = modal.querySelector('#team-add-email').value.trim();
-      let empId = modal.querySelector('#team-add-empid').value.trim();
+      const empId = modal.querySelector('#team-add-empid').value.trim();
       const dept = modal.querySelector('#team-add-dept').value.trim() || 'Operations & Dispatch Hub';
       const loc = modal.querySelector('#team-add-location').value.trim() || 'Mumbai HQ';
       const exp = modal.querySelector('#team-add-experience').value.trim() || '1.0 Year';
@@ -139,84 +139,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
         return;
       }
 
-      if (!empId) {
-        const nextNum = String(OPERATIONS_TEAM_MEMBERS.length + 1).padStart(3, '0');
-        empId = `EMP-2024-${nextNum}`;
-      }
-
-      const statusMap = {
-        'available': { label: 'Available', note: 'On duty • Active in Dispatch Hub' },
-        'in-transit': { label: 'In Transit', note: 'On-ground trip execution active' },
-        'on-leave': { label: 'On Leave', note: 'Approved time off' },
-      };
-
-      const newId = `ST-${String(OPERATIONS_TEAM_MEMBERS.length + 1).padStart(2, '0')}`;
-      const newMember = {
-        id: newId,
-        name,
-        employeeId: empId,
-        role,
-        department: dept,
-        status: statusMap[statusType]?.label || 'Available',
-        statusType,
-        statusNote: statusMap[statusType]?.note || 'Active in Dispatch Hub',
-        avatar: '',
-        email,
-        phone,
-        joiningDate: 'Today',
-        experience: exp,
-        reportingManager: 'Karan Sapalia (Head of Operations)',
-        officeLocation: loc,
-        bio: bio || `${role} coordinating travel operations, logistics and safety compliance.`,
-        metrics: {
-          totalTrips: 0,
-          activeTrips: statusType === 'in-transit' ? 1 : 0,
-          completedTrips: 0,
-          avgRating: '5.0',
-          reviewCount: 0,
-          onTimeDelivery: '100%'
-        },
-        workload: {
-          totalTasks: 0,
-          completedTasks: 0,
-          pendingTasks: 0,
-          overdueTasks: 0,
-          completionRate: 100,
-          workingHours: '09:00 AM – 06:30 PM IST',
-          workingDays: 'Monday – Saturday',
-          shift: 'Day Shift (Active)',
-          upcomingAssignment: 'Onboarding & Hub Induction'
-        },
-        responsibilities: [
-          'Tour dispatch and on-ground logistics execution',
-          'Driver and local guide communications',
-          'Operational safety and emergency response'
-        ],
-        expertise: [
-          dept,
-          loc
-        ],
-        skills: [
-          'Travel Operations',
-          'Incident Escalation',
-          'Route Coordination'
-        ],
-        servicesHandled: [
-          'General Operations'
-        ],
-        assignedBookingIds: [],
-        taskAssignments: {},
-        recentActivity: [
-          {
-            timestamp: 'Just now',
-            title: 'Team Member Added',
-            description: `Onboarded as ${role} in ${dept}.`,
-            reference: empId,
-            badge: 'New Member',
-            type: 'info'
-          }
-        ]
-      };
+      const newMember = buildTeamMember({ name, role, statusType, phone, email, empId, dept, loc, exp, bio });
 
       OPERATIONS_TEAM_MEMBERS.unshift(newMember);
       form.reset();
@@ -243,10 +166,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
       empInput.value = `EMP-2024-${String(OPERATIONS_TEAM_MEMBERS.length + 1).padStart(3, '0')}`;
     }
     modal.classList.add('open');
-    const firstInput = modal.querySelector('#team-add-name');
-    if (firstInput) {
-      setTimeout(() => firstInput.focus(), 60);
-    }
+    (modal.querySelector('.modal-card') || modal).focus?.({ preventScroll: true }); // no field is focused: no keyboard pops up on a phone
   }
 
   function closeAddMemberModal() {
@@ -257,7 +177,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
   }
 
   window.addEventListener('open-add-team-member-modal', () => {
-    openAddMemberModal();
+    if (document.documentElement.dataset.layout === 'desktop') openAddMemberModal(); // the phone has its own sheet (team-mobile.js)
   });
 
   function activate(targetId = null) {

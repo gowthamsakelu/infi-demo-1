@@ -39,6 +39,7 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
   const dlg = openSheet({
     label: edit ? 'Edit' : `Add ${cfg.noun}`,
     cls: 'wiz-sheet',
+    standalone: document.documentElement.dataset.layout === 'desktop', // PC: the centred popup, even when a record's panel is open behind it
     returnFocus,
     beforeClose: () => JSON.stringify(v) === initial || confirmDialog({ title: `Discard this ${cfg.noun}?`, text: 'What you entered has not been saved.', confirm: 'Discard', cancel: 'Keep editing', danger: true }),
     html: `<header class="asg-header wiz-header">

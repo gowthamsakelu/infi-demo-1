@@ -582,3 +582,82 @@ export function getTeamMemberAssignments(member, allBookings = INITIAL_BOOKINGS)
 
   return matched;
 }
+
+/** A new roster member from the Add Member form (PC popup and phone sheet): the same record either way. */
+export function buildTeamMember({ name, role, statusType, phone, email, empId, dept, loc, exp, bio }) {
+  if (!empId) empId = `EMP-2024-${String(OPERATIONS_TEAM_MEMBERS.length + 1).padStart(3, '0')}`;
+  const statusMap = {
+    'available': { label: 'Available', note: 'On duty • Active in Dispatch Hub' },
+    'in-transit': { label: 'In Transit', note: 'On-ground trip execution active' },
+    'on-leave': { label: 'On Leave', note: 'Approved time off' },
+  };
+
+  const newId = `ST-${String(OPERATIONS_TEAM_MEMBERS.length + 1).padStart(2, '0')}`;
+  const newMember = {
+    id: newId,
+    name,
+    employeeId: empId,
+    role,
+    department: dept,
+    status: statusMap[statusType]?.label || 'Available',
+    statusType,
+    statusNote: statusMap[statusType]?.note || 'Active in Dispatch Hub',
+    avatar: '',
+    email,
+    phone,
+    joiningDate: 'Today',
+    experience: exp,
+    reportingManager: 'Karan Sapalia (Head of Operations)',
+    officeLocation: loc,
+    bio: bio || `${role} coordinating travel operations, logistics and safety compliance.`,
+    metrics: {
+      totalTrips: 0,
+      activeTrips: statusType === 'in-transit' ? 1 : 0,
+      completedTrips: 0,
+      avgRating: '5.0',
+      reviewCount: 0,
+      onTimeDelivery: '100%'
+    },
+    workload: {
+      totalTasks: 0,
+      completedTasks: 0,
+      pendingTasks: 0,
+      overdueTasks: 0,
+      completionRate: 100,
+      workingHours: '09:00 AM – 06:30 PM IST',
+      workingDays: 'Monday – Saturday',
+      shift: 'Day Shift (Active)',
+      upcomingAssignment: 'Onboarding & Hub Induction'
+    },
+    responsibilities: [
+      'Tour dispatch and on-ground logistics execution',
+      'Driver and local guide communications',
+      'Operational safety and emergency response'
+    ],
+    expertise: [
+      dept,
+      loc
+    ],
+    skills: [
+      'Travel Operations',
+      'Incident Escalation',
+      'Route Coordination'
+    ],
+    servicesHandled: [
+      'General Operations'
+    ],
+    assignedBookingIds: [],
+    taskAssignments: {},
+    recentActivity: [
+      {
+        timestamp: 'Just now',
+        title: 'Team Member Added',
+        description: `Onboarded as ${role} in ${dept}.`,
+        reference: empId,
+        badge: 'New Member',
+        type: 'info'
+      }
+    ]
+  };
+  return newMember;
+}

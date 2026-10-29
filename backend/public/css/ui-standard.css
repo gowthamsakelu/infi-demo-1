@@ -55,12 +55,11 @@ html[data-layout="mobile"] .asg-overlay.open .asg-sheet.itin-sheet { transform: 
 html[data-layout="mobile"] :is(.asg-header, .modal-header, .item-dialog-head, .confirm-head, .wiz-title, .notifications-header) :is(h3, h4) { font-size: var(--ui-sheet-title); font-weight: 800; }
 html[data-layout="mobile"] .sheet-close-btn { width: var(--ui-close-size); height: var(--ui-close-size); border-radius: 50%; }
 
-/* The bell's panel is a bottom sheet too, with an X */
+/* The bell's panel: the same dropdown as on PC, under the bell at the top right (no X: tap outside or press Esc) */
 .notif-close { display: none; }
-html[data-layout="mobile"] .mobile-notifications { left: 0; right: 0; top: auto; bottom: 0; max-height: 80dvh; border: 0; border-radius: var(--ui-sheet-radius) var(--ui-sheet-radius) 0 0; box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.22); padding-bottom: var(--safe-bottom); animation: uiSheetIn var(--motion-slow) var(--ease-out); }
-html[data-layout="mobile"] .mobile-notifications::before { content: ""; flex: none; align-self: center; width: 40px; height: 4px; border-radius: 4px; background: #CBD5E1; margin: 8px 0 0; }
-html[data-layout="mobile"] .mobile-notifications .notifications-header { align-items: center; gap: 10px; }
-html[data-layout="mobile"] .mobile-notifications .notif-close { display: flex; flex: none; position: static; margin-left: 4px; }
+html[data-layout="mobile"] .mobile-notifications { left: auto; right: 12px; top: calc(var(--safe-top, 0px) + 64px); width: min(360px, calc(100vw - 24px)); max-height: 70dvh; animation: uiDropIn var(--motion-slow) var(--ease-out); transform-origin: top right; }
+html[data-layout="mobile"] .notif-backdrop { background: transparent; }
+@keyframes uiDropIn { from { opacity: 0; transform: translateY(-6px) scale(0.98); } to { opacity: 1; transform: none; } }
 @keyframes uiSheetIn { from { transform: translateY(100%); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { html[data-layout="mobile"] .mobile-notifications { animation: none; } html[data-layout="mobile"] .modal-overlay .modal-card, html[data-layout="mobile"] .modal-overlay .item-dialog, html[data-layout="mobile"] .modal-overlay .confirm-card { transition: none; } }
 
@@ -231,6 +230,9 @@ html[data-layout] .is-pushed .sheet-close-btn:not(.dialog-back), html[data-layou
 .ui-add-btn[hidden] { display: none !important; }
 html[data-layout="mobile"] .ui-add-fab { position: fixed; right: max(16px, var(--safe-right, 0px)); bottom: calc(68px + 12px + var(--safe-bottom, 0px)); z-index: 19; height: 44px; padding: 0 16px 0 14px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22); }
 html.is-keyboard-open .ui-add-fab { display: none; }
+/* never on top of a sheet, popup or wizard; the lists and the phone Team page use this one button instead of their own */
+html[data-layout="mobile"] body:has(.asg-overlay, .modal-overlay.open, .bottom-sheet.open, .sheet-backdrop.open, .notifications-panel:not([hidden])) .ui-add-fab { display: none; }
+html[data-layout="mobile"] .mobile-team-page .team-add-member-btn { display: none; }
 html[data-layout="desktop"] .ui-add-fab { display: none !important; }
 html[data-layout="mobile"] .desktop-header-actions .ui-add-btn { display: none !important; }
 /* the lists end above the floating Add button */
@@ -281,3 +283,80 @@ html[data-layout="mobile"] #mobile-page-host .sp-list, html[data-layout="mobile"
 /* Catalog rows on the phone: with the 56px picture the status pill wraps under the name instead of squeezing it to one letter */
 html[data-layout="mobile"] .sp-row .row-name-line { flex-wrap: wrap; row-gap: 4px; }
 html[data-layout="mobile"] .sp-row .row-name-line .card-title { max-width: 100%; }
+
+/* Sidebar logo block: exactly as tall as the top bar beside it (never squeezed by the scrolling sidebar), centred, with a divider that lines up */
+html[data-layout="desktop"] .sidebar-brand { flex: none; box-sizing: border-box; height: 54px; padding: 0 20px; gap: 10px; align-items: center; border-bottom: 1px solid #E2E8F0; }
+html[data-layout="desktop"] .sidebar-brand .brand-icon-box { flex: none; width: 36px; height: 36px; border-radius: 10px; }
+html[data-layout="desktop"] .sidebar-brand .brand-icon-box svg { width: 20px; height: 20px; }
+html[data-layout="desktop"] .sidebar-brand .brand-text-col { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+html[data-layout="desktop"] .sidebar-brand .brand-text-col h2 { margin: 0; line-height: 1.2; }
+html[data-layout="desktop"] .sidebar-brand .brand-text-col p { margin: 1px 0 0; line-height: 1.2; }
+@media (max-width: 1099px) { /* the narrow rail shows the icon only */
+  html[data-layout="desktop"] .desktop-sidebar:not(.rail-open) .sidebar-brand { padding: 0; justify-content: center; }
+  html[data-layout="desktop"] .desktop-sidebar:not(.rail-open) .sidebar-brand .brand-text-col { display: none; }
+}
+
+/* Phone "Add Team Member" sheet (team-mobile.js) */
+.tm-add-form + .fu-footer { display: flex; gap: 12px; justify-content: flex-end; }
+.tm-add-form { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 20px 16px; }
+.tm-add-form .form-group { display: flex; flex-direction: column; gap: 6px; }
+.tm-add-form label { font-size: 13px; font-weight: 600; color: #334155; }
+
+/* Phone: an itinerary event's Assign / View Details / Edit open as a centred mid-screen popup (the Add Inquiry look): rounded card, X top right, scrolling body, pinned buttons */
+html[data-layout="mobile"] :is(#mobile-activity-details-modal, #mobile-edit-activity-modal, .asg-overlay[data-centered]) { align-items: center; justify-content: center; padding: 16px; }
+html[data-layout="mobile"] :is(#mobile-activity-details-modal, #mobile-edit-activity-modal) .modal-card,
+html[data-layout="mobile"] .asg-overlay[data-centered] .asg-sheet {
+  width: min(calc(100vw - 32px), 440px) !important; max-width: none !important; margin: 0 !important; max-height: 80dvh !important; display: flex; flex-direction: column; overflow: hidden;
+  border-radius: 20px; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3); opacity: 0; transform: translateY(16px) scale(0.98);
+  transition: transform var(--motion-slow) var(--ease-out), opacity var(--motion-base) var(--ease-out);
+}
+html[data-layout="mobile"] :is(#mobile-activity-details-modal, #mobile-edit-activity-modal).open .modal-card,
+html[data-layout="mobile"] .asg-overlay[data-centered].open .asg-sheet { opacity: 1; transform: none; }
+html[data-layout="mobile"] :is(#mobile-activity-details-modal, #mobile-edit-activity-modal) .modal-card::before,
+html[data-layout="mobile"] .asg-overlay[data-centered] .filter-handle { display: none; }
+html[data-layout="mobile"] :is(#mobile-activity-details-modal, #mobile-edit-activity-modal) :is(.modal-body, .modal-body-scroll) { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+html[data-layout="mobile"] :is(#mobile-activity-details-modal, #mobile-edit-activity-modal) .modal-footer { flex: none; }
+
+/* Messages are only for real problems now: a small light card, not the dark pop-up */
+.toast { background: #FFFFFF; color: #0F172A; border: 1px solid #E2E8F0; border-left: 4px solid #F59E0B; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12); padding: 10px 14px; font-size: 13px; }
+.toast.toast-error { border-left-color: #EF4444; }
+
+/* Operation Team on the phone: the Bookings list structure (search row, pill chips, cards) with the Users card lines */
+html[data-layout="mobile"] .mobile-team-page { display: flex; flex-direction: column; gap: 12px; }
+html[data-layout="mobile"] .mobile-team-page .team-card-status-line { display: flex; align-items: center; flex-wrap: nowrap; gap: 6px; min-width: 0; }
+html[data-layout="mobile"] .mobile-team-page .team-card-status-line .team-card-role { margin: 0; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html[data-layout="mobile"] .mobile-team-page .team-card-status-line .status-pill { flex: none; }
+html[data-layout="mobile"] .mobile-team-page .team-card-title-line { display: flex; align-items: center; flex-wrap: nowrap !important; gap: 6px; min-width: 0; }
+html[data-layout="mobile"] .mobile-team-page .team-card-name { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html[data-layout="mobile"] .mobile-team-page .team-emp-tag { flex: none; }
+html[data-layout="mobile"] .mobile-team-page { gap: 8px; }
+
+/* ==========================================================================
+   Motion, once: three durations and one curve (fast = press feedback, base = hover / state, slow = sheets, modals, menus).
+   Only transform and opacity move; layouts and colours are not touched here.
+   ========================================================================== */
+:root { --motion-fast: 120ms; --motion-base: 200ms; --motion-slow: 280ms; --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+/* no 300ms tap delay, no highlight flash */
+:is(button, a, [role="button"], [role="tab"], [role="option"], [data-route], .tab-pill, .list-row-card, .booking-card, .dropdown-item-btn, .sidebar-nav-item, .dash-kpi-card, .team-roster-card, .circle-action-btn, .sp-icon-btn, summary, label) { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+/* press feedback (120ms) and smooth state changes (200ms) */
+:is(button, [role="button"], .tab-pill, .compact-tab-btn, .desktop-tab-btn, .nav-item, .sidebar-nav-item, .dropdown-item-btn, .circle-action-btn, .sp-icon-btn, .icon-bell-btn, .dash-filter-btn, .item-menu-btn) {
+  transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out);
+}
+:is(button:not(:disabled), [role="button"], .tab-pill, .compact-tab-btn, .desktop-tab-btn, .nav-item, .sidebar-nav-item, .circle-action-btn, .sp-icon-btn, .icon-bell-btn, .dash-filter-btn, .item-menu-btn):active { transform: scale(0.97); }
+:is(.dropdown-item-btn):active { background-color: #EFF6FF; }
+:is(.list-row-card, .booking-card, .team-roster-card, .dash-kpi-card, .sp-row) { transition: transform var(--motion-fast) var(--ease-out), background-color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out); }
+:is(.list-row-card, .booking-card, .team-roster-card, .dash-kpi-card, .sp-row):active { transform: scale(0.99); }
+
+/* a page switch: the new page fades in (opacity only, so fixed sheets inside it are never moved) */
+@keyframes uiPageIn { from { opacity: 0; } to { opacity: 1; } }
+#mobile-page-host[data-page] > *, #desktop-page-host[data-page] > * { animation: uiPageIn var(--motion-base) var(--ease-out); }
+
+/* the notifications dropdown, sheets and modals share the slow token */
+.notifications-panel:not(.mobile-notifications) { animation: uiDropIn var(--motion-slow) var(--ease-out); transform-origin: top right; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  :is(button, [role="button"], .tab-pill, .list-row-card, .booking-card, .team-roster-card, .dash-kpi-card):active { transform: none; }
+}

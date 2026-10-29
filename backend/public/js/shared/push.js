@@ -8,6 +8,9 @@ import { closeScreens } from './sheet.js';
 /** Everything that can be the sheet underneath: the phone's detail sheet, a sheet or dialog, the in-place builder, a pushed screen. */
 const HOSTS = '.bottom-sheet.open, .sp-detail-screen.is-open, .asg-overlay.open > .asg-sheet, .bld-inplace, .push-screen.is-in, .modal-overlay.open > .modal-card, .desktop-details-drawer.open:not(.is-empty)';
 
+/** On the phone these open as a centred mid-screen popup, not as a screen pushed into the sheet they came from (the itinerary event's Assign / View Details / Edit). */
+const CENTERED = '.asg-overlay[data-centered], #mobile-activity-details-modal, #mobile-edit-activity-modal';
+
 /** The sheet or dialog that `ov` was opened from (null when it was opened from a page: then it is an ordinary sheet). */
 export function hostOf(ov) {
   const hosts = [...document.querySelectorAll(HOSTS)].filter((h) => !ov.contains(h) && h.getClientRects().length);
@@ -21,6 +24,7 @@ const backButton = () => `<button type="button" class="dialog-back" data-push-ba
  * Does nothing when there is no such sheet. Returns true when it did.
  */
 export function placeAsPushed(ov) {
+  if (ov.matches(CENTERED)) return false;
   const host = hostOf(ov);
   const card = ov.firstElementChild;
   if (!host || !card) return false;
