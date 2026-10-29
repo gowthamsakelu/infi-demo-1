@@ -5,6 +5,8 @@ import { INITIAL_BOOKINGS } from './data.js';
 import { icon } from './shared/icons.js';
 import { esc, initials, toast, searchBox } from './shared/ui.js';
 import { renderTabs } from './shared/list-ui.js';
+import { personActionsHtml, bindPersonActions } from './shared/person-actions.js';
+import { bindSwipe, slideIn } from './shared/swipe.js';
 
 export function createMobileTeam(host, { onViewBooking } = {}) {
   let searchQuery = '';
@@ -189,17 +191,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
               </div>
             </div>
 
-            <div class="team-card-actions">
-              <button type="button" class="circle-action-btn" data-action-call="${esc(m.phone)}" title="Call ${esc(m.name)}" aria-label="Call ${esc(m.name)}">
-                ${icon('phone', { size: 14, stroke: 2.2 })}
-              </button>
-              <button type="button" class="circle-action-btn" data-action-mail="${esc(m.email)}" title="Email ${esc(m.name)}" aria-label="Email ${esc(m.name)}">
-                ${icon('mail', { size: 14, stroke: 2 })}
-              </button>
-              <span class="circle-action-btn is-chevron" aria-hidden="true">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </span>
-            </div>
+            <div class="team-card-actions">${personActionsHtml({ id: m.id, name: m.name, phone: m.phone, email: m.email })}</div>
           </div>
         `;
       })
@@ -222,21 +214,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
       });
     });
 
-    cardsListContainer.querySelectorAll('[data-action-call]').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const phone = btn.dataset.actionCall;
-        if (phone) window.location.href = `tel:${phone}`;
-      });
-    });
-
-    cardsListContainer.querySelectorAll('[data-action-mail]').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const email = btn.dataset.actionMail;
-        if (email) window.location.href = `mailto:${email}`;
-      });
-    });
+    bindPersonActions(cardsListContainer);
   }
 
   function openDetailSheet(memberId) {
@@ -981,6 +959,19 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
     });
   }
   window.addEventListener('open-add-team-member-modal', () => { if (document.documentElement.dataset.layout === 'mobile') openAddMember(); });
+
+  // Swipe the member sheet's content: next / previous tab (Overview, Assignments, Skills & Info); stops at the ends.
+  const DETAIL_TABS = ['overview', 'assignments', 'skills'];
+  function stepDetailTab(step) {
+    const to = DETAIL_TABS[DETAIL_TABS.indexOf(activeDetailTab) + step];
+    if (!to) return;
+    activeDetailTab = to;
+    renderSheetTabs();
+    renderSheetBody();
+    $('#mobile-team-sheet-tabs .sheet-tab-btn.active')?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    slideIn($('#mobile-team-sheet-body'), step);
+  }
+  bindSwipe($('#mobile-team-sheet-body'), { enabled: () => isDetailSheetOpen && !document.querySelector('.asg-overlay, .modal-overlay.open, .row-floating-menu'), onNext: () => stepDetailTab(1), onPrev: () => stepDetailTab(-1) });
 
   // Initial render
   renderFilterTabs();

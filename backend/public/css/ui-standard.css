@@ -360,3 +360,20 @@ html[data-layout="mobile"] .mobile-team-page { gap: 8px; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   :is(button, [role="button"], .tab-pill, .list-row-card, .booking-card, .team-roster-card, .dash-kpi-card):active { transform: none; }
 }
+
+/* Chip rows on the phone: one rule for all of them. Swipe sideways scrolls the row only (never the page); a tap still selects; the last chip has its edge. */
+html[data-layout="mobile"] .scroll-row { touch-action: pan-x pan-y; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+html[data-layout="mobile"] .scroll-row::-webkit-scrollbar { display: none; }
+html[data-layout="mobile"] .scroll-row > * { flex: none; }
+html[data-layout="mobile"] .scroll-row::after { content: ""; flex: none; width: 1px; } /* keeps the right edge padding after the last chip in every browser */
+html[data-layout="mobile"] .bg-tabs .tab-pill { height: 34px !important; padding: 0 14px !important; }
+
+/* Call / WhatsApp / ⋮ beside a person (Operation Team, Users): one line at the right of the card; a missing number greys the button out */
+.team-card-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.team-roster-card .card-circle-action-btn { width: var(--row-btn); height: var(--row-btn); } /* same size as the Bookings row buttons */
+.team-card-actions .card-circle-action-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+html[data-layout="mobile"] .team-card-actions { gap: 6px; }
+
+/* Desktop: the detail panel of the catalog pages has no big cover photo (the header keeps the small thumbnail); the phone sheet keeps its cover */
+html[data-layout="desktop"] .sp-desk .sp-detail .cat-hero { display: none; }
+.team-search-row .compact-search-bar { flex: 1 1 auto; width: 100%; min-width: 0; }

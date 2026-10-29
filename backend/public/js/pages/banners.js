@@ -27,12 +27,12 @@ function meta(b) {
 const stats = (b) => `<div class="bn-stats"><span><b>${num(b.clicks)}</b> clicks</span><span><b>${num(b.leads)}</b> leads</span><span><b>${num(b.converted)}</b> converted</span></div>`;
 const toggleBtn = (b) => `<button type="button" role="switch" aria-checked="${b.active}" aria-label="${esc(b.name)} on the website" class="bld-switch sp-switch ${b.active ? 'is-on' : ''}" data-bn-toggle="${esc(b.id)}"><span class="bld-switch-knob"></span></button>`;
 
-function hero(b, { thumb = false } = {}) {
+function hero(b) {
   const img = b.image ? `<img src="${esc(b.image)}" alt="${esc(`${b.headline} banner`)}" loading="lazy" decoding="async" />` : '';
-  return `<div class="bn-hero bn-tone-${esc(b.tone)} ${thumb ? 'bn-thumb' : ''}">${img}<span class="bn-shade"></span>
-    ${thumb ? '' : `<span class="bn-pill">${pill(b.status, LABEL[b.status])}</span>
+  return `<div class="bn-hero bn-tone-${esc(b.tone)}">${img}<span class="bn-shade"></span>
+    <span class="bn-pill">${pill(b.status, LABEL[b.status])}</span>
     <button type="button" class="bn-more" data-bn-more="${esc(b.id)}" aria-haspopup="menu" aria-label="More options for ${esc(b.name)}">${icon('more', { size: 18 })}</button>
-    <div class="bn-copy"><h3>${esc(b.headline)}</h3>${b.cta ? `<p>${esc(b.cta)}</p>` : ''}</div>`}</div>`;
+    <div class="bn-copy"><h3>${esc(b.headline)}</h3>${b.cta ? `<p>${esc(b.cta)}</p>` : ''}</div></div>`;
 }
 
 const card = (b, fresh = false) => `<article class="bn-card" data-bn-id="${esc(b.id)}">${hero(b)}${fresh ? '<span class="just-added-tag">JUST ADDED</span>' : ''}

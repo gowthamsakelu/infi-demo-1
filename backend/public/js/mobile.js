@@ -3,6 +3,7 @@ import { icon } from './shared/icons.js';
 import { createMobileCalendar } from './calendar-mobile.js';
 import { createMobileTeam } from './team-mobile.js';
 import { OPERATIONS_TEAM_MEMBERS } from './shared/team-data.js';
+import { bindSwipe, slideIn } from './shared/swipe.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
@@ -1634,98 +1635,32 @@ export function createMobileView(container, options = {}) {
       }
     }
 
-    if (sheetEl) {
-      let sheetTouchStartX = 0;
-      let sheetTouchStartY = 0;
-      let sheetTouchEndX = 0;
-      let sheetTouchEndY = 0;
-      let isSheetTouchSwiping = false;
-
-      sheetEl.addEventListener('touchstart', (e) => {
-        if (!isModalOpen || isAssignSheetOpen) return;
-        sheetTouchStartX = e.touches[0].clientX;
-        sheetTouchStartY = e.touches[0].clientY;
-        sheetTouchEndX = sheetTouchStartX;
-        sheetTouchEndY = sheetTouchStartY;
-        isSheetTouchSwiping = true;
-      }, { passive: true });
-
-      sheetEl.addEventListener('touchmove', (e) => {
-        if (!isSheetTouchSwiping || !isModalOpen || isAssignSheetOpen) return;
-        sheetTouchEndX = e.touches[0].clientX;
-        sheetTouchEndY = e.touches[0].clientY;
-      }, { passive: true });
-
-      sheetEl.addEventListener('touchend', (e) => {
-        if (!isSheetTouchSwiping || !isModalOpen || isAssignSheetOpen) return;
-        isSheetTouchSwiping = false;
-        const diffX = sheetTouchEndX - sheetTouchStartX;
-        const diffY = sheetTouchEndY - sheetTouchStartY;
-        const minDistance = 35;
-
-        // Ensure horizontal swipe was intended rather than vertical scrolling
-        if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY) * 1.1) {
-          if (diffX < 0) {
-            switchModalTabByDirection('left');
-          } else {
-            switchModalTabByDirection('right');
-          }
-        }
+    // Swipe the tab content: next / previous tab. Swipe the header (avatar and name): next / previous record of the list behind the sheet.
+    function swipeRecord(step) {
+      if (!isModalOpen || (page !== 'bookings' && page !== 'inquiries')) return;
+      const ids = [...container.querySelectorAll('#mobile-cards-list .list-row-card[data-booking-id]')].map((el) => el.dataset.bookingId);
+      const at = ids.indexOf(activeModalBooking?.id);
+      const next = at === -1 ? null : bookings.find((b) => b.id === ids[at + step]);
+      if (!next) return; // first / last record, or the list order is not known: do nothing
+      activeModalBooking = next;
+      activeModalTab = 'customer-details';
+      openDropdownItemId = null;
+      showAllGuests = false;
+      renderSheetHeader();
+      renderSheetBody();
+      container.querySelectorAll('.sheet-tab-btn').forEach((btn) => {
+        const on = btn.dataset.sheetTab === activeModalTab;
+        btn.classList.toggle('active', on);
+        if (on) btn.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
       });
-
-      // Mouse drag gesture on bottom sheet (for testing on desktop / mobile simulator)
-      let isSheetMouseDragging = false;
-      let sheetMouseStartX = 0;
-      let sheetMouseStartY = 0;
-      let sheetMouseEndX = 0;
-      let sheetMouseEndY = 0;
-
-      sheetEl.addEventListener('mousedown', (e) => {
-        if (!isModalOpen || isAssignSheetOpen || e.button !== 0) return;
-        if (e.target.closest('button, input, select, textarea, .custom-checkbox, .mini-icon-btn, .btn-confirm-booking')) return;
-        isSheetMouseDragging = true;
-        sheetMouseStartX = e.clientX;
-        sheetMouseStartY = e.clientY;
-        sheetMouseEndX = sheetMouseStartX;
-        sheetMouseEndY = sheetMouseStartY;
-      });
-
-      sheetEl.addEventListener('mousemove', (e) => {
-        if (!isSheetMouseDragging) return;
-        sheetMouseEndX = e.clientX;
-        sheetMouseEndY = e.clientY;
-      });
-
-      const endSheetMouseDrag = () => {
-        if (!isSheetMouseDragging) return;
-        isSheetMouseDragging = false;
-        const diffX = sheetMouseEndX - sheetMouseStartX;
-        const diffY = sheetMouseEndY - sheetMouseStartY;
-        const minDistance = 35;
-
-        if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY) * 1.1) {
-          if (diffX < 0) {
-            switchModalTabByDirection('left');
-          } else {
-            switchModalTabByDirection('right');
-          }
-        }
-      };
-
-      sheetEl.addEventListener('mouseup', endSheetMouseDrag);
-
-      // Trackpad / Horizontal wheel scroll on bottom sheet
-      sheetEl.addEventListener('wheel', (e) => {
-        if (!isModalOpen || isAssignSheetOpen) return;
-        if (Math.abs(e.deltaX) > 28 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.5) {
-          if (e.deltaX < 0) {
-            switchModalTabByDirection('left');
-          } else {
-            switchModalTabByDirection('right');
-          }
-        }
-      }, { passive: true });
+      const bodyEl2 = container.querySelector('#sheet-body-content');
+      if (bodyEl2) bodyEl2.scrollTop = 0;
+      slideIn(container.querySelector('#sheet-header-card-content'), step);
+      slideIn(bodyEl2, step);
     }
+    const swipeOk = () => isModalOpen && !isAssignSheetOpen && !document.querySelector('.asg-overlay, .modal-overlay.open, .row-floating-menu');
+    bindSwipe(container.querySelector('#sheet-body-content'), { enabled: swipeOk, onNext: () => switchModalTabByDirection('right'), onPrev: () => switchModalTabByDirection('left') });
+    bindSwipe(container.querySelector('#sheet-header-card-content'), { enabled: swipeOk, onNext: () => swipeRecord(1), onPrev: () => swipeRecord(-1) });
 
     // Bottom sheet: Esc and swipe-down on the handle/header close it
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isModalOpen && !document.querySelector('.asg-overlay, .fu-overlay, .row-floating-menu, .sheet-overlay')) closeModal(); });
@@ -1981,7 +1916,7 @@ export function createMobileView(container, options = {}) {
       }
 
       // Sheet Navigation Tabs
-      const sheetTabBtn = e.target.closest('.sheet-tab-btn');
+      const sheetTabBtn = e.target.closest('[data-sheet-tab]'); // the booking sheet's own tabs (the tab rows of hosted pages are not this handler's business)
       if (sheetTabBtn) {
         const targetTab = sheetTabBtn.dataset.sheetTab;
         const currentIdx = modalTabs.indexOf(activeModalTab);

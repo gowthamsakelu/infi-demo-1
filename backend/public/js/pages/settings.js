@@ -117,7 +117,7 @@ export default {
           <section class="st-card"><div class="st-card-body">
             ${x.sources.map((s, i) => `
               <div class="st-source">
-                <input type="text" value="${esc(s.name)}" maxlength="60" autocomplete="off" aria-label="Lead source ${i + 1}" data-st-field="sources.${i}.name" ${errors.get(id)?.[`sources.${i}.name`] ? 'aria-invalid="true"' : ''}>
+                <div class="form-group"><input type="text" value="${esc(s.name)}" maxlength="60" autocomplete="off" aria-label="Lead source ${i + 1}" data-st-field="sources.${i}.name" ${errors.get(id)?.[`sources.${i}.name`] ? 'aria-invalid="true"' : ''}></div>
                 <button type="button" role="switch" aria-checked="${!!s.active}" aria-label="${esc(`${s.name} is on`)}" class="bld-switch sp-switch ${s.active ? 'is-on' : ''}" data-sp-toggle="sources.${i}.active"><span class="bld-switch-knob"></span></button>
                 ${fieldError(id, `sources.${i}.name`)}
               </div>`).join('')}

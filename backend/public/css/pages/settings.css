@@ -165,7 +165,19 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 4px 12px;
-  padding: 10px 0;
+  min-height: 52px;
+  padding: 6px 0;
+}
+
+/* the name is the app's standard input (inside .form-group like every other settings field), at the body text size */
+.st-source .form-group {
+  margin: 0;
+  min-width: 0;
+}
+
+.st-source .form-group input {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .st-source+.st-source {

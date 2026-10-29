@@ -60,16 +60,6 @@ export function createDesktopView(container) {
 
         <nav class="sidebar-nav" aria-label="Main">
           ${sidebarNavHtml(currentPage())}
-          <span class="nav-section-title nav-section-team-title" id="nav-section-operations" style="cursor: pointer;" title="Operations Team Roster">Staff Members</span>
-          ${STAFF_MEMBERS.map(s => `
-            <div class="sidebar-nav-item staff-member-item" data-staff-id="${s.id}" style="cursor: pointer;" title="View ${s.name}'s profile and trips">
-              <div class="nav-left">
-                <img src="${s.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />
-                <span style="font-size: 13px;">${s.name}</span>
-              </div>
-              <span class="sidebar-badge" style="font-size: 10px;">${s.activeTrips} trips</span>
-            </div>
-          `).join('')}
         </nav>
 
         <div class="sidebar-profile-box">
@@ -1361,7 +1351,8 @@ export function createDesktopView(container) {
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
       container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
       container.querySelector('#nav-team')?.classList.toggle('active', page === 'team');
-      if (page !== 'inquiries' && page !== 'bookings') setShellAddAction(null); // Team keeps its own Add Member button in the roster header; hosted pages set their own
+      if (page === 'team') setShellAddAction('Add Member', () => window.dispatchEvent(new CustomEvent('open-add-team-member-modal'))); // the one shared Add; hosted pages set their own
+      else if (page !== 'inquiries' && page !== 'bookings') setShellAddAction(null);
       else setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') })); // Bookings has no add flow of its own: it opens the same one
       container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
       container.querySelector('#desktop-workspace-split')?.classList.toggle('team-mode', page === 'team');
@@ -1404,13 +1395,6 @@ export function createDesktopView(container) {
 
     bindSidebar(container.querySelector('.desktop-sidebar'));
 
-    const opsHeader = container.querySelector('#nav-section-operations');
-    if (opsHeader) {
-      opsHeader.addEventListener('click', (e) => {
-        e.preventDefault();
-        goToPage('team');
-      });
-    }
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
 
     // Add Inquiry: the one wizard. After a save the list shows everything again, the new row is selected and the lists are at the top.
@@ -2187,14 +2171,6 @@ export function createDesktopView(container) {
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: `Opening booking options (Print Voucher, Duplicate, Export Invoice)...`, type: 'info' }
         }));
-        return;
-      }
-
-      // Staff member in left sidebar -> open team page with member selected!
-      const staffNav = e.target.closest('.staff-member-item');
-      if (staffNav) {
-        const staffId = staffNav.dataset.staffId;
-        navigate('team', { member: staffId });
         return;
       }
 

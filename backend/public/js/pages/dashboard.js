@@ -140,7 +140,7 @@ export default {
 
     function renderWelcomeRight() {
       return `
-        <div class="dash-welcome-right">
+        <div class="dash-welcome-right scroll-row">
           ${renderTimeFilter()}
           <button type="button" class="btn-secondary-desktop dash-action-btn" data-dash-act="export" title="Export CSV report for ${esc(state.period)}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">

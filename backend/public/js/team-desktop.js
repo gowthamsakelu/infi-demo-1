@@ -3,6 +3,7 @@ import { INITIAL_BOOKINGS } from './data.js';
 import { icon } from './shared/icons.js';
 import { esc, initials, toast } from './shared/ui.js';
 import { getParams, setParams, navigate } from './shared/page-state.js';
+import { personActionsHtml, bindPersonActions } from './shared/person-actions.js';
 
 export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, onViewBooking, onMemberChange }) {
   let selectedMemberId = null;
@@ -287,10 +288,6 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
             <input type="text" id="team-roster-search-input" placeholder="Search team members..." value="${esc(searchQuery)}" aria-label="Search team members" />
             ${searchQuery ? `<button id="team-roster-search-clear" style="background: transparent; border: none; cursor: pointer; color: #94A3B8; font-size: 13px; padding: 0 4px;" title="Clear search">✕</button>` : ''}
           </div>
-          <button type="button" class="team-add-member-btn" id="btn-add-team-member" title="Add Member" aria-label="Add Member">
-            ${icon('plus', { size: 15, stroke: 2.4 })}
-            <span>Add Member</span>
-          </button>
         </div>
 
         <div class="compact-tabs-nav tabs-scroller" id="team-status-tabs-row" style="margin: 0; padding-bottom: 2px;">
@@ -338,17 +335,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
                 </div>
               </div>
 
-              <div class="team-card-actions">
-                <button type="button" class="circle-action-btn" data-action-call="${esc(m.phone)}" title="Call ${esc(m.name)}" aria-label="Call ${esc(m.name)}">
-                  ${icon('phone', { size: 14, stroke: 2.2 })}
-                </button>
-                <button type="button" class="circle-action-btn" data-action-mail="${esc(m.email)}" title="Email ${esc(m.name)}" aria-label="Email ${esc(m.name)}">
-                  ${icon('mail', { size: 14, stroke: 2 })}
-                </button>
-                <span class="circle-action-btn is-chevron" aria-hidden="true">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                </span>
-              </div>
+              <div class="team-card-actions">${personActionsHtml({ id: m.id, name: m.name, phone: m.phone, email: m.email })}</div>
             </div>
           `;
         }).join('')}
@@ -366,15 +353,6 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
   }
 
   function bindLeftPanelEvents() {
-    const addMemberBtn = colHost.querySelector('#btn-add-team-member');
-    if (addMemberBtn) {
-      addMemberBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        openAddMemberModal();
-      });
-    }
-
     const searchInput = colHost.querySelector('#team-roster-search-input');
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
@@ -412,26 +390,9 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
       });
     });
 
+    bindPersonActions(colHost);
     colHost.querySelectorAll('.team-roster-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        const callBtn = e.target.closest('[data-action-call]');
-        if (callBtn) {
-          e.stopPropagation();
-          const phone = callBtn.dataset.actionCall;
-          window.location.href = `tel:${phone.replace(/[^0-9+]/g, '')}`;
-          toast(`Calling ${phone}...`, 'info');
-          return;
-        }
-
-        const mailBtn = e.target.closest('[data-action-mail]');
-        if (mailBtn) {
-          e.stopPropagation();
-          const email = mailBtn.dataset.actionMail;
-          window.location.href = `mailto:${email}`;
-          toast(`Composing email to ${email}...`, 'info');
-          return;
-        }
-
         const id = card.dataset.teamId;
         if (id) selectMember(id);
       });

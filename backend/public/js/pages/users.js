@@ -10,6 +10,7 @@ import { icon } from '../shared/icons.js';
 import { confirmDialog } from '../shared/sheet.js';
 import { detailGrid, rowGroup, linkRow } from '../shared/page-ui.js';
 import { OPERATIONS_TEAM_MEMBERS } from '../shared/team-data.js';
+import { personActionsHtml, bindPersonActions } from '../shared/person-actions.js';
 
 function formatCardLocation(loc) {
   if (!loc) return 'Mumbai HQ';
@@ -307,8 +308,8 @@ export default {
       const locFull = tm?.officeLocation || 'Mumbai HQ — Operations Wing';
       const locShort = formatCardLocation(locFull);
       const exp = tm?.experience || '3.5 Years';
-      const phone = tm?.phone || u.phone || '+91 98765 00111';
-      const email = u.email || tm?.email || 'user@ruyitra.com';
+      const phone = tm?.phone || u.phone || '';
+      const email = u.email || tm?.email || '';
 
       const avHtml = u.avatar && !isDc
         ? `<img src="${esc(u.avatar)}" alt="${esc(u.name)}" class="team-avatar-img" />`
@@ -343,17 +344,7 @@ export default {
           </div>
         </div>
 
-        <div class="team-card-actions">
-          <button type="button" class="circle-action-btn" data-action-call="${esc(phone)}" title="Call ${esc(u.name)}" aria-label="Call ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='tel:${esc(phone)}';">
-            ${icon('phone', { size: 13, stroke: 2.2 })}
-          </button>
-          <button type="button" class="circle-action-btn" data-action-mail="${esc(email)}" title="Email ${esc(u.name)}" aria-label="Email ${esc(u.name)}" onclick="event.stopPropagation(); window.location.href='mailto:${esc(email)}';">
-            ${icon('mail', { size: 13, stroke: 2 })}
-          </button>
-          <span class="circle-action-btn is-chevron" aria-hidden="true">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </span>
-        </div>
+        <div class="team-card-actions">${personActionsHtml({ id: u.id, name: u.name, phone, email })}</div>
       `;
 
       return {
@@ -665,6 +656,7 @@ export default {
       noun: 'user',
       plural: 'users',
       addLabel: null,
+      swipeRecords: true, // phone: swipe the sheet header to the next / previous user
       searchPlaceholder: 'Search by name, email or role...',
       load: () => getJson('/api/users'),
       subtitle: (items) => 'Manage system users and their access permissions',
@@ -990,6 +982,7 @@ export default {
     });
 
     ctx.setAddButton?.('Add User', openAddUserModal);
+    bindPersonActions(host); // Call / WhatsApp / ⋮ beside each user
 
     /* ---------- Switch Toggling & Saving Logic ---------- */
     function syncSaveButton() {

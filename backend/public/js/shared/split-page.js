@@ -11,6 +11,7 @@ import { createDropdown } from './dropdown-filter.js';
 import { confirmDialog } from './sheet.js';
 import { detailHeaderHtml, sheetHandleHtml } from './detail-sheet.js';
 import { bindListKeys } from './split-view.js';
+import { bindSwipe, slideIn } from './swipe.js';
 import { hasOpenLayer } from './sheet.js';
 import { getParams, setParams, subscribe } from './page-state.js';
 
@@ -107,6 +108,7 @@ export function createSplitPage(host, ctx, cfg) {
   let dd = null;
 
   const $ = (s) => host.querySelector(s);
+  const $all = (s) => host.querySelectorAll(s);
   const searchInput = () => (phone ? $('.search-input-wrapper input') : $('.compact-search-bar input'));
 
   /* ---------- derived ---------- */
@@ -184,6 +186,27 @@ export function createSplitPage(host, ctx, cfg) {
       const v = e.target.value.trim();
       timer = setTimeout(() => setParams({ q: v || null }, { push: false }), 300);
     });
+    if (phone) {
+      // Swipe the detail: the content changes tab, the header changes record (only on pages that ask for it, and only along the list order on screen)
+      const open = () => !!current() && !document.querySelector('.asg-overlay, .modal-overlay.open, .row-floating-menu');
+      const goTab = (step) => {
+        const tabs = [...$all('[data-sp-dtab]')];
+        const to = tabs[tabs.findIndex((t) => t.classList.contains('active')) + step];
+        if (to) { to.click(); slideIn($('.sp-detail-body'), step); }
+      };
+      bindSwipe($('.sp-detail-body'), { enabled: open, onNext: () => goTab(1), onPrev: () => goTab(-1) });
+      if (cfg.swipeRecords) {
+        const goRecord = async (step) => {
+          const rows = visible();
+          const next = rows[rows.findIndex((i) => String(i.id) === String(state.selected)) + step];
+          if (!next || rows.findIndex((i) => String(i.id) === String(state.selected)) === -1) return;
+          await select(next.id, { push: false });
+          slideIn($('.sp-detail-head'), step);
+          slideIn($('.sp-detail-body'), step);
+        };
+        bindSwipe($('.sp-detail-head'), { enabled: open, onNext: () => goRecord(1), onPrev: () => goRecord(-1) });
+      }
+    }
     bindListKeys($('.sp-list'), { getList: visible, getActiveId: () => state.selected, onSelect: (item) => select(item.id, { push: false }) });
   }
 
