@@ -243,6 +243,7 @@ export function createMobileView(container, options = {}) {
             </div>
           </div>
           <div class="modal-footer">
+            <button class="btn-secondary-desktop" id="btn-cancel-special-req" type="button">Cancel</button>
             <button class="btn-confirm-booking" id="btn-done-special-req">Save & Apply</button>
           </div>
         </div>
@@ -1350,10 +1351,16 @@ export function createMobileView(container, options = {}) {
     });
     window.addEventListener('layout-changed', () => { if (isModalOpen) closeModal(); });
     // The itinerary event popups (View Details, Edit) close with a tap on the dimmed backdrop and with Esc, like every other popup
+    // The same for the customer and special-requirements popups: backdrop tap, Esc and Cancel act like their round X
+    ['#mobile-special-req-modal', '#mobile-edit-customer-modal'].forEach((id) => container.querySelector(id)?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget || e.target.closest('#btn-cancel-special-req')) e.currentTarget.querySelector('.sheet-close-btn')?.click();
+    }));
     container.querySelector('#mobile-activity-details-modal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeActivityDetailsModal(); });
     container.querySelector('#mobile-edit-activity-modal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeEditActivityModal(); });
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
+      const form = container.querySelector('#mobile-special-req-modal.open, #mobile-edit-customer-modal.open');
+      if (form) { e.stopImmediatePropagation(); form.querySelector('.sheet-close-btn')?.click(); return; }
       const edit = container.querySelector('#mobile-edit-activity-modal.open');
       const details = container.querySelector('#mobile-activity-details-modal.open');
       if (!edit && !details) return;

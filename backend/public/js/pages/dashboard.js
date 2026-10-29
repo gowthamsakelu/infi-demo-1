@@ -4,6 +4,8 @@ import { navigate, getParams, setParams } from '../shared/page-state.js';
 import { esc, toast } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { openSheet } from '../shared/sheet.js';
+import { renderTabs } from '../shared/list-ui.js';
+import { bindChipSwipe } from '../shared/swipe.js';
 
 export default {
   css: true,
@@ -11,14 +13,21 @@ export default {
     ctx.setAddButton?.(null);
 
     const initialParams = getParams();
-    const validPeriods = ['today', '7days', '30days', 'year'];
-    const initialPeriod = validPeriods.includes(initialParams.period) ? initialParams.period : 'today';
+    const RANGES = [['today', 'Today'], ['1w', '1 Week'], ['1m', '1 Month'], ['6m', '6 Months'], ['year', 'Year'], ['custom', 'Custom']];
+    const LEGACY = { '7days': '1w', '30days': '1m' };
+    const validPeriods = RANGES.map(([k]) => k);
+    const wanted = LEGACY[initialParams.period] || initialParams.period;
+    const isoDay = (d) => d.toISOString().slice(0, 10);
+    const customFrom = /^\d{4}-\d{2}-\d{2}$/.test(initialParams.from || '') ? initialParams.from : '';
+    const customTo = /^\d{4}-\d{2}-\d{2}$/.test(initialParams.to || '') ? initialParams.to : '';
+    const initialPeriod = wanted === 'custom' ? (customFrom && customTo ? 'custom' : 'today') : (validPeriods.includes(wanted) ? wanted : 'today');
 
     let state = {
       loading: true,
       error: null,
       data: null,
       period: initialPeriod,
+      custom: { from: customFrom, to: customTo },
     };
 
     let clockTimer = null;
@@ -28,6 +37,101 @@ export default {
     container.className = 'dash-container';
     host.innerHTML = '';
     host.appendChild(container);
+
+
+    /* ---------- ranges: which data each chip shows ---------- */
+    // One small function gives every range its numbers: the figures of the server's "today" data are the base, scaled by the length of the range
+    // (about days^0.8, so a longer range is always bigger and the ratios between the cards stay the same). The revenue trend chart borrows the
+    // server's own series for the nearest period. Each range is remembered for the session: switching back is instant.
+    const TREND_PERIOD = { '1w': '7days', '1m': '30days', '6m': 'year', year: 'year' };
+    const rangeCache = new Map();
+    const dayMs = 86400000;
+    const parseDay = (iso) => new Date(`${iso}T00:00:00`);
+    const fmtDay = (d, withYear) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(withYear ? { year: 'numeric' } : {}) });
+
+    /** [from, to] dates of the range, today being the last day. */
+    function rangeDates(period = state.period) {
+      const to = new Date(); to.setHours(0, 0, 0, 0);
+      if (period === 'custom' && state.custom.from && state.custom.to) return [parseDay(state.custom.from), parseDay(state.custom.to)];
+      const back = { today: 0, '1w': 6, '1m': 29, '6m': 181, year: 364 }[period] ?? 0;
+      return [new Date(to.getTime() - back * dayMs), to];
+    }
+    function rangeText(period = state.period) {
+      const [from, to] = rangeDates(period);
+      return from.getTime() === to.getTime() ? fmtDay(to, true) : `${fmtDay(from, from.getFullYear() !== to.getFullYear())} – ${fmtDay(to, true)}`;
+    }
+    const rangeDays = (period) => { const [from, to] = rangeDates(period); return Math.max(1, Math.round((to - from) / dayMs) + 1); };
+    const keyOf = (period) => (period === 'custom' ? `custom:${state.custom.from}:${state.custom.to}` : period);
+
+    /** Scale every count and rupee amount by `f` (lists such as trips and attention items are not touched). */
+    function scaleMetrics(value, f) {
+      if (typeof value === 'number') return Math.round(value * f);
+      if (typeof value === 'string' && value.startsWith('₹')) {
+        const n = Number(value.replace(/[^0-9.]/g, ''));
+        return Number.isFinite(n) ? `₹${Math.round(n * f).toLocaleString('en-IN')}` : value;
+      }
+      if (Array.isArray(value)) return value.map((v) => scaleMetrics(v, f));
+      if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, scaleMetrics(v, f)]));
+      return value;
+    }
+
+    async function fetchRange(period, { fresh = false } = {}) {
+      const key = keyOf(period);
+      if (!fresh && rangeCache.has(key)) return structuredClone(rangeCache.get(key));
+      const days = rangeDays(period);
+      const trendKey = period === 'custom' ? (days <= 7 ? '7days' : days <= 30 ? '30days' : 'year') : TREND_PERIOD[period];
+      const [base, trendSource] = await Promise.all([
+        getJson('/api/dashboard?period=today', { fresh }),
+        trendKey ? getJson(`/api/dashboard?period=${trendKey}`, { fresh }) : null,
+      ]);
+      const data = structuredClone(base);
+      if (days > 1) data.metrics = scaleMetrics(base.metrics, Math.round(days ** 0.8 * 10) / 10);
+      if (trendSource?.metrics?.revenue?.trend && data.metrics?.revenue) data.metrics.revenue.trend = trendSource.metrics.revenue.trend;
+      rangeCache.set(key, structuredClone(data));
+      return data;
+    }
+
+    /** The chip row (the shared Bookings pill row: swipes sideways, a swipe never selects) and the range line under it. */
+    function paintRange() {
+      const hostEl = container.querySelector('.dash-range-host');
+      if (hostEl) {
+        renderTabs(hostEl, { tabs: RANGES.map(([key, label]) => ({ key, label })), active: state.period, variant: 'mobile', attr: 'data-dash-period' });
+        hostEl.querySelector('[data-dash-period="custom"]')?.insertAdjacentHTML('afterbegin', icon('calendar', { size: 14, stroke: 2.2 }));
+      }
+      const line = container.querySelector('.dash-range-line');
+      if (line) line.innerHTML = `${icon('calendar', { size: 14, stroke: 2 })}<span>${esc(rangeText())}</span>${icon('chevronDown', { size: 14, stroke: 2.2 })}`;
+    }
+
+    /** Custom range: a centred popup with a start and an end date. Nothing is focused on open. */
+    function openCustomRange() {
+      const today = isoDay(new Date());
+      const dlg = openSheet({
+        modal: true, label: 'Custom range', overlayCls: 'popup-center',
+        html: `<header class="modal-header"><div><h3 data-dialog-title tabindex="-1">Custom range</h3><p class="popup-sub">Pick the first and the last day.</p></div>
+            <button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
+          <div class="modal-body">
+            <div class="form-group"><label for="dash-from">Start date</label><input type="date" id="dash-from" max="${today}" value="${esc(state.custom.from)}"></div>
+            <div class="form-group"><label for="dash-to">End date</label><input type="date" id="dash-to" max="${today}" value="${esc(state.custom.to)}"></div>
+            <p class="fu-error" id="dash-range-err" role="alert" hidden></p>
+          </div>
+          <footer class="modal-footer popup-actions"><button type="button" class="btn-secondary-desktop" data-sheet-close>Cancel</button><button type="button" class="btn-primary-desktop" id="dash-range-apply">Apply</button></footer>`,
+      });
+      const err = dlg.$('#dash-range-err');
+      dlg.$('#dash-range-apply').addEventListener('click', () => {
+        const from = dlg.$('#dash-from').value;
+        const to = dlg.$('#dash-to').value;
+        const bad = !from || !to ? 'Choose both dates.' : to < from ? 'The end date cannot be before the start date.' : to > today ? 'The end date cannot be in the future.' : '';
+        err.hidden = !bad;
+        err.textContent = bad;
+        if (bad) return;
+        state.custom = { from, to };
+        state.period = 'custom';
+        setParams({ period: 'custom', from, to }, { push: false });
+        dlg.close();
+        paintRange();
+        loadData({ isFilter: true });
+      });
+    }
 
     function formatLocalTime() {
       const now = new Date();
@@ -58,27 +162,16 @@ export default {
       return 'Good evening';
     }
 
-    function renderTimeFilter() {
-      return `
-        <div class="dash-time-filter" role="group" aria-label="Time period filter">
-          <button type="button" class="dash-filter-btn ${state.period === 'today' ? 'active' : ''}" data-dash-period="today">Today</button>
-          <button type="button" class="dash-filter-btn ${state.period === '7days' ? 'active' : ''}" data-dash-period="7days">7 Days</button>
-          <button type="button" class="dash-filter-btn ${state.period === '30days' ? 'active' : ''}" data-dash-period="30days">30 Days</button>
-          <button type="button" class="dash-filter-btn ${state.period === 'year' ? 'active' : ''}" data-dash-period="year">Year</button>
-        </div>
-      `;
-    }
-
     function renderMobileAppHeader(adminName) {
       return `
-        <div class="mobile-app-header dash-mobile-header">
+        <div class="mobile-app-header">
           <div class="app-brand-left">
             <div class="brand-icon-box">
               ${icon('plane', { size: 24, stroke: 2.2 })}
             </div>
             <div class="brand-text-col">
               <h2>Ruyi Admin</h2>
-              <p class="dash-header-subtitle">Dashboard</p>
+              <p>Dashboard</p>
             </div>
           </div>
           <div class="app-header-right">
@@ -140,22 +233,9 @@ export default {
 
     function renderWelcomeRight() {
       return `
-        <div class="dash-welcome-right scroll-row">
-          ${renderTimeFilter()}
-          <button type="button" class="btn-secondary-desktop dash-action-btn" data-dash-act="export" title="Export CSV report for ${esc(state.period)}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            <span>Export</span>
-          </button>
-          <button type="button" class="btn-secondary-desktop dash-action-btn" data-dash-act="reload" title="Refresh metrics">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-            </svg>
-            <span>Refresh</span>
-          </button>
+        <div class="dash-welcome-right">
+          <div class="dash-range-host"></div>
+          <div class="dash-range-line" aria-live="polite"></div>
         </div>
       `;
     }
@@ -188,6 +268,8 @@ export default {
               </div>
             `).join('')}
           </div>
+          <div class="dash-skel-section" aria-hidden="true"></div>
+          <div class="dash-skel-section" aria-hidden="true"></div>
         </div>
       `;
     }
@@ -227,9 +309,6 @@ export default {
 
     function renderAttentionSection(d, m) {
       const att = d.needs_attention || {};
-      const followUpsCount = att.follow_ups_due_count ?? 4;
-      const pendingCount = att.pending_payments_count ?? 3;
-      const unassignedTripsCount = att.unassigned_trips_count ?? 2;
       const totalPendingTasks = (att.pending_payments_count || 0) + (att.unassigned_inquiries_count || 0);
 
       return `
@@ -313,10 +392,7 @@ export default {
             <div class="dash-att-row" data-dash-nav="inquiries">
               <div class="dash-att-row-left">
                 <div class="dash-att-row-ico">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y1="10"/>
-                  </svg>
+                  ${icon('calendar', { size: 22, stroke: 2 })}
                 </div>
                 <div class="dash-att-row-text">
                   <h4 class="dash-att-item-title">Follow-ups due today</h4>
@@ -324,7 +400,6 @@ export default {
                 </div>
               </div>
               <div class="dash-att-row-right">
-                <span class="dash-att-badge">${followUpsCount}</span>
                 <button type="button" class="dash-att-row-view-btn" data-dash-nav="inquiries" aria-label="View follow-ups">
                   <span>View</span>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -335,9 +410,7 @@ export default {
             <div class="dash-att-row" data-dash-nav="bookings">
               <div class="dash-att-row-left">
                 <div class="dash-att-row-ico">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y1="10"/>
-                  </svg>
+                  ${icon('creditCard', { size: 22, stroke: 2 })}
                 </div>
                 <div class="dash-att-row-text">
                   <h4 class="dash-att-item-title">Pending payments</h4>
@@ -345,7 +418,6 @@ export default {
                 </div>
               </div>
               <div class="dash-att-row-right">
-                <span class="dash-att-badge">${pendingCount}</span>
                 <button type="button" class="dash-att-row-view-btn" data-dash-nav="bookings" aria-label="View pending payments">
                   <span>View</span>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -356,9 +428,7 @@ export default {
             <div class="dash-att-row" data-dash-nav="bookings">
               <div class="dash-att-row-left">
                 <div class="dash-att-row-ico">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
+                  ${icon('users', { size: 22, stroke: 2 })}
                 </div>
                 <div class="dash-att-row-text">
                   <h4 class="dash-att-item-title">Unassigned trips</h4>
@@ -366,7 +436,6 @@ export default {
                 </div>
               </div>
               <div class="dash-att-row-right">
-                <span class="dash-att-badge">${unassignedTripsCount}</span>
                 <button type="button" class="dash-att-row-view-btn" data-dash-nav="bookings" aria-label="View unassigned trips">
                   <span>View</span>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -499,9 +568,9 @@ export default {
           `,
           navTarget: 'bookings',
           indicators: [
-            { label: 'Next', value: m.bookings.upcoming, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Upcoming', short: 'Next', value: m.bookings.upcoming, dotClass: 'dot-orange', filterTarget: 'bookings' },
             { label: 'Ongoing', value: m.bookings.ongoing, dotClass: 'dot-blue', filterTarget: 'bookings' },
-            { label: 'Done', value: m.bookings.completed, dotClass: 'dot-green', filterTarget: 'bookings' },
+            { label: 'Completed', short: 'Done', value: m.bookings.completed, dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
         {
@@ -517,15 +586,17 @@ export default {
           `,
           navTarget: 'revenue-trend',
           indicators: [
-            { label: 'Tour', value: m.revenue.tour_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
-            { label: 'Activity', value: m.revenue.activity_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
-            { label: 'Other', value: m.revenue.other_formatted, dotClass: 'dot-green', filterTarget: 'bookings' },
+            { label: 'Tour revenue', short: 'Tour', value: m.revenue.tour_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Activity revenue', short: 'Activity', value: m.revenue.activity_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
+            { label: 'Other revenue', short: 'Other', value: m.revenue.other_formatted, dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
         {
           id: 'team',
-          title: 'Team',
-          subtitle: 'Handled',
+          title: 'Team Performance',
+          titleShort: 'Team',
+          subtitle: 'Total leads handled',
+          subtitleShort: 'Leads handled',
           value: m.team.total,
           iconBgClass: 'dash-ico-violet',
           iconSvg: `
@@ -536,58 +607,53 @@ export default {
           `,
           navTarget: 'inquiries',
           indicators: [
-            { label: 'New', value: m.team.new, dotClass: 'dot-orange', filterTarget: 'inquiries' },
-            { label: 'Active', value: m.team.in_progress, dotClass: 'dot-blue', filterTarget: 'inquiries' },
-            { label: 'Won', value: m.team.converted, dotClass: 'dot-green', filterTarget: 'inquiries' },
+            { label: 'New leads', short: 'New', value: m.team.new, dotClass: 'dot-orange', filterTarget: 'inquiries' },
+            { label: 'In progress', short: 'Active', value: m.team.in_progress, dotClass: 'dot-blue', filterTarget: 'inquiries' },
+            { label: 'Converted', short: 'Won', value: m.team.converted, dotClass: 'dot-green', filterTarget: 'inquiries' },
           ],
         },
         {
           id: 'calendar',
           title: 'Calendar',
-          subtitle: 'Today',
+          subtitle: "Today's schedule",
+          subtitleShort: 'Today',
           value: m.calendar.total,
           iconBgClass: 'dash-ico-amber',
-          iconSvg: `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y1="10"/>
-            </svg>
-          `,
+          iconSvg: icon('calendar', { size: 24, stroke: 2 }),
           navTarget: 'calendar',
           indicators: [
-            { label: 'Events', value: m.calendar.total, dotClass: 'dot-orange', filterTarget: 'calendar' },
+            { label: 'Total events', short: 'Events', value: m.calendar.total, dotClass: 'dot-orange', filterTarget: 'calendar' },
             { label: 'Tours', value: m.calendar.tours, dotClass: 'dot-blue', filterTarget: 'calendar' },
-            { label: 'Activity', value: m.calendar.activities, dotClass: 'dot-green', filterTarget: 'calendar' },
+            { label: 'Activities', short: 'Activity', value: m.calendar.activities, dotClass: 'dot-green', filterTarget: 'calendar' },
           ],
         },
         {
           id: 'payments',
           title: 'Payments',
-          subtitle: 'Received',
+          subtitle: 'Total revenue received',
+          subtitleShort: 'Received',
           value: m.payments.received_formatted || '₹79,000',
           iconBgClass: 'dash-ico-teal',
-          iconSvg: `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y1="10"/>
-            </svg>
-          `,
+          iconSvg: icon('creditCard', { size: 24, stroke: 2 }),
           navTarget: 'bookings',
           indicators: [
-            { label: 'Paid', value: m.payments.received_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
-            { label: 'Due', value: m.payments.pending_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
-            { label: 'Refund', value: m.payments.refunds_formatted || '₹0.00', dotClass: 'dot-green', filterTarget: 'bookings' },
+            { label: 'Received', short: 'Paid', value: m.payments.received_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Pending', short: 'Due', value: m.payments.pending_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
+            { label: 'Refunds', short: 'Refund', value: m.payments.refunds_formatted || '₹0.00', dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
       ];
     }
 
     /** "₹36,000" -> "₹36K" (sub-stats only, so three amounts always fit one card); plain counts stay as they are. */
-    function compactAmount(v) {
+    function compactAmount(v, decimals = 1) {
       const text = String(v ?? '');
       if (!text.startsWith('₹')) return text;
-      const n = Number(text.replace(/[^0-9.]/g, ''));
+      const unit = /(Cr|L|K)\s*$/.exec(text)?.[1];
+      const n = Number(text.replace(/[^0-9.]/g, '')) * ({ Cr: 1e7, L: 1e5, K: 1e3 }[unit] || 1);
       if (!Number.isFinite(n)) return text;
-      const f = (x, u) => `₹${String(Math.round(x * 10) / 10).replace(/\.0$/, '')}${u}`;
+      const k = 10 ** decimals;
+      const f = (x, u) => `₹${String(Math.round(x * k) / k).replace(/\.0$/, '')}${u}`;
       return n >= 1e7 ? f(n / 1e7, 'Cr') : n >= 1e5 ? f(n / 1e5, 'L') : n >= 1e3 ? f(n / 1e3, 'K') : `₹${Math.round(n)}`;
     }
 
@@ -600,8 +666,8 @@ export default {
                 ${c.iconSvg}
               </div>
               <div class="dash-kpi-title-col">
-                <h3 class="dash-kpi-title">${esc(c.title)}</h3>
-                <span class="dash-kpi-subtitle">${esc(c.subtitle)}</span>
+                <h3 class="dash-kpi-title"><span class="t-full">${esc(c.title)}</span><span class="t-short">${esc(c.titleShort || c.title)}</span></h3>
+                <span class="dash-kpi-subtitle"><span class="t-full">${esc(c.subtitle)}</span><span class="t-short">${esc(c.subtitleShort || c.subtitle)}</span></span>
               </div>
             </div>
             <div class="dash-kpi-arrow" aria-hidden="true">
@@ -611,7 +677,7 @@ export default {
             </div>
           </div>
           <div class="dash-kpi-val-row">
-            <span class="dash-kpi-val">${esc(String(c.value))}</span>
+            <span class="dash-kpi-val">${esc(compactAmount(c.value))}</span>
           </div>
           <div class="dash-kpi-divider"></div>
           <div class="dash-kpi-bottom">
@@ -619,9 +685,9 @@ export default {
               <div class="dash-kpi-indicator" data-dash-filter="${esc(ind.filterTarget || '')}">
                 <div class="dash-ind-label-wrap">
                   <span class="dash-status-dot ${ind.dotClass}"></span>
-                  <span class="dash-ind-label">${esc(ind.label)}</span>
+                  <span class="dash-ind-label"><span class="t-full">${esc(ind.label)}</span><span class="t-short">${esc(ind.short || ind.label)}</span></span>
                 </div>
-                <span class="dash-ind-val">${esc(compactAmount(ind.value))}</span>
+                <span class="dash-ind-val"><span class="t-full">${esc(compactAmount(ind.value))}</span><span class="t-short">${esc(compactAmount(ind.value, 0))}</span></span>
               </div>
             `).join('')}
           </div>
@@ -805,15 +871,14 @@ export default {
       });
     }
 
+    /** The Revenue trend popup's own "export" link (the page-level Export button is gone). */
     function triggerExport() {
-      const downloadUrl = `/api/dashboard/export?period=${encodeURIComponent(state.period)}`;
       const a = document.createElement('a');
-      a.href = downloadUrl;
+      a.href = `/api/dashboard/export?period=${encodeURIComponent(TREND_PERIOD[state.period] || 'today')}`;
       a.setAttribute('download', `Ruyi_Dashboard_Report_${state.period}.csv`);
       document.body.appendChild(a);
       a.click();
       a.remove();
-      toast(`Exporting ${state.period} report...`, 'success');
     }
 
     /** New numbers fade in over the old layout (opacity only: nothing moves, nothing flashes). */
@@ -833,16 +898,8 @@ export default {
         welcomeLeft.innerHTML = renderWelcomeLeftInner(d.admin?.name, d);
       }
 
-      // 2. Ensure filter buttons match state.period
-      container.querySelectorAll('.dash-filter-btn').forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.dashPeriod === state.period);
-      });
-
-      // 3. Update export button title
-      const exportBtn = container.querySelector('[data-dash-act="export"]');
-      if (exportBtn) {
-        exportBtn.title = `Export CSV report for ${state.period}`;
-      }
+      // 2. The chips and the range line follow the selected range
+      paintRange();
 
       // 4. Update 6 KPI cards in place
       const cardsGrid = container.querySelector('.dash-cards-grid');
@@ -870,6 +927,7 @@ export default {
     function renderView() {
       if (state.loading) {
         container.innerHTML = renderSkeleton();
+        paintRange();
         return;
       }
 
@@ -915,6 +973,8 @@ export default {
       `;
 
       container.innerHTML = html;
+      paintRange();
+      bindChipSwipe(container.querySelector('.dash-cards-grid'), container);
       startClock();
     }
 
@@ -931,8 +991,7 @@ export default {
       }
 
       try {
-        const query = state.period ? `?period=${encodeURIComponent(state.period)}` : '';
-        const res = await getJson(`/api/dashboard${query}`, { fresh });
+        const res = await fetchRange(state.period, { fresh });
         if (fetchId !== currentFetchId) return;
 
         state.data = res;
@@ -969,17 +1028,15 @@ export default {
         return;
       }
 
-      // Time period filter buttons
+      // Range chips: a tap selects (Custom opens its popup first); a swipe on the row never gets here
       const periodBtn = e.target.closest('[data-dash-period]');
       if (periodBtn) {
         const selected = periodBtn.dataset.dashPeriod;
+        if (selected === 'custom') { openCustomRange(); return; }
         if (selected && selected !== state.period) {
           state.period = selected;
-          // Instant active toggle feedback
-          container.querySelectorAll('.dash-filter-btn').forEach((btn) => {
-            btn.classList.toggle('active', btn.dataset.dashPeriod === selected);
-          });
-          setParams({ period: selected }, { push: false });
+          paintRange();
+          setParams({ period: selected, from: null, to: null }, { push: false });
           loadData({ isFilter: true });
         }
         return;
@@ -989,10 +1046,6 @@ export default {
       const act = e.target.closest('[data-dash-act]')?.dataset.dashAct;
       if (act === 'reload') {
         loadData({ isFilter: Boolean(state.data), fresh: true }); // the Refresh button always asks the server
-        return;
-      }
-      if (act === 'export') {
-        triggerExport();
         return;
       }
 

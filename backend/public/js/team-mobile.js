@@ -5,7 +5,7 @@ import { INITIAL_BOOKINGS } from './data.js';
 import { icon } from './shared/icons.js';
 import { esc, initials, toast, searchBox } from './shared/ui.js';
 import { renderTabs } from './shared/list-ui.js';
-import { personActionsHtml, bindPersonActions } from './shared/person-actions.js';
+import { personCardHtml, bindPersonActions } from './shared/person-actions.js';
 import { bindSwipe, bindChipSwipe, slideIn } from './shared/swipe.js';
 
 export function createMobileTeam(host, { onViewBooking } = {}) {
@@ -164,34 +164,13 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
 
         return `
           <div class="team-roster-card ${isSelected ? 'active' : ''}" data-member-id="${esc(m.id)}" role="button" tabindex="0">
-            <div class="team-card-left">
-              <div class="team-avatar-container">
-                ${m.avatar ? `<img src="${esc(m.avatar)}" alt="${esc(m.name)}" class="team-avatar-img" />` : `<div class="team-avatar-initials">${esc(inits)}</div>`}
-                <span class="team-avatar-dot ${m.statusType}"></span>
-              </div>
-              <div class="team-card-info">
-                <div class="team-card-title-line">
-                  <span class="team-card-name">${esc(m.name)}</span>
-                  ${m.employeeId ? `<span class="team-emp-tag">${esc(m.employeeId)}</span>` : ''}
-                </div>
-                <div class="team-card-status-line">
-                  <span class="team-card-role">${esc(m.role)}</span>
-                  <span class="status-pill ${status.cls}">
-                    <span class="dot"></span>
-                    ${esc(status.label)}
-                  </span>
-                </div>
-                <div class="team-card-meta-line">
-                  <span class="badge-trips-pill">${m.metrics?.activeTrips ?? 0} Trips</span>
-                  <span class="team-meta-dot">•</span>
-                  <span class="team-meta-loc" title="${esc(m.officeLocation)}">${esc(formatCardLocation(m.officeLocation))}</span>
-                  <span class="team-meta-dot">•</span>
-                  <span class="team-meta-exp">${esc(m.experience)}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="team-card-actions">${personActionsHtml({ id: m.id, name: m.name, phone: m.phone, email: m.email })}</div>
+            ${personCardHtml({
+              avatar: m.avatar ? `<img src="${esc(m.avatar)}" alt="${esc(m.name)}" class="team-avatar-img" />` : `<div class="team-avatar-initials">${esc(inits)}</div>`,
+              dot: m.statusType, name: m.name, emp: m.employeeId, role: m.role,
+              badges: `<span class="status-pill ${status.cls}"><span class="dot"></span>${esc(status.label)}</span>`,
+              meta: `<span class="badge-trips-pill">${m.metrics?.activeTrips ?? 0} Trips</span><span class="team-meta-dot">•</span><span class="team-meta-loc" title="${esc(m.officeLocation)}">${esc(formatCardLocation(m.officeLocation))}</span><span class="team-meta-dot">•</span><span class="team-meta-exp">${esc(m.experience)}</span>`,
+              person: { id: m.id, name: m.name, phone: m.phone, email: m.email },
+            })}
           </div>
         `;
       })

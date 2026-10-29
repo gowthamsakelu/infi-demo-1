@@ -46,7 +46,7 @@ export function slideIn(el, dir = 1) {
  */
 export function bindChipSwipe(listEl, rowHost, { enabled = () => true } = {}) {
   const phone = () => document.documentElement.dataset.layout === 'mobile';
-  const blocked = () => document.body.classList.contains('sp-detail-open') || !!document.querySelector('.asg-overlay, .modal-overlay.open, .row-floating-menu, #mobile-bottom-sheet.open, #mobile-team-sheet.open, .notifications-panel:not([hidden])');
+  const blocked = () => document.body.classList.contains('sp-detail-open') || !!document.querySelector('.asg-overlay, .fu-overlay, .sheet-overlay, .modal-overlay.open, .row-floating-menu, #mobile-bottom-sheet.open, #mobile-team-sheet.open, .notifications-panel:not([hidden])');
   const step = (dir) => {
     const pills = [...rowHost.querySelectorAll('.tab-pill')];
     const to = pills[pills.findIndex((p) => p.classList.contains('active')) + dir];

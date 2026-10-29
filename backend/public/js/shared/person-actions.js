@@ -37,3 +37,22 @@ export function bindPersonActions(root) {
     });
   }, true);
 }
+
+/**
+ * The one person card of the Operation Team and Users lists (same markup, same css): avatar with status dot, name + employee id, the role on its own
+ * line, the tag and status badges on one tidy row, a meta line, then Call / WhatsApp / ⋮.
+ * `avatar` and `badges` / `meta` are ready-made html; `dot` is the status dot class.
+ */
+export function personCardHtml({ avatar, dot, name, emp, role, badges = '', meta = '', person }) {
+  return `
+    <div class="team-card-left">
+      <div class="team-avatar-container">${avatar}<span class="team-avatar-dot ${esc(dot)}"></span></div>
+      <div class="team-card-info">
+        <div class="team-card-title-line"><span class="team-card-name card-title">${esc(name)}</span>${emp ? `<span class="team-emp-tag">${esc(emp)}</span>` : ''}</div>
+        <p class="team-card-role">${esc(role)}</p>
+        <div class="team-card-badges">${badges}</div>
+        <div class="team-card-meta-line">${meta}</div>
+      </div>
+    </div>
+    <div class="team-card-actions">${personActionsHtml(person)}</div>`;
+}

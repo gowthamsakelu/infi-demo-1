@@ -58,21 +58,20 @@ export function bindSidebar(root) {
   });
 }
 
-/** The phone's "More" screen: every page the bottom bar does not show, in the same four groups. */
+/** The phone's "More" screen: every accessible page not in the bottom bar. */
 export function openMoreSheet({ returnFocus } = {}) {
-  const groups = NAV.map((g) => ({ title: g.title === 'Menu' ? 'Operations' : g.title, items: g.items.filter((i) => !BOTTOM_BAR.includes(i.key) && !hiddenPages.has(i.key)) })).filter((g) => g.items.length);
+  const items = NAV_ITEMS.filter((i) => !BOTTOM_BAR.includes(i.key) && !hiddenPages.has(i.key));
   const dlg = openSheet({
     label: 'More',
     cls: 'more-sheet',
     returnFocus,
     html: `<header class="asg-header"><h3>More</h3><button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
-      <div class="more-body">${groups.map((g) => `
-        <section class="more-group"><h4>${esc(g.title)}</h4>
-          <div class="more-grid">${g.items.map((i) => `
+      <div class="more-body">
+          <div class="more-grid">${items.map((i) => `
             <button type="button" class="more-tile ${i.key === currentPage() ? 'active' : ''}" data-nav="${i.key}">
               <span class="more-ico">${icon(i.icon, { size: 20 })}</span><span class="more-label">${esc(i.label)}</span>
             </button>`).join('')}</div>
-        </section>`).join('')}</div>`,
+      </div>`,
   });
   dlg.ov.addEventListener('click', (e) => {
     const tile = e.target.closest('.more-tile');

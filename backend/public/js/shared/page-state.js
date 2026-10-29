@@ -19,7 +19,7 @@ const ALIASES = {
 export function currentPage() {
   const raw = location.hash.replace(/^#/, '').split('?')[0].toLowerCase();
   const page = ALIASES[raw] || raw;
-  return PAGES.includes(page) ? page : 'bookings';
+  return PAGES.includes(page) ? page : 'dashboard'; // no (or an unknown) page in the address: the Dashboard is the home page
 }
 
 export function getParams() {
@@ -45,14 +45,10 @@ export function setParams(patch, { push = true, silent = false } = {}) {
 /** Go to another page; filters and search do not carry over (unless `params` sets them for the new page). */
 export function navigate(page, params = {}) {
   if (page === currentPage() && !location.search && !Object.keys(params).length) return;
-  const go = () => {
-    history.pushState(null, '', buildUrl(new URLSearchParams(params), page));
-    notify();
-  };
-  // Short crossfade of the content (the shell is identical on every page). Falls back to an instant swap.
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (document.startViewTransition && !reduced) document.startViewTransition(go);
-  else go();
+  // Route immediately. Async page mounts animate their content after it is styled;
+  // a document snapshot here captures the loading frame and delays rapid taps.
+  history.pushState(null, '', buildUrl(new URLSearchParams(params), page));
+  notify();
 }
 
 /** Re-run every subscriber (used after a layout change). */
@@ -62,6 +58,16 @@ export function subscribe(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);
 }
+
+// Arriving from the login form (a fresh navigation, not a reload) always starts on the Dashboard, whatever hash or query came along.
+// A refresh keeps the page it was on; an address without a page gets the Dashboard written into it, so the nav item and the URL agree.
+(() => {
+  const nav = performance.getEntriesByType?.('navigation')?.[0];
+  let fromLogin = false;
+  try { fromLogin = !!document.referrer && new URL(document.referrer).pathname.replace(/\/+$/, '') === '/login'; } catch { /* no referrer */ }
+  if (fromLogin && (!nav || nav.type === 'navigate')) history.replaceState(null, '', `${location.pathname}#dashboard`);
+  else if (!location.hash) history.replaceState(null, '', `${location.pathname}${location.search}#dashboard`);
+})();
 
 // Old "#enquiries" links keep working.
 const rawHash = location.hash.replace(/^#/, '').toLowerCase();

@@ -10,7 +10,8 @@ import { icon } from '../shared/icons.js';
 import { confirmDialog } from '../shared/sheet.js';
 import { detailGrid, rowGroup, linkRow } from '../shared/page-ui.js';
 import { OPERATIONS_TEAM_MEMBERS } from '../shared/team-data.js';
-import { personActionsHtml, bindPersonActions } from '../shared/person-actions.js';
+import { personCardHtml, bindPersonActions } from '../shared/person-actions.js';
+import { enhanceSelects } from '../shared/dropdown-filter.js';
 
 function formatCardLocation(loc) {
   if (!loc) return 'Mumbai HQ';
@@ -317,35 +318,12 @@ export default {
 
       const showRoleBadge = u.roleLabel && u.roleLabel.toLowerCase() !== jobRole.toLowerCase();
 
-      const customHtml = `
-        <div class="team-card-left">
-          <div class="team-avatar-container">
-            ${avHtml}
-            <span class="team-avatar-dot ${dotClass}"></span>
-          </div>
-          <div class="team-card-info">
-            <div class="team-card-title-line">
-              <span class="team-card-name card-title">${esc(u.name)}</span>
-              <span class="team-emp-tag">${esc(empId)}</span>
-            </div>
-            <div class="team-card-status-line">
-              <span class="team-card-role">${esc(jobRole)}</span>
-              ${showRoleBadge ? `<span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>` : ''}
-              <span class="status-pill is-${sKey} ${pillCls}">
-                <span class="dot"></span>
-                ${esc(statusLabel)}
-              </span>
-            </div>
-            <div class="team-card-meta-line">
-              <span class="team-meta-loc" title="${esc(locFull)}">${esc(locShort)}</span>
-              <span class="team-meta-dot">•</span>
-              <span class="team-meta-exp">${esc(exp)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="team-card-actions">${personActionsHtml({ id: u.id, name: u.name, phone, email })}</div>
-      `;
+      const customHtml = personCardHtml({
+        avatar: avHtml, dot: dotClass, name: u.name, emp: empId, role: jobRole,
+        badges: `${showRoleBadge ? `<span class="us-role-badge ${roleClass}">${esc(u.roleLabel)}</span>` : ''}<span class="status-pill is-${sKey} ${pillCls}"><span class="dot"></span>${esc(statusLabel)}</span>`,
+        meta: `<span class="team-meta-loc" title="${esc(locFull)}">${esc(locShort)}</span><span class="team-meta-dot">•</span><span class="team-meta-exp">${esc(exp)}</span>`,
+        person: { id: u.id, name: u.name, phone, email },
+      });
 
       return {
         custom: customHtml,
@@ -767,41 +745,41 @@ export default {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
-          <form id="form-add-user">
-            <div class="modal-body">
+          <form id="form-add-user" novalidate>
+            <div class="modal-body us-form-grid">
               <div class="form-group">
-                <label>Full Name *</label>
-                <input type="text" id="us-add-name" placeholder="e.g. Sameer Verma" required />
+                <label for="us-add-name">Full Name *</label>
+                <input type="text" id="us-add-name" placeholder="e.g. Sameer Verma" autocomplete="off" />
+                <small class="us-field-err" data-add-err="name" hidden></small>
               </div>
               <div class="form-group">
-                <label>Email Address *</label>
-                <input type="email" id="us-add-email" placeholder="e.g. sameer.verma@ruyitra.com" required />
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div class="form-group">
-                  <label>Assigned Role *</label>
-                  <select id="us-add-role">
-                    <option value="Admin">Admin</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Staff" selected>Staff</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Status</label>
-                  <select id="us-add-status">
-                    <option value="active" selected>Active</option>
-                    <option value="pending">Pending</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
+                <label for="us-add-email">Email Address *</label>
+                <input type="email" id="us-add-email" placeholder="e.g. sameer.verma@ruyitra.com" autocomplete="off" />
+                <small class="us-field-err" data-add-err="email" hidden></small>
               </div>
               <div class="form-group">
-                <label>Job Title</label>
-                <input type="text" id="us-add-title" placeholder="e.g. Operations Coordinator" />
+                <label for="us-add-role">Assigned Role *</label>
+                <select id="us-add-role">
+                  <option value="Admin">Admin</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Staff" selected>Staff</option>
+                </select>
               </div>
               <div class="form-group">
-                <label>Phone Number</label>
-                <input type="tel" id="us-add-phone" placeholder="e.g. +91 98765 00999" />
+                <label for="us-add-status">Status</label>
+                <select id="us-add-status">
+                  <option value="active" selected>Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="us-add-title">Job Title</label>
+                <input type="text" id="us-add-title" placeholder="e.g. Operations Coordinator" autocomplete="off" />
+              </div>
+              <div class="form-group">
+                <label for="us-add-phone">Phone Number</label>
+                <input type="tel" id="us-add-phone" placeholder="e.g. +91 98765 00999" autocomplete="off" />
               </div>
             </div>
             <div class="modal-footer">
@@ -867,6 +845,7 @@ export default {
       </div>
     `;
     document.body.appendChild(modalContainer);
+    enhanceSelects(modalContainer); // the app's own select, not the raw browser one
 
     function openModal(id) {
       document.getElementById(id)?.classList.add('open');
@@ -878,6 +857,7 @@ export default {
 
     function openAddUserModal() {
       document.getElementById('form-add-user')?.reset();
+      document.querySelectorAll('#form-add-user [data-add-err]').forEach((el) => { el.hidden = true; el.closest('.form-group')?.classList.remove('has-error'); });
       openModal('modal-add-user');
     }
 
@@ -922,6 +902,18 @@ export default {
       const status = document.getElementById('us-add-status').value;
       const title = document.getElementById('us-add-title').value.trim();
       const phone = document.getElementById('us-add-phone').value.trim();
+
+      const problems = {
+        name: name ? '' : 'Enter the full name.',
+        email: !email ? 'Enter the email address.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Enter a valid email address.',
+      };
+      formAdd.querySelectorAll('[data-add-err]').forEach((el) => {
+        const msg = problems[el.dataset.addErr] || '';
+        el.hidden = !msg;
+        el.textContent = msg;
+        el.closest('.form-group')?.classList.toggle('has-error', !!msg);
+      });
+      if (problems.name || problems.email) return;
 
       const btn = document.getElementById('us-submit-add');
       btn.disabled = true;

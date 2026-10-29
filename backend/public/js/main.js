@@ -12,7 +12,7 @@ import { closeAssign } from './shared/assign-sheet.js';
 import { closeFollowUpModal } from './shared/followup-modal.js';
 import { initAccountMenu } from './shared/account-menu.js';
 import { isHostedPage } from './shared/nav.js';
-import { mountPage, unmountPage, prefetchPages } from './shared/page-host.js';
+import { mountPage, unmountPage, prefetchPages, warmPage } from './shared/page-host.js';
 import { syncNavActive } from './shared/nav-ui.js';
 import { currentPage, subscribe as subscribePage } from './shared/page-state.js';
 
@@ -160,6 +160,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.addEventListener('layout-changed', syncHostedPage);
   syncHostedPage();
   prefetchPages(currentPage()); // once idle: the other pages' scripts, styles and data
+  // A nav item that is being touched or hovered: its page is loaded before the tap lands
+  const warmFrom = (e) => { const el = e.target.closest?.('[data-route], [data-nav]'); warmPage(el?.dataset.route || el?.dataset.nav); };
+  document.addEventListener('touchstart', warmFrom, { passive: true, capture: true });
+  document.addEventListener('mouseover', warmFrom, { passive: true, capture: true });
 
   enhanceSelects(document); // no unstyled OS lists: every <select> uses the shared dropdown
 
@@ -168,6 +172,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     targetBookingForGuest = e.detail.bookingId;
     document.getElementById('modal-add-guest').classList.add('open');
   });
+
+  // Backdrop tap and Esc close the Add Guest popup like its X
+  const guestModal = document.getElementById('modal-add-guest');
+  guestModal.addEventListener('click', (e) => { if (e.target === guestModal) document.getElementById('close-add-guest-modal').click(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && guestModal.classList.contains('open')) { e.stopImmediatePropagation(); document.getElementById('close-add-guest-modal').click(); } }, true);
 
   // Close Add Guest Modal
   document.getElementById('close-add-guest-modal').addEventListener('click', () => {
