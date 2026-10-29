@@ -841,11 +841,20 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
                 ` : ''}
 
                 <span class="team-skills-subheading">Specialized Skills & Certifications</span>
-                <div class="team-skills-chips">
+                <div class="team-skills-chips" style="${(member.servicesHandled && member.servicesHandled.length > 0) ? 'margin-bottom: 14px;' : ''}">
                   ${(member.skills || []).map(s => `
                     <span class="team-skill-tag">${esc(s)}</span>
                   `).join('')}
                 </div>
+
+                ${(member.servicesHandled && member.servicesHandled.length > 0) ? `
+                  <span class="team-skills-subheading">Travel Services Handled</span>
+                  <div class="team-skills-chips">
+                    ${member.servicesHandled.map(svc => `
+                      <span class="team-skill-tag tag-service">${esc(svc)}</span>
+                    `).join('')}
+                  </div>
+                ` : ''}
               </div>
             </div>
           </div>

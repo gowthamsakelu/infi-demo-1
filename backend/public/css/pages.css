@@ -12,7 +12,7 @@
 .phone-device.page-mode #mobile-page-host { display: block; }
 .phone-device.page-mode #mobile-page-host[data-page="dashboard"] {
   padding: 0 !important;
-  background: #F8FAFC !important;
+  background: #F0F4F8 !important;
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;

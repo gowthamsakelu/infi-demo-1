@@ -12,7 +12,7 @@ export default {
 
     const initialParams = getParams();
     const validPeriods = ['today', '7days', '30days', 'year'];
-    const initialPeriod = validPeriods.includes(initialParams.period) ? initialParams.period : '30days';
+    const initialPeriod = validPeriods.includes(initialParams.period) ? initialParams.period : 'today';
 
     let state = {
       loading: true,
@@ -51,6 +51,13 @@ export default {
       }
     }
 
+    function getTimeGreeting() {
+      const hr = new Date().getHours();
+      if (hr < 12) return 'Good morning';
+      if (hr < 17) return 'Good afternoon';
+      return 'Good evening';
+    }
+
     function renderTimeFilter() {
       return `
         <div class="dash-time-filter" role="group" aria-label="Time period filter">
@@ -71,7 +78,7 @@ export default {
             </div>
             <div class="brand-text-col">
               <h2>Ruyi Admin</h2>
-              <p class="dash-header-subtitle">Dashboard • Operations</p>
+              <p class="dash-header-subtitle">Travel CRM</p>
             </div>
           </div>
           <div class="app-header-right">
@@ -87,18 +94,38 @@ export default {
 
     function renderWelcomeLeftInner(adminName, d) {
       const timeStr = formatLocalTime();
+      const greeting = getTimeGreeting();
+      const name = adminName || 'Karan Sapalia';
+      const dateText = d?.current_date ? d.current_date.replace(/^[A-Za-z]+,\s*/, '') : '28 Oct 2026';
       return `
-        <h1 class="dash-welcome-title">Welcome back, ${esc(adminName || 'Karan Sapalia')} 👋</h1>
+        <div class="dash-welcome-title-row">
+          <div class="dash-welcome-sun" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4" fill="#FEF3C7"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+          </div>
+          <h1 class="dash-welcome-title">${esc(greeting)}, ${esc(name)} 👋</h1>
+        </div>
         <p class="dash-welcome-msg">Here's your travel business overview for today.</p>
-        <div class="dash-welcome-meta">
-          <span class="dash-welcome-date">${esc(d?.current_date || 'Tuesday, 27 October 2026')}</span>
-          <span>•</span>
-          <span class="dash-live-time" title="Current Local Time (updates every minute)">
-            <span class="dash-live-time-dot"></span>
+        <div class="dash-welcome-meta-bar">
+          <div class="dash-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+            <span class="dash-welcome-date">${esc(dateText)}</span>
+          </div>
+          <span class="dash-meta-divider" aria-hidden="true">|</span>
+          <div class="dash-meta-item" title="Current Local Time (updates every minute)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
             <span id="dash-live-clock">${esc(timeStr)}</span>
-          </span>
-          <span>•</span>
-          <span class="dash-welcome-subtitle">${esc(d?.period_label || "Overview of bookings and real-time revenue.")}</span>
+          </div>
         </div>
       `;
     }
@@ -199,9 +226,16 @@ export default {
     }
 
     function renderAttentionSection(d, m) {
+      const att = d.needs_attention || {};
+      const followUpsCount = att.follow_ups_due_count ?? 4;
+      const pendingCount = att.pending_payments_count ?? 3;
+      const unassignedTripsCount = att.unassigned_trips_count ?? 2;
+      const totalPendingTasks = (att.pending_payments_count || 0) + (att.unassigned_inquiries_count || 0);
+
       return `
         <section class="dash-attention-section">
-          <div class="dash-section-header">
+          <!-- Desktop Header -->
+          <div class="dash-section-header dash-desktop-att-header">
             <div class="dash-section-title-wrap">
               <div class="dash-section-icon orange-tint">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -213,17 +247,39 @@ export default {
                 <p class="dash-section-sub">Immediate items requiring operations or financial review</p>
               </div>
             </div>
-            <span class="dash-alert-tag">${(d.needs_attention.pending_payments_count || 0) + (d.needs_attention.unassigned_inquiries_count || 0)} Tasks Pending</span>
+            <span class="dash-alert-tag">${totalPendingTasks} Tasks Pending</span>
           </div>
 
-          <div class="dash-attention-grid">
+          <!-- Mobile Header (Exact match to reference) -->
+          <div class="dash-section-header dash-mobile-att-header">
+            <div class="dash-section-title-wrap">
+              <div class="dash-section-icon red-hexagon-tint">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#EF4444" stroke="none">
+                  <path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/>
+                  <line x1="12" y1="8" x2="12" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="12" cy="16" r="1.2" fill="#FFFFFF"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="dash-section-title">Needs Attention</h2>
+                <p class="dash-section-sub">Items that require your immediate attention</p>
+              </div>
+            </div>
+            <button type="button" class="dash-view-all-link" data-dash-nav="inquiries">
+              <span>View All</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+          <!-- Desktop Grid -->
+          <div class="dash-attention-grid dash-desktop-att">
             <div class="dash-attention-card">
               <div class="dash-attention-top">
                 <span class="dash-att-icon-pill red-pill">Payment Clearance</span>
-                <span class="dash-att-val">₹${(d.needs_attention.pending_payments_amount || 0).toLocaleString('en-IN')}</span>
+                <span class="dash-att-val">₹${(att.pending_payments_amount || 0).toLocaleString('en-IN')}</span>
               </div>
               <h4 class="dash-att-title">Pending Booking Payments</h4>
-              <p class="dash-att-desc">${d.needs_attention.pending_payments_count} customer bookings currently have pending balance payments awaiting collection.</p>
+              <p class="dash-att-desc">${att.pending_payments_count} customer bookings currently have pending balance payments awaiting collection.</p>
               <div class="dash-att-footer">
                 <button type="button" class="dash-att-btn" data-dash-nav="bookings">Review Bookings →</button>
               </div>
@@ -232,10 +288,10 @@ export default {
             <div class="dash-attention-card">
               <div class="dash-attention-top">
                 <span class="dash-att-icon-pill blue-pill">Lead Follow-up</span>
-                <span class="dash-att-val">${d.needs_attention.unassigned_inquiries_count} New</span>
+                <span class="dash-att-val">${att.unassigned_inquiries_count} New</span>
               </div>
               <h4 class="dash-att-title">Unassigned Customer Inquiries</h4>
-              <p class="dash-att-desc">${d.needs_attention.unassigned_inquiries_count} fresh inquiries received recently requiring team assignment and travel quotes.</p>
+              <p class="dash-att-desc">${att.unassigned_inquiries_count} fresh inquiries received recently requiring team assignment and travel quotes.</p>
               <div class="dash-att-footer">
                 <button type="button" class="dash-att-btn" data-dash-nav="inquiries">Assign Leads →</button>
               </div>
@@ -253,14 +309,84 @@ export default {
               </div>
             </div>
           </div>
+
+          <!-- Mobile Unified Card with 3 Rows (Exact match to reference) -->
+          <div class="dash-attention-card-wrap dash-mobile-att">
+            <div class="dash-att-row" data-dash-nav="inquiries">
+              <div class="dash-att-row-left">
+                <div class="dash-att-row-ico coral-ico">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y1="10"/>
+                  </svg>
+                </div>
+                <div class="dash-att-row-text">
+                  <h4 class="dash-att-item-title">Follow-ups due today</h4>
+                  <p class="dash-att-item-sub">Inquiries that need a response</p>
+                </div>
+              </div>
+              <div class="dash-att-row-right">
+                <span class="dash-att-badge">${followUpsCount}</span>
+                <button type="button" class="dash-att-row-view-btn" data-dash-nav="inquiries" aria-label="View follow-ups">
+                  <span>View</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="dash-att-row" data-dash-nav="bookings">
+              <div class="dash-att-row-left">
+                <div class="dash-att-row-ico amber-ico">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y1="10"/>
+                  </svg>
+                </div>
+                <div class="dash-att-row-text">
+                  <h4 class="dash-att-item-title">Pending payments</h4>
+                  <p class="dash-att-item-sub">Payments awaiting confirmation</p>
+                </div>
+              </div>
+              <div class="dash-att-row-right">
+                <span class="dash-att-badge">${pendingCount}</span>
+                <button type="button" class="dash-att-row-view-btn" data-dash-nav="bookings" aria-label="View pending payments">
+                  <span>View</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="dash-att-row" data-dash-nav="bookings">
+              <div class="dash-att-row-left">
+                <div class="dash-att-row-ico blue-ico">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
+                <div class="dash-att-row-text">
+                  <h4 class="dash-att-item-title">Unassigned trips</h4>
+                  <p class="dash-att-item-sub">Upcoming trips without team member</p>
+                </div>
+              </div>
+              <div class="dash-att-row-right">
+                <span class="dash-att-badge">${unassignedTripsCount}</span>
+                <button type="button" class="dash-att-row-view-btn" data-dash-nav="bookings" aria-label="View unassigned trips">
+                  <span>View</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
       `;
     }
 
     function renderTripsSection(d, m) {
+      const trips = d.upcoming_trips || [];
+
       return `
         <section class="dash-trips-section">
-          <div class="dash-section-header">
+          <!-- Desktop Header -->
+          <div class="dash-section-header dash-desktop-trips-header">
             <div class="dash-section-title-wrap">
               <div class="dash-section-icon blue-tint">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -275,7 +401,27 @@ export default {
             <button type="button" class="dash-link-btn" data-dash-nav="bookings">View All Bookings (${m.bookings.total}) →</button>
           </div>
 
-          <div class="dash-table-card">
+          <!-- Mobile Header (Exact match to reference) -->
+          <div class="dash-section-header dash-mobile-trips-header">
+            <div class="dash-section-title-wrap">
+              <div class="dash-section-icon blue-plane-tint">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="dash-section-title">Upcoming Trips</h2>
+                <p class="dash-section-sub">Next scheduled trips</p>
+              </div>
+            </div>
+            <button type="button" class="dash-view-all-link" data-dash-nav="bookings">
+              <span>View All</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+          <!-- Desktop Table Card -->
+          <div class="dash-table-card dash-desktop-trips">
             <div class="dash-table-scroll">
               <table class="dash-table">
                 <thead>
@@ -291,9 +437,51 @@ export default {
                   </tr>
                 </thead>
                 <tbody>
-                  ${(d.upcoming_trips || []).map((t) => renderTripRow(t)).join('')}
+                  ${trips.map((t) => renderTripRow(t)).join('')}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- Mobile Compact Trips Card (Exact match to reference) -->
+          <div class="dash-mobile-trips-card dash-mobile-trips">
+            <div class="dash-mobile-trips-table">
+              <div class="dash-mobile-tr-head">
+                <span class="dash-mth col-cust">Customer</span>
+                <span class="dash-mth col-dest">Destination</span>
+                <span class="dash-mth col-date">Travel Date</span>
+                <span class="dash-mth col-stat">Status</span>
+                <span class="dash-mth col-arr"></span>
+              </div>
+              <div class="dash-mobile-tr-body">
+                ${(trips.slice(0, 3)).map((t, idx) => {
+                  const avColors = ['av-blue', 'av-purple', 'av-cyan'];
+                  const avClass = avColors[idx % avColors.length];
+                  const isConfirmed = t.status === 'Paid' || t.status === 'Confirmed';
+                  return `
+                    <div class="dash-mobile-tr-row" data-dash-nav="bookings" data-booking-id="${esc(t.id)}">
+                      <div class="dash-mtd col-cust">
+                        <span class="dash-m-avatar ${avClass}">${esc(t.customer_initials || 'G')}</span>
+                        <span class="dash-m-cust-name" title="${esc(t.customer_name)}">${esc(t.customer_name)}</span>
+                      </div>
+                      <div class="dash-mtd col-dest">
+                        <span class="dash-m-dest-text" title="${esc(t.destination)}">${esc(t.destination)}</span>
+                      </div>
+                      <div class="dash-mtd col-date">
+                        <span class="dash-m-date-text">${esc(t.dates || '30 Oct 2026')}</span>
+                      </div>
+                      <div class="dash-mtd col-stat">
+                        <span class="dash-m-status-pill ${isConfirmed ? 'pill-confirmed' : 'pill-pending'}">
+                          ${isConfirmed ? 'Confirmed' : 'Pending'}
+                        </span>
+                      </div>
+                      <div class="dash-mtd col-arr">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
             </div>
           </div>
         </section>
@@ -309,15 +497,17 @@ export default {
           value: m.inquiries.total,
           iconBgClass: 'dash-ico-indigo',
           iconSvg: `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
             </svg>
           `,
           navTarget: 'inquiries',
           indicators: [
-            { label: 'New', value: m.inquiries.new, dotClass: 'dot-orange', filterTarget: 'inquiries?tab=new' },
-            { label: 'Ongoing', value: m.inquiries.ongoing, dotClass: 'dot-blue', filterTarget: 'inquiries?tab=ongoing' },
-            { label: 'Closed', value: m.inquiries.closed, dotClass: 'dot-green', filterTarget: 'inquiries?tab=closed' },
+            { label: 'New', value: m.inquiries.new, dotClass: 'dot-orange', filterTarget: 'inquiries' },
+            { label: 'Ongoing', value: m.inquiries.ongoing, dotClass: 'dot-blue', filterTarget: 'inquiries' },
+            { label: 'Closed', value: m.inquiries.closed, dotClass: 'dot-green', filterTarget: 'inquiries' },
           ],
         },
         {
@@ -327,36 +517,33 @@ export default {
           value: m.bookings.total,
           iconBgClass: 'dash-ico-cyan',
           iconSvg: `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
             </svg>
           `,
           navTarget: 'bookings',
           indicators: [
-            { label: 'Upcoming', value: m.bookings.upcoming, dotClass: 'dot-orange', filterTarget: 'bookings?tab=upcoming' },
-            { label: 'Ongoing', value: m.bookings.ongoing, dotClass: 'dot-blue', filterTarget: 'bookings?tab=ongoing' },
-            { label: 'Completed', value: m.bookings.completed, dotClass: 'dot-green', filterTarget: 'bookings?tab=completed' },
+            { label: 'Upcoming', value: m.bookings.upcoming, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Ongoing', value: m.bookings.ongoing, dotClass: 'dot-blue', filterTarget: 'bookings' },
+            { label: 'Completed', value: m.bookings.completed, dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
         {
           id: 'revenue',
           title: 'Revenue',
-          subtitle: 'Total revenue • Click to view trend',
-          value: m.revenue.total_formatted || '₹4.06L',
+          subtitle: 'Total revenue',
+          value: m.revenue.total_formatted || '₹90,000',
           iconBgClass: 'dash-ico-emerald',
           iconSvg: `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 3h12M6 8h12M6 13l7 8M6 13h5a4 4 0 0 0 0-8"/>
             </svg>
           `,
           navTarget: 'revenue-trend',
           indicators: [
-            { label: 'Tour', value: m.revenue.tour_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
-            { label: 'Activity', value: m.revenue.activity_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
-            { label: 'Other', value: m.revenue.other_formatted, dotClass: 'dot-green', filterTarget: 'bookings' },
+            { label: 'Tour revenue', value: m.revenue.tour_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Activity revenue', value: m.revenue.activity_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
+            { label: 'Other revenue', value: m.revenue.other_formatted, dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
         {
@@ -366,14 +553,14 @@ export default {
           value: m.team.total,
           iconBgClass: 'dash-ico-violet',
           iconSvg: `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
           `,
           navTarget: 'inquiries',
           indicators: [
-            { label: 'New', value: m.team.new, dotClass: 'dot-orange', filterTarget: 'inquiries' },
+            { label: 'New leads', value: m.team.new, dotClass: 'dot-orange', filterTarget: 'inquiries' },
             { label: 'In progress', value: m.team.in_progress, dotClass: 'dot-blue', filterTarget: 'inquiries' },
             { label: 'Converted', value: m.team.converted, dotClass: 'dot-green', filterTarget: 'inquiries' },
           ],
@@ -385,13 +572,14 @@ export default {
           value: m.calendar.total,
           iconBgClass: 'dash-ico-amber',
           iconSvg: `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y1="10"/>
             </svg>
           `,
           navTarget: 'calendar',
           indicators: [
-            { label: 'Total', value: m.calendar.total, dotClass: 'dot-orange', filterTarget: 'calendar' },
+            { label: 'Total events', value: m.calendar.total, dotClass: 'dot-orange', filterTarget: 'calendar' },
             { label: 'Tours', value: m.calendar.tours, dotClass: 'dot-blue', filterTarget: 'calendar' },
             { label: 'Activities', value: m.calendar.activities, dotClass: 'dot-green', filterTarget: 'calendar' },
           ],
@@ -399,19 +587,19 @@ export default {
         {
           id: 'payments',
           title: 'Payments',
-          subtitle: 'Total revenue',
-          value: m.payments.received_formatted || '₹2.36L',
+          subtitle: 'Total revenue received',
+          value: m.payments.received_formatted || '₹79,000',
           iconBgClass: 'dash-ico-teal',
           iconSvg: `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y1="10"/>
             </svg>
           `,
           navTarget: 'bookings',
           indicators: [
-            { label: 'Received', value: m.payments.received_formatted, dotClass: 'dot-green', filterTarget: 'bookings' },
-            { label: 'Pending', value: m.payments.pending_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
-            { label: 'Refunds', value: m.payments.refunds_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
+            { label: 'Received', value: m.payments.received_formatted, dotClass: 'dot-orange', filterTarget: 'bookings' },
+            { label: 'Pending', value: m.payments.pending_formatted, dotClass: 'dot-blue', filterTarget: 'bookings' },
+            { label: 'Refunds', value: m.payments.refunds_formatted || '₹0.00', dotClass: 'dot-green', filterTarget: 'bookings' },
           ],
         },
       ];
@@ -430,25 +618,40 @@ export default {
                 <span class="dash-kpi-subtitle">${esc(c.subtitle)}</span>
               </div>
             </div>
-            <div class="dash-kpi-right">
-              <span class="dash-kpi-val">${esc(String(c.value))}</span>
-              <span class="dash-kpi-arrow" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 18 15 12 9 6"/>
-                </svg>
-              </span>
+            <div class="dash-kpi-arrow" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
             </div>
+          </div>
+          <div class="dash-kpi-val-row">
+            <span class="dash-kpi-val">${esc(String(c.value))}</span>
           </div>
           <div class="dash-kpi-divider"></div>
           <div class="dash-kpi-bottom">
             ${c.indicators.map((ind) => `
               <div class="dash-kpi-indicator" data-dash-filter="${esc(ind.filterTarget || '')}">
-                <span class="dash-status-dot ${ind.dotClass}"></span>
-                <span class="dash-ind-label">${esc(ind.label)}</span>
+                <div class="dash-ind-label-wrap">
+                  <span class="dash-status-dot ${ind.dotClass}"></span>
+                  <span class="dash-ind-label">${esc(ind.label)}</span>
+                </div>
                 <span class="dash-ind-val">${esc(String(ind.value))}</span>
               </div>
             `).join('')}
           </div>
+          ${c.id === 'revenue' ? `
+            <div class="dash-kpi-action-box">
+              <button type="button" class="dash-kpi-trend-btn" data-dash-act="open-revenue-trend" title="Tap to view revenue trend">
+                <div class="dash-kpi-trend-btn-left">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+                  </svg>
+                  <span>Tap to view revenue trend</span>
+                </div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          ` : ''}
         </article>
       `;
     }
@@ -816,6 +1019,14 @@ export default {
         return;
       }
 
+      // Open revenue trend modal
+      if (e.target.closest('[data-dash-act="open-revenue-trend"]')) {
+        if (state.data) {
+          openRevenueModal(state.data, state.period);
+        }
+        return;
+      }
+
       // Card / general navigation
       const navTarget = e.target.closest('[data-dash-nav]')?.dataset.dashNav;
       if (navTarget) {
@@ -830,12 +1041,18 @@ export default {
     };
 
     container.addEventListener('click', onClick);
+
+    // Hide floating add button on mobile while on dashboard
+    const mobileAddBtn = document.getElementById('mobile-page-add');
+    if (mobileAddBtn) mobileAddBtn.style.setProperty('display', 'none', 'important');
+
     await loadData();
 
     return {
       destroy() {
         stopClock();
         container.removeEventListener('click', onClick);
+        if (mobileAddBtn) mobileAddBtn.style.removeProperty('display');
       },
     };
   },

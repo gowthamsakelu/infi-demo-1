@@ -9,6 +9,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
   let selectedMemberId = null;
   let activeDetailTab = 'overview'; // 'overview', 'assignments', 'skills'
   let isDetailSheetOpen = false;
+  let assignmentViewMode = 'cards'; // 'cards' | 'table'
 
   // Mount the basic DOM structure
   host.innerHTML = `
@@ -371,17 +372,17 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
 
     if (activeDetailTab === 'overview') {
       bodyEl.innerHTML = `
-        <div class="customer-details-tab-content">
+        <div class="customer-details-tab-content team-mobile-skills-section">
           <!-- Section 1: Contact & Workplace Info -->
-          <div class="details-section-card">
-            <div class="details-section-header">
-              <div class="section-header-left">
-                <div class="section-icon-circle blue-circle">
+          <div class="team-mobile-section-card">
+            <div class="team-mobile-section-header">
+              <div class="team-mobile-section-header-left">
+                <div class="team-icon-circle theme-blue">
                   ${icon('user', { size: 15 })}
                 </div>
-                <h3>Contact &amp; Workplace</h3>
+                <h3 class="team-mobile-section-title">Contact &amp; Workplace</h3>
               </div>
-              <span class="team-section-badge" style="font-size: 11px;">Directory</span>
+              <span class="team-mobile-section-badge">Directory</span>
             </div>
 
             <div class="customer-info-grid">
@@ -427,13 +428,13 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
           </div>
 
           <!-- Section 2: About & Responsibilities -->
-          <div class="details-section-card" style="margin-top: 14px;">
-            <div class="details-section-header">
-              <div class="section-header-left">
-                <div class="section-icon-circle purple-circle">
+          <div class="team-mobile-section-card">
+            <div class="team-mobile-section-header">
+              <div class="team-mobile-section-header-left">
+                <div class="team-icon-circle theme-purple">
                   ${icon('note', { size: 15 })}
                 </div>
-                <h3>About &amp; Responsibilities</h3>
+                <h3 class="team-mobile-section-title">About &amp; Responsibilities</h3>
               </div>
             </div>
             <p style="font-size: 13px; line-height: 1.55; color: #475569; margin: 0; padding: 2px 2px;">
@@ -442,13 +443,13 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
           </div>
 
           <!-- Section 3: Performance Overview -->
-          <div class="details-section-card" style="margin-top: 14px;">
-            <div class="details-section-header">
-              <div class="section-header-left">
-                <div class="section-icon-circle emerald-circle">
+          <div class="team-mobile-section-card">
+            <div class="team-mobile-section-header">
+              <div class="team-mobile-section-header-left">
+                <div class="team-icon-circle theme-emerald">
                   ${icon('calendar', { size: 15 })}
                 </div>
-                <h3>Performance Overview</h3>
+                <h3 class="team-mobile-section-title">Performance Overview</h3>
               </div>
               <span class="badge-pill-live" style="font-size: 11px; background: #ECFDF5; color: #047857; font-weight: 700; padding: 2px 8px; border-radius: 10px;">Live KPIs</span>
             </div>
@@ -498,156 +499,365 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
 
       if (assignments.length === 0) {
         bodyEl.innerHTML = `
-          <div class="team-empty-state" style="padding: 40px 16px; text-align: center; color: #64748B;">
-            <p>No active assignments currently linked to ${esc(member.name)}.</p>
+          <div class="customer-details-tab-content team-mobile-assignments-section">
+            <div class="team-mobile-assignments-header-card">
+              <div class="team-mobile-assignments-header-top">
+                <div class="team-mobile-assignments-title-wrap">
+                  <h3 class="team-mobile-assignments-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <span>Current Assignments</span>
+                  </h3>
+                  <p class="team-mobile-assignments-subtitle">
+                    Trips currently coordinated and dispatched by ${esc(member.name)}
+                  </p>
+                </div>
+                <span class="team-assignments-count-badge">0 Trips Assigned</span>
+              </div>
+            </div>
+            <div class="team-empty-state" style="padding: 36px 16px; text-align: center; color: #64748B;">
+              <p style="font-size: 13.5px; margin: 0 0 4px; font-weight: 600; color: #334155;">No Active Assignments</p>
+              <p style="font-size: 12px; margin: 0;">No trips currently linked to ${esc(member.name)}.</p>
+            </div>
           </div>
         `;
       } else {
         bodyEl.innerHTML = `
-          <div class="customer-details-tab-content">
-            <div class="details-section-card">
-              <div class="details-section-header">
-                <div class="section-header-left">
-                  <div class="section-icon-circle blue-circle">
-                    ${icon('briefcase', { size: 15 })}
-                  </div>
-                  <h3>Active Assignments (${assignments.length})</h3>
+          <div class="customer-details-tab-content team-mobile-assignments-section">
+            <!-- Section Header (Exact Match to Desktop Current Assignments Header) -->
+            <div class="team-mobile-assignments-header-card">
+              <div class="team-mobile-assignments-header-top">
+                <div class="team-mobile-assignments-title-wrap">
+                  <h3 class="team-mobile-assignments-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <span>Current Assignments</span>
+                  </h3>
+                  <p class="team-mobile-assignments-subtitle">
+                    Trips currently coordinated and dispatched by ${esc(member.name)}
+                  </p>
+                </div>
+                <span class="team-assignments-count-badge">${assignments.length} Trips Assigned</span>
+              </div>
+
+              <div class="team-mobile-header-toolbar">
+                <span class="team-mobile-toolbar-label">Layout Mode</span>
+                <div class="team-mobile-view-toggle" role="group" aria-label="Assignments Layout">
+                  <button type="button" class="team-mobile-toggle-btn ${assignmentViewMode === 'cards' ? 'active' : ''}" data-view-mode="cards" aria-pressed="${assignmentViewMode === 'cards'}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Cards</span>
+                  </button>
+                  <button type="button" class="team-mobile-toggle-btn ${assignmentViewMode === 'table' ? 'active' : ''}" data-view-mode="table" aria-pressed="${assignmentViewMode === 'table'}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18"/></svg>
+                    <span>Table</span>
+                  </button>
                 </div>
               </div>
+            </div>
 
-              <div style="display: flex; flex-direction: column; gap: 10px;">
+            ${assignmentViewMode === 'cards' ? `
+              <!-- Card View: Every Card Incorporates All Components from Screenshot 2 -->
+              <div class="team-mobile-cards-stack">
                 ${assignments
-            .map((b) => {
-              const custName = b.guest?.name || b.customer?.name || 'Customer';
-              const statusClass =
-                b.status === 'Confirmed'
-                  ? 'badge-confirmed'
-                  : b.status === 'Completed'
-                    ? 'badge-completed'
-                    : 'badge-pending';
+                  .map((b) => {
+                    const cust = b.customer || b.guest || {};
+                    const custName = cust.name || b.guest?.name || 'Customer';
+                    const custPhone = cust.phone || b.guest?.phone || '';
+                    const inits = initials(custName);
+                    const task = (member.taskAssignments && member.taskAssignments[b.id])
+                      ? member.taskAssignments[b.id]
+                      : (b.assignedTask || b.title || 'Ground Operations & Dispatch');
+                    const dest = cust.preferredDestination || b.destination || b.title;
+                    const statusCls = b.statusClass || (b.status === 'Paid' ? 'status-paid' : (b.status === 'Part Paid' ? 'status-part-paid' : 'status-pending'));
+                    const statusText = b.status || (statusCls === 'status-paid' ? 'Paid' : (statusCls === 'status-part-paid' ? 'Part Paid' : 'Pending'));
 
-              return `
-                      <div class="mobile-assign-item-card" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 12px 14px;">
-                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
-                          <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                            <div class="team-cust-avatar" style="width: 32px; height: 32px; font-size: 11px;">${initials(custName)}</div>
-                            <div style="min-width: 0;">
-                              <h4 style="font-size: 13.5px; font-weight: 700; color: #0F172A; margin: 0;">${esc(custName)}</h4>
-                              <div style="font-size: 11.5px; color: #64748B; margin-top: 1px;">${esc(b.id)} • ${b.pax || 2} Pax</div>
+                    return `
+                      <div class="team-mobile-assignment-card" data-booking-card-id="${esc(b.id)}">
+                        <!-- Component 1: Customer (Avatar, Name, Booking ID tag, Phone) & Component 5: Status with Dot -->
+                        <div class="team-mobile-card-top-row">
+                          <div class="team-mobile-cust-group">
+                            <div class="team-table-avatar" title="${esc(custName)}">${esc(inits)}</div>
+                            <div class="team-mobile-cust-info">
+                              <div class="team-mobile-cust-name-row">
+                                <strong class="team-mobile-cust-name">${esc(custName)}</strong>
+                                <span class="team-mobile-bkid-pill">${esc(b.id)}</span>
+                              </div>
+                              ${custPhone ? `
+                                <a href="tel:${esc(custPhone)}" class="team-mobile-cust-phone" title="Call ${esc(custName)}">
+                                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                  <span>${esc(custPhone)}</span>
+                                </a>
+                              ` : ''}
                             </div>
                           </div>
-                          <span class="status-badge ${statusClass}" style="font-size: 11px;">${esc(b.status || 'Active')}</span>
-                        </div>
-
-                        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #F1F5F9; font-size: 12px; color: #334155;">
-                          <div style="display: flex; align-items: center; gap: 5px; font-weight: 600; color: #0F172A;">
-                            <span style="color: #EF4444;">${icon('pin', { size: 12 })}</span>
-                            <span>${esc(b.destination || b.title)}</span>
-                          </div>
-                          <div style="display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: 11.5px; color: #64748B;">
-                            <span>${esc(b.dates || 'Trip Dates')}</span>
-                            <span>•</span>
-                            <span>${esc(b.duration || 'Duration')}</span>
+                          <div class="team-mobile-status-cell">
+                            <span class="status-pill ${statusCls}">
+                              <span class="dot"></span>
+                              ${esc(statusText)}
+                            </span>
                           </div>
                         </div>
 
-                        <div style="margin-top: 8px; font-size: 11.5px; color: #475569;">
-                          <strong style="color: #334155;">Task:</strong> ${esc(b.assignedTask || 'On-ground operational coordination')}
+                        <!-- Component 2: Destination & Component 3: Travel Dates + Component 4: Pax Badge -->
+                        <div class="team-mobile-trip-details">
+                          <div class="team-mobile-dest-row">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <span class="team-mobile-dest-text">${esc(dest)}</span>
+                          </div>
+                          <div class="team-mobile-dates-pax-row">
+                            <div class="team-mobile-dates-wrap">
+                              <span class="team-table-dates-bold">${esc(b.dates || 'Trip Dates')}</span>
+                              <span class="team-meta-dot">•</span>
+                              <span class="team-table-dates-sub">${esc(b.duration || 'Duration')}</span>
+                            </div>
+                            <span class="team-table-pax-badge">${esc(b.pax || 2)} Pax</span>
+                          </div>
                         </div>
 
-                        <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
-                          <button type="button" class="team-btn-view-booking" data-booking-id="${b.id}" style="width: 100%; justify-content: center; height: 34px;">
-                            <span>View Booking Details</span>
-                            ${icon('chevronRight', { size: 13 })}
-                          </button>
+                        <!-- Component 6: Assigned Responsibility (Dedicated Box) -->
+                        <div class="team-mobile-responsibility-box">
+                          <div class="team-mobile-resp-header">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                            <span class="team-mobile-resp-label">ASSIGNED RESPONSIBILITY</span>
+                          </div>
+                          <p class="team-mobile-resp-text">${esc(task)}</p>
                         </div>
+
+                        <!-- Component 7: Action (View Booking Details) -->
+                        <button type="button" class="team-mobile-view-btn team-btn-view-booking" data-booking-id="${esc(b.id)}">
+                          <span>View Booking Details</span>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
                       </div>
                     `;
-            })
-            .join('')}
+                  })
+                  .join('')}
               </div>
-            </div>
+            ` : `
+              <!-- Table View: Exact Screenshot 2 Table Component Adapted for Mobile Scroll -->
+              <div class="team-assignments-card" style="padding: 0; overflow: hidden; border-radius: 12px;">
+                <div class="team-mobile-table-scroll-hint">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="8 8 4 12 8 16"/><polyline points="16 8 20 12 16 16"/></svg>
+                  <span>Swipe horizontally to inspect full table</span>
+                </div>
+                <div class="team-assignments-table-wrap" style="border: none; border-radius: 0;">
+                  <table class="team-assignments-table">
+                    <thead>
+                      <tr>
+                        <th>Customer</th>
+                        <th>Destination</th>
+                        <th>Travel Dates</th>
+                        <th>Pax</th>
+                        <th>Status</th>
+                        <th>Assigned Responsibility</th>
+                        <th style="text-align: right;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${assignments
+                        .map((b) => {
+                          const cust = b.customer || b.guest || {};
+                          const custName = cust.name || b.guest?.name || 'Customer';
+                          const custPhone = cust.phone || b.guest?.phone || '';
+                          const inits = initials(custName);
+                          const task = (member.taskAssignments && member.taskAssignments[b.id])
+                            ? member.taskAssignments[b.id]
+                            : (b.assignedTask || b.title || 'Ground Operations & Dispatch');
+                          const dest = cust.preferredDestination || b.destination || b.title;
+                          const statusCls = b.statusClass || (b.status === 'Paid' ? 'status-paid' : (b.status === 'Part Paid' ? 'status-part-paid' : 'status-pending'));
+                          const statusText = b.status || (statusCls === 'status-paid' ? 'Paid' : (statusCls === 'status-part-paid' ? 'Part Paid' : 'Pending'));
+
+                          return `
+                            <tr>
+                              <td>
+                                <div class="team-table-cust-cell">
+                                  <div class="team-table-avatar">${esc(inits)}</div>
+                                  <div class="team-table-cust-info">
+                                    <strong class="team-table-cust-name">${esc(custName)}</strong>
+                                    ${custPhone ? `<span class="team-table-cust-phone">${esc(custPhone)}</span>` : ''}
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <div class="team-table-dest-cell">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                  <span>${esc(dest)}</span>
+                                </div>
+                              </td>
+                              <td>
+                                <div class="team-table-dates-cell">
+                                  <span class="team-table-dates-bold">${esc(b.dates || 'Trip Dates')}</span>
+                                  <span class="team-table-dates-sub">${esc(b.duration || 'Duration')}</span>
+                                </div>
+                              </td>
+                              <td>
+                                <span class="team-table-pax-badge">${esc(b.pax || 2)} Pax</span>
+                              </td>
+                              <td>
+                                <span class="status-pill ${statusCls}">
+                                  <span class="dot"></span>
+                                  ${esc(statusText)}
+                                </span>
+                              </td>
+                              <td>
+                                <span class="team-table-task-desc" title="${esc(task)}">${esc(task)}</span>
+                              </td>
+                              <td style="text-align: right;">
+                                <button type="button" class="team-table-view-btn team-btn-view-booking" data-booking-id="${esc(b.id)}">
+                                  View Booking
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                              </td>
+                            </tr>
+                          `;
+                        })
+                        .join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            `}
           </div>
         `;
 
-        bodyEl.querySelectorAll('.team-btn-view-booking').forEach((btn) => {
+        // Bind view mode toggle buttons
+        bodyEl.querySelectorAll('[data-view-mode]').forEach((btn) => {
           btn.addEventListener('click', () => {
+            assignmentViewMode = btn.dataset.viewMode;
+            renderSheetBody();
+          });
+        });
+
+        // Bind view booking buttons
+        bodyEl.querySelectorAll('.team-btn-view-booking').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const bId = btn.dataset.bookingId;
             const b = INITIAL_BOOKINGS.find((item) => item.id === bId) || { id: bId, title: 'Trip Booking', guest: { name: 'Guest' } };
             closeDetailSheet();
-            if (onViewBooking) onViewBooking(b);
+            if (onViewBooking) onViewBooking(bId || b.id || b);
           });
         });
       }
     } else if (activeDetailTab === 'skills') {
       bodyEl.innerHTML = `
-        <div class="customer-details-tab-content">
-          <!-- Primary Responsibilities -->
-          <div class="details-section-card">
-            <div class="details-section-header">
-              <div class="section-header-left">
-                <div class="section-icon-circle blue-circle">
-                  ${icon('checkCircle', { size: 15 })}
-                </div>
-                <h3>Primary Responsibilities</h3>
+        <div class="customer-details-tab-content team-mobile-skills-section">
+          <!-- Card 1: Core Responsibilities & Skills (Exact Desktop Component from Image 2) -->
+          <div class="team-extra-card team-mobile-core-card">
+            <div class="team-extra-card-header">
+              <div class="team-extra-card-header-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <h4>Core Responsibilities &amp; Skills</h4>
               </div>
+              <span class="team-skills-verified-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Verified Profile</span>
+              </span>
             </div>
-            <ul class="team-checklist">
-              ${member.responsibilities
-          .map(
-            (r) => `
-                <li>
-                  <span class="checklist-bullet">${icon('check', { size: 11, stroke: 2.5 })}</span>
-                  <span style="font-size: 12.5px;">${esc(r)}</span>
-                </li>
-              `
-          )
-          .join('')}
-            </ul>
+
+            <div class="team-skills-layout-mobile">
+              <!-- Subheading 1: Operational Responsibilities -->
+              <div class="team-skills-section-block">
+                <div class="team-skills-subheading-wrap">
+                  <span class="team-skills-subheading">Operational Responsibilities</span>
+                  <span class="team-skills-subheading-count">${(member.responsibilities || []).length} Duties</span>
+                </div>
+                <ul class="team-resp-list">
+                  ${(member.responsibilities || [])
+                    .map(
+                      (r) => `
+                    <li>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>${esc(r)}</span>
+                    </li>
+                  `
+                    )
+                    .join('')}
+                </ul>
+              </div>
+
+              <!-- Subheading 2: Regional Expertise & Circuits -->
+              ${(member.expertise && member.expertise.length > 0) ? `
+                <div class="team-skills-section-block">
+                  <div class="team-skills-subheading-wrap">
+                    <span class="team-skills-subheading">Regional Expertise &amp; Circuits</span>
+                    <span class="team-skills-subheading-count">${member.expertise.length} Circuits</span>
+                  </div>
+                  <div class="team-skills-chips">
+                    ${member.expertise.map((e) => `
+                      <span class="team-skill-tag tag-expertise">${esc(e)}</span>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Subheading 3: Specialized Skills & Certifications -->
+              ${(member.skills && member.skills.length > 0) ? `
+                <div class="team-skills-section-block">
+                  <div class="team-skills-subheading-wrap">
+                    <span class="team-skills-subheading">Specialized Skills &amp; Certifications</span>
+                    <span class="team-skills-subheading-count">${member.skills.length} Skills</span>
+                  </div>
+                  <div class="team-skills-chips">
+                    ${member.skills.map((s) => `
+                      <span class="team-skill-tag">${esc(s)}</span>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Subheading 4: Travel Services Handled -->
+              ${(member.servicesHandled && member.servicesHandled.length > 0) ? `
+                <div class="team-skills-section-block">
+                  <div class="team-skills-subheading-wrap">
+                    <span class="team-skills-subheading">Travel Services Handled</span>
+                    <span class="team-skills-subheading-count">${member.servicesHandled.length} Services</span>
+                  </div>
+                  <div class="team-skills-chips">
+                    ${member.servicesHandled.map((svc) => `
+                      <span class="team-skill-tag tag-service">${esc(svc)}</span>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
           </div>
 
-          <!-- Areas of Expertise -->
-          <div class="details-section-card" style="margin-top: 14px;">
-            <div class="details-section-header">
-              <div class="section-header-left">
-                <div class="section-icon-circle purple-circle">
-                  ${icon('pin', { size: 15 })}
-                </div>
-                <h3>Areas of Expertise</h3>
+          <!-- Card 2: Operational Deployment & Credentials (Uniform Structured Companion Card for Info Tab) -->
+          <div class="team-extra-card team-mobile-core-card">
+            <div class="team-extra-card-header">
+              <div class="team-extra-card-header-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                <h4>Operational Deployment &amp; Field Info</h4>
               </div>
+              <span class="badge-pill-live" style="font-size: 11px; background: #ECFDF5; color: #047857; font-weight: 700; padding: 2px 8px; border-radius: 10px;">Active Roster</span>
             </div>
-            <div class="team-tag-cloud">
-              ${member.expertise.map((exp) => `<span class="team-tag tag-expertise">${esc(exp)}</span>`).join('')}
-            </div>
-          </div>
 
-          <!-- Skills & Certifications -->
-          <div class="details-section-card" style="margin-top: 14px;">
-            <div class="details-section-header">
-              <div class="section-header-left">
-                <div class="section-icon-circle emerald-circle">
-                  ${icon('note', { size: 15 })}
-                </div>
-                <h3>Skills &amp; Certifications</h3>
+            <div class="customer-info-grid">
+              <div class="info-cell">
+                <span class="info-label">INDUSTRY EXPERIENCE</span>
+                <span class="info-value-bold">${esc(member.experience || '5+ Years')}</span>
               </div>
-            </div>
-            <div class="team-tag-cloud">
-              ${member.skills.map((skill) => `<span class="team-tag tag-skill">${esc(skill)}</span>`).join('')}
-            </div>
-          </div>
-
-          <!-- Travel Services Handled -->
-          <div class="details-section-card" style="margin-top: 14px;">
-            <div class="details-section-header">
-              <div class="section-header-left">
-                <div class="section-icon-circle amber-circle">
-                  ${icon('calendar', { size: 15 })}
-                </div>
-                <h3>Travel Services Handled</h3>
+              <div class="info-cell">
+                <span class="info-label">JOINING DATE</span>
+                <span class="info-value-bold">${esc(member.joiningDate || 'Active')}</span>
               </div>
-            </div>
-            <div class="team-tag-cloud">
-              ${member.servicesHandled.map((svc) => `<span class="team-tag tag-service">${esc(svc)}</span>`).join('')}
+              <div class="info-cell">
+                <span class="info-label">ACTIVE SHIFT</span>
+                <span class="info-value-bold">${esc(member.workload?.shift || 'Day Shift')}</span>
+              </div>
+              <div class="info-cell">
+                <span class="info-label">DUTY HOURS</span>
+                <span class="info-value-bold" style="font-size: 12px;">${esc(member.workload?.workingHours || '09:00 AM – 06:30 PM')}</span>
+              </div>
+              <div class="info-cell" style="grid-column: span 2;">
+                <span class="info-label">BASE DESK LOCATION</span>
+                <span class="info-value-bold" style="font-size: 12px;">${esc(member.officeLocation || 'Mumbai HQ Operations Wing')}</span>
+              </div>
+              ${member.workload?.upcomingAssignment ? `
+                <div class="info-cell" style="grid-column: span 2;">
+                  <span class="info-label">UPCOMING DEPLOYMENT</span>
+                  <span class="info-value-bold" style="color: #1D4ED8; font-size: 12px;">${esc(member.workload.upcomingAssignment)}</span>
+                </div>
+              ` : ''}
             </div>
           </div>
         </div>

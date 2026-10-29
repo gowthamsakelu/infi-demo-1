@@ -423,6 +423,12 @@ export default {
             </span>
           </div>
         </div>
+        <button type="button" class="sheet-close-btn mobile-sheet-close-pill us-sheet-close-btn" data-sp-back title="Close" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>`;
     }
 
@@ -724,34 +730,16 @@ export default {
         }
       }
 
-      // 2. Ensure top drag handle exists at top of bottom sheet
-      if (detailEl && !detailEl.querySelector('.us-drag-handle')) {
-        const handle = document.createElement('div');
-        handle.className = 'us-drag-handle';
-        handle.setAttribute('aria-hidden', 'true');
-        detailEl.insertBefore(handle, detailEl.firstChild);
-      }
+      // 2. Remove extra duplicate drag handle if present (standard sheet-drag-handle-bar is already provided)
+      detailEl?.querySelector('.us-drag-handle')?.remove();
 
-      // 3. Customize the close button in .sp-phone-top to circular ✕ matching Reference Image 1
-      const topBar = phoneRoot.querySelector('.sp-phone-top');
-      if (topBar) {
-        const backBtn = topBar.querySelector('.sp-back');
-        if (backBtn && !backBtn.dataset.hasCloseX) {
-          backBtn.dataset.hasCloseX = 'true';
-          backBtn.className = 'us-sheet-close-btn sp-back';
-          backBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
-          backBtn.setAttribute('title', 'Close (Esc)');
-          backBtn.setAttribute('aria-label', 'Close');
-        }
-      }
-
-      // 4. Swipe down gesture to dismiss sheet
+      // 3. Swipe down gesture to dismiss sheet
       if (detailEl && !detailEl.dataset.hasSwipe) {
         detailEl.dataset.hasSwipe = 'true';
         let touchStartY = 0;
         let isHeaderTouch = false;
         detailEl.addEventListener('touchstart', (e) => {
-          const headerTouch = e.target.closest('.us-drag-handle, .sp-phone-top, .sp-detail-head');
+          const headerTouch = e.target.closest('.sheet-drag-handle-bar, .sheet-customer-header, .sp-detail-head');
           if (headerTouch) {
             touchStartY = e.touches[0].clientY;
             isHeaderTouch = true;
@@ -1152,7 +1140,7 @@ export default {
         return;
       }
       if (e.key === 'Escape' && document.body.classList.contains('sp-detail-open')) {
-        const backBtn = host.querySelector('.sp-phone-top [data-sp-back]');
+        const backBtn = host.querySelector('[data-sp-back]');
         if (backBtn) backBtn.click();
       }
     };
