@@ -40,6 +40,7 @@ class SaveTourPackageRequest extends FormRequest
             'exclusions.*' => ['string', 'max:200'],
             'highlights' => $list,
             'highlights.*' => ['string', 'max:200'],
+            'image' => ['nullable', 'string', 'max:7000000'],
         ];
     }
 

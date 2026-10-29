@@ -3,11 +3,11 @@
 // The Add Destination and Edit buttons are drawn as designed and do nothing yet.
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson } from '../shared/http.js';
-import { createCatalogCrud, numOrNull, textOrNull, listOf } from '../shared/catalog-crud.js';
+import { createCatalogCrud, numOrNull, textOrNull, listOf, pictureOf } from '../shared/catalog-crud.js';
 import { openAddInquiry } from '../shared/add-inquiry.js';
 import { esc } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
-import { card, highlightsCard, overviewCard } from './catalog-ui.js';
+import { card, highlightsCard, overviewCard, heroImage } from './catalog-ui.js';
 import { pill, statRow, sectionTitle, detailGrid, rowGroup, linkRow, money, moneyShort, plural } from '../shared/page-ui.js';
 
 const label = (s) => (s === 'active' ? 'Active' : 'Draft');
@@ -21,6 +21,7 @@ function wizardConfig() {
   return {
     noun: 'destination',
     requiredKey: 'name',
+    required: ['name', 'region'], // saved only when these are filled in
     steps: [
       { label: 'Basics', title: 'Basics', sub: 'The name, the state or region, and whether it is on the website.', fields: [
         { key: 'name', type: 'text', label: 'Destination name', placeholder: 'e.g. Kashmir', optional: false, max: 120 },
@@ -39,7 +40,7 @@ function wizardConfig() {
       { label: 'Overview', title: 'Overview & picture', sub: 'What the destination is, its top places, and a picture for the website.', fields: [
         { key: 'description', type: 'textarea', label: 'Overview', placeholder: 'A few sentences about the destination', rows: 5, max: 2000 },
         { key: 'highlights', type: 'list', label: 'Top places to see', placeholder: 'e.g. Dal Lake and shikara rides', addLabel: 'Add place' },
-        { key: 'image', type: 'image', label: 'Picture', hint: 'A landscape photo works best' },
+        { key: 'image', type: 'image', label: 'Image', hint: 'JPG, PNG or WebP · up to 5 MB' },
       ] },
     ],
     defaults: () => ({ name: '', region: '', status: 'draft', popular: false, bestSeason: '', avgDays: '', avgNights: '', idealDuration: '', nearestAirport: '', howToReach: '', description: '', highlights: [], image: [] }),
@@ -79,6 +80,7 @@ export default {
       const about = d?.about;
       const year = d?.year ?? new Date().getFullYear();
       return `
+        ${heroImage(item.image, item.name)}
         ${statRow([
           { icon: 'layers', label: 'Packages', value: stats ? stats.packages : item.packages, tone: 'blue' },
           { icon: 'note', label: `Inquiries ${year}`, value: stats ? stats.inquiries : item.inquiries, tone: 'green' },
@@ -105,11 +107,11 @@ export default {
         name: v.name.trim(), region: textOrNull(v.region), status: v.status || 'draft', popular: !!v.popular,
         bestSeason: textOrNull(v.bestSeason), avgDays: numOrNull(v.avgDays), avgNights: numOrNull(v.avgNights), idealDuration: textOrNull(v.idealDuration),
         nearestAirport: textOrNull(v.nearestAirport), howToReach: textOrNull(v.howToReach), description: textOrNull(v.description),
-        highlights: listOf(v.highlights), image: String(v.image?.[0] ?? '').startsWith('data:') ? v.image[0] : undefined,
+        highlights: listOf(v.highlights), image: pictureOf(v.image),
       }),
       local: (v, old) => ({
         ...(old || {}), name: v.name.trim(), region: textOrNull(v.region), status: v.status || 'draft', popular: !!v.popular,
-        image: String(v.image?.[0] ?? '').startsWith('data:') ? v.image[0] : (old?.image ?? null),
+        image: pictureOf(v.image),
         packages: old?.packages ?? 0, inquiries: old?.inquiries ?? 0, description: textOrNull(v.description), highlights: listOf(v.highlights), howToReach: textOrNull(v.howToReach),
         about: { bestSeason: textOrNull(v.bestSeason), averageTrip: numOrNull(v.avgDays) ? `${v.avgDays} days / ${numOrNull(v.avgNights) ?? 0} nights` : null, idealDuration: textOrNull(v.idealDuration), nearestAirport: textOrNull(v.nearestAirport), topLeadSource: old?.about?.topLeadSource ?? null, peakMonth: old?.about?.peakMonth ?? null },
         stats: old?.stats ?? { packages: 0, inquiries: 0, bookings: 0, revenue: 0 }, packages: old?.packages ?? [], stays: old?.stays ?? [], activities: old?.activities ?? [], inquiriesList: old?.inquiriesList ?? [],
@@ -160,6 +162,8 @@ export default {
       searchText: (i) => `${i.name} ${i.region || ''}`,
       row: (i) => ({
         tile: picture(i, 22),
+        thumb: true,
+        image: i.image,
         name: i.name,
         pill: `${pill(i.status, label(i.status))}${crud.isFresh(i.id) ? '<span class="just-added-tag">JUST ADDED</span>' : ''}`,
         sub: i.region || '',

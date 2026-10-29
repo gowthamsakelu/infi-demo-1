@@ -3,10 +3,10 @@
 // The Add button and the Edit button are drawn as designed and do nothing yet.
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson, sendJson } from '../shared/http.js';
-import { createCatalogCrud, numOrNull, textOrNull, listOf } from '../shared/catalog-crud.js';
+import { createCatalogCrud, numOrNull, textOrNull, listOf, pictureOf } from '../shared/catalog-crud.js';
 import { esc, toast } from '../shared/ui.js';
 import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, toggle, flipToggle, money, plural } from '../shared/page-ui.js';
-import { card, highlightsCard, overviewCard, inclusionsCard, bulletCard } from './catalog-ui.js';
+import { card, highlightsCard, overviewCard, inclusionsCard, bulletCard, heroImage } from './catalog-ui.js';
 
 const RENTALS = ['self_drive', 'scooter_bike'];
 const kind = (v) => (RENTALS.includes(v.key) ? 'rental' : v.category === 'bus' || v.key === 'bus' ? 'bus' : v.category === 'car' || v.category === 'van' ? 'car' : 'other');
@@ -30,6 +30,7 @@ function wizardConfig() {
   return {
     noun: 'vehicle',
     requiredKey: 'name',
+    required: ['name', 'seats'], // saved only when these are filled in
     steps: [
       { label: 'Basics', title: 'Basics', sub: 'The vehicle, its size and what the builder shows.', fields: [
         { key: 'name', type: 'text', label: 'Vehicle name', placeholder: 'e.g. Sedan 4-seater AC', optional: false, max: 80 },
@@ -41,19 +42,20 @@ function wizardConfig() {
         { key: 'mostPopular', type: 'toggle', label: 'Most popular', hint: 'Shown first in the builder' },
         { key: 'showInBuilder', type: 'toggle', label: 'Show in itinerary builder', hint: 'Available to agents' },
       ] },
-      { label: 'Rates', title: 'Rates', sub: 'Leave the daily rate empty when the customer arranges this vehicle.', fields: [
-        { key: 'rateUnit', type: 'chips', label: 'Rate basis', options: [{ value: 'per_day', label: 'Per day' }, { value: 'per_trip', label: 'Per trip' }] },
-        { key: 'baseRate', type: 'price', label: 'Base rate', placeholder: '3,500', max: 9 },
-        { key: 'rateCard', type: 'rates', label: 'Rate card', placeholder: 'e.g. Extra distance', addLabel: 'Add rate' },
-      ] },
       { label: 'Overview', title: 'Overview & features', sub: 'What the vehicle is like, what the price covers, and what it does not.', fields: [
+        { key: 'image', type: 'image', label: 'Image', hint: 'JPG, PNG or WebP · up to 5 MB' },
         { key: 'overview', type: 'textarea', label: 'Overview', placeholder: 'A few sentences about this vehicle', rows: 4, max: 2000 },
         { key: 'highlights', type: 'list', label: 'Features', placeholder: 'e.g. Push-back seats', addLabel: 'Add feature' },
         { key: 'inclusions', type: 'list', label: 'Included', placeholder: 'e.g. Fuel', addLabel: 'Add item' },
         { key: 'exclusions', type: 'list', label: 'Not included', placeholder: 'e.g. Entry tickets', addLabel: 'Add item' },
       ] },
+      { label: 'Rates', title: 'Rates', sub: 'Leave the daily rate empty when the customer arranges this vehicle.', fields: [
+        { key: 'rateUnit', type: 'chips', label: 'Rate basis', options: [{ value: 'per_day', label: 'Per day' }, { value: 'per_trip', label: 'Per trip' }] },
+        { key: 'baseRate', type: 'price', label: 'Base rate', placeholder: '3,500', max: 9 },
+        { key: 'rateCard', type: 'rates', label: 'Rate card', placeholder: 'e.g. Extra distance', addLabel: 'Add rate' },
+      ] },
     ],
-    defaults: () => ({ name: '', category: 'car', seats: '', description: '', ac: true, active: true, mostPopular: false, showInBuilder: true, rateUnit: 'per_day', baseRate: '', rateCard: [], overview: '', highlights: [], inclusions: [], exclusions: [] }),
+    defaults: () => ({ image: [], name: '', category: 'car', seats: '', description: '', ac: true, active: true, mostPopular: false, showInBuilder: true, rateUnit: 'per_day', baseRate: '', rateCard: [], overview: '', highlights: [], inclusions: [], exclusions: [] }),
     preview: (v) => ({ title: String(v.name || '').trim(), lines: [VEHICLE_CATEGORIES.find((c) => c.value === v.category)?.label || '', v.seats ? `${v.seats} seats` : '', v.ac ? 'AC' : 'Non-AC', numOrNull(v.baseRate) != null ? `₹${Number(v.baseRate).toLocaleString('en-IN')} per day` : 'Arranged by the customer'] }),
   };
 }
@@ -80,19 +82,19 @@ export default {
       endpoint: '/api/transport',
       wizard: () => wizardConfig(),
       toBody: (v) => ({
-        name: v.name.trim(), category: v.category || 'car', seats: numOrNull(v.seats), ac: !!v.ac, active: !!v.active, mostPopular: !!v.mostPopular,
+        name: v.name.trim(), image: pictureOf(v.image), category: v.category || 'car', seats: numOrNull(v.seats), ac: !!v.ac, active: !!v.active, mostPopular: !!v.mostPopular,
         showInBuilder: !!v.showInBuilder, description: textOrNull(v.description), rateUnit: v.rateUnit || 'per_day', baseRate: numOrNull(v.baseRate),
         rateCard: rateCardOf(v.rateCard), overview: textOrNull(v.overview), highlights: listOf(v.highlights), inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions),
       }),
       local: (v, old) => ({
-        ...(old || {}), name: v.name.trim(), category: v.category || 'car', icon: v.category === 'other' ? 'car' : (v.category || 'car'),
+        ...(old || {}), name: v.name.trim(), image: pictureOf(v.image), category: v.category || 'car', icon: v.category === 'other' ? 'car' : (v.category || 'car'),
         seats: numOrNull(v.seats), ac: !!v.ac, active: !!v.active, mostPopular: !!v.mostPopular, showInBuilder: !!v.showInBuilder,
         description: textOrNull(v.description), rateUnit: v.rateUnit || 'per_day', baseRate: numOrNull(v.baseRate), rateCard: rateCardOf(v.rateCard),
         overview: textOrNull(v.overview), highlights: listOf(v.highlights), inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions),
         key: old?.key ?? 'new', trips: old?.trips ?? 0, avgDays: old?.avgDays ?? null,
       }),
       values: (item) => ({
-        name: item.name, category: item.category || 'car', seats: item.seats ?? '', ac: !!item.ac, active: !!item.active, mostPopular: !!item.mostPopular,
+        image: item.image ? [item.image] : [], name: item.name, category: item.category || 'car', seats: item.seats ?? '', ac: !!item.ac, active: !!item.active, mostPopular: !!item.mostPopular,
         showInBuilder: !!item.showInBuilder, description: item.description ?? '', rateUnit: item.rateUnit || 'per_day', baseRate: item.baseRate ?? '',
         rateCard: (item.rateCard || []).map((r) => ({ ...r, amount: r.amount ?? '' })), overview: item.overview ?? '',
         highlights: item.highlights || [], inclusions: item.inclusions || [], exclusions: item.exclusions || [],
@@ -133,6 +135,8 @@ export default {
       discard: () => { draft = null; },
       row: (v) => ({
         tile: tile(iconOf(v)),
+        thumb: true,
+        image: v.image,
         name: v.name,
         pill: `${v.mostPopular ? tag('resort', 'Most popular') : ''}${crud.isFresh(v.id) ? '<span class="just-added-tag">JUST ADDED</span>' : ''}`,
         sub: v.description || '',
@@ -140,10 +144,10 @@ export default {
       }),
       detail: (item, ui) => {
         const v = valuesOf(item);
-        const tabs = [{ key: 'rates', label: 'Rates' }, { key: 'details', label: 'Details' }];
+        const tabs = [{ key: 'overview', label: 'Overview' }, { key: 'rates', label: 'Rates' }];
         let body;
-        if (ui.tab === 'details') {
-          body = `${card('car', 'Vehicle', detailGrid([
+        if (ui.tab !== 'rates') {
+          body = `${heroImage(item.image, item.name)}${card('car', 'Vehicle', detailGrid([
             ['Seats', item.seats ? String(item.seats) : ''], ['Air conditioning', item.ac ? 'AC' : 'Non-AC'],
             ['Type', KIND_LABEL[kind(item)]], ['Rate basis', item.rateUnit === 'per_day' ? 'Per day' : item.baseRate == null ? 'No rate (arranged by the customer)' : ''],
             ['Trips this year', String(item.trips)], ['Average days per trip', item.avgDays != null ? String(item.avgDays) : ''],

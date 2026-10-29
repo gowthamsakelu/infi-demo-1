@@ -12,7 +12,7 @@ class SavedHotel extends Model
     use HasFactory;
 
     protected $fillable = ['place_id', 'name', 'city', 'address', 'phone', 'uses', 'last_used_at',
-        'tag', 'status', 'region', 'rating', 'reviews', 'rooms_count', 'price_from', 'email', 'description', 'amenities', 'bookings_count', 'revenue', 'demo_key', 'inclusions', 'exclusions', 'extra_charges', 'price_note'];
+        'tag', 'status', 'region', 'rating', 'reviews', 'rooms_count', 'price_from', 'email', 'description', 'amenities', 'bookings_count', 'revenue', 'demo_key', 'inclusions', 'exclusions', 'extra_charges', 'price_note', 'image'];
 
     protected $casts = ['last_used_at' => 'datetime', 'amenities' => 'array', 'inclusions' => 'array', 'exclusions' => 'array', 'extra_charges' => 'array', 'rating' => 'float', 'price_from' => 'float', 'revenue' => 'float'];
 

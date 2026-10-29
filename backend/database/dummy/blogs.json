@@ -17,7 +17,10 @@
             "updatedAt": "2026-10-27",
             "views": 2140,
             "leads": 11,
-            "converted": 3
+            "converted": 3,
+            "cover": "/images/kedarnath.jpg",
+            "excerpt": "Snow, shikara rides on a frozen Dal Lake and hot kahwa: the ten places that make Kashmir special from December to February.",
+            "content": "Kashmir in winter is a different place. Gulmarg turns into a ski slope, the Mughal gardens go quiet and Dal Lake can freeze at the edges.\n\nStart in Srinagar with a shikara ride at sunrise, then drive to Gulmarg for the gondola. Pahalgam and Sonamarg are best done as day trips if the roads are clear.\n\nPack warm layers, carry cash for small shops and book a hotel with a heater. We can plan the whole trip, including the cab, for you."
         },
         {
             "id": 2,
@@ -30,7 +33,10 @@
             "updatedAt": "2026-10-27",
             "views": 1860,
             "leads": 9,
-            "converted": 2
+            "converted": 2,
+            "cover": "/images/kedarnath_temple_1792398330688.jpg",
+            "excerpt": "A relaxed five-day plan covering Srinagar, Gulmarg and Pahalgam, built for people visiting Kashmir for the first time.",
+            "content": "Day 1 is for settling in: a houseboat stay and a slow evening on the Boulevard. Day 2 covers the Mughal gardens and the old city.\n\nDays 3 and 4 are the mountains: the Gulmarg gondola and Pahalgam. Keep a buffer day for weather.\n\nDay 5 is shopping for shawls and dry fruit, then the airport. This plan suits couples and small families."
         },
         {
             "id": 3,
@@ -43,7 +49,10 @@
             "updatedAt": "2026-10-27",
             "views": 1230,
             "leads": 6,
-            "converted": 1
+            "converted": 1,
+            "cover": "/images/goa_beach_villa_1792398351292.jpg",
+            "excerpt": "When a private villa beats a hotel in Goa, what each really costs, and how to save on a group trip.",
+            "content": "For groups of six or more, a villa with a pool is often cheaper per person than three hotel rooms, and you get a kitchen and a garden.\n\nHotels win for short stays, couples and anyone who wants breakfast without lifting a finger. Compare the all-in cost, not just the room rate.\n\nTravel in the shoulder months, book directly and ask about long-stay discounts. Our team can quote both options side by side."
         },
         {
             "id": 4,
@@ -56,7 +65,10 @@
             "updatedAt": "2026-10-27",
             "views": 980,
             "leads": 4,
-            "converted": 1
+            "converted": 1,
+            "cover": "/images/manali_resort_1792398389178.jpg",
+            "excerpt": "Thermals, waterproof boots and a power bank: everything to pack before you head to the snow in Manali.",
+            "content": "Manali nights drop below freezing from December. Layer a thermal base, a fleece and a proper down jacket.\n\nSnow gear is rentable at Solang, but good boots and gloves are worth carrying. Keep a spare pair of socks in your day bag.\n\nMedicines, a power bank and a printed copy of your bookings round off the list. Mobile networks can be patchy in the valley."
         },
         {
             "id": 5,
@@ -69,7 +81,10 @@
             "updatedAt": "2026-10-27",
             "views": 870,
             "leads": 5,
-            "converted": 1
+            "converted": 1,
+            "cover": "/images/rishikesh_rafting_1792398369106.jpg",
+            "excerpt": "Which rapids suit beginners, when the river is safest and what to ask your rafting operator before you go.",
+            "content": "The rafting season runs roughly from September to June, with the best water in spring. The monsoon months are closed for safety.\n\nChoose a licensed operator, confirm that helmets and life jackets are provided and ask about the guide’s experience on your stretch.\n\nFirst-timers should start with the 9 or 16 km runs. Wear quick-dry clothes and leave valuables at the hotel."
         },
         {
             "id": 6,
@@ -82,7 +97,10 @@
             "updatedAt": "2026-10-27",
             "views": 760,
             "leads": 2,
-            "converted": 1
+            "converted": 1,
+            "cover": "/images/rishikesh.jpg",
+            "excerpt": "Houseboat or homestay? How to choose a cruise in Alleppey, what it costs and what is included in the price.",
+            "content": "A houseboat stay in the Kerala backwaters is usually overnight, with meals on board and a quiet cruise through the canals.\n\nPrices depend on the number of bedrooms, the season and whether the boat is air conditioned. Ask what is included before you pay.\n\nDecember to February is the busiest time, so book early. Combine it with Munnar and Thekkady for a full Kerala trip."
         },
         {
             "id": 8,
@@ -95,7 +113,10 @@
             "updatedAt": "2026-10-27",
             "views": 0,
             "leads": 0,
-            "converted": 0
+            "converted": 0,
+            "cover": null,
+            "excerpt": "Seven relaxed days across Ubud, Seminyak and Uluwatu, with time for beaches, temples and slow breakfasts.",
+            "content": "Spend the first three nights in Ubud for the rice terraces and the temples, then move to the coast for the beaches.\n\nLeave one day free for a Nusa Penida trip if the sea is calm, and keep an evening for a cliff-top sunset in Uluwatu.\n\nIndian passport holders should check the current visa rules before booking."
         },
         {
             "id": 7,
@@ -108,7 +129,10 @@
             "updatedAt": "2026-10-27",
             "views": 0,
             "leads": 0,
-            "converted": 0
+            "converted": 0,
+            "cover": "/images/goa.jpg",
+            "excerpt": "Short on time this Diwali? Ten places that are easy to reach, comfortable in November and still have rooms.",
+            "content": "Diwali weekends fill up quickly. Pick places with good road or rail links so you spend less time in transit.\n\nGoa, Udaipur and Jaipur are popular for a reason: festive lights, good food and plenty of stays at every budget.\n\nBook hotels and transport two to three weeks ahead and keep a flexible plan for the festival days."
         },
         {
             "id": 10,
@@ -121,7 +145,10 @@
             "updatedAt": "2026-10-27",
             "views": 0,
             "leads": 0,
-            "converted": 0
+            "converted": 0,
+            "cover": "/images/paragliding_bir_1792398411958.jpg",
+            "excerpt": "What first-time flyers should know about weather, safety checks and how to pick a licensed tandem pilot in Bir Billing.",
+            "content": "Bir Billing is one of the best paragliding sites in India, with a long landing field and reliable thermals from October to November.\n\nChoose a certified tandem pilot, check the glider and harness together and listen to the briefing carefully.\n\nWear closed shoes, tie back long hair and skip a heavy meal before your flight."
         },
         {
             "id": 9,
@@ -134,7 +161,10 @@
             "updatedAt": "2026-10-27",
             "views": 0,
             "leads": 0,
-            "converted": 0
+            "converted": 0,
+            "cover": null,
+            "excerpt": "Fuel, permits, tyres and altitude medicines: the checklist we give every group before the Spiti loop.",
+            "content": "Spiti is remote, so plan your fuel stops and carry a spare tyre. The last petrol pump before Kaza is at Reckong Peo.\n\nAcclimatise for a day at Kalpa or Kaza before going higher, drink water and avoid alcohol on the first nights.\n\nCarry cash, offline maps and a basic first-aid kit. Check road status before you leave Manali."
         }
     ]
 }

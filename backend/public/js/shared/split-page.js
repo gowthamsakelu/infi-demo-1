@@ -219,7 +219,7 @@ export function createSplitPage(host, ctx, cfg) {
         </div>`;
       }
       return `<div class="booking-card list-row-card sp-row ${on ? 'active' : ''}" role="option" id="sp-opt-${esc(item.id)}" aria-selected="${on}" data-sp-id="${esc(item.id)}">
-        <div class="row-lead-col"><div class="row-avatar" aria-hidden="true">${r.tile}</div></div>
+        <div class="row-lead-col"><div class="row-avatar" aria-hidden="true">${r.thumb ? `<span class="row-thumb${r.image ? '' : ' is-empty'}">${r.image ? `<img src="${esc(r.image)}" alt="" width="56" height="56" loading="lazy" decoding="async">` : icon('mountain', { size: 22, stroke: 1.8 })}</span>` : r.tile}</div></div>
         <div class="card-info-col">
           <div class="row-name-line"><h3 class="card-title">${esc(r.name)}</h3>${r.pill || ''}</div>
           ${r.sub ? `<p class="row-trip">${r.raw ? r.sub : esc(r.sub)}</p>` : ''}
@@ -411,7 +411,7 @@ export function createSplitPage(host, ctx, cfg) {
     current,
     reload: load,
     /** Replace the list (a record was added or edited in memory) and show it. */
-    setItems(items) { state.items = items.map((i) => ({ ...i, id: String(i.id) })); state.status = 'ready'; reconcile(); renderAll(); },
+    setItems(items) { if (!alive) return; /* a late timer (JUST ADDED) must not touch a page that is gone */ state.items = items.map((i) => ({ ...i, id: String(i.id) })); state.status = 'ready'; reconcile(); renderAll(); },
     /** Open a record (PC: in the pane; phone: its sheet). */
     select: (id) => select(String(id)),
     /** A page that edits the open record reports whether it has unsaved changes. */

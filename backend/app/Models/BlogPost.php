@@ -12,7 +12,7 @@ class BlogPost extends Model
     public const STATUSES = ['published', 'draft', 'scheduled'];
     public const CATEGORIES = ['guide', 'itinerary', 'tips'];
 
-    protected $fillable = ['title', 'slug', 'author', 'category', 'status', 'published_at', 'views', 'leads', 'converted'];
+    protected $fillable = ['title', 'slug', 'author', 'category', 'status', 'published_at', 'views', 'leads', 'converted', 'excerpt', 'content', 'cover'];
 
     protected $casts = ['published_at' => 'datetime', 'views' => 'integer', 'leads' => 'integer', 'converted' => 'integer'];
 }

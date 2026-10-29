@@ -9,6 +9,9 @@ export const card = (ico, title, inner, right = '') => `
     ${inner}
   </section>`;
 
+/** The picture at the top of a detail Overview: 16:9, rounded, the width of the card. Nothing when the record has no picture. */
+export const heroImage = (src, alt = '') => (src ? `<div class="cat-hero"><img src="${esc(src)}" alt="${esc(alt)}" width="640" height="360" loading="lazy" decoding="async"></div>` : '');
+
 /** The distinct, sorted values of a field, as the options of a split page's filter. */
 export const optionsOf = (items, pick) => [...new Set(items.map(pick).filter(Boolean))].sort((a, b) => a.localeCompare(b)).map((v) => ({ value: v, label: v }));
 

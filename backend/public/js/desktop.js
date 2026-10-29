@@ -7,7 +7,7 @@ import { selectedOf, setSelected, toggleRow } from './shared/selection.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { renderTabs, avatar, justAddedTag, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bindQuickNotes, rowCard, bulkBar, bindBulkBar, updateBulkBar, inlineSelectionBar, updateInlineBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
-import { openFollowUpModal, openBookingFollowUp } from './shared/followup-modal.js';
+import { openFollowUpModal } from './shared/followup-modal.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
 import { openDayDialog, commit } from './shared/itinerary-dialog.js';
@@ -913,13 +913,6 @@ export function createDesktopView(container) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              <button class="btn-add-followup" id="btn-add-followup-action">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" x2="12" y1="5" y2="19"/>
-                  <line x1="5" x2="19" y1="12" y2="12"/>
-                </svg>
-                Add Follow-up
-              </button>
             </div>
 
             <div class="lead-journey-timeline">
@@ -2067,13 +2060,6 @@ export function createDesktopView(container) {
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Customer details updated successfully!', type: 'success' }
         }));
-        return;
-      }
-
-      // Open Add Follow-up Modal (App-based modal, no browser popups)
-      if (e.target.closest('#desktop-add-followup-btn') || e.target.closest('#btn-add-followup-action')) {
-        if (activeBooking?.kind === 'inquiry') { openFollowUpModal(activeBooking.raw); return; }
-        if (activeBooking) openBookingFollowUp(activeBooking, renderDetailPanel);
         return;
       }
 

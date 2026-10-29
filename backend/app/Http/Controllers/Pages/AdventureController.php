@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pages;
 use App\Http\Controllers\Controller;
 use App\Models\SavedActivity;
 use App\Support\DummyData;
+use App\Support\DataUrlImage;
 use App\Http\Requests\SaveAdventureRequest;
 use Illuminate\Http\JsonResponse;
 
@@ -37,6 +38,7 @@ class AdventureController extends Controller
             'partner' => $a->partner,
             'meetingPoint' => $a->meeting_point,
             'description' => $a->description,
+            'image' => DataUrlImage::url($a->image),
             'highlights' => $a->highlights ?? [],
             'inclusions' => $a->inclusions ?? [],
             'exclusions' => $a->exclusions ?? [],
@@ -71,13 +73,13 @@ class AdventureController extends Controller
 
     private function columns(SaveAdventureRequest $r): array
     {
-        return [
+        return DataUrlImage::into([
             'name' => $r->input('name'), 'tag' => $r->input('tag', 'sightseeing'), 'status' => $r->input('status', 'active'),
             'city' => $r->input('city'), 'region' => $r->input('region'), 'duration_minutes' => $r->input('minutes'), 'difficulty' => $r->input('difficulty'),
             'best_time' => $r->input('bestTime'), 'meeting_point' => $r->input('meetingPoint'), 'min_age' => $r->input('minAge'), 'partner' => $r->input('partner'),
             'price_adult' => $r->input('price'), 'price_child' => $r->input('priceChild'), 'price_group' => $r->input('priceGroup'), 'group_size' => $r->input('groupSize'),
             'description' => $r->input('description'), 'highlights' => array_values($r->input('highlights', [])),
             'inclusions' => array_values($r->input('inclusions', [])), 'exclusions' => array_values($r->input('exclusions', [])),
-        ];
+        ], $r, 'adventures');
     }
 }

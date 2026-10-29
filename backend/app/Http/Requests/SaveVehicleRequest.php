@@ -30,6 +30,7 @@ class SaveVehicleRequest extends CatalogRequest
             'inclusions.*' => ['string', 'max:200'],
             'exclusions' => $this->listRule(),
             'exclusions.*' => ['string', 'max:200'],
+            'image' => ['nullable', 'string', 'max:7000000'],
         ];
     }
 }

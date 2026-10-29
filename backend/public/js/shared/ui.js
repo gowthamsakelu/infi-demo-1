@@ -194,9 +194,6 @@ export function backdropDismiss(overlay, onClose) {
   return () => { overlay.removeEventListener('pointerdown', down); overlay.removeEventListener('click', click); };
 }
 
-/** True while an action chosen from a row's ⋮ menu runs: the screen it opens comes in from the right (see .from-menu in ui-standard.css). */
-let inRowMenu = false;
-export const fromRowMenu = () => inRowMenu;
 
 /**
  * Floating menu anchored to a trigger. Fixed-positioned so scroll containers never clip it.
@@ -252,8 +249,7 @@ export function openRowMenu(trigger, items, onSelect) {
     if (!b) return;
     e.stopPropagation(); // the tap that picks an item is not a tap on anything under the menu
     close();
-    inRowMenu = true;
-    try { onSelect(b.dataset.menuKey); } finally { inRowMenu = false; }
+    onSelect(b.dataset.menuKey);
   });
   menu.addEventListener('keydown', (e) => {
     const btns = [...menu.querySelectorAll('button')];

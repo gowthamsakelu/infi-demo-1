@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pages;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateBlogPostRequest;
 use App\Models\BlogPost;
+use App\Support\DataUrlImage;
 use App\Support\DummyData;
 use Illuminate\Support\Carbon;
 use App\Http\Requests\SaveBlogPostRequest;
@@ -51,6 +52,9 @@ class BlogController extends Controller
             'title' => $p->title,
             'slug' => $p->slug,
             'author' => $p->author,
+            'excerpt' => $p->excerpt,
+            'content' => $p->content,
+            'cover' => DataUrlImage::url($p->cover),
             'category' => $p->category,
             'status' => $p->status,
             'publishedAt' => $p->published_at?->format('Y-m-d'),
@@ -59,6 +63,18 @@ class BlogController extends Controller
             'leads' => $p->leads,
             'converted' => $p->converted,
         ];
+    }
+
+    /** Delete an article. With dummy data nothing is deleted: the page drops it from its in-memory list. */
+    public function destroy(string $post): JsonResponse
+    {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
+        }
+
+        BlogPost::query()->findOrFail((int) $post)->delete();
+
+        return response()->json(['success' => true, 'data' => null]);
     }
 
     /** Add an article from the wizard. With dummy data nothing is written. */
@@ -97,7 +113,11 @@ class BlogController extends Controller
             $status === 'scheduled' => now()->addDay(),
             default => now(),
         };
-        $columns = ['title' => $r->input('title'), 'author' => $r->input('author', ''), 'category' => $r->input('category'), 'status' => $status, 'published_at' => $publishedAt];
+        $columns = ['title' => $r->input('title'), 'author' => $r->input('author', ''), 'category' => $r->input('category'), 'status' => $status, 'published_at' => $publishedAt,
+            'excerpt' => $r->input('excerpt'), 'content' => $r->input('content')];
+        if ($r->exists('cover')) {
+            $columns['cover'] = DataUrlImage::column($r->input('cover'), 'blogs'); // a new picture is saved, a stored path is kept, empty clears it
+        }
         if (! $current) {
             $base = Str::slug((string) $r->input('title')) ?: 'article';
             $slug = $base;

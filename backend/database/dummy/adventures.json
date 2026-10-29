@@ -37,7 +37,8 @@
                 "Meals and drinks",
                 "Personal expenses"
             ],
-            "bookings": 25
+            "bookings": 25,
+            "image": "/images/paragliding_bir_1792398411958.jpg"
         },
         {
             "id": 2,
@@ -75,7 +76,8 @@
                 "Photography charges",
                 "Shopping on the lake"
             ],
-            "bookings": 21
+            "bookings": 21,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 3,
@@ -113,7 +115,8 @@
                 "Meals and snacks",
                 "Tips"
             ],
-            "bookings": 23
+            "bookings": 23,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 4,
@@ -149,7 +152,8 @@
                 "Mobile and camera deposit",
                 "Meals"
             ],
-            "bookings": 23
+            "bookings": 23,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 5,
@@ -186,7 +190,8 @@
                 "Shopping",
                 "Lunch"
             ],
-            "bookings": 22
+            "bookings": 22,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 6,
@@ -222,7 +227,8 @@
                 "Soft drinks and bottled water",
                 "Extra dishes"
             ],
-            "bookings": 21
+            "bookings": 21,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 7,
@@ -258,7 +264,8 @@
                 "Breakfast",
                 "Anything you buy"
             ],
-            "bookings": 33
+            "bookings": 33,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 8,
@@ -294,7 +301,8 @@
                 "Meals",
                 "Photography fees"
             ],
-            "bookings": 31
+            "bookings": 31,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 9,
@@ -330,7 +338,8 @@
                 "Sledge hire",
                 "Meals"
             ],
-            "bookings": 33
+            "bookings": 33,
+            "image": "/images/paragliding_bir_1792398411958.jpg"
         },
         {
             "id": 10,
@@ -367,7 +376,8 @@
                 "Ski gear hire",
                 "Guide charges"
             ],
-            "bookings": 14
+            "bookings": 14,
+            "image": "/images/paragliding_bir_1792398411958.jpg"
         }
     ]
 }

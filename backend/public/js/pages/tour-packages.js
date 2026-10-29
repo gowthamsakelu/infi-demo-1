@@ -1,15 +1,14 @@
-// Tour Packages: the trips we sell. List on the left, detail on the right (Overview / Itinerary / Pricing).
+// Tour Packages: the trips we sell. List on the left, detail on the right (Overview / Pricing).
 // The overview holds About, Inclusions & Exclusions and the recent inquiries.
 // Same shape as destinations.js. The Add and Edit buttons are drawn as designed and do nothing yet; "Use as itinerary for an inquiry"
 // opens the itinerary builder prefilled with this package (see tour-packages-builder.js).
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson, sendJson } from '../shared/http.js';
 import { openWizard } from '../shared/wizard.js';
-import { createCatalogCrud, numOrNull, textOrNull, listOf } from '../shared/catalog-crud.js';
+import { createCatalogCrud, numOrNull, textOrNull, listOf, pictureOf } from '../shared/catalog-crud.js';
 import { esc, errorState, toast } from '../shared/ui.js';
-import { itemIconHtml, itemPills } from '../shared/itinerary.js';
 import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, linkRow, money, plural } from '../shared/page-ui.js';
-import { card, optionsOf, filled, inclusionsCard, highlightsCard } from './catalog-ui.js';
+import { card, optionsOf, filled, inclusionsCard, highlightsCard, heroImage } from './catalog-ui.js';
 import { useAsItinerary } from './tour-packages-builder.js';
 
 const TAGS = { tour: 'tour', group: 'tour', family: 'tour', honeymoon: 'tour', villa: 'villa', activity: 'activity' };
@@ -18,39 +17,13 @@ const STATUS = { published: 'Published', draft: 'Draft' };
 const trip = (p) => `${p.days}D / ${p.nights}N`;
 const day = (iso) => (iso ? new Date(`${iso}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'No date');
 
-/** "11:30 AM • Private cab": the time gets its own weight, as in the Day-wise Schedule. */
-function subtitle(item) {
-  const sub = item.subtitle || '';
-  return item.time && sub.startsWith(item.time) ? `<span class="item-time">${esc(item.time)}</span>${esc(sub.slice(item.time.length))}` : esc(sub);
-}
-
-/** The Day-wise Schedule look (narrow day column, line and dot, wide cards) without its edit controls. */
-function timeline(days) {
-  if (!days.length) return '<div class="state-box"><h4>No itinerary yet</h4><p>This package has no days planned.</p></div>';
-  return `<div class="itinerary-v2-container tp-timeline">${days.map((d) => `
-    <div class="itinerary-day-section">
-      <div class="timeline-day-col"><div class="day-head"><span class="day-badge-text">${esc(d.day)}</span></div></div>
-      <div class="timeline-track-col"><div class="timeline-line-track"></div><div class="timeline-dot-node"></div></div>
-      <div class="timeline-items-col">
-        ${d.title ? `<p class="tp-day-title">${esc(d.title)}</p>` : ''}
-        ${(d.items || []).map((it) => `
-          <div class="itinerary-card-item">
-            <div class="item-left-content">${itemIconHtml(it, 22)}
-              <div class="item-text-info"><h4 class="item-text-title">${esc(it.title)}</h4><p class="item-text-sub">${subtitle(it)}</p>${itemPills(it) ? `<div class="item-badges">${itemPills(it)}</div>` : ''}</div>
-            </div>
-          </div>`).join('') || '<p class="day-empty">No events yet</p>'}
-      </div>
-    </div>`).join('')}</div>`;
-}
-
-/** The notes of a saved day, for editing it in the wizard: the text of its events, else their titles. */
-const dayText = (d) => (d.items || []).map((it) => it.subtitle || it.title).filter(Boolean).join('\n');
 
 /** Add / Edit Tour Package: the shared catalog wizard described by config only (see shared/wizard.js). */
 function wizardConfig(destOptions) {
   return {
     noun: 'package',
     requiredKey: 'name',
+    required: ['name', 'destinationId', 'days'], // saved only when these are filled in
     steps: [
       { label: 'Basics', title: 'Basics', sub: 'The name, where it goes and how long it is.', fields: [
         { key: 'name', type: 'text', label: 'Package name', placeholder: 'e.g. Kashmir Valley & Gulmarg Tour', optional: false, max: 120 },
@@ -61,16 +34,11 @@ function wizardConfig(destOptions) {
         { key: 'season', type: 'text', label: 'Season', placeholder: 'e.g. Mar - Jun', max: 60 },
         { key: 'status', type: 'chips', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft'], ['seasonal', 'Seasonal']].map(([value, label]) => ({ value, label })) },
         { key: 'minPax', type: 'number', label: 'Minimum group size', placeholder: 'e.g. 2', max: 3 },
+        { key: 'image', type: 'image', label: 'Image', hint: 'JPG, PNG or WebP · up to 5 MB' },
       ] },
       { label: 'Pricing', title: 'Pricing', sub: 'Per person, in rupees.', fields: [
         { key: 'price', type: 'price', label: 'From price per person', placeholder: '15,000', max: 9 },
         { key: 'groupPrice', type: 'price', label: 'Price per person for groups', placeholder: '12,500', max: 9 },
-      ] },
-      { label: 'Itinerary', title: 'Itinerary', sub: 'One row per day. You can plan the details later in the itinerary builder.', fields: [
-        { key: 'itinerary', type: 'rows', label: 'Days', addLabel: 'Add day', sub: { title: 'Day', rowLabel: (i) => `Day ${i + 1}`, fields: [
-          { key: 'title', type: 'text', label: 'Title', placeholder: 'e.g. Arrival in Srinagar', required: true, optional: false, max: 80 },
-          { key: 'description', type: 'textarea', label: 'Description', placeholder: 'What happens on this day', rows: 4, max: 1000 },
-        ] } },
       ] },
       { label: 'Inclusions & Exclusions', title: 'Inclusions & Exclusions', sub: 'What the price covers, what it does not, and what makes the trip special.', fields: [
         { key: 'inclusions', type: 'list', label: 'Inclusions', placeholder: 'e.g. Daily breakfast', addLabel: 'Add inclusion' },
@@ -78,7 +46,7 @@ function wizardConfig(destOptions) {
         { key: 'highlights', type: 'list', label: 'Highlights', placeholder: 'e.g. Shikara ride on Dal Lake', addLabel: 'Add highlight' },
       ] },
     ],
-    defaults: () => ({ name: '', destinationId: '', tag: 'tour', days: '', nights: '', season: '', status: 'draft', minPax: '', price: '', groupPrice: '', itinerary: [], inclusions: [], exclusions: [], highlights: [] }),
+    defaults: () => ({ image: [], name: '', destinationId: '', tag: 'tour', days: '', nights: '', season: '', status: 'draft', minPax: '', price: '', groupPrice: '', inclusions: [], exclusions: [], highlights: [] }),
     preview: (v) => ({
       title: String(v.name || '').trim(),
       lines: [destOptions().find((o) => o.value === String(v.destinationId))?.label || 'No destination yet', v.days ? `${v.days}D / ${v.nights || 0}N` : 'No duration yet', v.price ? `From ${money(v.price)}` : 'No price yet', STATUS[v.status] || (v.status === 'seasonal' ? 'Seasonal' : 'Draft')],
@@ -120,38 +88,31 @@ export default {
       numOrNull(v.price) != null ? { label: 'Per person', note: 'Starting price', price: Number(v.price) } : null,
       numOrNull(v.groupPrice) != null ? { label: 'Group', note: 'Per person, for groups', price: Number(v.groupPrice) } : null,
     ].filter(Boolean);
-    const dayShape = (d, i) => ({
-      day: `Day ${i + 1}`, date: 'TBD', isoDate: null, title: d.title, location: null, locationMode: 'same',
-      items: textOrNull(d.description) ? [{ id: `new-D${i + 1}`, type: 'note', icon: 'note', title: d.title, subtitle: d.description, details: { b: { role: 'note' } } }] : [],
-    });
-
     const crud = createCatalogCrud({
       key: 'tour-packages',
       endpoint: '/api/tour-packages',
       wizard: () => wizardConfig(destOptions),
       toBody: (v) => ({
-        name: v.name.trim(), destinationId: numOrNull(v.destinationId), destination: destLabel(v.destinationId) || undefined,
+        name: v.name.trim(), image: pictureOf(v.image), destinationId: numOrNull(v.destinationId), destination: destLabel(v.destinationId) || undefined,
         tag: v.tag || undefined, status: v.status || undefined, days: numOrNull(v.days), nights: numOrNull(v.nights), season: textOrNull(v.season), minPax: numOrNull(v.minPax),
         price: numOrNull(v.price), groupPrice: numOrNull(v.groupPrice),
-        itinerary: (v.itinerary || []).map((d) => ({ title: d.title.trim(), description: textOrNull(d.description) })), itineraryChanged: !!v.itineraryTouched,
         inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions), highlights: listOf(v.highlights),
       }),
       local: (v, old) => {
         const days = numOrNull(v.days) ?? 1;
         return {
-          ...(old || {}), name: v.name.trim(), destinationId: numOrNull(v.destinationId), destination: destLabel(v.destinationId), tag: v.tag || 'tour',
+          ...(old || {}), name: v.name.trim(), image: pictureOf(v.image), destinationId: numOrNull(v.destinationId), destination: destLabel(v.destinationId), tag: v.tag || 'tour',
           status: v.status === 'seasonal' ? 'published' : v.status || 'draft', seasonal: v.status === 'seasonal', season: textOrNull(v.season),
           days, nights: numOrNull(v.nights) ?? Math.max(0, days - 1), price: numOrNull(v.price), minPax: numOrNull(v.minPax),
           bookings: old?.bookings ?? 0, priceTiers: tiersOf(v), inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions), highlights: listOf(v.highlights),
-          itinerary: v.itineraryTouched || !old ? (v.itinerary || []).map(dayShape) : old.itinerary,
+          itinerary: old?.itinerary ?? [], // kept for "Use as itinerary for an inquiry"
           description: old?.description ?? null, inquiries: old?.inquiries ?? [],
         };
       },
       values: (d) => ({
-        name: d.name, destinationId: d.destinationId != null ? String(d.destinationId) : '', tag: d.tag || 'tour', days: d.days ?? '', nights: d.nights ?? '',
+        name: d.name, image: d.image ? [d.image] : [], destinationId: d.destinationId != null ? String(d.destinationId) : '', tag: d.tag || 'tour', days: d.days ?? '', nights: d.nights ?? '',
         season: d.season || '', status: d.seasonal ? 'seasonal' : d.status, minPax: d.minPax ?? '', price: d.price ?? '',
         groupPrice: (d.priceTiers || []).find((t) => t.label === 'Group')?.price ?? '',
-        itinerary: (d.itinerary || []).map((day) => ({ title: day.title || day.day, description: dayText(day) })),
         inclusions: d.inclusions || [], exclusions: d.exclusions || [], highlights: d.highlights || [],
       }),
       load: () => getJson('/api/tour-packages'),
@@ -175,6 +136,7 @@ export default {
     function overview(item, d) {
       const ready = d && !d.failed;
       return `
+        ${heroImage(item.image, item.name)}
         ${statRow([
           { icon: 'chart', label: 'From (per person)', value: money(item.price), tone: 'blue' },
           { icon: 'calendar', label: 'Duration', value: trip(item), tone: 'green' },
@@ -229,6 +191,8 @@ export default {
       searchText: (i) => `${i.name} ${i.destination || ''} ${i.tag}`,
       row: (i) => ({
         tile: tile('layers'),
+        thumb: true,
+        image: i.image,
         name: i.name,
         pill: `${pill(i.status, STATUS[i.status] || i.status)}${crud.isFresh(i.id) ? '<span class="just-added-tag">JUST ADDED</span>' : ''}`,
         sub: [i.destination, trip(i)].filter(Boolean).join(' · '),
@@ -239,12 +203,10 @@ export default {
         const ready = d && !d.failed;
         const tabs = [
           { key: 'overview', label: 'Overview' },
-          { key: 'itinerary', label: 'Itinerary' },
           { key: 'pricing', label: 'Pricing' },
         ];
         let body;
-        if (ui.tab === 'itinerary') body = ready ? card('calendar', 'Day-wise Schedule', timeline(d.itinerary)) : pending(d, 'the itinerary');
-        else if (ui.tab === 'pricing') body = ready ? (d.priceTiers.length ? `<section>${sectionTitle('Price per person', '<span class="sp-hint">By group size</span>')}${rowGroup(d.priceTiers.map((t) => linkRow({ ico: 'users', title: t.label, sub: t.note, right: money(t.price) })))}</section>` : empty('No price tiers yet.')) : pending(d, 'the pricing');
+        if (ui.tab === 'pricing') body = ready ? (d.priceTiers.length ? `<section>${sectionTitle('Price per person', '<span class="sp-hint">By group size</span>')}${rowGroup(d.priceTiers.map((t) => linkRow({ ico: 'users', title: t.label, sub: t.note, right: money(t.price) })))}</section>` : empty('No price tiers yet.')) : pending(d, 'the pricing');
         else body = overview(item, d);
         return {
           head: {
@@ -260,7 +222,6 @@ export default {
             primary: { label: 'Use as itinerary for an inquiry', icon: 'note', act: 'use-itinerary' },
             quick: [
               { label: 'Edit', icon: 'edit', tone: 'fwd', act: 'edit' },
-              { label: 'Itinerary', icon: 'calendar', tone: 'msg', act: 'tab-itinerary' },
               { label: 'Pricing', icon: 'chart', tone: 'call', act: 'tab-pricing' },
             ],
           },
@@ -275,7 +236,6 @@ export default {
       if (e.target.closest('[data-tp-retry]')) { ensureDetail(item, true); page.api.refresh(); return; }
       const act = e.target.closest('[data-sp-act]')?.dataset.spAct;
       if (act === 'edit') openEdit(item);
-      else if (act === 'tab-itinerary') page.api.setTab('itinerary');
       else if (act === 'tab-pricing') page.api.setTab('pricing');
       else if (act === 'use-itinerary') {
         let d = cache.get(item.id);

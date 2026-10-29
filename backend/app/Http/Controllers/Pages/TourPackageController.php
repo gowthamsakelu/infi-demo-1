@@ -7,6 +7,7 @@ use App\Http\Requests\SaveTourPackageRequest;
 use App\Models\Inquiry;
 use App\Models\TourPackage;
 use App\Support\DummyData;
+use App\Support\DataUrlImage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -86,7 +87,7 @@ class TourPackageController extends Controller
         $status = $r->input('status', 'draft');
         $days = (int) $r->input('days', 1);
 
-        return [
+        return DataUrlImage::into([
             'name' => $r->input('name'),
             'destination_id' => $r->input('destinationId'),
             'tag' => $r->input('tag', 'tour'),
@@ -101,7 +102,7 @@ class TourPackageController extends Controller
             'inclusions' => array_values($r->input('inclusions', [])),
             'exclusions' => array_values($r->input('exclusions', [])),
             'highlights' => array_values($r->input('highlights', [])),
-        ];
+        ], $r, 'tour-packages');
     }
 
     private function tiers(SaveTourPackageRequest $r): array
@@ -175,6 +176,7 @@ class TourPackageController extends Controller
             'status' => $p->status,
             'seasonal' => $p->seasonal,
             'season' => $p->season,
+            'image' => DataUrlImage::url($p->image),
             'days' => $p->days,
             'nights' => $p->nights,
             'price' => $p->price_from,

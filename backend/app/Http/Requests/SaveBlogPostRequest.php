@@ -13,6 +13,9 @@ class SaveBlogPostRequest extends CatalogRequest
             'category' => ['required', 'in:guide,itinerary,tips'],
             'status' => ['required', 'in:published,draft,scheduled'],
             'publishedAt' => ['nullable', 'date'],
+            'excerpt' => ['nullable', 'string', 'max:300'],
+            'content' => ['nullable', 'string', 'max:20000'],
+            'cover' => ['nullable', 'string', 'max:7000000'],
         ];
     }
 }

@@ -3,7 +3,7 @@
 import { placeAsPushed } from './push.js';
 import { STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST } from '../data.js';
 import { icon } from './icons.js';
-import { esc, toast, initials, dismissOnOutside, backdropDismiss, fromRowMenu, openWhatsApp, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
+import { esc, toast, initials, dismissOnOutside, backdropDismiss, openWhatsApp, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { applyInquiryUpdates } from './inquiry-store.js';
 
@@ -51,7 +51,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
   const noun = kind === 'inquiry' ? 'Inquiries' : kind === 'itinerary' ? 'Events' : 'Bookings';
   const first = items[0];
   const ov = document.createElement('div');
-  ov.className = `asg-overlay${fromRowMenu() ? ' from-menu' : ''}`; // from a row's ⋮ menu: a full-height screen from the right
+  ov.className = 'asg-overlay';
   ov.innerHTML = `
     <div class="asg-sheet" role="dialog" aria-modal="true" aria-labelledby="asg-title">
       <div class="filter-handle" aria-hidden="true"></div>

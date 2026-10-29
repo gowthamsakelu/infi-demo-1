@@ -5,10 +5,10 @@ import { createMobileTeam } from './team-mobile.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, fromRowMenu, esc, jsq, skeletonCards, errorState } from './shared/ui.js';
+import { searchBox, emptyState, toast, openRowMenu, esc, jsq, skeletonCards, errorState } from './shared/ui.js';
 import { renderTabs, bindQuickNotes, rowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
-import { openFollowUpModal, openBookingFollowUp } from './shared/followup-modal.js';
+import { openFollowUpModal } from './shared/followup-modal.js';
 import { detailHeaderHtml, sheetHandleHtml } from './shared/detail-sheet.js';
 import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
 import { openAssign } from './shared/assign-sheet.js';
@@ -687,13 +687,6 @@ export function createMobileView(container, options = {}) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              <button class="btn-add-followup" id="btn-add-followup-action">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" x2="12" y1="5" y2="19"/>
-                  <line x1="5" x2="19" y1="12" y2="12"/>
-                </svg>
-                Add Follow-up
-              </button>
             </div>
 
             <div class="lead-journey-timeline">
@@ -962,10 +955,8 @@ export function createMobileView(container, options = {}) {
 
     const backdrop = container.querySelector('#mobile-sheet-backdrop');
     const sheet = container.querySelector('#mobile-bottom-sheet');
-    // Opened from a row's ⋮ menu: a full-height screen that slides in from the right, with no dimmed backdrop
-    const fromMenu = fromRowMenu();
-    if (backdrop) backdrop.classList.toggle('open', !fromMenu);
-    if (sheet) { sheet.classList.toggle('from-menu', fromMenu); sheet.classList.add('open'); }
+    if (backdrop) backdrop.classList.add('open');
+    if (sheet) sheet.classList.add('open');
 
     // Ensure bottom nav is hidden so it never peeks beneath sheet
     const bottomNav = container.querySelector('.mobile-bottom-nav');
@@ -1837,16 +1828,6 @@ export function createMobileView(container, options = {}) {
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Customer details updated successfully!', type: 'success' }
         }));
-        return;
-      }
-
-      // Add follow-up button -> Opens app modal
-      if (e.target.closest('#btn-add-followup-action') && activeModalBooking?.kind === 'inquiry') {
-        openFollowUpModal(activeModalBooking.raw);
-        return;
-      }
-      if (e.target.closest('#btn-add-followup-action')) {
-        if (activeModalBooking) openBookingFollowUp(activeModalBooking, renderSheetBody);
         return;
       }
 

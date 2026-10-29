@@ -263,29 +263,21 @@ html[data-layout="mobile"] #mobile-page-host .sp-list, html[data-layout="mobile"
 .wz-review dd { margin: 0; color: var(--text-main); overflow-wrap: anywhere; }
 .wiz-step-pane .wf-select .dd-trigger { width: 100%; max-width: none; justify-content: space-between; }
 
-/* Opened from a row's ⋮ menu (ui.js fromRowMenu): a full-height screen that slides in from the RIGHT and out to the right, never up from the bottom */
-html[data-layout="mobile"] .asg-overlay.from-menu { align-items: stretch; justify-content: flex-end; }
-html[data-layout="mobile"] .asg-overlay.from-menu .asg-sheet { width: 100%; max-width: none; height: 100dvh; max-height: 100dvh; border-radius: 0; transform: translateX(100%); transition: transform var(--motion-slow) var(--ease-out); }
-html[data-layout="mobile"] .asg-overlay.from-menu.open .asg-sheet { transform: none; }
-html[data-layout="mobile"] .asg-overlay.from-menu:not(.open) .asg-sheet { transition-timing-function: var(--ease-in); }
-html[data-layout="mobile"] .asg-overlay.from-menu .filter-handle { display: none; }
-@media (prefers-reduced-motion: reduce) { html[data-layout="mobile"] .asg-overlay.from-menu .asg-sheet { transition: none; } }
-
-/* Follow-up screen: back arrow, title and muted subtitle on one line, round X; comment fills the body; Save above a white Cancel */
-.fu-header { align-items: center; }
-.fu-header .dialog-back { flex: none; }
+/* Follow-up: a compact bottom sheet that sizes to its content */
 .fu-title-col { flex: 1 1 auto; min-width: 0; }
 .fu-title-col h3, .fu-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fu-header .sheet-close-btn { width: 36px; height: 36px; flex: none; }
-.fu-body > .fu-field:has(.fu-textarea) { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
-.fu-body .fu-textarea { flex: 1 1 auto; display: flex; min-height: 140px; }
-.fu-body .fu-textarea textarea { flex: 1 1 auto; min-height: 140px; }
-.fu-footer { display: flex; flex-direction: column; gap: 10px; }
-.fu-footer .fu-save, .fu-footer .fu-cancel { width: 100%; justify-content: center; }
-html[data-layout] .fu-footer .fu-save, html[data-layout] .fu-footer .fu-cancel { flex: 0 0 auto; width: 100%; min-width: 0; height: 48px; margin: 0; }
-html[data-layout] .fu-footer { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
-.fu-header .sheet-close-btn { position: relative; } /* its 44px tap area (::after) must stay on the X, not cover the whole sheet */
+.fu-header .sheet-close-btn { width: 36px; height: 36px; flex: none; position: relative; } /* its 44px tap area (::after) must stay on the X */
+.fu-body .fu-textarea textarea { min-height: 96px; max-height: 120px; }
 
-/* The customer detail sheet opened from a row's ⋮ menu (mobile.js openModal): full height, in from the right, out to the right */
-html[data-layout="mobile"] .bottom-sheet.from-menu { top: 0 !important; bottom: 0 !important; left: 0 !important; right: 0 !important; height: 100dvh !important; max-height: 100dvh !important; border-radius: 0 !important; transform: translateX(100%) !important; }
-html[data-layout="mobile"] .bottom-sheet.from-menu.open { transform: none !important; }
+
+/* Pictures on the catalog pages (Destinations, Tour Packages, Transport, Stays, Adventures): one thumbnail size and one placeholder everywhere, a 16:9 hero on the detail */
+.row-thumb { display: flex; align-items: center; justify-content: center; flex: none; width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: #F1F5F9; color: #94A3B8; }
+.row-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.row-thumb.is-empty { background: #E2E8F0; } /* the one neutral placeholder, the same on every page */
+.row-avatar:has(.row-thumb) { width: 56px; height: 56px; padding: 0; border: 0; background: transparent; }
+.cat-hero { aspect-ratio: 16 / 9; width: 100%; margin: 0 0 12px; border-radius: 16px; overflow: hidden; background: #F1F5F9; }
+.cat-hero img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Catalog rows on the phone: with the 56px picture the status pill wraps under the name instead of squeezing it to one letter */
+html[data-layout="mobile"] .sp-row .row-name-line { flex-wrap: wrap; row-gap: 4px; }
+html[data-layout="mobile"] .sp-row .row-name-line .card-title { max-width: 100%; }

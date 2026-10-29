@@ -11,7 +11,8 @@
             "reviews": 312,
             "roomsCount": 24,
             "price": 4200,
-            "bookings": 22
+            "bookings": 22,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 2,
@@ -24,7 +25,8 @@
             "reviews": 188,
             "roomsCount": 5,
             "price": 9500,
-            "bookings": 15
+            "bookings": 15,
+            "image": "/images/goa_beach_villa_1792398351292.jpg"
         },
         {
             "id": 3,
@@ -37,7 +39,8 @@
             "reviews": 241,
             "roomsCount": 42,
             "price": 5600,
-            "bookings": 8
+            "bookings": 8,
+            "image": "/images/manali_resort_1792398389178.jpg"
         },
         {
             "id": 4,
@@ -50,7 +53,8 @@
             "reviews": 156,
             "roomsCount": 18,
             "price": 7200,
-            "bookings": 11
+            "bookings": 11,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg/500px-Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg"
         },
         {
             "id": 5,
@@ -63,7 +67,8 @@
             "reviews": 97,
             "roomsCount": 20,
             "price": 2900,
-            "bookings": 13
+            "bookings": 13,
+            "image": "/images/rishikesh_rafting_1792398369106.jpg"
         },
         {
             "id": 6,
@@ -76,7 +81,8 @@
             "reviews": 205,
             "roomsCount": 6,
             "price": 12000,
-            "bookings": 20
+            "bookings": 20,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/20191207_Lake_Pichola%2C_City_Palace%2C_Udaipur%2C_1516_7254.jpg/500px-20191207_Lake_Pichola%2C_City_Palace%2C_Udaipur%2C_1516_7254.jpg"
         },
         {
             "id": 7,
@@ -89,7 +95,8 @@
             "reviews": 540,
             "roomsCount": 32,
             "price": 6500,
-            "bookings": 19
+            "bookings": 19,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 8,
@@ -102,7 +109,8 @@
             "reviews": 2100,
             "roomsCount": 27,
             "price": 12000,
-            "bookings": 6
+            "bookings": 6,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 9,
@@ -115,7 +123,8 @@
             "reviews": 980,
             "roomsCount": 19,
             "price": 5200,
-            "bookings": 13
+            "bookings": 13,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 10,
@@ -128,7 +137,8 @@
             "reviews": 410,
             "roomsCount": 38,
             "price": 3200,
-            "bookings": 13
+            "bookings": 13,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 11,
@@ -141,7 +151,8 @@
             "reviews": 186,
             "roomsCount": 32,
             "price": 5200,
-            "bookings": 9
+            "bookings": 9,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Lobby_lounge_of_Amantaka_Suite_Amantaka_luxury_Resort_%26_Hotel_Luang_Prabang_Laos.jpg/500px-Lobby_lounge_of_Amantaka_Suite_Amantaka_luxury_Resort_%26_Hotel_Luang_Prabang_Laos.jpg"
         }
     ],
     "detail": {
@@ -229,7 +240,8 @@
                         "all": 9600
                     }
                 }
-            ]
+            ],
+            "image": "/images/kedarnath.jpg"
         },
         "2": {
             "id": 2,
@@ -316,7 +328,8 @@
                         "all": 19400
                     }
                 }
-            ]
+            ],
+            "image": "/images/goa_beach_villa_1792398351292.jpg"
         },
         "3": {
             "id": 3,
@@ -403,7 +416,8 @@
                         "all": 12200
                     }
                 }
-            ]
+            ],
+            "image": "/images/manali_resort_1792398389178.jpg"
         },
         "4": {
             "id": 4,
@@ -489,7 +503,8 @@
                         "all": 15100
                     }
                 }
-            ]
+            ],
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg/500px-Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg"
         },
         "5": {
             "id": 5,
@@ -575,7 +590,8 @@
                         "all": 7200
                     }
                 }
-            ]
+            ],
+            "image": "/images/rishikesh_rafting_1792398369106.jpg"
         },
         "6": {
             "id": 6,
@@ -662,7 +678,8 @@
                         "all": 24000
                     }
                 }
-            ]
+            ],
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/20191207_Lake_Pichola%2C_City_Palace%2C_Udaipur%2C_1516_7254.jpg/500px-20191207_Lake_Pichola%2C_City_Palace%2C_Udaipur%2C_1516_7254.jpg"
         },
         "7": {
             "id": 7,
@@ -748,7 +765,8 @@
                         "all": 13800
                     }
                 }
-            ]
+            ],
+            "image": "/images/kedarnath.jpg"
         },
         "8": {
             "id": 8,
@@ -835,7 +853,8 @@
                         "all": 24000
                     }
                 }
-            ]
+            ],
+            "image": "/images/kedarnath.jpg"
         },
         "9": {
             "id": 9,
@@ -920,7 +939,8 @@
                         "all": 11400
                     }
                 }
-            ]
+            ],
+            "image": "/images/kedarnath.jpg"
         },
         "10": {
             "id": 10,
@@ -1005,7 +1025,8 @@
                         "all": 7700
                     }
                 }
-            ]
+            ],
+            "image": "/images/kedarnath.jpg"
         },
         "11": {
             "id": 11,
@@ -1092,7 +1113,8 @@
                         "all": 19400
                     }
                 }
-            ]
+            ],
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Lobby_lounge_of_Amantaka_Suite_Amantaka_luxury_Resort_%26_Hotel_Luang_Prabang_Laos.jpg/500px-Lobby_lounge_of_Amantaka_Suite_Amantaka_luxury_Resort_%26_Hotel_Luang_Prabang_Laos.jpg"
         }
     }
 }

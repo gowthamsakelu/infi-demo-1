@@ -1,7 +1,7 @@
 // Schedule / Follow-up: the same shared sheet as Assign (bottom sheet below 1100px, centered modal above).
 import { placeAsPushed } from './push.js';
 import { icon } from './icons.js';
-import { esc, toast, dismissOnOutside, backdropDismiss, bindSheet, fromRowMenu, afterPaint, afterTransition, lockScroll } from './ui.js';
+import { esc, toast, dismissOnOutside, backdropDismiss, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { addFollowUpLocal } from './followups.js';
 
@@ -41,12 +41,11 @@ export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
   const defTime = `${pad(when.getHours())}:00`;
 
   overlay = document.createElement('div');
-  overlay.className = `fu-overlay asg-overlay${fromRowMenu() ? ' from-menu' : ''}`; // from a row's ⋮ menu: a full-height screen from the right
+  overlay.className = 'fu-overlay asg-overlay';
   overlay.innerHTML = `
     <div class="fu-card asg-sheet" role="dialog" aria-modal="true" aria-labelledby="fu-title">
       <div class="filter-handle" aria-hidden="true"></div>
       <header class="fu-header">
-        <button type="button" class="dialog-back" data-fu-close aria-label="Back">${icon('arrowLeft', { size: 20, stroke: 2.2 })}</button>
         <div class="fu-title-col">
           <h3 id="fu-title">Schedule / Follow-up</h3>
           <p class="fu-sub">${esc(`${inquiry.customer_name} • ${inquiry.trip}`)}</p>
@@ -83,7 +82,6 @@ export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
       </form>
       <footer class="fu-footer">
         <button type="button" class="btn-primary-desktop fu-save" data-fu-save>Save Follow-up</button>
-        <button type="button" class="btn-secondary-desktop fu-cancel" data-fu-close>Cancel</button>
       </footer>
     </div>`;
   document.body.appendChild(overlay);
@@ -186,23 +184,6 @@ export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
     btn.disabled = false;
     btn.textContent = 'Save Follow-up';
   }
-}
-
-/** Add Follow-up for a booking: the entry is added to the top of its Lead Flow (newest first) and becomes its next follow-up. */
-export function openBookingFollowUp(booking, rerender) {
-  const c = booking.customer || {};
-  openFollowUpModal({ customer_name: booking.guest?.name || c.name || 'Customer', trip: booking.trip || booking.tripName || booking.destination || booking.id || '' }, {
-    onSubmit: ({ type, date, time, comment, outcome }) => {
-      const meta = { follow_up: ['followup', 'Follow-up scheduled'], called: ['call', outcome ? `Called: ${outcome}` : 'Called'], cc: ['cc', 'CC'] }[type] || ['followup', 'Follow-up scheduled'];
-      booking.customer = c;
-      c.leadFlow = [{
-        date: fmtDate(date), time: fmtTime(time), type: meta[0], iconBg: type === 'called' ? 'icon-green' : 'icon-blue',
-        title: meta[1], desc: comment || 'No comment added.', author: 'By Ruyi Admin',
-      }, ...(c.leadFlow || [])];
-      booking.nextFollowUp = `${date}T${time}`;
-      rerender?.();
-    },
-  });
 }
 
 export function closeFollowUpModal() {

@@ -28,6 +28,7 @@ class SaveStayRequest extends CatalogRequest
             'exclusions.*' => ['string', 'max:200'],
             'extraCharges' => $this->listRule(),
             'extraCharges.*' => ['string', 'max:200'],
+            'image' => ['nullable', 'string', 'max:7000000'],
         ];
     }
 }

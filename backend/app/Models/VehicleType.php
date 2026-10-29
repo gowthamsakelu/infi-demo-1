@@ -11,7 +11,7 @@ class VehicleType extends Model
     use HasFactory;
 
     protected $fillable = ['key', 'name', 'icon', 'seats', 'ac', 'category', 'base_rate', 'rate_unit', 'popularity_rank', 'active',
-        'most_popular', 'show_in_builder', 'description', 'rate_card', 'trips_count', 'avg_days', 'overview', 'highlights', 'inclusions', 'exclusions'];
+        'most_popular', 'show_in_builder', 'description', 'rate_card', 'trips_count', 'avg_days', 'overview', 'highlights', 'inclusions', 'exclusions', 'image'];
 
     protected $casts = ['ac' => 'boolean', 'active' => 'boolean', 'base_rate' => 'float', 'seats' => 'integer', 'popularity_rank' => 'integer',
         'most_popular' => 'boolean', 'show_in_builder' => 'boolean', 'rate_card' => 'array', 'trips_count' => 'integer', 'avg_days' => 'float', 'highlights' => 'array', 'inclusions' => 'array', 'exclusions' => 'array'];

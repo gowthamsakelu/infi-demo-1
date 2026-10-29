@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateTransportRequest;
 use App\Models\VehicleType;
 use App\Support\DummyData;
+use App\Support\DataUrlImage;
 use App\Http\Requests\SaveVehicleRequest;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
@@ -33,6 +34,7 @@ class TransportController extends Controller
     {
         return $v->toApi() + [
             'description' => $v->description,
+            'image' => DataUrlImage::url($v->image),
             'overview' => $v->overview,
             'highlights' => $v->highlights ?? [],
             'inclusions' => $v->inclusions ?? [],
@@ -79,7 +81,7 @@ class TransportController extends Controller
     {
         $category = $r->input('category', 'car');
 
-        return [
+        return DataUrlImage::into([
             'name' => $r->input('name'), 'category' => $category, 'icon' => $category === 'other' ? 'car' : $category,
             'seats' => $r->input('seats'), 'ac' => $r->boolean('ac'), 'active' => $r->boolean('active', true),
             'most_popular' => $r->boolean('mostPopular'), 'show_in_builder' => $r->boolean('showInBuilder', true),
@@ -92,7 +94,7 @@ class TransportController extends Controller
             'highlights' => array_values($r->input('highlights', [])),
             'inclusions' => array_values($r->input('inclusions', [])),
             'exclusions' => array_values($r->input('exclusions', [])),
-        ];
+        ], $r, 'vehicles');
     }
 
     private function uniqueKey(string $name): string

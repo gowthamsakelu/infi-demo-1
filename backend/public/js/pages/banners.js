@@ -59,6 +59,7 @@ function wizardConfig() {
   return {
     noun: 'banner',
     requiredKey: 'name',
+    required: ['name', 'image'], // saved only when these are filled in
     steps: [
       { label: 'Basics', title: 'Basics', sub: 'The name for the team, and the words on the banner.', fields: [
         { key: 'name', type: 'text', label: 'Name (for the team)', placeholder: 'e.g. Kashmir Winter Special', optional: false, max: 120 },
@@ -145,7 +146,7 @@ export default {
         active: !!b.active, startsAt: b.startsAt ?? '', endsAt: b.endsAt ?? '', image: b.image ? [b.image] : [],
       }),
       load: () => getJson('/api/banners'),
-      onChange: (list) => { state.items = list; render(); },
+      onChange: (list) => { if (!alive) return; state.items = list; render(); },
     });
 
     async function load() {

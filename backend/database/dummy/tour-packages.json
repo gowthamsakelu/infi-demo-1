@@ -11,7 +11,8 @@
             "days": 5,
             "nights": 4,
             "price": 15000,
-            "bookings": 14
+            "bookings": 14,
+            "image": "/images/paragliding_bir_1792398411958.jpg"
         },
         {
             "id": 2,
@@ -24,7 +25,8 @@
             "days": 4,
             "nights": 3,
             "price": 12500,
-            "bookings": 11
+            "bookings": 11,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 3,
@@ -37,7 +39,8 @@
             "days": 3,
             "nights": 2,
             "price": 11000,
-            "bookings": 9
+            "bookings": 9,
+            "image": "/images/goa_beach_villa_1792398351292.jpg"
         },
         {
             "id": 4,
@@ -50,7 +53,8 @@
             "days": 6,
             "nights": 5,
             "price": 18500,
-            "bookings": 7
+            "bookings": 7,
+            "image": "/images/manali_resort_1792398389178.jpg"
         },
         {
             "id": 5,
@@ -63,7 +67,8 @@
             "days": 6,
             "nights": 5,
             "price": 21000,
-            "bookings": 5
+            "bookings": 5,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg/500px-Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg"
         },
         {
             "id": 6,
@@ -76,7 +81,8 @@
             "days": 2,
             "nights": 1,
             "price": 4500,
-            "bookings": 12
+            "bookings": 12,
+            "image": "/images/rishikesh_rafting_1792398369106.jpg"
         },
         {
             "id": 7,
@@ -89,7 +95,8 @@
             "days": 8,
             "nights": 7,
             "price": 26000,
-            "bookings": 0
+            "bookings": 0,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Pangong_Lake%2C_Ladakh%2C_India_07.jpg/500px-Pangong_Lake%2C_Ladakh%2C_India_07.jpg"
         },
         {
             "id": 8,
@@ -102,7 +109,8 @@
             "days": 6,
             "nights": 5,
             "price": 48000,
-            "bookings": 3
+            "bookings": 3,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Rice_terraces%2C_Bali.jpg/500px-Rice_terraces%2C_Bali.jpg"
         },
         {
             "id": 9,
@@ -115,7 +123,8 @@
             "days": 6,
             "nights": 5,
             "price": 22000,
-            "bookings": 6
+            "bookings": 6,
+            "image": "/images/kedarnath.jpg"
         },
         {
             "id": 10,
@@ -128,7 +137,8 @@
             "days": 4,
             "nights": 3,
             "price": 9500,
-            "bookings": 0
+            "bookings": 0,
+            "image": "/images/goa_beach_villa_1792398351292.jpg"
         }
     ],
     "detail": {
@@ -521,7 +531,8 @@
                     "travelDate": "2026-12-15",
                     "pax": 3
                 }
-            ]
+            ],
+            "image": "/images/paragliding_bir_1792398411958.jpg"
         },
         "2": {
             "id": 2,
@@ -809,7 +820,8 @@
                     "travelDate": "2026-12-15",
                     "pax": 3
                 }
-            ]
+            ],
+            "image": "/images/kedarnath.jpg"
         },
         "3": {
             "id": 3,
@@ -1044,7 +1056,8 @@
                     "travelDate": "2026-12-04",
                     "pax": 6
                 }
-            ]
+            ],
+            "image": "/images/goa_beach_villa_1792398351292.jpg"
         },
         "4": {
             "id": 4,
@@ -1388,7 +1401,8 @@
                     "travelDate": "2027-01-10",
                     "pax": 4
                 }
-            ]
+            ],
+            "image": "/images/manali_resort_1792398389178.jpg"
         },
         "5": {
             "id": 5,
@@ -1792,7 +1806,8 @@
                     ]
                 }
             ],
-            "inquiries": []
+            "inquiries": [],
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg/500px-Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg"
         },
         "6": {
             "id": 6,
@@ -2006,7 +2021,8 @@
                     "travelDate": "2026-11-14",
                     "pax": 8
                 }
-            ]
+            ],
+            "image": "/images/rishikesh_rafting_1792398369106.jpg"
         },
         "7": {
             "id": 7,
@@ -2441,7 +2457,8 @@
                     ]
                 }
             ],
-            "inquiries": []
+            "inquiries": [],
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Pangong_Lake%2C_Ladakh%2C_India_07.jpg/500px-Pangong_Lake%2C_Ladakh%2C_India_07.jpg"
         },
         "8": {
             "id": 8,
@@ -2821,7 +2838,8 @@
                     ]
                 }
             ],
-            "inquiries": []
+            "inquiries": [],
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Rice_terraces%2C_Bali.jpg/500px-Rice_terraces%2C_Bali.jpg"
         },
         "9": {
             "id": 9,
@@ -3188,7 +3206,8 @@
                     "travelDate": "2026-12-15",
                     "pax": 3
                 }
-            ]
+            ],
+            "image": "/images/kedarnath.jpg"
         },
         "10": {
             "id": 10,
@@ -3453,7 +3472,8 @@
                     "travelDate": "2026-12-04",
                     "pax": 6
                 }
-            ]
+            ],
+            "image": "/images/goa_beach_villa_1792398351292.jpg"
         }
     }
 }

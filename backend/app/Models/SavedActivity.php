@@ -12,7 +12,7 @@ class SavedActivity extends Model
 
     protected $fillable = ['place_id', 'name', 'city', 'address', 'phone', 'meeting_point', 'uses', 'last_used_at',
         'tag', 'status', 'region', 'rating', 'reviews', 'duration_minutes', 'price_adult', 'price_child', 'price_group', 'group_size',
-        'difficulty', 'best_time', 'min_age', 'partner', 'description', 'bookings_count', 'demo_key', 'highlights', 'inclusions', 'exclusions'];
+        'difficulty', 'best_time', 'min_age', 'partner', 'description', 'bookings_count', 'demo_key', 'highlights', 'inclusions', 'exclusions', 'image'];
 
     protected $casts = ['last_used_at' => 'datetime', 'highlights' => 'array', 'inclusions' => 'array', 'exclusions' => 'array', 'rating' => 'float', 'price_adult' => 'float', 'price_child' => 'float', 'price_group' => 'float'];
 

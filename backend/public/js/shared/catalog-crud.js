@@ -12,6 +12,8 @@ const FRESH_MS = 6000;
 /** "12", "" or "x" -> 12, null, null (the wizard's text and number inputs as the server wants them). */
 export const numOrNull = (x) => (x === '' || x == null || Number.isNaN(Number(x)) ? null : Number(x));
 export const textOrNull = (x) => { const t = String(x ?? '').trim(); return t === '' ? null : t; };
+/** The picture the sheet holds (a new data URL, a stored path, or nothing) as the request sends it. */
+export const pictureOf = (list) => (Array.isArray(list) && list[0] ? list[0] : null);
 /** The non-empty lines of a list input. */
 export const listOf = (xs) => (xs || []).map((t) => String(t).trim()).filter(Boolean);
 
@@ -79,10 +81,18 @@ export function createCatalogCrud(cfg) {
     openWizard(wizardFor('edit', record), { mode: 'edit', record, values: cfg.values(record), returnFocus, onSaved: (r) => saved(r) });
   }
 
+  /** Delete a record. With dummy data the server only answers { dummy: true } and the record is dropped from the in-memory list. */
+  async function remove(record) {
+    const res = await sendJson(`${cfg.endpoint}/${encodeURIComponent(record.id)}`, 'DELETE');
+    if (res.dummy) store.remove(record.id); else server = await cfg.load();
+    cfg.onChange(items(), { id: null, added: false });
+  }
+
   return {
     load,
     add,
     edit,
+    remove,
     items,
     /** The in-memory record of one added or edited this session (its detail too), else null. */
     detail: (id) => store.detail(id),

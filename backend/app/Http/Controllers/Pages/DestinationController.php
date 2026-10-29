@@ -171,9 +171,7 @@ class DestinationController extends Controller
             }
             $columns['slug'] = $slug;
         }
-        if ($image = DataUrlImage::store($r->input('image'), 'destinations')) {
-            $columns['image'] = $image;
-        }
+        $columns = DataUrlImage::into($columns, $r, 'destinations');
 
         return $columns;
     }

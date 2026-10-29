@@ -2,10 +2,10 @@
 // (Overview / Pricing). Add, Edit and "`Add` to an itinerary" are drawn as designed and do nothing yet.
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson } from '../shared/http.js';
-import { createCatalogCrud, numOrNull, textOrNull, listOf } from '../shared/catalog-crud.js';
+import { createCatalogCrud, numOrNull, textOrNull, listOf, pictureOf } from '../shared/catalog-crud.js';
 import { esc } from '../shared/ui.js';
 import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, money } from '../shared/page-ui.js';
-import { card, optionsOf, place, filled, inclusionsCard, highlightsCard, overviewCard } from './catalog-ui.js';
+import { card, optionsOf, place, filled, inclusionsCard, highlightsCard, overviewCard, heroImage } from './catalog-ui.js';
 
 // ADVENTURE is purple, SIGHTSEEING teal, WATER blue, CULTURE yellow, the rest green (the shared tag colours)
 const TAG_KIND = { adventure: 'tour', sightseeing: 'activity', water: 'resort', culture: 'villa', food: 'transport', nature: 'transport' };
@@ -34,6 +34,7 @@ function wizardConfig() {
   return {
     noun: 'adventure',
     requiredKey: 'name',
+    required: ['name', 'city', 'price'], // saved only when these are filled in
     steps: [
       { label: 'Basics', title: 'Basics', sub: 'The activity, its kind and where it happens.', fields: [
         { key: 'name', type: 'text', label: 'Activity name', placeholder: 'e.g. Gulmarg Gondola', optional: false, max: 120 },
@@ -57,13 +58,14 @@ function wizardConfig() {
         { key: 'groupSize', type: 'number', label: 'Private group size (up to)', placeholder: '6', max: 3 },
       ] },
       { label: 'Overview', title: 'Overview', sub: 'What the activity is, what it includes and what it does not.', fields: [
+        { key: 'image', type: 'image', label: 'Image', hint: 'JPG, PNG or WebP · up to 5 MB' },
         { key: 'description', type: 'textarea', label: 'Description', placeholder: 'A few sentences about the activity', rows: 4, max: 2000 },
         { key: 'highlights', type: 'list', label: 'Highlights', placeholder: 'e.g. Views over the Pir Panjal', addLabel: 'Add highlight' },
         { key: 'inclusions', type: 'list', label: 'Inclusions', placeholder: 'e.g. Gondola tickets', addLabel: 'Add item' },
         { key: 'exclusions', type: 'list', label: 'Exclusions', placeholder: 'e.g. Transport to Gulmarg', addLabel: 'Add item' },
       ] },
     ],
-    defaults: () => ({ name: '', tag: 'sightseeing', status: 'active', city: '', region: '', minutes: '', difficulty: '', bestTime: '', meetingPoint: '', minAge: '', partner: '', price: '', priceChild: '', priceGroup: '', groupSize: '', description: '', highlights: [], inclusions: [], exclusions: [] }),
+    defaults: () => ({ image: [], name: '', tag: 'sightseeing', status: 'active', city: '', region: '', minutes: '', difficulty: '', bestTime: '', meetingPoint: '', minAge: '', partner: '', price: '', priceChild: '', priceGroup: '', groupSize: '', description: '', highlights: [], inclusions: [], exclusions: [] }),
     preview: (v) => ({ title: String(v.name || '').trim(), lines: [v.city, numOrNull(v.minutes) != null ? `${v.minutes} min` : '', numOrNull(v.price) != null ? `₹${Number(v.price).toLocaleString('en-IN')} / person` : ''] }),
   };
 }
@@ -76,20 +78,20 @@ export default {
       endpoint: '/api/adventures',
       wizard: () => wizardConfig(),
       toBody: (v) => ({
-        name: v.name.trim(), tag: v.tag || 'sightseeing', status: v.status || 'active', city: textOrNull(v.city), region: textOrNull(v.region),
+        name: v.name.trim(), image: pictureOf(v.image), tag: v.tag || 'sightseeing', status: v.status || 'active', city: textOrNull(v.city), region: textOrNull(v.region),
         minutes: numOrNull(v.minutes), difficulty: textOrNull(v.difficulty), bestTime: textOrNull(v.bestTime), meetingPoint: textOrNull(v.meetingPoint),
         minAge: textOrNull(v.minAge), partner: textOrNull(v.partner), price: numOrNull(v.price), priceChild: numOrNull(v.priceChild), priceGroup: numOrNull(v.priceGroup),
         groupSize: numOrNull(v.groupSize), description: textOrNull(v.description), highlights: listOf(v.highlights), inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions),
       }),
       local: (v, old) => ({
-        ...(old || {}), name: v.name.trim(), tag: v.tag || 'sightseeing', status: v.status || 'active', city: textOrNull(v.city), region: textOrNull(v.region),
+        ...(old || {}), name: v.name.trim(), image: pictureOf(v.image), tag: v.tag || 'sightseeing', status: v.status || 'active', city: textOrNull(v.city), region: textOrNull(v.region),
         minutes: numOrNull(v.minutes), difficulty: textOrNull(v.difficulty), bestTime: textOrNull(v.bestTime), meetingPoint: textOrNull(v.meetingPoint),
         minAge: textOrNull(v.minAge), partner: textOrNull(v.partner), price: numOrNull(v.price), priceChild: numOrNull(v.priceChild), priceGroup: numOrNull(v.priceGroup),
         groupSize: numOrNull(v.groupSize), description: textOrNull(v.description), highlights: listOf(v.highlights), inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions),
         bookings: old?.bookings ?? 0, rating: old?.rating ?? null, reviews: old?.reviews ?? 0,
       }),
       values: (a) => ({
-        name: a.name, tag: a.tag || 'sightseeing', status: a.status || 'active', city: a.city ?? '', region: a.region ?? '', minutes: a.minutes ?? '',
+        image: a.image ? [a.image] : [], name: a.name, tag: a.tag || 'sightseeing', status: a.status || 'active', city: a.city ?? '', region: a.region ?? '', minutes: a.minutes ?? '',
         difficulty: a.difficulty ?? '', bestTime: a.bestTime ?? '', meetingPoint: a.meetingPoint ?? '', minAge: a.minAge ?? '', partner: a.partner ?? '',
         price: a.price ?? '', priceChild: a.priceChild ?? '', priceGroup: a.priceGroup ?? '', groupSize: a.groupSize ?? '', description: a.description ?? '',
         highlights: a.highlights || [], inclusions: a.inclusions || [], exclusions: a.exclusions || [],
@@ -128,6 +130,8 @@ export default {
       searchText: (a) => `${a.name} ${a.city || ''} ${a.region || ''} ${a.tag}`,
       row: (a) => ({
         tile: tile('mountain'),
+        thumb: true,
+        image: a.image,
         name: a.name,
         pill: `${tag(TAG_KIND[a.tag] || 'activity', a.tag)}${crud.isFresh(a.id) ? '<span class="just-added-tag">JUST ADDED</span>' : ''}`,
         sub: place(a),
@@ -141,6 +145,7 @@ export default {
           tierRow(`Private group${a.groupSize ? ` (up to ${a.groupSize})` : ''}`, 'Priority booking, fixed price', a.priceGroup),
         ])}</section>`;
         const body = ui.tab === 'pricing' ? tiers : `
+          ${heroImage(a.image, a.name)}
           ${statRow([
             { icon: 'chart', label: 'Price per person', value: a.price != null ? money(a.price) : '—', tone: 'blue' },
             { icon: 'briefcase', label: 'Bookings', value: a.bookings, tone: 'green' },

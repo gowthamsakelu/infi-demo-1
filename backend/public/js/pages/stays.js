@@ -2,11 +2,11 @@
 // (Overview / Rooms & Rates; the meal plans sit under the rooms). Add room type and Edit are drawn as designed and do nothing yet; Call opens the phone's dialler.
 import { createSplitPage } from '../shared/split-page.js';
 import { getJson } from '../shared/http.js';
-import { createCatalogCrud, numOrNull, textOrNull, listOf } from '../shared/catalog-crud.js';
+import { createCatalogCrud, numOrNull, textOrNull, listOf, pictureOf } from '../shared/catalog-crud.js';
 import { esc, errorState } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, linkRow, chip, money, moneyShort, plural } from '../shared/page-ui.js';
-import { card, optionsOf, place, filled, inclusionsCard, bulletCard, overviewCard } from './catalog-ui.js';
+import { card, optionsOf, place, filled, inclusionsCard, bulletCard, overviewCard, heroImage } from './catalog-ui.js';
 
 // HOTEL is blue, VILLA yellow, RESORT teal (the shared tag colours)
 const TAG_KIND = { hotel: 'resort', villa: 'villa', resort: 'activity' };
@@ -20,6 +20,7 @@ function wizardConfig() {
   return {
     noun: 'stay',
     requiredKey: 'name',
+    required: ['name', 'city', 'price'], // saved only when these are filled in
     steps: [
       { label: 'Basics', title: 'Basics', sub: 'The name, the kind of stay and where it is.', fields: [
         { key: 'name', type: 'text', label: 'Stay name', placeholder: 'e.g. Hotel Lake View', optional: false, max: 120 },
@@ -37,6 +38,7 @@ function wizardConfig() {
         { key: 'priceNote', type: 'text', label: 'Price note', placeholder: 'e.g. Price may vary, please confirm before booking', max: 255 },
       ] },
       { label: 'Details', title: 'Details', sub: 'What the stay is like, and what is and is not included.', fields: [
+        { key: 'image', type: 'image', label: 'Image', hint: 'JPG, PNG or WebP · up to 5 MB' },
         { key: 'description', type: 'textarea', label: 'About the stay', placeholder: 'A few sentences about the stay', rows: 4, max: 2000 },
         { key: 'amenities', type: 'list', label: 'Amenities', placeholder: 'e.g. Wi-Fi', addLabel: 'Add amenity' },
         { key: 'inclusions', type: 'list', label: 'Included', placeholder: 'e.g. Breakfast', addLabel: 'Add item' },
@@ -44,7 +46,7 @@ function wizardConfig() {
         { key: 'extraCharges', type: 'list', label: 'Extra charges', placeholder: 'e.g. Extra mattress: ₹800 per night', addLabel: 'Add charge' },
       ] },
     ],
-    defaults: () => ({ name: '', tag: 'hotel', status: 'active', city: '', region: '', address: '', phone: '', email: '', price: '', roomsCount: '', priceNote: '', description: '', amenities: [], inclusions: [], exclusions: [], extraCharges: [] }),
+    defaults: () => ({ image: [], name: '', tag: 'hotel', status: 'active', city: '', region: '', address: '', phone: '', email: '', price: '', roomsCount: '', priceNote: '', description: '', amenities: [], inclusions: [], exclusions: [], extraCharges: [] }),
     preview: (v) => ({ title: String(v.name || '').trim(), lines: [v.city, numOrNull(v.price) != null ? `From ₹${Number(v.price).toLocaleString('en-IN')} / night` : 'No price yet', v.status === 'inactive' ? 'Inactive' : 'Active'] }),
   };
 }
@@ -85,6 +87,7 @@ export default {
     function overview(item, d) {
       const ready = d && !d.failed;
       return `
+        ${heroImage(item.image, item.name)}
         ${statRow([
           { icon: 'briefcase', label: 'Bookings', value: item.bookings, tone: 'blue' },
           { icon: 'bed', label: 'Room types', value: ready ? d.rooms.length : '…', tone: 'green' },
@@ -120,19 +123,19 @@ export default {
       endpoint: '/api/stays',
       wizard: () => wizardConfig(),
       toBody: (v) => ({
-        name: v.name.trim(), tag: v.tag || 'hotel', status: v.status || 'active', city: textOrNull(v.city), region: textOrNull(v.region), address: textOrNull(v.address),
+        name: v.name.trim(), image: pictureOf(v.image), tag: v.tag || 'hotel', status: v.status || 'active', city: textOrNull(v.city), region: textOrNull(v.region), address: textOrNull(v.address),
         phone: textOrNull(v.phone), email: textOrNull(v.email), price: numOrNull(v.price), roomsCount: numOrNull(v.roomsCount), priceNote: textOrNull(v.priceNote),
         description: textOrNull(v.description), amenities: listOf(v.amenities), inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions), extraCharges: listOf(v.extraCharges),
       }),
       local: (v, old) => ({
-        ...(old || {}), name: v.name.trim(), tag: v.tag || 'hotel', status: v.status || 'active', city: textOrNull(v.city), region: textOrNull(v.region),
+        ...(old || {}), name: v.name.trim(), image: pictureOf(v.image), tag: v.tag || 'hotel', status: v.status || 'active', city: textOrNull(v.city), region: textOrNull(v.region),
         price: numOrNull(v.price), roomsCount: numOrNull(v.roomsCount), bookings: old?.bookings ?? 0, rating: old?.rating ?? null, reviews: old?.reviews ?? 0,
         address: textOrNull(v.address), phone: textOrNull(v.phone), email: textOrNull(v.email), description: textOrNull(v.description),
         amenities: listOf(v.amenities), inclusions: listOf(v.inclusions), exclusions: listOf(v.exclusions), extraCharges: listOf(v.extraCharges),
         priceNote: textOrNull(v.priceNote), revenue: old?.revenue ?? 0, rooms: old?.rooms ?? [],
       }),
       values: (d) => ({
-        name: d.name, tag: d.tag || 'hotel', status: d.status || 'active', city: d.city ?? '', region: d.region ?? '', address: d.address ?? '', phone: d.phone ?? '',
+        image: d.image ? [d.image] : [], name: d.name, tag: d.tag || 'hotel', status: d.status || 'active', city: d.city ?? '', region: d.region ?? '', address: d.address ?? '', phone: d.phone ?? '',
         email: d.email ?? '', price: d.price ?? '', roomsCount: d.roomsCount ?? '', priceNote: d.priceNote ?? '', description: d.description ?? '',
         amenities: d.amenities || [], inclusions: d.inclusions || [], exclusions: d.exclusions || [], extraCharges: d.extraCharges || [],
       }),
@@ -174,6 +177,8 @@ export default {
       searchText: (s) => `${s.name} ${s.city || ''} ${s.region || ''} ${TAG_LABEL[s.tag] || ''}`,
       row: (s) => ({
         tile: tile('bed'),
+        thumb: true,
+        image: s.image,
         name: s.name,
         pill: `${tag(TAG_KIND[s.tag] || 'resort', TAG_LABEL[s.tag] || s.tag)}${crud.isFresh(s.id) ? '<span class="just-added-tag">JUST ADDED</span>' : ''}`,
         sub: place(s),

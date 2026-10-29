@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pages;
 use App\Http\Controllers\Controller;
 use App\Models\SavedHotel;
 use App\Support\DummyData;
+use App\Support\DataUrlImage;
 use App\Http\Requests\SaveStayRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -52,6 +53,7 @@ class StayController extends Controller
     {
         return [
             'id' => $h->id,
+            'image' => DataUrlImage::url($h->image),
             'name' => $h->name,
             'city' => $h->city,
             'region' => $h->region,
@@ -94,12 +96,12 @@ class StayController extends Controller
 
     private function columns(SaveStayRequest $r): array
     {
-        return [
+        return DataUrlImage::into([
             'name' => $r->input('name'), 'tag' => $r->input('tag', 'hotel'), 'status' => $r->input('status', 'active'),
             'city' => $r->input('city'), 'region' => $r->input('region'), 'address' => $r->input('address'), 'phone' => $r->input('phone'), 'email' => $r->input('email'),
             'price_from' => $r->input('price'), 'rooms_count' => $r->input('roomsCount'), 'price_note' => $r->input('priceNote'), 'description' => $r->input('description'),
             'amenities' => array_values($r->input('amenities', [])), 'inclusions' => array_values($r->input('inclusions', [])),
             'exclusions' => array_values($r->input('exclusions', [])), 'extra_charges' => array_values($r->input('extraCharges', [])),
-        ];
+        ], $r, 'stays');
     }
 }

@@ -7,7 +7,7 @@
             "region": "Jammu & Kashmir, India",
             "status": "active",
             "popular": true,
-            "image": null,
+            "image": "/images/kedarnath.jpg",
             "packages": 3,
             "inquiries": 1
         },
@@ -40,7 +40,7 @@
             "region": "Kerala, India",
             "status": "active",
             "popular": true,
-            "image": null,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg/500px-Alleppey_backwaters_view_%2C_Kerala_%2C_India_11.jpg",
             "packages": 1,
             "inquiries": 0
         },
@@ -51,7 +51,7 @@
             "region": "Indonesia",
             "status": "active",
             "popular": true,
-            "image": null,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Rice_terraces%2C_Bali.jpg/500px-Rice_terraces%2C_Bali.jpg",
             "packages": 1,
             "inquiries": 0
         },
@@ -73,7 +73,7 @@
             "region": "Rajasthan, India",
             "status": "active",
             "popular": false,
-            "image": null,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/20191207_Lake_Pichola%2C_City_Palace%2C_Udaipur%2C_1516_7254.jpg/500px-20191207_Lake_Pichola%2C_City_Palace%2C_Udaipur%2C_1516_7254.jpg",
             "packages": 0,
             "inquiries": 0
         },
@@ -84,7 +84,7 @@
             "region": "Rajasthan, India",
             "status": "active",
             "popular": false,
-            "image": null,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/East_facade_Hawa_Mahal_Jaipur_from_ground_level_%28July_2022%29_-_img_01.jpg/500px-East_facade_Hawa_Mahal_Jaipur_from_ground_level_%28July_2022%29_-_img_01.jpg",
             "packages": 0,
             "inquiries": 0
         },
@@ -95,7 +95,7 @@
             "region": "Ladakh, India",
             "status": "active",
             "popular": false,
-            "image": null,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Pangong_Lake%2C_Ladakh%2C_India_07.jpg/500px-Pangong_Lake%2C_Ladakh%2C_India_07.jpg",
             "packages": 0,
             "inquiries": 0
         },
@@ -106,7 +106,7 @@
             "region": "Andaman & Nicobar, India",
             "status": "active",
             "popular": false,
-            "image": null,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Havelock_Island%2C_Radhanagar_Beach_before_sunset%2C_Andaman_Islands.jpg/500px-Havelock_Island%2C_Radhanagar_Beach_before_sunset%2C_Andaman_Islands.jpg",
             "packages": 0,
             "inquiries": 0
         }

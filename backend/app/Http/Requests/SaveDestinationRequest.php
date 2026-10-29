@@ -21,7 +21,7 @@ class SaveDestinationRequest extends CatalogRequest
             'description' => ['nullable', 'string', 'max:2000'],
             'highlights' => $this->listRule(),
             'highlights.*' => ['string', 'max:200'],
-            'image' => ['nullable', 'string', 'max:4000000'],
+            'image' => ['nullable', 'string', 'max:7000000'],
         ];
     }
 }

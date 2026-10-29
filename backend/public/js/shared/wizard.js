@@ -16,6 +16,7 @@ import { openSheet, openScreen, confirmDialog } from './sheet.js';
 import { flipToggle } from './page-ui.js';
 import { renderField, bindSelects, display, isEmpty } from './wizard-fields.js';
 
+const PICTURE_MAX = 5 * 1024 * 1024;
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const clone = (v) => JSON.parse(JSON.stringify(v));
 
@@ -24,6 +25,7 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
   const steps = [...cfg.steps, { label: 'Review', title: 'Review', sub: edit ? 'Check the changes, then save.' : 'Check what you filled in, then save.', review: true }];
   const last = steps.length - 1;
   const allFields = cfg.steps.flatMap((s) => s.fields);
+  const required = new Set(cfg.required || [cfg.requiredKey]); // the fields a record cannot be saved without
   const v = Object.assign(cfg.defaults ? cfg.defaults() : {}, values ? clone(values) : {});
   const initial = JSON.stringify(v);
   const errors = {};
@@ -40,7 +42,7 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
     returnFocus,
     beforeClose: () => JSON.stringify(v) === initial || confirmDialog({ title: `Discard this ${cfg.noun}?`, text: 'What you entered has not been saved.', confirm: 'Discard', cancel: 'Keep editing', danger: true }),
     html: `<header class="asg-header wiz-header">
-        <div class="wiz-title"><h3 data-dialog-title tabindex="-1" id="wz-title"></h3><p class="wiz-sub">${edit ? 'Change what you need. Everything except the name is optional.' : 'Fill in what you know. Only the name is required.'}</p></div>
+        <div class="wiz-title"><h3 data-dialog-title tabindex="-1" id="wz-title"></h3><p class="wiz-sub">${edit ? 'Change what you need. Required fields must stay filled in.' : 'Fill in the required fields to save.'}</p></div>
         <button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button>
       </header>
       <div class="wiz-progress"><p class="wiz-mstep" id="wz-mstep"></p><div class="wiz-seg" id="wz-seg" aria-hidden="true"></div></div>
@@ -49,7 +51,6 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
         <div class="wiz-pane">
           <div class="wiz-body" id="wz-body"></div>
           <footer class="fu-footer wiz-footer">
-            <button type="button" class="bld-link wiz-early" id="wz-early"></button>
             <span class="wiz-spacer"></span>
             <button type="button" class="btn-secondary-desktop" id="wz-back">Back</button>
             <button type="button" class="btn-primary-desktop" id="wz-next">Next</button>
@@ -65,7 +66,6 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
     const p = cfg.preview(v);
     return `<small>LIVE PREVIEW</small><b>${esc(p.title || `Untitled ${cfg.noun}`)}</b>${(p.lines || []).filter(Boolean).map((l) => `<span>${esc(l)}</span>`).join('')}`;
   }
-  const earlyHtml = () => `${icon('check', { size: 16, stroke: 2.5 })}<span>Save with what I have</span><small>· ${plural(detailCount(), 'detail')} added</small>`;
   function paintChrome() {
     $('#wz-title').textContent = heading();
     $('#wz-rail').innerHTML = `${steps.map((t, i) => `
@@ -78,18 +78,14 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
     paintFooter();
   }
   function paintFooter() {
-    $('#wz-early').hidden = step === last;
-    $('#wz-early').innerHTML = earlyHtml();
     $('#wz-back').hidden = step === 0;
     $('#wz-next').textContent = saving ? 'Saving…' : step === last ? (edit ? 'Save changes' : `Save ${cfg.noun}`) : 'Next';
-    dlg.sheet.querySelectorAll('#wz-back, #wz-next, #wz-early').forEach((b) => { b.disabled = saving; });
+    dlg.sheet.querySelectorAll('#wz-back, #wz-next').forEach((b) => { b.disabled = saving; });
   }
   /** While typing: no re-render, so the cursor (and the phone's keyboard) stay where they are. */
   function paintLive() {
     const pv = $('#wz-preview');
     if (pv) pv.innerHTML = previewHtml();
-    const early = $('#wz-early');
-    if (early) early.innerHTML = earlyHtml();
     const title = $('#wz-title');
     if (title) title.textContent = heading();
   }
@@ -108,12 +104,12 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
     const s = steps[step];
     const html = s.review ? reviewHtml() : fieldsHtml(s.fields);
     bodyEl.innerHTML = `<section class="wiz-step-pane" aria-labelledby="wz-h"><h4 class="wiz-h" id="wz-h" tabindex="-1">${esc(s.title)}</h4><p class="wiz-help">${esc(s.sub || '')}</p>${html}</section>`;
-    disposeSelects = s.review ? () => {} : bindSelects(bodyEl, s.fields, v, (k, val) => { v[k] = val; paintLive(); });
+    disposeSelects = s.review ? () => {} : bindSelects(bodyEl, s.fields, v, (k, val) => { v[k] = val; delete errors[k]; const p = $(`#wf-${k}-err`); if (p) p.hidden = true; paintLive(); });
     bodyEl.scrollTop = 0;
   }
   /** Fields marked `half` sit two to a row (like Customer & trip). */
   function fieldsHtml(fields) {
-    const one = (f) => renderField(f, v[f.key], errors[f.key]);
+    const one = (f) => renderField(required.has(f.key) ? { ...f, optional: false } : f, v[f.key], errors[f.key]);
     const out = [];
     for (let i = 0; i < fields.length; i += 1) {
       if (fields[i].half && fields[i + 1]?.half) { out.push(`<div class="wiz-row">${one(fields[i])}${one(fields[i + 1])}</div>`); i += 1; } else out.push(one(fields[i]));
@@ -130,16 +126,28 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
   }
 
   /* ---------- save ---------- */
-  function validate() {
-    Object.keys(errors).forEach((k) => delete errors[k]);
-    if (String(v[cfg.requiredKey] ?? '').trim() === '') errors[cfg.requiredKey] = `Give the ${cfg.noun} a name.`;
-    return Object.keys(errors).length === 0;
+  /** Is a required field empty? (an empty list counts: the picture of a banner) */
+  const isMissing = (f) => (Array.isArray(v[f.key]) ? v[f.key].length === 0 : String(v[f.key] ?? '').trim() === '');
+  const messageFor = (f) => {
+    const label = String(f.label).toLowerCase();
+    if (f.type === 'image') return `Add ${label}.`;
+    if (f.type === 'select' || f.type === 'chips') return `Choose ${/^[aeiou]/.test(label) ? 'an' : 'a'} ${label}.`;
+    return `Enter ${/^(the|a|an) /.test(label) ? '' : 'the '}${label}.`;
+  };
+  /** Mark the missing required fields among `fields` (inline, under each one); returns the key of the first one, or null. */
+  function check(fields) {
+    let first = null;
+    fields.forEach((f) => {
+      if (required.has(f.key) && isMissing(f)) { errors[f.key] = messageFor(f); first ??= f.key; } else delete errors[f.key];
+    });
+    return first;
   }
   const stepOf = (key) => cfg.steps.findIndex((s) => s.fields.some((f) => f.key === key));
 
   async function save() {
     if (saving) return;
-    if (!validate()) { step = stepOf(cfg.requiredKey); renderStep(); paintChrome(); $('#wz-h')?.focus({ preventScroll: true }); return; }
+    const firstMissing = check(allFields); // a record with a required field empty is never saved
+    if (firstMissing) { step = stepOf(firstMissing); renderStep(); paintChrome(); $('#wz-h')?.focus({ preventScroll: true }); return; }
     const n = detailCount();
     saving = true;
     paintFooter();
@@ -190,12 +198,17 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
   dlg.ov.addEventListener('click', (e) => {
     const t = (sel) => e.target.closest(sel);
     let el;
-    if (t('#wz-next')) { if (step === last) save(); else go(step + 1); return; }
+    if (t('#wz-next')) {
+      if (step === last) save();
+      else if (check(steps[step].fields)) { renderStep(); $('#wz-h')?.focus({ preventScroll: true }); } // the step's required fields first
+      else go(step + 1);
+      return;
+    }
     if (t('#wz-back')) { go(step - 1); return; }
-    if (t('#wz-early')) { save(); return; }
     if ((el = t('[data-go]'))) { go(Number(el.dataset.go)); return; }
     if ((el = t('[data-wchip]'))) {
       const f = allFields.find((x) => x.key === el.dataset.wchip);
+      delete errors[f.key];
       const val = el.dataset.val;
       if (f.multi) { const set = new Set(v[f.key] || []); set.has(val) ? set.delete(val) : set.add(val); v[f.key] = [...set]; } else v[f.key] = v[f.key] === val ? '' : val;
       renderStep(); paintLive();
@@ -215,7 +228,7 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
       renderStep(); paintLive();
       return;
     }
-    if ((el = t('[data-wimg-del]'))) { v[el.dataset.wimgDel].splice(Number(el.dataset.i), 1); renderStep(); paintLive(); return; }
+    if ((el = t('[data-wimg-del]'))) { v[el.dataset.wimgDel].splice(Number(el.dataset.i), 1); delete errors[el.dataset.wimgDel]; renderStep(); paintLive(); return; }
     if ((el = t('[data-wrow-add]'))) { openRowScreen(allFields.find((x) => x.key === el.dataset.wrowAdd), null); return; }
     if ((el = t('[data-wrow-edit]'))) { openRowScreen(allFields.find((x) => x.key === el.dataset.wrowEdit), Number(el.dataset.i)); }
   });
@@ -236,6 +249,14 @@ export function openWizard(cfg, { mode = 'add', record = null, values = null, on
     if (!el.dataset.wimg) return;
     const f = allFields.find((x) => x.key === el.dataset.wimg);
     const files = [...el.files];
+    const bad = files.find((file) => !/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > PICTURE_MAX);
+    if (bad) {
+      errors[f.key] = /^image\/(jpeg|png|webp)$/.test(bad.type) ? 'That picture is larger than 5 MB. Choose a smaller one.' : 'Use a JPG, PNG or WebP picture.';
+      el.value = '';
+      renderStep();
+      return;
+    }
+    delete errors[f.key];
     Promise.all(files.map((file) => new Promise((resolve) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.readAsDataURL(file); }))).then((urls) => {
       v[f.key] = f.multi ? [...(v[f.key] || []), ...urls] : urls.slice(0, 1);
       renderStep(); paintLive();
