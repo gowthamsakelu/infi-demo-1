@@ -7058,6 +7058,568 @@ html.is-keyboard-open .mobile-screen-content { padding-bottom: calc(var(--kb-ins
 
 
 /* =========================================================
+   Operations Team Mobile Pop-Up: Current Assignments
+   (Inspired by Screenshot 2 Desktop Table & Components)
+   ========================================================= */
+
+.team-mobile-assignments-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.team-mobile-assignments-header-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.team-mobile-assignments-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.team-mobile-assignments-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.team-mobile-assignments-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.team-mobile-assignments-subtitle {
+  font-size: 11.5px;
+  color: #64748B;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.team-mobile-header-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #F1F5F9;
+}
+
+.team-mobile-toolbar-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.team-mobile-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.team-mobile-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 3.5px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.team-mobile-toggle-btn.active {
+  background: #FFFFFF;
+  color: #2563EB;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.team-mobile-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.team-mobile-assignment-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 13px 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.team-mobile-assignment-card:hover {
+  border-color: #BFDBFE;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+}
+
+.team-mobile-card-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.team-mobile-cust-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.team-mobile-cust-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.team-mobile-cust-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.team-mobile-cust-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.team-mobile-bkid-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #475569;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.2px;
+}
+
+.team-mobile-cust-phone {
+  font-size: 11px;
+  color: #64748B;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.team-mobile-cust-phone:hover {
+  color: #2563EB;
+}
+
+.team-mobile-status-cell {
+  flex-shrink: 0;
+}
+
+.team-mobile-trip-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #F8FAFC;
+  border: 1px solid #F1F5F9;
+  border-radius: 8px;
+}
+
+.team-mobile-dest-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.team-mobile-dest-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-mobile-dates-pax-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px dashed #E2E8F0;
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+.team-mobile-dates-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+}
+
+.team-mobile-dates-wrap .team-meta-dot {
+  color: #CBD5E1;
+  font-size: 10px;
+}
+
+.team-mobile-responsibility-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.team-mobile-resp-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748B;
+}
+
+.team-mobile-resp-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748B;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.team-mobile-resp-text {
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.45;
+  margin: 0;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.team-mobile-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 36px;
+  border-radius: 8px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #2563EB;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.team-mobile-view-btn:hover {
+  background: #DBEAFE;
+  color: #1D4ED8;
+  border-color: #93C5FD;
+}
+
+.team-mobile-table-scroll-hint {
+  font-size: 11px;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+  font-weight: 500;
+}
+
+#mobile-team-sheet .team-assignments-table {
+  min-width: 620px;
+}
+
+/* =========================================================
+   Operations Team Mobile Pop-Up: Skills & Info Section
+   (Structured, Uniform & Perfectly Aligned — Inspired by Image 2 Desktop Core Responsibilities & Skills)
+   ========================================================= */
+
+.team-mobile-skills-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Core Card matching Image 2 */
+.team-mobile-core-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 14px 15px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.team-mobile-core-card .team-extra-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid #F1F5F9;
+  padding-bottom: 10px;
+}
+
+.team-mobile-core-card .team-extra-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.team-mobile-core-card .team-extra-card-header h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.team-skills-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #059669;
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  padding: 2.5px 8px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.team-skills-layout-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.team-skills-section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.team-skills-subheading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.team-skills-subheading {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  display: block;
+}
+
+.team-skills-subheading-count {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #94A3B8;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Responsibilities List with Crisp Green SVG Checkmarks (Exact match to Image 2) */
+.team-mobile-skills-section .team-resp-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7.5px;
+}
+
+.team-mobile-skills-section .team-resp-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.team-mobile-skills-section .team-resp-list li svg {
+  flex-shrink: 0;
+  margin-top: 1.5px;
+}
+
+/* Badge Chips Grid matching Image 2 */
+.team-mobile-skills-section .team-skills-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.team-mobile-skills-section .team-skill-tag {
+  font-size: 11px;
+  line-height: 1.35;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  white-space: normal;
+  word-break: break-word;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+/* 1. Regional Expertise: Soft Blue Pill (Exact match to Image 2) */
+.team-skill-tag.tag-expertise,
+.team-mobile-skills-section .team-skill-tag.tag-expertise {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+.team-skill-tag.tag-expertise:hover,
+.team-mobile-skills-section .team-skill-tag.tag-expertise:hover {
+  background: #DBEAFE;
+  border-color: #93C5FD;
+}
+
+/* 2. Specialized Skills: Soft Slate Pill (Exact match to Image 2) */
+.team-skill-tag,
+.team-mobile-skills-section .team-skill-tag {
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+}
+.team-skill-tag:hover,
+.team-mobile-skills-section .team-skill-tag:hover {
+  background: #E2E8F0;
+  border-color: #CBD5E1;
+}
+
+/* 3. Travel Services Handled: Soft Amber Pill */
+.team-skill-tag.tag-service,
+.team-mobile-skills-section .team-skill-tag.tag-service {
+  background: #FFFBEB;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+.team-skill-tag.tag-service:hover,
+.team-mobile-skills-section .team-skill-tag.tag-service:hover {
+  background: #FEF3C7;
+  border-color: #FCD34D;
+}
+
+/* Legacy & backward compatibility classes */
+.team-mobile-section-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 14px 15px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+.team-mobile-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #F1F5F9;
+}
+.team-mobile-section-header-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.team-mobile-section-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1.25;
+}
+.team-mobile-section-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  padding: 2px 7.5px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.team-icon-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.team-icon-circle.theme-blue { background: #EFF6FF; color: #2563EB; border: 1px solid #DBEAFE; }
+.team-icon-circle.theme-purple { background: #F5F3FF; color: #7C3AED; border: 1px solid #DDD6FE; }
+.team-icon-circle.theme-emerald { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+.team-icon-circle.theme-amber { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+.team-mobile-chip-grid { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.team-skill-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5.5px;
+  padding: 5.5px 11px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.team-skill-chip.chip-expertise { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.team-skill-chip.chip-skill { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+.team-skill-chip.chip-service { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+
+
+
+/* =========================================================
    Operations Team Details Right Panel (Exact Match to Screenshot 2)
    ========================================================= */
 

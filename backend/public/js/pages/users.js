@@ -608,7 +608,7 @@ export default {
         <div class="us-matrix-table-card" role="table" aria-label="Access Permissions">
           <div class="us-tbl-head-row" role="row">
             <span class="us-tbl-col-head us-tbl-col-module" role="columnheader">MODULE / FEATURE</span>
-            ${ACTIONS.map((a) => `<span class="us-tbl-col-head" role="columnheader">${ACTION_LABELS[a]}</span>`).join('')}
+            ${ACTIONS.map((a) => `<span class="us-tbl-col-head us-col-${a}" role="columnheader" title="${ACTION_LABELS[a]}">${ACTION_LABELS[a]}</span>`).join('')}
           </div>
           <div class="us-tbl-body">${rowsHtml}</div>
         </div>
