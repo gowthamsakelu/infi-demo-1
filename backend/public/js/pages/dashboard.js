@@ -237,7 +237,7 @@ export default {
           <!-- Desktop Header -->
           <div class="dash-section-header dash-desktop-att-header">
             <div class="dash-section-title-wrap">
-              <div class="dash-section-icon orange-tint">
+              <div class="dash-section-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
@@ -253,11 +253,9 @@ export default {
           <!-- Mobile Header (Exact match to reference) -->
           <div class="dash-section-header dash-mobile-att-header">
             <div class="dash-section-title-wrap">
-              <div class="dash-section-icon red-hexagon-tint">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#EF4444" stroke="none">
-                  <path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/>
-                  <line x1="12" y1="8" x2="12" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
-                  <circle cx="12" cy="16" r="1.2" fill="#FFFFFF"/>
+              <div class="dash-section-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
               </div>
               <div>
@@ -314,8 +312,8 @@ export default {
           <div class="dash-attention-card-wrap dash-mobile-att">
             <div class="dash-att-row" data-dash-nav="inquiries">
               <div class="dash-att-row-left">
-                <div class="dash-att-row-ico coral-ico">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="dash-att-row-ico">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
                     <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y1="10"/>
                   </svg>
@@ -336,8 +334,8 @@ export default {
 
             <div class="dash-att-row" data-dash-nav="bookings">
               <div class="dash-att-row-left">
-                <div class="dash-att-row-ico amber-ico">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="dash-att-row-ico">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y1="10"/>
                   </svg>
                 </div>
@@ -357,7 +355,7 @@ export default {
 
             <div class="dash-att-row" data-dash-nav="bookings">
               <div class="dash-att-row-left">
-                <div class="dash-att-row-ico blue-ico">
+                <div class="dash-att-row-ico">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
@@ -388,7 +386,7 @@ export default {
           <!-- Desktop Header -->
           <div class="dash-section-header dash-desktop-trips-header">
             <div class="dash-section-title-wrap">
-              <div class="dash-section-icon blue-tint">
+              <div class="dash-section-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect width="20" height="14" x="2" y="6" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
                 </svg>
@@ -404,7 +402,7 @@ export default {
           <!-- Mobile Header (Exact match to reference) -->
           <div class="dash-section-header dash-mobile-trips-header">
             <div class="dash-section-title-wrap">
-              <div class="dash-section-icon blue-plane-tint">
+              <div class="dash-section-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/>
                 </svg>
@@ -443,46 +441,24 @@ export default {
             </div>
           </div>
 
-          <!-- Mobile Compact Trips Card (Exact match to reference) -->
-          <div class="dash-mobile-trips-card dash-mobile-trips">
-            <div class="dash-mobile-trips-table">
-              <div class="dash-mobile-tr-head">
-                <span class="dash-mth col-cust">Customer</span>
-                <span class="dash-mth col-dest">Destination</span>
-                <span class="dash-mth col-date">Travel Date</span>
-                <span class="dash-mth col-stat">Status</span>
-                <span class="dash-mth col-arr"></span>
-              </div>
-              <div class="dash-mobile-tr-body">
-                ${(trips.slice(0, 3)).map((t, idx) => {
-                  const avColors = ['av-blue', 'av-purple', 'av-cyan'];
-                  const avClass = avColors[idx % avColors.length];
-                  const isConfirmed = t.status === 'Paid' || t.status === 'Confirmed';
-                  return `
-                    <div class="dash-mobile-tr-row" data-dash-nav="bookings" data-booking-id="${esc(t.id)}">
-                      <div class="dash-mtd col-cust">
-                        <span class="dash-m-avatar ${avClass}">${esc(t.customer_initials || 'G')}</span>
-                        <span class="dash-m-cust-name" title="${esc(t.customer_name)}">${esc(t.customer_name)}</span>
-                      </div>
-                      <div class="dash-mtd col-dest">
-                        <span class="dash-m-dest-text" title="${esc(t.destination)}">${esc(t.destination)}</span>
-                      </div>
-                      <div class="dash-mtd col-date">
-                        <span class="dash-m-date-text">${esc(t.dates || '30 Oct 2026')}</span>
-                      </div>
-                      <div class="dash-mtd col-stat">
-                        <span class="dash-m-status-pill ${isConfirmed ? 'pill-confirmed' : 'pill-pending'}">
-                          ${isConfirmed ? 'Confirmed' : 'Pending'}
-                        </span>
-                      </div>
-                      <div class="dash-mtd col-arr">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
+          <!-- Phone: stacked rows like the other list cards -->
+          <div class="dash-mobile-trips dash-trip-list">
+            ${trips.slice(0, 3).map((t) => {
+              const confirmed = t.status === 'Paid' || t.status === 'Confirmed';
+              return `
+              <div class="dash-trip-row" data-dash-nav="bookings" data-booking-id="${esc(t.id)}" role="button" tabindex="0">
+                <span class="row-avatar" aria-hidden="true">${esc(t.customer_initials || 'G')}</span>
+                <div class="dash-trip-main">
+                  <b class="dash-trip-name">${esc(t.customer_name)}</b>
+                  <span class="dash-trip-dest-line">${esc(t.destination)}</span>
+                </div>
+                <div class="dash-trip-side">
+                  <span class="dash-trip-date">${esc(t.dates || '')}</span>
+                  <span class="status-pill ${confirmed ? 'status-confirmed' : 'status-pending'}"><span class="dot"></span>${confirmed ? 'Confirmed' : 'Pending'}</span>
+                </div>
+                <svg class="dash-trip-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>`;
+            }).join('')}
           </div>
         </section>
       `;

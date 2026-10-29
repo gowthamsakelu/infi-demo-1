@@ -1026,9 +1026,9 @@
     "semantic_hash": ""
   },
   "backend/public/js/pages/dashboard.js": {
-    "mtime": 1793272533.6852987,
-    "seen": 1793272711.957178,
-    "ast_hash": "15289e7939b47d4484d956ba471009e1",
+    "mtime": 1793273199.034993,
+    "seen": 1793273525.8806007,
+    "ast_hash": "bfeb5db30eb5b4127cb0fec3b26401c4",
     "semantic_hash": ""
   },
   "backend/public/js/pages/destinations.js": {

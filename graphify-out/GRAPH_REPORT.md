@@ -1,7 +1,7 @@
 # Graph Report - Admin_Project_LARAVEL  (2026-10-29)
 
 ## Corpus Check
-- 322 files · ~524,040 words
+- 322 files · ~523,974 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 48 file(s) not represented in the graph (top: .css 15, (none) 14, .woff2 8)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a2b27a3f`
+- Built from commit: `58742f6b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

@@ -2165,3 +2165,39 @@ html[data-layout] :is(#mobile-page-host, #desktop-page-host)[data-page="dashboar
 html[data-layout="mobile"] #mobile-page-host[data-page="dashboard"] .dash-time-filter { gap: 6px !important; }
 html[data-layout="mobile"] #mobile-page-host[data-page="dashboard"] .dash-filter-btn { padding: 0 12px !important; }
 html[data-layout="mobile"] #mobile-page-host[data-page="dashboard"] .dash-welcome-right { gap: 6px !important; }
+
+/* ==========================================================================
+   One icon style, one badge, one primary button; stacked trip rows on the phone; a header that stays put.
+   ========================================================================== */
+/* every icon box on the dashboard: app blue icon on the soft blue tint, one size */
+.dash-container :is(.dash-kpi-icon, .dash-section-icon, .dash-att-row-ico) { width: 34px !important; height: 34px !important; min-width: 34px; flex: none; border-radius: 10px !important; background: #EFF6FF !important; display: inline-flex; align-items: center; justify-content: center; }
+.dash-container :is(.dash-kpi-icon, .dash-section-icon, .dash-att-row-ico) svg { stroke: #2563EB !important; width: 18px; height: 18px; }
+
+/* Needs Attention rows (phone): icon, title + subtitle, badge, View */
+.dash-container .dash-att-row { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 10px !important; min-height: 64px; padding: 10px 14px !important; box-sizing: border-box; }
+.dash-container .dash-att-row + .dash-att-row { border-top: 1px solid #F1F5F9; }
+.dash-container .dash-att-row-left { display: flex !important; align-items: center !important; gap: 10px !important; flex: 1 1 auto !important; min-width: 0 !important; }
+.dash-container .dash-att-row-text { min-width: 0 !important; flex: 1 1 auto; }
+.dash-container .dash-att-item-title { margin: 0 !important; font-size: 14px !important; font-weight: 700 !important; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-container .dash-att-item-sub { margin: 2px 0 0 !important; font-size: 12px !important; line-height: 1.3; color: #64748B !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-container .dash-att-row-right { display: flex !important; align-items: center !important; gap: 8px !important; flex: none !important; }
+.dash-container .dash-att-badge { display: inline-flex !important; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 8px; border-radius: 9999px !important; background: #F1F5F9 !important; color: #475569 !important; border: 0 !important; font-size: 12px !important; font-weight: 600 !important; }
+.dash-container .dash-att-row-view-btn { display: inline-flex !important; align-items: center; justify-content: center; gap: 4px; height: 34px !important; padding: 0 12px !important; border: 0 !important; border-radius: 10px !important; background: #2563EB !important; color: #FFFFFF !important; font-size: 13px !important; font-weight: 700 !important; cursor: pointer; }
+.dash-container .dash-att-row-view-btn:hover { background: #1D4ED8 !important; }
+.dash-container .dash-att-row-view-btn svg { stroke: #FFFFFF; }
+
+/* Upcoming Trips (phone): avatar, name over destination, date over status, chevron */
+.dash-container .dash-trip-list { display: flex !important; flex-direction: column !important; width: 100% !important; box-sizing: border-box; overflow: hidden !important; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; overflow: hidden; }
+.dash-container .dash-trip-row { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 68px; padding: 10px 12px; box-sizing: border-box; cursor: pointer; }
+.dash-container .dash-trip-row + .dash-trip-row { border-top: 1px solid #F1F5F9; }
+.dash-container .dash-trip-row .row-avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+.dash-container .dash-trip-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dash-container .dash-trip-name { font-size: 14px; font-weight: 700; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-container .dash-trip-dest-line { font-size: 12px; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-container .dash-trip-side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.dash-container .dash-trip-date { font-size: 11.5px; color: #475569; white-space: nowrap; }
+.dash-container .dash-trip-chev { flex: none; }
+html[data-layout="desktop"] .dash-container .dash-trip-list { display: none !important; }
+
+/* the phone header stays at the top and solid, whichever box ends up scrolling */
+html[data-layout="mobile"] .dash-mobile-header { position: sticky; top: 0; z-index: 30; background: #FFFFFF !important; }
