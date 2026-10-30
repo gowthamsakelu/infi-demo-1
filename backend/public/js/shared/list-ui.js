@@ -12,8 +12,31 @@ import { esc, initials, contactButtons, rowMenuButton, checkbox, openRowMenu } f
  */
 export function renderTabs(host, { tabs, active, variant = 'desktop', attr = 'data-tab' }) {
   if (!host) return;
-  const scroller = variant === 'mobile' ? host.querySelector('.category-filter-tabs') : host.firstElementChild;
-  const left = scroller ? scroller.scrollLeft : 0;
+  const wrap = { mobile: 'category-filter-tabs', desktop: 'toolbar-tabs-group', compact: 'compact-tabs-nav' }[variant];
+  const scroller = host.firstElementChild;
+  const buttons = scroller ? [...scroller.children] : [];
+  const label = (t) => variant === 'compact' ? t.short || t.label : t.label;
+  // Data arrives after the first paint. Keep the scroller AND its buttons alive so
+  // count/filter updates cannot cancel an in-progress touch or reset its momentum.
+  if (scroller?.classList.contains(wrap) && buttons.length === tabs.length && buttons.every((b, i) => b.getAttribute(attr) === String(tabs[i].key))) {
+    buttons.forEach((button, i) => {
+      const t = tabs[i];
+      const on = t.key === active;
+      button.classList.toggle('active', on);
+      if (button.getAttribute('aria-selected') !== String(on)) button.setAttribute('aria-selected', String(on));
+      const caption = variant === 'mobile' ? `${label(t)}${t.count == null ? '' : ' '}` : `${label(t)}${t.count == null ? '' : ` (${t.count})`}`;
+      if (button.firstChild.nodeValue !== caption) button.firstChild.nodeValue = caption;
+      if (variant === 'mobile') {
+        let badge = button.querySelector('.pill-badge');
+        if (t.count == null) badge?.remove();
+        else {
+          if (!badge) { badge = document.createElement('span'); badge.className = 'pill-badge'; button.append(badge); }
+          if (badge.textContent !== String(t.count)) badge.textContent = String(t.count);
+        }
+      }
+    });
+    return;
+  }
   const item = (t) => {
     const on = t.key === active;
     if (variant === 'mobile') {
@@ -23,21 +46,20 @@ export function renderTabs(host, { tabs, active, variant = 'desktop', attr = 'da
     const short = variant === 'compact' ? t.short || t.label : t.label;
     return `<button class="${cls} ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(short)}${t.count == null ? '' : ` (${t.count})`}</button>`;
   };
-  const wrap = { mobile: 'category-filter-tabs', desktop: 'toolbar-tabs-group', compact: 'compact-tabs-nav' }[variant];
   host.innerHTML = `<div class="${wrap} tabs-scroller scroll-row" role="tablist">${tabs.map(item).join('')}</div>`;
   const el = host.firstElementChild;
-  el.scrollLeft = left;
   bindTabsScroller(el);
   // the active tab is kept in view by watchScrollRows (below)
 }
 
 /**
  * Keep the active item of every .scroll-row in view, with its row's 16px edge: when a tab, pill or chip becomes active (on load, on tap, after a
- * re-render) and is not fully visible, the row scrolls it into view smoothly. Rows the person scrolled by hand are left alone while the active item is visible.
+ * re-render) and is not fully visible, the row scrolls it into view smoothly. Manual scrolling never changes the selection or triggers a reveal.
  * Call once at start-up; it watches the whole page.
  */
 export function watchScrollRows() {
   const ACTIVE = '.active, .is-selected, .is-on, [aria-selected="true"]';
+  const selections = new WeakMap();
   const reveal = (row) => {
     const on = row.querySelector(ACTIVE);
     if (!on || row.scrollWidth <= row.clientWidth) return;
@@ -47,18 +69,46 @@ export function watchScrollRows() {
     let dx = 0;
     if (o.left < r.left + edge) dx = o.left - r.left - edge;
     else if (o.right > r.right - edge) dx = o.right - r.right + edge;
-    if (Math.abs(dx) > 1) row.scrollTo({ left: row.scrollLeft + dx, behavior: 'smooth' });
+    if (Math.abs(dx) > 1) row.scrollTo({ left: row.scrollLeft + dx, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   };
   const queued = new Set();
-  const flush = () => { const rows = [...queued]; queued.clear(); rows.forEach((row) => row.isConnected && reveal(row)); };
+  const flush = () => {
+    const rows = [...queued];
+    queued.clear();
+    rows.forEach((row) => {
+      if (!row.isConnected) return;
+      const selected = row.querySelector(ACTIVE);
+      if (selections.get(row) === selected) return;
+      selections.set(row, selected);
+      reveal(row);
+    });
+  };
   const queue = (node) => {
     const el = node.nodeType === 1 ? node : node.parentElement;
     const row = el?.closest?.('.scroll-row');
     if (row) { if (!queued.size) requestAnimationFrame(() => requestAnimationFrame(flush)); queued.add(row); }
     if (el?.querySelectorAll) el.querySelectorAll('.scroll-row').forEach((r) => { if (!queued.size) requestAnimationFrame(() => requestAnimationFrame(flush)); queued.add(r); });
   };
-  new MutationObserver((list) => list.forEach((m) => queue(m.type === 'childList' ? (m.addedNodes[0] || m.target) : m.target)))
-    .observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'aria-selected'] });
+  const selectedClasses = (value) => (value || '').split(/\s+/).filter((c) => ['active', 'is-selected', 'is-on'].includes(c)).sort().join(' ');
+  new MutationObserver((list) => list.forEach((m) => {
+    if (m.type === 'attributes') {
+      // Edge fades change while scrolling. They must never scroll back to the active chip.
+      if (m.attributeName === 'class' && selectedClasses(m.oldValue) === selectedClasses(m.target.getAttribute('class'))) return;
+      queue(m.target);
+    } else {
+      queue(m.target);
+      m.addedNodes.forEach(queue);
+    }
+  }))
+    .observe(document.body, { subtree: true, childList: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'aria-selected'] });
+  // A gesture can start before the initial reveal is painted; the user's scroll wins.
+  const rememberSelection = (e) => {
+    const row = e.target.closest?.('.scroll-row');
+    if (row) selections.set(row, row.querySelector(ACTIVE));
+  };
+  document.addEventListener('pointerdown', rememberSelection, { capture: true, passive: true });
+  document.addEventListener('wheel', rememberSelection, { capture: true, passive: true });
+  queue(document.body);
   window.addEventListener('layout-changed', () => document.querySelectorAll('.scroll-row').forEach(reveal));
 }
 
@@ -75,6 +125,16 @@ window.addEventListener('pointermove', (e) => {
   drag.el.scrollLeft = drag.startLeft - dx;
 });
 window.addEventListener('pointerup', () => { if (drag) { const d = drag; drag = null; if (d.moved) d.el.dataset.dragged = '1'; } });
+window.addEventListener('pointercancel', () => { drag = null; });
+window.addEventListener('blur', () => { drag = null; });
+// Run before the page's capture-phase tab handlers, so a mouse drag cannot also select a tab.
+window.addEventListener('click', (e) => {
+  const row = e.target.closest?.('.tabs-scroller[data-dragged]');
+  if (!row || !e.detail) return;
+  delete row.dataset.dragged;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+}, true);
 
 function bindTabsScroller(el) {
   let fadeQueued = false;
@@ -86,11 +146,12 @@ function bindTabsScroller(el) {
   const queueFade = () => { if (!fadeQueued) { fadeQueued = true; requestAnimationFrame(fade); } };
   fade();
   el.addEventListener('scroll', queueFade, { passive: true });
+  el.addEventListener('selectstart', (e) => e.preventDefault());
   el.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse') return;
+    delete el.dataset.dragged;
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
     drag = { el, startX: e.clientX, startLeft: el.scrollLeft, moved: false };
   });
-  el.addEventListener('click', (e) => { if (el.dataset.dragged) { delete el.dataset.dragged; e.stopPropagation(); e.preventDefault(); } }, true);
   el.addEventListener('wheel', (e) => {
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && el.scrollWidth > el.clientWidth) { el.scrollLeft += e.deltaY; e.preventDefault(); }
   }, { passive: false });

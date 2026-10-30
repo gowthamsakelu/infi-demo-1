@@ -78,6 +78,7 @@ export function openAddInquiry({ showRow, returnFocus, prefill = {} } = {}) {
   const dlg = openSheet({
     label: 'Add Inquiry',
     cls: 'wiz-sheet',
+    standalone: document.documentElement.dataset.layout === 'desktop', // PC: always the centred popup, even with a record's panel open behind it
     returnFocus,
     beforeClose: () => !hasData() || confirmDialog({ title: 'Discard this inquiry?', text: 'What you entered has not been saved.', confirm: 'Discard', cancel: 'Keep editing', danger: true }),
     html: `<header class="asg-header wiz-header">
@@ -297,8 +298,16 @@ export function openAddInquiry({ showRow, returnFocus, prefill = {} } = {}) {
   dlg.ov.addEventListener('click', async (e) => {
     const t = (sel) => e.target.closest(sel);
     let el;
-    if (t('#wiz-next')) { if (step === 2) save(); else go(step + 1); return; }
-    if (t('#wiz-back')) { go(step - 1); return; }
+    if (t('#wiz-next')) {
+      if (step === 1 && builder?.sub() === 1) { builder.next(); return; } // Route & Dates -> Itinerary: the same Next
+      if (step === 2) save(); else go(step + 1);
+      return;
+    }
+    if (t('#wiz-back')) {
+      if (step === 1 && builder?.sub() === 2) { builder.back(); return; } // Itinerary -> Route & Dates
+      go(step - 1);
+      return;
+    }
     if (t('#wiz-early')) { save(); return; }
     if ((el = t('[data-go]'))) { go(Number(el.dataset.go)); return; }
     if ((el = t('[data-chip]'))) {

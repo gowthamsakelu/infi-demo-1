@@ -1463,60 +1463,11 @@ export function createMobileView(container, options = {}) {
       }
     }, true);
 
-    // Categories Array for Left/Right Swiping & Filtering
-    const categories = { includes: (k) => tabDefs().some(t => t.key === k), indexOf: (k) => tabDefs().findIndex(t => t.key === k), get length() { return tabDefs().length; }, 0: null };
-    const categoryAt = (i) => tabDefs()[i].key;
-
-    function setCategory(cat, slideDir = null) {
-      if (!categories.includes(cat)) return;
+    function setCategory(cat) {
+      if (!tabDefs().some(t => t.key === cat) || cat === activeCategory) return;
       activeCategory = cat;
       setParams({ tab: cat === allKey() ? null : cat }, { silent: true });
-
-      // Update active tab buttons
-      container.querySelectorAll('.tab-pill').forEach(btn => {
-        if (btn.dataset.cat === cat) {
-          btn.classList.add('active');
-          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-
-      const listEl = container.querySelector('#mobile-cards-list');
-      if (listEl) {
-        const offset = slideDir === 'left' ? '-14px' : slideDir === 'right' ? '14px' : '0px';
-        listEl.style.transition = 'opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)';
-        listEl.style.opacity = '0';
-        listEl.style.transform = `translateX(${offset})`;
-
-        setTimeout(() => {
-          renderCards();
-          listEl.style.transform = slideDir === 'left' ? 'translateX(14px)' : slideDir === 'right' ? 'translateX(-14px)' : 'translateX(0)';
-          void listEl.offsetHeight; // trigger reflow
-          listEl.style.transition = 'opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)';
-          listEl.style.opacity = '1';
-          listEl.style.transform = 'translateX(0)';
-        }, 60);
-      } else {
-        renderCards();
-      }
-    }
-
-    function switchCategoryByDirection(direction) {
-      const currentIndex = categories.indexOf(activeCategory);
-      let targetIndex = currentIndex;
-
-      if (direction === 'left') {
-        // Swiping left moves towards left tab ('New Bookings')
-        targetIndex = Math.max(0, currentIndex - 1);
-      } else if (direction === 'right') {
-        // Swiping right moves towards right tab ('Assigned', 'Ongoing')
-        targetIndex = Math.min(categories.length - 1, currentIndex + 1);
-      }
-
-      if (targetIndex !== currentIndex) {
-        setCategory(categoryAt(targetIndex), direction);
-      }
+      renderCards();
     }
 
     // Category Tabs click

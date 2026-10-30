@@ -8,8 +8,8 @@ import { closeScreens } from './sheet.js';
 /** Everything that can be the sheet underneath: the phone's detail sheet, a sheet or dialog, the in-place builder, a pushed screen. */
 const HOSTS = '.bottom-sheet.open, .sp-detail-screen.is-open, .asg-overlay.open > .asg-sheet, .bld-inplace, .push-screen.is-in, .modal-overlay.open > .modal-card, .desktop-details-drawer.open:not(.is-empty)';
 
-/** On the phone these open as a centred mid-screen popup, not as a screen pushed into the sheet they came from (the itinerary event's Assign / View Details / Edit). */
-const CENTERED = '.asg-overlay[data-centered], #mobile-activity-details-modal, #mobile-edit-activity-modal, #mobile-special-req-modal, #mobile-edit-customer-modal, #modal-add-guest';
+/** These open as a centred mid-screen popup (phone and PC), not as a screen pushed into the sheet or panel they came from: Edit customer, Edit special requirements, Add guest and an itinerary event's Assign / View Details / Edit. */
+const CENTERED = '.asg-overlay[data-centered], #mobile-activity-details-modal, #mobile-edit-activity-modal, #mobile-special-req-modal, #mobile-edit-customer-modal, #modal-add-guest, #desktop-activity-details-modal, #desktop-edit-activity-modal, #desktop-special-req-modal, #desktop-edit-customer-modal';
 
 /** The sheet or dialog that `ov` was opened from (null when it was opened from a page: then it is an ordinary sheet). */
 export function hostOf(ov) {
@@ -24,7 +24,7 @@ const backButton = () => `<button type="button" class="dialog-back" data-push-ba
  * Does nothing when there is no such sheet. Returns true when it did.
  */
 export function placeAsPushed(ov) {
-  if (document.documentElement.dataset.layout === 'mobile' && ov.matches(CENTERED)) return false;
+  if (ov.matches(CENTERED)) return false; // phone and PC alike: a centred popup, never a screen pushed into the sheet or panel behind it
   if (ov.matches('#modal-add-user')) return false; // Add User: a centred dialog on a PC, a bottom sheet on a phone (never a screen pushed into the user panel)
   const host = hostOf(ov);
   const card = ov.firstElementChild;

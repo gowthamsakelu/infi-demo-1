@@ -246,6 +246,7 @@ export function createDesktopView(container) {
             </div>
           </div>
           <div class="modal-footer">
+            <button class="btn-secondary-desktop" id="desktop-btn-cancel-special-req" type="button">Cancel</button>
             <button class="btn-confirm-booking" id="desktop-btn-done-special-req" style="height: 40px; font-size: 13.5px; border-radius: 10px;">Save & Apply</button>
           </div>
         </div>
@@ -1386,6 +1387,18 @@ export function createDesktopView(container) {
       if (isDetailDrawerOpen && activeDetailTab === 'customer-details' && activeBooking) renderDetailPanel();
     });
     window.addEventListener('layout-changed', () => { if (isDetailDrawerOpen) closeDrawer({ user: false, render: false }); renderTable(); });
+    // The centred popups of the detail panel (customer, special requirements, event details / edit): a backdrop click, Esc and Cancel act like their round X
+    const POPUPS = '#desktop-edit-customer-modal, #desktop-special-req-modal, #desktop-activity-details-modal, #desktop-edit-activity-modal';
+    container.querySelectorAll(POPUPS).forEach((ov) => ov.addEventListener('click', (e) => {
+      if (e.target === ov || e.target.closest('#desktop-btn-cancel-special-req')) ov.querySelector('.sheet-close-btn')?.click();
+    }));
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const open = container.querySelector(POPUPS.split(', ').map((x) => `${x}.open`).join(', '));
+      if (!open) return;
+      e.stopImmediatePropagation();
+      open.querySelector('.sheet-close-btn')?.click();
+    }, true);
     container.addEventListener('click', (e) => { if (e.target.id === 'desktop-workspace-split' && isDetailDrawerOpen) closeDrawer(); });
     bindListKeys(container.querySelector('#desktop-compact-list-items'), { getList: () => visibleRecords().filtered, getActiveId: () => activeBooking?.id, onSelect: (b) => openDrawer(b, { push: false }) });
     window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));

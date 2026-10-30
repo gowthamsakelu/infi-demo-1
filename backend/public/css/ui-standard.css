@@ -366,6 +366,8 @@ html[data-layout="mobile"] .mobile-team-page { gap: 8px; }
 html[data-layout="mobile"] .scroll-row { touch-action: pan-x pan-y; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 html[data-layout="mobile"] .scroll-row::-webkit-scrollbar { display: none; }
 html[data-layout="mobile"] .scroll-row > * { flex: none; }
+/* Let vertical scrolling remain native while the list receives horizontal gestures. */
+html[data-layout="mobile"] #mobile-cards-list { touch-action: pan-y pinch-zoom; }
 html[data-layout="mobile"] .scroll-row::after { content: ""; flex: none; width: 1px; } /* keeps the right edge padding after the last chip in every browser */
 html[data-layout="mobile"] .bg-tabs .tab-pill { height: 34px !important; padding: 0 14px !important; }
 
@@ -467,3 +469,10 @@ html[data-layout="desktop"] :is(.team-roster-card, [data-sp="users"] .sp-row) .t
 /* a name is never cut: when the employee id does not fit beside it, the id drops to its own line */
 :is(.team-roster-card, [data-sp="users"] .sp-row) .team-card-title-line { flex-wrap: wrap !important; row-gap: 3px; }
 :is(.team-roster-card, [data-sp="users"] .sp-row) .team-card-name { flex: 0 0 auto !important; max-width: 100%; }
+html[data-layout="mobile"] .wiz-footer [hidden] { display: none !important; }
+/* PC: the detail panel's popups are the standard centred modal: 20px card, scrolling body, buttons pinned at the bottom right */
+html[data-layout="desktop"] :is(#desktop-edit-customer-modal, #desktop-special-req-modal, #desktop-activity-details-modal, #desktop-edit-activity-modal, #modal-add-guest) .modal-card { width: min(600px, calc(100vw - 32px)); max-width: none; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; border-radius: 20px; }
+html[data-layout="desktop"] :is(#desktop-edit-customer-modal, #desktop-special-req-modal, #desktop-activity-details-modal, #desktop-edit-activity-modal, #modal-add-guest) .modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+html[data-layout="desktop"] :is(#desktop-edit-customer-modal, #desktop-special-req-modal, #desktop-activity-details-modal, #desktop-edit-activity-modal, #modal-add-guest) .modal-footer { flex: none; display: flex; justify-content: flex-end; gap: 10px; }
+html[data-layout="desktop"] :is(#desktop-special-req-modal, #desktop-activity-details-modal) .modal-footer > button { width: auto; min-width: 140px; }
+html[data-layout="desktop"] .asg-sheet.bld-sheet { max-width: 720px; }
