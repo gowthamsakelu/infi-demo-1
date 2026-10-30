@@ -319,8 +319,8 @@ export function skeletonRows(cols, n = 8) {
   return Array.from({ length: n }, () => `<tr class="skel-row" aria-hidden="true">${Array.from({ length: cols }, () => '<td><div class="skel"></div></td>').join('')}</tr>`).join('');
 }
 /** The detail pane when nothing is selected (PC and tablet): "Select a booking" and one muted line. `noun` is "a booking", "an inquiry", "a package" ... */
-export function selectEmptyState(noun) {
-  return `<div class="state-box detail-empty"><div class="state-box-ico">${icon('eye', { size: 22 })}</div><h4>Select ${esc(noun)}</h4><p>Choose an item from the list to see its details here.</p></div>`;
+export function selectEmptyState(noun, hint = 'Choose an item from the list to see its details here.') {
+  return `<div class="state-box detail-empty"><div class="state-box-ico">${icon('eye', { size: 22 })}</div><h4>Select ${esc(noun)}</h4><p>${esc(hint)}</p></div>`;
 }
 
 /** The sentence under "Could not load ...": no answer from the server vs. a server error. Never the raw error text. */

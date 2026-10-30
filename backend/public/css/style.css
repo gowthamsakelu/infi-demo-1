@@ -8669,8 +8669,20 @@ body,
 
 /* Reading pane: opens by itself, so it appears without sliding in; the empty state hides the tabs and footer */
 .desktop-workspace-split.no-anim .desktop-compact-list-view { animation: none; }
-.desktop-workspace-split.no-anim .desktop-details-drawer, .desktop-workspace-split.no-anim .desktop-details-drawer.open { transition: none !important; }
-.desktop-details-drawer.is-empty .desktop-tabs-nav, .desktop-details-drawer.is-empty .desktop-drawer-footer { display: none !important; }
+.desktop-details-drawer.is-empty .desktop-drawer-header-box,
+.desktop-details-drawer.is-empty .desktop-tabs-nav,
+.desktop-details-drawer.is-empty .desktop-drawer-footer {
+  display: none !important;
+}
+.desktop-details-drawer.is-empty .desktop-body-scroll {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
 .detail-empty { margin: auto; text-align: center; }
 .compact-list-items:focus-visible { outline: 2px solid #2563EB; outline-offset: -2px; }
 

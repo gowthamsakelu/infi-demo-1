@@ -8196,6 +8196,37 @@ html {
   color: #B91C1C;
 }
 
+.state-box-ico {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #F1F5F9;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-empty {
+  margin: auto;
+  text-align: center;
+}
+
+.desktop-details-drawer.is-empty .desktop-drawer-header-box,
+.desktop-details-drawer.is-empty .desktop-tabs-nav,
+.desktop-details-drawer.is-empty .desktop-drawer-footer {
+  display: none !important;
+}
+.desktop-details-drawer.is-empty .desktop-body-scroll {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
 /* List content swaps with a short fade instead of blanking */
 .list-fade {
   animation: motionFadeIn var(--motion-fast) var(--ease-out);

@@ -2,7 +2,7 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, closeRowMenu, esc, initials, skeletonRows, errorState, checkbox } from './shared/ui.js';
+import { searchBox, emptyState, selectEmptyState, toast, openRowMenu, closeRowMenu, esc, initials, skeletonRows, errorState, checkbox } from './shared/ui.js';
 import { selectedOf, setSelected, toggleRow } from './shared/selection.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bindQuickNotes, rowCard, bulkBar, bindBulkBar, updateBulkBar, inlineSelectionBar, updateInlineBar } from './shared/list-ui.js';
@@ -220,16 +220,13 @@ export function createDesktopView(container) {
               <!-- Calendar page: the month and agenda take the list's place; the detail pane stays the same -->
               <section class="desktop-calendar-col" id="desktop-calendar-col" aria-label="Calendar"></section>
               <aside class="desktop-calendar-empty" id="desktop-calendar-empty">
-                <div class="state-box"><h4>Select a booking</h4><p>Choose an item from the agenda to see its details here.</p></div>
+                ${selectEmptyState('a booking', 'Choose an item from the agenda to see its details here.')}
               </aside>
 
               <!-- Operations Team page: the roster takes the list's place; the detail pane shows team member details -->
               <section class="desktop-team-col" id="desktop-team-col" aria-label="Operations Team"></section>
               <aside class="desktop-team-empty" id="desktop-team-empty">
-                <div class="state-box">
-                  <h4 style="font-size: 16px; font-weight: 700; color: #0F172A; margin: 0 0 8px; letter-spacing: 0.3px;">SELECT MEMBER TO KNOW DETAILS</h4>
-                  <p style="font-size: 13.5px; color: #64748B; margin: 0; max-width: 380px; line-height: 1.5;">Choose a team member from the list to view their profile, performance, assignments, and operational details.</p>
-                </div>
+                ${selectEmptyState('a team member')}
               </aside>
               <aside class="desktop-team-detail" id="desktop-team-detail" aria-label="Team Member Details"></aside>
 

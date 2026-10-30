@@ -283,3 +283,9 @@ export function skeletonRows(cols, n = 8) {
 export function errorState({ title, text, retryId }) {
   return `<div class="state-box is-error" role="alert"><h4>${esc(title)}</h4><p>${esc(text)}</p><button class="btn-secondary-desktop" id="${retryId}" style="height:36px;">Try again</button></div>`;
 }
+
+/** The detail pane when nothing is selected (PC and tablet): "Select a booking" and one muted line. `noun` is "a booking", "an inquiry", "a package" ... */
+export function selectEmptyState(noun, hint = 'Choose an item from the list to see its details here.') {
+  return `<div class="state-box detail-empty"><div class="state-box-ico">${icon('eye', { size: 22 })}</div><h4>Select ${esc(noun)}</h4><p>${esc(hint)}</p></div>`;
+}
+

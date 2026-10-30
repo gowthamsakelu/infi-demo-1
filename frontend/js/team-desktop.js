@@ -1,7 +1,7 @@
 import { OPERATIONS_TEAM_MEMBERS, getTeamMemberById, getTeamMemberAssignments } from './shared/team-data.js';
 import { INITIAL_BOOKINGS } from './data.js';
 import { icon } from './shared/icons.js';
-import { esc, initials, toast } from './shared/ui.js';
+import { esc, initials, toast, selectEmptyState } from './shared/ui.js';
 import { getParams, setParams, navigate } from './shared/page-state.js';
 
 export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, onViewBooking, onMemberChange }) {
@@ -532,13 +532,8 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
   function renderRightPanel() {
     if (!detailHost) return;
 
-    // Centered empty-state message required by user
-    const emptyStateHtml = `
-      <div class="team-empty-state-view" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px 24px; color: #64748B;">
-        <h4 style="font-size: 16px; font-weight: 700; color: #0F172A; margin: 0 0 8px; letter-spacing: 0.3px;">SELECT MEMBER TO KNOW DETAILS</h4>
-        <p style="font-size: 13.5px; color: #64748B; margin: 0; max-width: 380px; line-height: 1.5;">Choose a team member from the list to view their profile, performance, assignments, and operational details.</p>
-      </div>
-    `;
+    // Centered empty-state message matching standard design
+    const emptyStateHtml = selectEmptyState('a team member');
 
     if (!selectedMemberId) {
       detailHost.innerHTML = emptyStateHtml;
