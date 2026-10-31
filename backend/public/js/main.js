@@ -15,6 +15,7 @@ import { isHostedPage } from './shared/nav.js';
 import { mountPage, unmountPage, prefetchPages, warmPage } from './shared/page-host.js';
 import { syncNavActive } from './shared/nav-ui.js';
 import { currentPage, subscribe as subscribePage } from './shared/page-state.js';
+import { initBranding } from './shared/branding.js';
 
 // Wait (briefly) for the web fonts before the first render, so text never reflows when they arrive.
 // The boot skeleton stays on screen meanwhile; after 1.5s we render with the fallback anyway.
@@ -27,6 +28,7 @@ const fontsReady = () => Promise.race([
 ]);
 
 applyLayout();
+initBranding();
 
 document.addEventListener('DOMContentLoaded', async () => {
   const appContainer = document.getElementById('app');
@@ -144,6 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   await ensureView();
+  initBranding();
 
   // Pages outside Bookings / Inquiries / Calendar live in a host: the PC one beside the sidebar, the phone one under the header.
   function syncHostedPage() {

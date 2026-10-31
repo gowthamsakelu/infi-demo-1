@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateSettingsRequest;
 use App\Models\AppSetting;
 use App\Models\Inquiry;
 use App\Support\DummyData;
+use App\Support\DataUrlImage;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -61,13 +62,80 @@ class SettingsController extends Controller
         $data = $request->validated();
 
         match ($section) {
-            'company' => [AppSetting::write('company', $data['values']), AppSetting::write('preferences', $data['preferences'])],
+            'company' => $this->saveCompany($data),
             'lead-sources' => AppSetting::write('lead_sources', array_map(fn ($s) => ['name' => trim($s['name']), 'active' => (bool) $s['active']], $data['sources'])),
             'bookings-payments' => AppSetting::write('payments', $data['values']),
             'notifications' => AppSetting::write('alert_types', $data['types']),
         };
 
         return response()->json(['success' => true, 'data' => $this->payload($section)]);
+    }
+
+    public function branding(): JsonResponse
+    {
+        return response()->json(['success' => true, 'data' => self::brandingData()]);
+    }
+
+    public static function brandingData(): array
+    {
+        $saved = AppSetting::read('branding', []);
+        $logoPath = $saved['logo'] ?? null;
+        $url = null;
+        if ($logoPath) {
+            $clean = preg_replace('#^/?images/#', '', (string) $logoPath);
+            if ($clean !== '' && is_file(public_path('images/'.$clean))) {
+                $url = '/images/'.$clean;
+            }
+        }
+
+        $brandColor = !empty($saved['color']) ? $saved['color'] : '#2563EB';
+        $themeColor = !empty($saved['themeColor']) ? $saved['themeColor'] : $brandColor;
+
+        return [
+            'logo' => $url,
+            'color' => $brandColor,
+            'themeColor' => $themeColor,
+            'detectedColor' => $saved['detectedColor'] ?? null,
+            'detectedThemeColor' => $saved['detectedThemeColor'] ?? null,
+        ];
+    }
+
+    private function saveCompany(array $data): void
+    {
+        AppSetting::write('company', $data['values']);
+        AppSetting::write('preferences', $data['preferences']);
+
+        if (array_key_exists('branding', $data) && is_array($data['branding'])) {
+            $current = AppSetting::read('branding', []);
+            $rawLogo = $data['branding']['logo'] ?? null;
+            $newLogo = null;
+
+            if ($rawLogo) {
+                if (str_starts_with($rawLogo, 'data:image/')) {
+                    $newLogo = DataUrlImage::store($rawLogo, 'branding');
+                } else {
+                    $newLogo = DataUrlImage::path($rawLogo);
+                }
+            }
+
+            if (!empty($current['logo']) && $current['logo'] !== $newLogo) {
+                $oldFile = public_path('images/'.preg_replace('#^/?images/#', '', $current['logo']));
+                if (is_file($oldFile)) {
+                    @unlink($oldFile);
+                }
+            }
+
+            $brandColor = !empty($data['branding']['color']) ? $data['branding']['color'] : '#2563EB';
+            $themeColor = !empty($data['branding']['themeColor']) ? $data['branding']['themeColor'] : $brandColor;
+
+            AppSetting::write('branding', [
+                'logo' => $newLogo,
+                'color' => $brandColor,
+                'themeColor' => $themeColor,
+                'detectedColor' => $data['branding']['detectedColor'] ?? null,
+                'detectedThemeColor' => $data['branding']['detectedThemeColor'] ?? null,
+            ]);
+        }
     }
 
     private function payload(string $section): array
@@ -78,6 +146,7 @@ class SettingsController extends Controller
             'company' => [
                 'values' => array_merge(self::COMPANY, AppSetting::read('company', [])),
                 'preferences' => array_merge(self::PREFERENCES, AppSetting::read('preferences', [])),
+                'branding' => self::brandingData(),
                 'services' => $this->services(),
             ],
             'lead-sources' => ['sources' => AppSetting::read('lead_sources') ?: array_map(fn ($n) => ['name' => $n, 'active' => true], self::SOURCES)],

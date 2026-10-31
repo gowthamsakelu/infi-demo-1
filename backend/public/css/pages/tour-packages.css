@@ -14,5 +14,5 @@
 .tp-chooser-body { padding: 4px 20px 20px; overflow-y: auto; min-height: 120px; }
 .tp-pick { width: 100%; border: 0; background: #FFFFFF; text-align: left; cursor: pointer; font: inherit; }
 .tp-pick:hover { background: var(--bg-hover); }
-.tp-pick:focus-visible { outline: 2px solid #2563EB; outline-offset: -2px; }
+.tp-pick:focus-visible { outline: 2px solid var(--primary, #2563EB); outline-offset: -2px; }
 .tp-has { flex: none; height: 26px; padding: 0 10px; font-size: 12px; }

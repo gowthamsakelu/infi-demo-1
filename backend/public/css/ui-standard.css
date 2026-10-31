@@ -10,8 +10,8 @@
   --ui-field-radius: 12px;
   --ui-field-border: #E2E8F0;
   --ui-field-bg: #F8FAFC;
-  --ui-focus-border: #3B82F6;
-  --ui-focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  --ui-focus-border: var(--primary, #3B82F6);
+  --ui-focus-ring: 0 0 0 3px var(--primary-ring, rgba(59, 130, 246, 0.12));
   --ui-sheet-radius: 26px;
   --ui-sheet-title: 18px;
   --ui-close-size: 32px;
@@ -69,7 +69,7 @@ html[data-layout="mobile"] :is(.asg-sheet, .modal-card, .bottom-sheet, .sp-detai
   height: var(--ui-btn-h); min-height: var(--ui-btn-h); padding: 0 14px; border-radius: var(--ui-btn-radius);
   font-size: 14px; font-weight: 700; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-html[data-layout="mobile"] :is(.asg-sheet, .modal-card, .bottom-sheet, .sp-detail, .sheet-sticky-footer) :is(.btn-primary-desktop, .btn-confirm-booking, .btn-whatsapp-assign):not(.btn-danger) { background: var(--primary); border: 0; color: #FFFFFF; box-shadow: none; }
+html[data-layout="mobile"] :is(.asg-sheet, .modal-card, .bottom-sheet, .sp-detail, .sheet-sticky-footer) :is(.btn-primary-desktop, .btn-confirm-booking, .btn-whatsapp-assign):not(.btn-danger) { background: var(--primary-gradient, var(--primary)); border: 0; color: #FFFFFF; box-shadow: none; }
 html[data-layout="mobile"] :is(.asg-sheet, .modal-card, .bottom-sheet, .sp-detail, .sheet-sticky-footer) :is(.btn-secondary-desktop, .btn-cancel-assign, .quick-action-col-btn, .modal-footer .action-pill-btn) { background: #FFFFFF; border: 1px solid #CBD5E1; color: #334155; }
 html[data-layout="mobile"] :is(.btn-primary-desktop, .btn-confirm-booking).btn-danger { background: #DC2626; border: 0; }
 html[data-layout="mobile"] .quick-action-col-btn svg { flex: none; width: 16px; height: 16px; }
@@ -221,14 +221,14 @@ html[data-layout] .is-pushed .sheet-close-btn:not(.dialog-back), html[data-layou
 
 /* Row menu: same dropdown everywhere; on touch screens the rows are at least 44px high */
 @media (pointer: coarse) { .row-floating-menu .dropdown-item-btn { min-height: 44px; } }
-.row-floating-menu .dropdown-item-btn:active { background: #EFF6FF; }
+.row-floating-menu .dropdown-item-btn:active { background: var(--primary-light, #EFF6FF); }
 
 /* The one Add button (shared/add-button.js): solid blue, plus icon, the word "Add". Top bar on PC; floating above the bottom bar on the phone. */
-.ui-add-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 12px; background: #2563EB; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; line-height: 1; white-space: nowrap; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); }
-.ui-add-btn:hover { background: #1D4ED8; }
+.ui-add-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--primary-gradient, var(--primary, #2563EB)); color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; line-height: 1; white-space: nowrap; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); }
+.ui-add-btn:hover { background: var(--primary-gradient-hover, var(--primary-hover, #1D4ED8)); }
 .ui-add-btn:active { transform: scale(0.97); }
 .ui-add-btn[hidden] { display: none !important; }
-html[data-layout="mobile"] .ui-add-fab { position: fixed; right: max(16px, var(--safe-right, 0px)); bottom: calc(68px + 12px + var(--safe-bottom, 0px)); z-index: 19; height: 44px; padding: 0 16px 0 14px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22); }
+html[data-layout="mobile"] .ui-add-fab { position: fixed; right: max(16px, var(--safe-right, 0px)); bottom: calc(68px + 12px + var(--safe-bottom, 0px)); z-index: 19; height: 44px; padding: 0 16px 0 14px; background: var(--primary-gradient, var(--primary)); box-shadow: 0 4px 12px var(--primary-shadow, rgba(37, 99, 235, 0.22)); }
 html.is-keyboard-open .ui-add-fab { display: none; }
 /* never on top of a sheet, popup or wizard; the lists and the phone Team page use this one button instead of their own */
 html[data-layout="mobile"] body:has(.asg-overlay, .modal-overlay.open, .bottom-sheet.open, .sheet-backdrop.open, .notifications-panel:not([hidden])) .ui-add-fab { display: none; }
@@ -345,7 +345,7 @@ html[data-layout="mobile"] .mobile-team-page { gap: 8px; }
   transition: transform var(--motion-fast) var(--ease-out), opacity var(--motion-base) var(--ease-out);
 }
 :is(button:not(:disabled), [role="button"], .tab-pill, .compact-tab-btn, .desktop-tab-btn, .nav-item, .sidebar-nav-item, .circle-action-btn, .sp-icon-btn, .icon-bell-btn, .dash-filter-btn, .item-menu-btn):active { transform: scale(0.97); }
-:is(.dropdown-item-btn):active { background-color: #EFF6FF; }
+:is(.dropdown-item-btn):active { background-color: var(--primary-light, #EFF6FF); }
 :is(.list-row-card, .booking-card, .team-roster-card, .dash-kpi-card, .sp-row) { transition: transform var(--motion-fast) var(--ease-out), opacity var(--motion-base) var(--ease-out); }
 :is(.list-row-card, .booking-card, .team-roster-card, .dash-kpi-card, .sp-row):active { transform: scale(0.99); }
 

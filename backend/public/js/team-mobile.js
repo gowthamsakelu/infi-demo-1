@@ -140,7 +140,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
       cardsListContainer.innerHTML = `
         <div class="team-empty-state" style="padding: 40px 16px; text-align: center; color: #64748B;">
           <p style="font-size: 14px; margin: 0 0 10px;">No team members found matching "<strong>${esc(searchQuery)}</strong>"</p>
-          <button type="button" class="btn-secondary-desktop" id="mobile-team-reset-filter" style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #2563EB; border-radius: 8px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer;">
+          <button type="button" class="btn-secondary-desktop" id="mobile-team-reset-filter" style="background: var(--primary-light, #EFF6FF); border: 1px solid var(--primary-border, #BFDBFE); color: var(--primary, #2563EB); border-radius: 8px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer;">
             Show All Members
           </button>
         </div>
@@ -438,7 +438,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
               <div class="team-mobile-assignments-header-top">
                 <div class="team-mobile-assignments-title-wrap">
                   <h3 class="team-mobile-assignments-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                     <span>Current Assignments</span>
                   </h3>
                   <p class="team-mobile-assignments-subtitle">
@@ -462,7 +462,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
               <div class="team-mobile-assignments-header-top">
                 <div class="team-mobile-assignments-title-wrap">
                   <h3 class="team-mobile-assignments-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                     <span>Current Assignments</span>
                   </h3>
                   <p class="team-mobile-assignments-subtitle">
@@ -569,7 +569,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
               <!-- Table View: Exact Screenshot 2 Table Component Adapted for Mobile Scroll -->
               <div class="team-assignments-card" style="padding: 0; overflow: hidden; border-radius: 12px;">
                 <div class="team-mobile-table-scroll-hint">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="8 8 4 12 8 16"/><polyline points="16 8 20 12 16 16"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="8 8 4 12 8 16"/><polyline points="16 8 20 12 16 16"/></svg>
                   <span>Swipe horizontally to inspect full table</span>
                 </div>
                 <div class="team-assignments-table-wrap" style="border: none; border-radius: 0;">
@@ -678,7 +678,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
           <div class="team-extra-card team-mobile-core-card">
             <div class="team-extra-card-header">
               <div class="team-extra-card-header-left">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <h4>Core Responsibilities &amp; Skills</h4>
               </div>
               <span class="team-skills-verified-badge">
@@ -759,7 +759,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
           <div class="team-extra-card team-mobile-core-card">
             <div class="team-extra-card-header">
               <div class="team-extra-card-header-left">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                 <h4>Operational Deployment &amp; Field Info</h4>
               </div>
               <span class="badge-pill-live" style="font-size: 11px; background: #ECFDF5; color: #047857; font-weight: 700; padding: 2px 8px; border-radius: 10px;">Active Roster</span>
@@ -789,7 +789,7 @@ export function createMobileTeam(host, { onViewBooking } = {}) {
               ${member.workload?.upcomingAssignment ? `
                 <div class="info-cell" style="grid-column: span 2;">
                   <span class="info-label">UPCOMING DEPLOYMENT</span>
-                  <span class="info-value-bold" style="color: #1D4ED8; font-size: 12px;">${esc(member.workload.upcomingAssignment)}</span>
+                  <span class="info-value-bold" style="color: var(--primary-accent, var(--primary, #1D4ED8)); font-size: 12px;">${esc(member.workload.upcomingAssignment)}</span>
                 </div>
               ` : ''}
             </div>

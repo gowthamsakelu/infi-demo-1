@@ -27,6 +27,12 @@ class UpdateSettingsRequest extends FormRequest
                 'preferences.sendQuoteWhatsapp' => ['required', 'boolean'],
                 'preferences.dailySummary' => ['required', 'boolean'],
                 'preferences.showGst' => ['required', 'boolean'],
+                'branding' => ['nullable', 'array'],
+                'branding.logo' => ['nullable', 'string'],
+                'branding.color' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
+                'branding.themeColor' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
+                'branding.detectedColor' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
+                'branding.detectedThemeColor' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
             ],
             'lead-sources' => [
                 'sources' => ['required', 'array', 'min:1', 'max:30'],

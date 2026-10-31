@@ -716,7 +716,7 @@
                     <div class="itinerary-tab-content" style="padding: 0;">
                         <div class="itinerary-section-header-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
                             <div class="section-header-left" style="display: flex; align-items: center; gap: 8px;">
-                                <div class="section-icon-circle blue-circle" style="width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; color: #2563EB;">
+                                <div class="section-icon-circle blue-circle" style="width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light, #EFF6FF); display: flex; align-items: center; justify-content: center; color: var(--primary, #2563EB);">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                         <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
                                         <line x1="16" x2="16" y1="2" y2="6"/>
@@ -740,7 +740,7 @@
                         <div class="day-schedule-box" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 13px; font-weight: 800; color: #2563EB; background: #EFF6FF; padding: 2px 8px; border-radius: 6px;">{{ $dayGroup['day'] }}</span>
+                                    <span style="font-size: 13px; font-weight: 800; color: var(--primary, #2563EB); background: var(--primary-light, #EFF6FF); padding: 2px 8px; border-radius: 6px;">{{ $dayGroup['day'] }}</span>
                                     <span style="font-size: 12.5px; color: #64748B; font-weight: 500;">{{ $dayGroup['date'] ?? '' }}</span>
                                 </div>
                                 <button class="action-pill-btn" wire:click="openAddEvent('{{ $dayGroup['day'] }}')" style="padding: 2px 8px; font-size: 11px;">Add</button>
@@ -754,7 +754,7 @@
                                 @endphp
                                 <div class="itinerary-item-row" style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                                     <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-                                        <div style="width: 32px; height: 32px; border-radius: 8px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-light, #EFF6FF); color: var(--primary, #2563EB); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
                                         </div>
                                         <div style="flex: 1; min-width: 0;">
@@ -804,7 +804,7 @@
                         <div class="lead-timeline" style="margin-top: 14px; display: flex; flex-direction: column; gap: 12px;">
                             @forelse($activeBooking->customer['leadFlow'] ?? [] as $lf)
                             <div style="display: flex; gap: 12px;">
-                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 10px;">
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary-light, #EFF6FF); color: var(--primary, #2563EB); display: flex; align-items: center; justify-content: center; font-size: 10px;">
                                     ✓
                                 </div>
                                 <div style="flex: 1;">
@@ -1045,7 +1045,7 @@
                     </div>
                     <h4 style="font-size: 15px; font-weight: 700; color: #0F172A; margin: 0 0 4px 0;">No Bookings Found</h4>
                     <p style="font-size: 13px; margin: 0 0 14px 0; color: #94A3B8;">No results matching your selected filters.</p>
-                    <button class="action-pill-btn" wire:click="$set('search', ''); $set('category', 'ALL'); $set('tab', 'All Bookings');" style="height: 36px; padding: 0 16px; font-weight: 600; border-radius: 10px; background: #2563EB; color: #FFFFFF; border: none; cursor: pointer; margin: 0 auto;">Reset Filters</button>
+                    <button class="action-pill-btn" wire:click="$set('search', ''); $set('category', 'ALL'); $set('tab', 'All Bookings');" style="height: 36px; padding: 0 16px; font-weight: 600; border-radius: 10px; background: var(--primary-gradient, var(--primary, #2563EB)); color: #FFFFFF; border: none; cursor: pointer; margin: 0 auto;">Reset Filters</button>
                 </div>
                 @endforelse
             </div>
@@ -1106,7 +1106,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                     <h3>Edit Special Requirements</h3>
                 </div>
                 <button class="sheet-close-btn" wire:click="closeSpecialReqModal" style="position: static;">✕</button>
@@ -1245,7 +1245,7 @@
                         <h4 style="margin: 0; font-size: 13.5px; font-weight: 700; color: #0F172A;">{{ $assignTargetItem['title'] }}</h4>
                         <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748B;">{{ $assignTargetItem['subtitle'] }}</p>
                     </div>
-                    <span class="tag-activity-pill" style="padding: 3px 8px; border-radius: 9999px; background: #EFF6FF; color: #2563EB; font-size: 11px; font-weight: 700; text-transform: uppercase;">{{ $assignTargetItem['type'] ?? 'ACTIVITY' }}</span>
+                    <span class="tag-activity-pill" style="padding: 3px 8px; border-radius: 9999px; background: var(--primary-light, #EFF6FF); color: var(--primary, #2563EB); font-size: 11px; font-weight: 700; text-transform: uppercase;">{{ $assignTargetItem['type'] ?? 'ACTIVITY' }}</span>
                 </div>
                 @endif
 

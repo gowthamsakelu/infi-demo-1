@@ -135,4 +135,134 @@ class SettingsTest extends TestCase
         auth()->logout();
         $this->getJson('/api/settings')->assertUnauthorized();
     }
+
+    public function test_company_returns_branding_defaults(): void
+    {
+        $d = $this->getJson('/api/settings/company')->assertOk()->json('data');
+        $this->assertArrayHasKey('branding', $d);
+        $this->assertNull($d['branding']['logo']);
+        $this->assertSame('#2563EB', $d['branding']['color']);
+        $this->assertSame('#2563EB', $d['branding']['themeColor']);
+        $this->assertNull($d['branding']['detectedColor']);
+        $this->assertNull($d['branding']['detectedThemeColor']);
+    }
+
+    public function test_company_branding_saves_valid_color_and_logo_and_persists(): void
+    {
+        $base64Png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+        $body = [
+            'values' => ['name' => 'Ruyi Travels', 'phone' => '', 'email' => '', 'website' => '', 'address' => ''],
+            'preferences' => ['autoAssign' => true, 'sendQuoteWhatsapp' => true, 'dailySummary' => true, 'showGst' => false],
+            'branding' => [
+                'logo' => $base64Png,
+                'color' => '#E11D48',
+                'themeColor' => '#4F46E5',
+                'detectedColor' => '#E11D48',
+                'detectedThemeColor' => '#4F46E5',
+            ],
+        ];
+
+        $res = $this->putJson('/api/settings/company', $body)->assertOk();
+        $branding = $res->json('data.branding');
+
+        $this->assertSame('#E11D48', $branding['color']);
+        $this->assertSame('#4F46E5', $branding['themeColor']);
+        $this->assertSame('#E11D48', $branding['detectedColor']);
+        $this->assertSame('#4F46E5', $branding['detectedThemeColor']);
+        $this->assertNotNull($branding['logo']);
+        $this->assertStringStartsWith('/images/branding/', $branding['logo']);
+
+        // Verify the file was stored on disk
+        $filePath = public_path(ltrim($branding['logo'], '/'));
+        $this->assertFileExists($filePath);
+
+        // Verify reading back from GET /api/settings/company
+        $getRes = $this->getJson('/api/settings/company')->assertOk()->json('data.branding');
+        $this->assertSame('#E11D48', $getRes['color']);
+        $this->assertSame('#4F46E5', $getRes['themeColor']);
+        $this->assertSame($branding['logo'], $getRes['logo']);
+
+        // Verify reading from GET /api/branding
+        $brandRes = $this->getJson('/api/branding')->assertOk()->json('data');
+        $this->assertSame('#E11D48', $brandRes['color']);
+        $this->assertSame('#4F46E5', $brandRes['themeColor']);
+        $this->assertSame($branding['logo'], $brandRes['logo']);
+
+        // Clean up created test image
+        if (is_file($filePath)) {
+            @unlink($filePath);
+        }
+    }
+
+    public function test_company_branding_validates_color_hex(): void
+    {
+        $body = [
+            'values' => ['name' => 'Ruyi Travels', 'phone' => '', 'email' => '', 'website' => '', 'address' => ''],
+            'preferences' => ['autoAssign' => true, 'sendQuoteWhatsapp' => true, 'dailySummary' => true, 'showGst' => false],
+            'branding' => [
+                'color' => 'not-a-hex',
+                'themeColor' => 'bad-theme',
+            ],
+        ];
+
+        $this->putJson('/api/settings/company', $body)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['branding.color', 'branding.themeColor']);
+    }
+
+    public function test_company_branding_resets_to_default(): void
+    {
+        // First save custom branding
+        AppSetting::write('branding', [
+            'logo' => 'branding/test.png',
+            'color' => '#E11D48',
+            'themeColor' => '#4F46E5',
+            'detectedColor' => '#E11D48',
+            'detectedThemeColor' => '#4F46E5',
+        ]);
+
+        // Reset
+        $body = [
+            'values' => ['name' => 'Ruyi Travels', 'phone' => '', 'email' => '', 'website' => '', 'address' => ''],
+            'preferences' => ['autoAssign' => true, 'sendQuoteWhatsapp' => true, 'dailySummary' => true, 'showGst' => false],
+            'branding' => [
+                'logo' => null,
+                'color' => '#2563EB',
+                'themeColor' => '#2563EB',
+                'detectedColor' => null,
+                'detectedThemeColor' => null,
+            ],
+        ];
+
+        $res = $this->putJson('/api/settings/company', $body)->assertOk();
+        $branding = $res->json('data.branding');
+
+        $this->assertNull($branding['logo']);
+        $this->assertSame('#2563EB', $branding['color']);
+        $this->assertSame('#2563EB', $branding['themeColor']);
+        $this->assertNull($branding['detectedColor']);
+    }
+
+    public function test_home_serves_injected_branding_style_and_script(): void
+    {
+        AppSetting::write('branding', [
+            'logo' => 'branding/sample.png',
+            'color' => '#E11D48',
+            'themeColor' => '#4F46E5',
+            'detectedColor' => '#E11D48',
+        ]);
+
+        $html = $this->get('/')->assertOk()->getContent();
+        $this->assertStringContainsString('--brand-color: #E11D48;', $html);
+        $this->assertStringContainsString('--primary: #4F46E5;', $html);
+        $this->assertStringContainsString('--primary-gradient: linear-gradient(135deg, #E11D48 0%, #4F46E5 100%);', $html);
+        $this->assertStringContainsString('window.__BRANDING__', $html);
+        $this->assertStringContainsString('#E11D48', $html);
+        $this->assertStringContainsString('#4F46E5', $html);
+        $this->assertStringContainsString('.ks-avatar-badge', $html);
+        $this->assertStringContainsString('.row-avatar', $html);
+        $this->assertStringContainsString('.compact-tab-btn.active', $html);
+        $this->assertStringContainsString('.item-icon-box', $html);
+        $this->assertStringContainsString('.dd-trigger svg:first-child', $html);
+    }
 }

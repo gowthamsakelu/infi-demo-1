@@ -10,9 +10,9 @@
 .st-rates b { font-size: 15.5px; font-weight: 700; color: #0F172A; white-space: nowrap; }
 @container (min-width: 560px) { .st-rates { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .st-note { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 0; padding: 12px 14px; border-radius: 12px; background: #F1F5F9; color: #475569; font-size: 13px; line-height: 1.45; }
-.st-note svg { flex: none; margin-top: 2px; color: #2563EB; }
+.st-note svg { flex: none; margin-top: 2px; color: var(--primary, #2563EB); }
 .st-where { display: flex; align-items: center; gap: 6px; margin: 12px 0 0; font-size: 13.5px; color: #475569; min-width: 0; }
-.st-where > svg { flex: none; color: #2563EB; }
+.st-where > svg { flex: none; color: var(--primary, #2563EB); }
 .st-where > span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .st-map { flex: none; margin-left: auto; font-size: 13px; font-weight: 700; white-space: nowrap; text-decoration: none; }
 .details-section-card .st-about, .details-section-card .st-note { margin-top: 12px; }

@@ -32,7 +32,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
       <div class="modal-card">
         <div class="modal-header">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-light, #EFF6FF); color: var(--primary, #2563EB); display: flex; align-items: center; justify-content: center;">
               ${icon('plus', { size: 17, stroke: 2.4 })}
             </div>
             <div>
@@ -278,7 +278,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <h3 style="font-size: 15px; font-weight: 700; color: #0F172A; margin: 0;">Operations Team</h3>
-            <span style="font-size: 11.5px; font-weight: 600; color: #2563EB; background: #EFF6FF; padding: 2px 8px; border-radius: 9999px;">${filtered.length} active</span>
+            <span style="font-size: 11.5px; font-weight: 600; color: var(--primary, #2563EB); background: var(--primary-light, #EFF6FF); padding: 2px 8px; border-radius: 9999px;">${filtered.length} active</span>
           </div>
         </div>
 
@@ -502,7 +502,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
               <div class="team-kpi-card-header">
                 <span class="team-kpi-title">Total Assigned Trips</span>
                 <div class="team-kpi-icon-box bg-blue">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </div>
               </div>
               <div class="team-kpi-value-row">
@@ -670,7 +670,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
         <div class="team-extra-grid">
           <div class="team-extra-card">
             <div class="team-extra-card-header">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               <h4>Core Responsibilities & Skills</h4>
             </div>
 

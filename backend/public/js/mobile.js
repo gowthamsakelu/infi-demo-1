@@ -214,7 +214,7 @@ export function createMobileView(container, options = {}) {
         <div class="modal-card">
           <div class="modal-header">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
                 <line x1="16" x2="8" y1="13" y2="13"/>
@@ -711,7 +711,7 @@ export function createMobileView(container, options = {}) {
           <div class="special-req-header">
             <div class="special-req-title-left">
               <div class="special-req-icon-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                   <line x1="16" x2="8" y1="13" y2="13"/>
@@ -732,7 +732,7 @@ export function createMobileView(container, options = {}) {
           <div class="special-req-chips-list">
             ${reqs.length > 0 ? reqs.map(r => `
               <span class="special-req-chip">
-                <span class="req-chip-icon">${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+                <span class="req-chip-icon">${getSpecialReqIconSvg(r.icon, r.color || 'var(--primary, #2563EB)')}</span>
                 <span class="req-chip-text">${r.text}</span>
               </span>
             `).join('') : `
@@ -850,7 +850,7 @@ export function createMobileView(container, options = {}) {
                 <p>${m.role} • ${m.phone}</p>
               </div>
             </div>
-            <span class="active-badge-pill" style="font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-weight: 700; flex-shrink: 0;">
+            <span class="active-badge-pill" style="font-size: 11px; padding: 3px 8px; border-radius: 12px; background: var(--primary-light, #EFF6FF); color: var(--primary, #2563EB); font-weight: 700; flex-shrink: 0;">
               ${m.activeTrips} Trips
             </span>
           </div>
@@ -1047,7 +1047,7 @@ export function createMobileView(container, options = {}) {
     listEl.innerHTML = reqs.length > 0 ? reqs.map((r) => `
       <div class="editable-req-item">
         <div class="editable-req-item-left">
-          <span>${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+          <span>${getSpecialReqIconSvg(r.icon, r.color || 'var(--primary, #2563EB)')}</span>
           <span>${r.text}</span>
         </div>
         <button class="btn-delete-req-pill" data-delete-req-id="${r.id}" title="Remove requirement">
@@ -1060,7 +1060,7 @@ export function createMobileView(container, options = {}) {
       const alreadyHas = reqs.some(r => r.text.toLowerCase() === p.text.toLowerCase());
       return `
         <button class="preset-chip-btn ${alreadyHas ? 'is-active' : ''}" data-preset-text="${p.text}" data-preset-icon="${p.icon}" data-preset-color="${p.color}">
-          ${getSpecialReqIconSvg(p.icon, alreadyHas ? '#2563EB' : p.color)}
+          ${getSpecialReqIconSvg(p.icon, alreadyHas ? 'var(--primary, #2563EB)' : p.color)}
           <span>${alreadyHas ? '✓ ' + p.text : p.text}</span>
         </button>
       `;
@@ -1136,9 +1136,9 @@ export function createMobileView(container, options = {}) {
               </div>
             </div>
           ` : `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 10px;">
-              <span style="font-size: 12.5px; color: #1E40AF; font-weight: 600;">No vendor or staff assigned yet</span>
-              <button class="action-pill-btn" id="btn-modal-details-assign-now" style="background: #2563EB; color: #FFFFFF; border: none; padding: 5px 12px; font-size: 12px;">Assign Now</button>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--primary-light, #EFF6FF); border: 1px solid var(--primary-border, #DBEAFE); border-radius: 10px;">
+              <span style="font-size: 12.5px; color: var(--primary, #1E40AF); font-weight: 600;">No vendor or staff assigned yet</span>
+              <button class="action-pill-btn" id="btn-modal-details-assign-now" style="background: var(--primary-gradient, var(--primary, #2563EB)); color: #FFFFFF; border: none; padding: 5px 12px; font-size: 12px;">Assign Now</button>
             </div>
           `}
         </div>
@@ -1886,7 +1886,7 @@ export function createMobileView(container, options = {}) {
             id: 'SR-' + Date.now(),
             icon: 'leaf',
             text: val,
-            color: '#2563EB'
+            color: 'var(--primary, #2563EB)'
           });
           input.value = '';
           renderSpecialReqModalContent();
