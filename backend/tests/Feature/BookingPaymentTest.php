@@ -48,4 +48,50 @@ class BookingPaymentTest extends TestCase
         $this->patchJson('/api/bookings/BK-1/payment', ['status' => 'Refunded'])->assertJsonValidationErrors(['status']);
         $this->patchJson('/api/bookings/NOPE/payment', ['status' => 'Paid'])->assertNotFound();
     }
+
+    public function test_add_guest_and_update_pax(): void
+    {
+        $this->booking();
+
+        $res = $this->postJson('/api/bookings/BK-1/guests', [
+            'name' => 'Amit Sharma',
+            'age' => 32,
+            'role' => 'Adult',
+            'phone' => '+91 98765 43210'
+        ])->assertOk();
+
+        $res->assertJsonPath('status', 'success');
+        $this->assertSame(1, Booking::find('BK-1')->pax);
+        $this->assertSame('Amit Sharma', Booking::find('BK-1')->guests[0]['name']);
+    }
+
+    public function test_update_special_requirements(): void
+    {
+        $this->booking();
+
+        $reqs = [['id' => 'sr-1', 'icon' => 'leaf', 'text' => 'Pure Vegetarian', 'color' => '#10B981']];
+        $this->putJson('/api/bookings/BK-1/special-requirements', ['special_requirements' => $reqs])
+            ->assertOk()->assertJsonPath('status', 'success');
+
+        $this->assertSame('Pure Vegetarian', Booking::find('BK-1')->special_requirements[0]['text']);
+    }
+
+    public function test_update_customer_details_and_status(): void
+    {
+        $this->booking();
+
+        $this->putJson('/api/bookings/BK-1', [
+            'name' => 'Neha Gupta',
+            'phone' => '+91 91234 56789',
+            'email' => 'neha@example.com',
+            'status' => 'Confirmed',
+            'notes' => 'VIP customer',
+        ])->assertOk()->assertJsonPath('status', 'success');
+
+        $b = Booking::find('BK-1');
+        $this->assertSame('Confirmed', $b->status);
+        $this->assertSame('status-confirmed', $b->status_class);
+        $this->assertSame('Neha Gupta', $b->customer['name']);
+        $this->assertSame('VIP customer', $b->notes);
+    }
 }

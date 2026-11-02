@@ -16,6 +16,7 @@ import { mountPage, unmountPage, prefetchPages, warmPage } from './shared/page-h
 import { syncNavActive } from './shared/nav-ui.js';
 import { currentPage, subscribe as subscribePage } from './shared/page-state.js';
 import { initBranding } from './shared/branding.js';
+import { initLogoObserver } from './shared/logo.js';
 
 // Wait (briefly) for the web fonts before the first render, so text never reflows when they arrive.
 // The boot skeleton stays on screen meanwhile; after 1.5s we render with the fallback anyway.
@@ -29,6 +30,7 @@ const fontsReady = () => Promise.race([
 
 applyLayout();
 initBranding();
+initLogoObserver();
 
 document.addEventListener('DOMContentLoaded', async () => {
   const appContainer = document.getElementById('app');
@@ -190,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Handle Add Guest Form Submission
-  document.getElementById('form-add-guest').addEventListener('submit', (e) => {
+  document.getElementById('form-add-guest').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('guest-input-name').value.trim();
     const age = parseInt(document.getElementById('guest-input-age').value) || 25;
@@ -199,23 +201,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!name) return;
 
-    const booking = INITIAL_BOOKINGS.find(b => b.id === targetBookingForGuest);
-    if (booking) {
-      const newGuest = {
-        id: booking.guests.length + 1,
-        name,
-        age,
-        role,
-        phone
-      };
-      booking.guests.push(newGuest);
-      booking.pax = booking.guests.length;
+    try {
+      const res = await fetch(`/api/bookings/${encodeURIComponent(targetBookingForGuest)}/guests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ name, age, role, phone })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to add guest');
+      const updated = data.data;
 
-      // Update both views
-      mobileView?.updateBooking(booking);
-      desktopView?.updateBooking(booking);
+      const booking = INITIAL_BOOKINGS.find(b => b.id === targetBookingForGuest);
+      if (booking) {
+        Object.assign(booking, updated);
+      } else {
+        INITIAL_BOOKINGS.push(updated);
+      }
 
-      showToast(`Added ${name} to ${booking.title}!`, 'success');
+      mobileView?.updateBooking(updated);
+      desktopView?.updateBooking(updated);
+
+      showToast(`Added ${name} to ${updated.title || targetBookingForGuest}!`, 'success');
+    } catch (err) {
+      // Fallback in case of network issue
+      const booking = INITIAL_BOOKINGS.find(b => b.id === targetBookingForGuest);
+      if (booking) {
+        const newGuest = { id: (booking.guests?.length || 0) + 1, name, age, role, phone };
+        booking.guests = booking.guests || [];
+        booking.guests.push(newGuest);
+        booking.pax = booking.guests.length;
+        mobileView?.updateBooking(booking);
+        desktopView?.updateBooking(booking);
+      }
+      showToast(err.message || `Added ${name}!`, 'info');
     }
 
     document.getElementById('form-add-guest').reset();

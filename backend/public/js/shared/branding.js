@@ -1,6 +1,7 @@
 // System-wide Company Branding & Theme Manager
 // Manages the logo, brand identity color, and entire application theme across Desktop and Mobile layouts.
 import { hexToRgb, rgbToHsl, hslToRgb, rgbToHex, isValidHex } from './color-detector.js';
+import { applyLogoBackground } from './logo.js';
 
 export const DEFAULT_BRAND_COLOR = '#2563EB';
 
@@ -10,11 +11,13 @@ const DEFAULT_PLANE_SVG = `
   </svg>`;
 
 let currentBranding = {
+  companyName: 'Ruyi Admin',
   logo: null,
   color: DEFAULT_BRAND_COLOR,
   themeColor: DEFAULT_BRAND_COLOR,
   detectedColor: null,
   detectedThemeColor: null,
+  logoBg: null,
 };
 
 /**
@@ -135,14 +138,52 @@ export function applyTheme(brandHex, themeHex) {
     }
 
     /* Brand identity elements (Logo Box) */
-    .brand-icon-box {
+    .brand-icon-box:not(.has-custom-logo) {
       background: ${solidPrimary} !important;
       color: ${primaryContrastText} !important;
       box-shadow: 0 4px 12px ${brandShades.primaryShadow} !important;
     }
-    .brand-icon-box svg {
+    .brand-icon-box:not(.has-custom-logo) svg {
       color: ${primaryContrastText} !important;
       stroke: ${primaryContrastText} !important;
+    }
+
+    /* Global Logo Background Handling */
+    .brand-icon-box.has-custom-logo.logo-bg-white,
+    .st-brand-logo-thumb-box.logo-bg-white,
+    .logo-bg-white {
+      background: #FFFFFF !important;
+      background-color: #FFFFFF !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    }
+    .brand-icon-box.has-custom-logo.logo-bg-dark,
+    .brand-icon-box.has-custom-logo.logo-bg-black,
+    .st-brand-logo-thumb-box.logo-bg-dark,
+    .st-brand-logo-thumb-box.logo-bg-black,
+    .logo-bg-dark,
+    .logo-bg-black {
+      background: #000000 !important;
+      background-color: #000000 !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    }
+    .brand-icon-box.has-custom-logo.logo-bg-custom,
+    .st-brand-logo-thumb-box.logo-bg-custom,
+    .logo-bg-custom {
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    .brand-icon-box.has-custom-logo.logo-bg-as-uploaded,
+    .st-brand-logo-thumb-box.logo-bg-as-uploaded,
+    .logo-bg-as-uploaded {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    .brand-icon-box.has-custom-logo:not(.logo-bg-white):not(.logo-bg-dark):not(.logo-bg-black):not(.logo-bg-custom):not(.logo-bg-as-uploaded) {
+      background: transparent !important;
     }
 
     /* Sidebar & Mobile Navigation */
@@ -533,19 +574,38 @@ export function applyTheme(brandHex, themeHex) {
 /**
  * Updates all shared branding logos in the DOM (desktop sidebar, mobile header, split page headers).
  */
-export function updateSystemLogos(logoUrl) {
+export function updateSystemLogos(logoUrl, logoBg) {
+  const targetLogo = logoUrl !== undefined ? logoUrl : currentBranding.logo;
+  const effectiveBg = logoBg !== undefined ? logoBg : (currentBranding.logoBg || null);
   const boxes = document.querySelectorAll('.brand-icon-box');
   boxes.forEach((box) => {
     // Preserve mini preview boxes in settings from being overwritten by global state
     if (box.closest('.st-brand-preview-frame')) return;
 
-    if (logoUrl) {
-      box.innerHTML = `<img src="${logoUrl}" alt="Company Logo" class="brand-logo-img">`;
+    if (targetLogo) {
+      box.innerHTML = `<img src="${targetLogo}" alt="Company Logo" class="brand-logo-img">`;
       box.classList.add('has-custom-logo');
+      applyLogoBackground(box, targetLogo, effectiveBg);
     } else {
       box.innerHTML = DEFAULT_PLANE_SVG;
-      box.classList.remove('has-custom-logo');
+      box.classList.remove('has-custom-logo', 'logo-bg-white', 'logo-bg-black', 'logo-bg-dark', 'logo-bg-custom', 'logo-bg-as-uploaded');
+      box.style.removeProperty('background');
+      box.style.removeProperty('background-color');
     }
+  });
+}
+
+/**
+ * Updates all company name titles in headers across Desktop and Mobile layouts.
+ */
+export function updateSystemCompanyTitle(name) {
+  const effectiveName = name || currentBranding.companyName || 'Ruyi Admin';
+  currentBranding.companyName = effectiveName;
+  const titles = document.querySelectorAll('.brand-text-col h2, .sidebar-brand .brand-text-col h2, .mobile-app-header .brand-text-col h2');
+  titles.forEach((el) => {
+    // Preserve preview boxes in settings if they have distinct draft data
+    if (el.closest('.st-brand-preview-frame')) return;
+    el.textContent = effectiveName;
   });
 }
 
@@ -556,17 +616,21 @@ export function applyBranding(branding) {
   if (!branding) return;
   const brandColor = branding.color || DEFAULT_BRAND_COLOR;
   const themeColor = branding.themeColor || brandColor || DEFAULT_BRAND_COLOR;
+  const companyName = branding.companyName || currentBranding.companyName || 'Ruyi Admin';
 
   currentBranding = {
+    companyName: companyName,
     logo: branding.logo || null,
     color: brandColor,
     themeColor: themeColor,
     detectedColor: branding.detectedColor || null,
     detectedThemeColor: branding.detectedThemeColor || null,
+    logoBg: branding.logoBg || null,
   };
 
   applyTheme(currentBranding.color, currentBranding.themeColor);
-  updateSystemLogos(currentBranding.logo);
+  updateSystemLogos(currentBranding.logo, currentBranding.logoBg);
+  updateSystemCompanyTitle(currentBranding.companyName);
 
   window.dispatchEvent(new CustomEvent('branding-changed', { detail: currentBranding }));
 }
@@ -585,17 +649,21 @@ export function initBranding() {
   const initial = window.__BRANDING__ || {};
   const brandColor = initial.color || DEFAULT_BRAND_COLOR;
   const themeColor = initial.themeColor || brandColor || DEFAULT_BRAND_COLOR;
+  const companyName = initial.companyName || 'Ruyi Admin';
 
   applyBranding({
+    companyName: companyName,
     logo: initial.logo || null,
     color: brandColor,
     themeColor: themeColor,
     detectedColor: initial.detectedColor || null,
     detectedThemeColor: initial.detectedThemeColor || null,
+    logoBg: initial.logoBg || null,
   });
 
   // Re-apply logos if dynamic views are rendered (desktop/mobile switch)
   window.addEventListener('layout-changed', () => {
-    updateSystemLogos(currentBranding.logo);
+    updateSystemLogos(currentBranding.logo, currentBranding.logoBg);
+    updateSystemCompanyTitle(currentBranding.companyName);
   });
 }

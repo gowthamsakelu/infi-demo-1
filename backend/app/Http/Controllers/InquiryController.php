@@ -208,6 +208,28 @@ class InquiryController extends Controller
         ]);
     }
 
+    public function update(Request $request, Inquiry $inquiry): JsonResponse
+    {
+        $data = $request->validate([
+            'customer_name' => 'nullable|string|max:120',
+            'customer_phone' => 'nullable|string|max:30',
+            'customer_email' => 'nullable|email|max:120',
+            'location' => 'nullable|string|max:150',
+            'trip' => 'nullable|string|max:150',
+            'status' => 'nullable|string|in:new,ongoing,warm,hot,closed,won',
+            'notes' => 'nullable|string|max:1000',
+            'budget' => 'nullable|numeric',
+        ]);
+
+        $inquiry->update(array_filter($data, fn ($v) => $v !== null));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Inquiry updated successfully',
+            'data' => $this->present($inquiry->fresh(['followUps'])),
+        ]);
+    }
+
     /** Follow-ups for one customer (matched on phone); feeds the Lead Flow / Journey timeline. */
     public function followUps(Request $request): JsonResponse
     {

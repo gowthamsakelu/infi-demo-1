@@ -6,6 +6,7 @@ import { icon } from '../shared/icons.js';
 import { openSheet } from '../shared/sheet.js';
 import { renderTabs } from '../shared/list-ui.js';
 import { bindChipSwipe } from '../shared/swipe.js';
+import { getBranding, updateSystemLogos, updateSystemCompanyTitle } from '../shared/branding.js';
 
 export default {
   css: true,
@@ -163,14 +164,17 @@ export default {
     }
 
     function renderMobileAppHeader(adminName) {
+      const b = getBranding();
+      const logoHtml = b.logo
+        ? `<div class="brand-icon-box has-custom-logo" data-logo-src="${esc(b.logo)}"><img src="${esc(b.logo)}" alt="Company Logo" class="brand-logo-img"></div>`
+        : `<div class="brand-icon-box">${icon('plane', { size: 24, stroke: 2.2 })}</div>`;
+
       return `
         <div class="mobile-app-header">
           <div class="app-brand-left">
-            <div class="brand-icon-box">
-              ${icon('plane', { size: 24, stroke: 2.2 })}
-            </div>
+            ${logoHtml}
             <div class="brand-text-col">
-              <h2>Ruyi Admin</h2>
+              <h2>${esc(b.companyName || 'Ruyi Admin')}</h2>
               <p>Dashboard</p>
             </div>
           </div>
@@ -928,6 +932,7 @@ export default {
       if (state.loading) {
         container.innerHTML = renderSkeleton();
         paintRange();
+        updateSystemLogos();
         return;
       }
 
@@ -976,6 +981,7 @@ export default {
       paintRange();
       bindChipSwipe(container.querySelector('.dash-cards-grid'), container);
       startClock();
+      updateSystemLogos();
     }
 
     async function loadData({ isFilter = false, fresh = false } = {}) {
@@ -1079,6 +1085,14 @@ export default {
 
     container.addEventListener('click', onClick);
 
+    const onBrandingChanged = (e) => {
+      updateSystemLogos(e?.detail?.logo, e?.detail?.logoBg);
+      if (e?.detail?.companyName) {
+        updateSystemCompanyTitle(e.detail.companyName);
+      }
+    };
+    window.addEventListener('branding-changed', onBrandingChanged);
+
     // Hide floating add button on mobile while on dashboard
     const mobileAddBtn = document.getElementById('mobile-page-add');
     if (mobileAddBtn) mobileAddBtn.style.setProperty('display', 'none', 'important');
@@ -1089,6 +1103,7 @@ export default {
       destroy() {
         stopClock();
         container.removeEventListener('click', onClick);
+        window.removeEventListener('branding-changed', onBrandingChanged);
         if (mobileAddBtn) mobileAddBtn.style.removeProperty('display');
       },
     };

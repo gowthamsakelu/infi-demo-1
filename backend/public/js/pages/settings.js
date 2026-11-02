@@ -8,7 +8,8 @@ import { esc, toast, errorState } from '../shared/ui.js';
 import { icon } from '../shared/icons.js';
 import { pill, sectionTitle, detailGrid, rowGroup, linkRow, toggle, flipToggle } from '../shared/page-ui.js';
 import { detectDominantColor, isValidHex } from '../shared/color-detector.js';
-import { applyBranding, DEFAULT_BRAND_COLOR, calculateThemeShades, isLightColor } from '../shared/branding.js';
+import { applyBranding, updateSystemLogos, updateSystemCompanyTitle, DEFAULT_BRAND_COLOR, calculateThemeShades, isLightColor } from '../shared/branding.js';
+import { applyLogoBackground, analyzeLogo, getCachedTransparency } from '../shared/logo.js';
 
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -43,7 +44,7 @@ export default {
 
     /* ---------- what is editable in each section ---------- */
     const EDIT = {
-      company: { get: (d) => ({ values: d.values, preferences: d.preferences, branding: d.branding || { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null } }), body: (x) => x },
+      company: { get: (d) => ({ values: d.values, preferences: d.preferences, branding: d.branding || { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null, logoBg: null, hasTransparency: null } }), body: (x) => x },
       'lead-sources': { get: (d) => ({ sources: d.sources }), body: (x) => x },
       'bookings-payments': { get: (d) => ({ values: d.values }), body: (x) => x },
       notifications: { get: (d) => ({ types: d.types }), body: (x) => x },
@@ -104,9 +105,10 @@ export default {
 
     function brandingCard(id) {
       const x = draftOf(id);
-      const b = x.branding || { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null };
+      const b = x.branding || { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null, logoBg: null, hasTransparency: null };
       const currentBrandColor = b.color || DEFAULT_BRAND_COLOR;
       const currentThemeColor = b.themeColor || currentBrandColor;
+      const currentLogoBg = b.logoBg || '';
       const detectedBrand = b.detectedColor;
       const detectedTheme = b.detectedThemeColor || detectedBrand;
       const detectedPalette = b.detectedPalette || (detectedBrand ? [detectedBrand] : []);
@@ -123,17 +125,50 @@ export default {
         ['#0F172A', 'Slate'],
       ];
 
+      const isTransparentLogo = b.hasTransparency !== undefined && b.hasTransparency !== null
+        ? Boolean(b.hasTransparency)
+        : (getCachedTransparency(b.logo) ?? (!/\.jpe?g(\?.*)?$/i.test(b.logo || '')));
+
       const logoHtml = b.logo ? `
         <div class="st-brand-logo-preview">
-          <div class="st-brand-logo-thumb-box" style="background:${esc(currentBrandColor)};">
+          <div class="st-brand-logo-thumb-box" id="st-brand-logo-thumb-box" data-logo-src="${esc(b.logo)}" ${currentLogoBg ? `data-logo-bg="${esc(currentLogoBg)}"` : ''}>
             <img src="${esc(b.logo)}" alt="Company logo preview" class="st-brand-logo-thumb" id="st-logo-img-preview">
           </div>
           <div class="st-brand-logo-meta">
             <b>Custom logo uploaded</b>
-            <small>PNG, JPG or WebP image</small>
+            <small>${isTransparentLogo ? 'Transparent image (PNG, WebP or SVG)' : 'Image (JPG, PNG or WebP)'}</small>
             <div class="st-brand-logo-actions">
               <button type="button" class="btn-secondary-desktop btn-sm" data-st-brand-act="replace-logo">${icon('upload', { size: 14 })} Replace</button>
               <button type="button" class="btn-secondary-desktop btn-sm st-btn-danger" data-st-brand-act="remove-logo">${icon('trash', { size: 14 })} Reset to default</button>
+            </div>
+          </div>
+        </div>
+        <div class="st-logo-bg-section" id="st-logo-bg-section" style="${isTransparentLogo ? '' : 'display:none;'}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="st-brand-sublabel" style="font-weight:600;color:#1E293B;font-size:13px;">Logo Background Color (without bg / PNG)</span>
+            <span class="st-hint" style="font-size:11.5px;margin:0;">Select background color for logo display</span>
+          </div>
+          <div class="st-logo-bg-options" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="st-logo-bg-chip ${currentLogoBg.toUpperCase() === '#FFFFFF' || currentLogoBg.toLowerCase() === 'white' ? 'is-active' : ''}" data-st-logo-bg="#FFFFFF" title="Solid White Background">
+              <span class="st-logo-bg-dot" style="background:#FFFFFF;border:1px solid #CBD5E1;"></span>
+              <span>White</span>
+            </button>
+            <button type="button" class="st-logo-bg-chip ${currentLogoBg.toUpperCase() === '#000000' || currentLogoBg.toLowerCase() === 'black' ? 'is-active' : ''}" data-st-logo-bg="#000000" title="Solid Black Background (ideal for white logo designs)">
+              <span class="st-logo-bg-dot" style="background:#000000;border:1px solid #334155;"></span>
+              <span>Black</span>
+            </button>
+            <button type="button" class="st-logo-bg-chip ${currentLogoBg.toUpperCase() === currentBrandColor.toUpperCase() ? 'is-active' : ''}" data-st-logo-bg="${esc(currentBrandColor)}" title="Use Brand Color">
+              <span class="st-logo-bg-dot" style="background:${esc(currentBrandColor)};border:1px solid rgba(0,0,0,0.1);"></span>
+              <span>Brand Color</span>
+            </button>
+            <button type="button" class="st-logo-bg-chip ${currentLogoBg.toLowerCase() === 'transparent' ? 'is-active' : ''}" data-st-logo-bg="transparent" title="No background (transparent)">
+              <span class="st-logo-bg-dot" style="background:repeating-conic-gradient(#cbd5e1 0% 25%, #fff 0% 50%) 50% / 8px 8px;border:1px solid #CBD5E1;"></span>
+              <span>Transparent</span>
+            </button>
+            <div class="st-logo-bg-custom-wrap" style="display:inline-flex;align-items:center;gap:6px;margin-left:4px;">
+              <label for="st-logo-bg-custom-picker" style="font-size:12px;color:#64748B;cursor:pointer;">Custom:</label>
+              <input type="color" id="st-logo-bg-custom-picker" value="${esc(currentLogoBg && currentLogoBg.toUpperCase() !== '#FFFFFF' && currentLogoBg.toUpperCase() !== '#000000' && currentLogoBg.toUpperCase() !== currentBrandColor.toUpperCase() && currentLogoBg.toLowerCase() !== 'transparent' && isValidHex(currentLogoBg) ? currentLogoBg : '#FFFFFF')}" style="width:26px;height:26px;border:1px solid #CBD5E1;border-radius:6px;padding:1px;cursor:pointer;vertical-align:middle;" title="Pick custom logo background color">
+              <input type="text" id="st-logo-bg-hex-input" value="${esc(currentLogoBg && currentLogoBg !== 'transparent' ? currentLogoBg : '')}" placeholder="#FFFFFF" maxlength="7" style="width:72px;height:26px;font-size:12px;font-family:monospace;padding:2px 6px;border:1px solid #CBD5E1;border-radius:6px;" title="Custom hex code">
             </div>
           </div>
         </div>` : `
@@ -291,7 +326,7 @@ export default {
                   <div class="st-prev-header-label">Desktop Sidebar Preview</div>
                   <div class="st-prev-sidebar-box">
                     <div class="sidebar-brand">
-                      <div class="brand-icon-box" style="background:linear-gradient(135deg, ${esc(currentBrandColor)} 0%, ${esc(currentThemeColor)} 100%);box-shadow:0 4px 12px ${esc(brandShades.primaryShadow)};">
+                      <div class="brand-icon-box ${b.logo ? 'has-custom-logo' : ''}" data-logo-src="${esc(b.logo || '')}" style="${b.logo ? '' : `background:linear-gradient(135deg, ${esc(currentBrandColor)} 0%, ${esc(currentThemeColor)} 100%);box-shadow:0 4px 12px ${esc(brandShades.primaryShadow)};`}">
                         ${b.logo ? `<img src="${esc(b.logo)}" alt="Logo" class="brand-logo-img">` : icon('plane', { size: 22, stroke: 2.2 })}
                       </div>
                       <div class="brand-text-col">
@@ -319,7 +354,7 @@ export default {
                   <div class="st-prev-mobile-box">
                     <div class="mobile-app-header">
                       <div class="app-brand-left">
-                        <div class="brand-icon-box" style="background:linear-gradient(135deg, ${esc(currentBrandColor)} 0%, ${esc(currentThemeColor)} 100%);box-shadow:0 4px 12px ${esc(brandShades.primaryShadow)};">
+                        <div class="brand-icon-box ${b.logo ? 'has-custom-logo' : ''}" data-logo-src="${esc(b.logo || '')}" style="${b.logo ? '' : `background:linear-gradient(135deg, ${esc(currentBrandColor)} 0%, ${esc(currentThemeColor)} 100%);box-shadow:0 4px 12px ${esc(brandShades.primaryShadow)};`}">
                           ${b.logo ? `<img src="${esc(b.logo)}" alt="Logo" class="brand-logo-img">` : icon('plane', { size: 22, stroke: 2.2 })}
                         </div>
                         <div class="brand-text-col">
@@ -356,6 +391,26 @@ export default {
     const bodies = {
       company(id, d) {
         const x = draftOf(id);
+        const logoUrl = x.branding?.logo;
+        const logoBg = x.branding?.logoBg;
+        if (logoUrl) {
+          queueMicrotask(async () => {
+            const thumb = host.querySelector('#st-brand-logo-thumb-box');
+            if (thumb) applyLogoBackground(thumb, logoUrl, logoBg);
+            const prevBoxes = host.querySelectorAll('.st-brand-preview-frame .brand-icon-box');
+            prevBoxes.forEach((bx) => applyLogoBackground(bx, logoUrl, logoBg));
+
+            // Dynamically check transparency if not yet evaluated
+            const bgSec = host.querySelector('#st-logo-bg-section');
+            if (bgSec && (x.branding?.hasTransparency === undefined || x.branding?.hasTransparency === null)) {
+              try {
+                const analysis = await analyzeLogo(logoUrl);
+                if (x.branding) x.branding.hasTransparency = analysis.hasTransparency;
+                bgSec.style.display = analysis.hasTransparency ? '' : 'none';
+              } catch { /* calm fallback */ }
+            }
+          });
+        }
         return `
           <div class="st-form">
             ${COMPANY_FIELDS.map(([k, label]) => field(id, `values.${k}`, label, x.values[k], { inputmode: k === 'phone' ? 'tel' : k === 'email' ? 'email' : 'text' })).join('')}
@@ -445,7 +500,7 @@ export default {
 
     const numeric = (path, v) => (/gstPercent|advancePercent|dueDays/.test(path) && v.trim() !== '' && !Number.isNaN(Number(v)) ? Number(v) : v);
 
-    function updateLivePreview(brandColor, themeColor, logo) {
+    function updateLivePreview(brandColor, themeColor, logo, logoBg) {
       const bColor = isValidHex(brandColor) ? brandColor : DEFAULT_BRAND_COLOR;
       const tColor = isValidHex(themeColor) ? themeColor : bColor;
       const brandShades = calculateThemeShades(bColor);
@@ -454,13 +509,30 @@ export default {
       // Apply dynamic styles globally so the current session sees the changes
       applyTheme(bColor, tColor);
 
+      const effectiveLogoBg = logoBg !== undefined ? logoBg : (draftOf('company')?.branding?.logoBg || null);
+
       const prevBoxes = host.querySelectorAll('.st-brand-preview-frame .brand-icon-box');
       prevBoxes.forEach((b) => {
-        b.style.background = `linear-gradient(135deg, ${bColor} 0%, ${tColor} 100%)`;
-        b.style.boxShadow = `0 4px 10px ${brandShades.primaryShadow}`;
+        if (logo) {
+          b.classList.add('has-custom-logo');
+          b.style.removeProperty('box-shadow');
+          applyLogoBackground(b, logo, effectiveLogoBg);
+        } else {
+          b.classList.remove('has-custom-logo', 'logo-bg-white', 'logo-bg-black', 'logo-bg-dark', 'logo-bg-custom', 'logo-bg-as-uploaded');
+          b.style.background = `linear-gradient(135deg, ${bColor} 0%, ${tColor} 100%)`;
+          b.style.boxShadow = `0 4px 10px ${brandShades.primaryShadow}`;
+        }
       });
       const logoThumb = host.querySelector('.st-brand-logo-thumb-box');
-      if (logoThumb) logoThumb.style.background = `linear-gradient(135deg, ${bColor} 0%, ${tColor} 100%)`;
+      if (logoThumb) {
+        if (logo) {
+          applyLogoBackground(logoThumb, logo, effectiveLogoBg);
+        } else {
+          logoThumb.classList.remove('logo-bg-white', 'logo-bg-black', 'logo-bg-dark', 'logo-bg-custom', 'logo-bg-as-uploaded');
+          logoThumb.style.background = `linear-gradient(135deg, ${bColor} 0%, ${tColor} 100%)`;
+        }
+      }
+      updateSystemLogos(logo || null, effectiveLogoBg || null);
 
       const gradientBar = host.querySelector('.st-brand-gradient-bar');
       if (gradientBar) {
@@ -522,8 +594,25 @@ export default {
       reader.onload = async () => {
         const dataUrl = reader.result;
         const d = touch(item.id);
-        if (!d.branding) d.branding = { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null };
+        if (!d.branding) d.branding = { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null, logoBg: null, hasTransparency: null };
         d.branding.logo = dataUrl;
+
+        try {
+          const analysis = await analyzeLogo(dataUrl);
+          d.branding.hasTransparency = Boolean(analysis.hasTransparency);
+          if (analysis.hasTransparency) {
+            d.branding.logoBg = analysis.recommendedBg;
+            if (analysis.isWhiteArtwork) {
+              toast('White logo detected — background set to black for visibility.', 'info');
+            }
+          } else {
+            d.branding.logoBg = 'transparent';
+          }
+        } catch (e) {
+          console.warn('Logo analysis failed:', e);
+          d.branding.hasTransparency = false;
+          d.branding.logoBg = 'transparent';
+        }
 
         try {
           const detected = await detectDominantColor(dataUrl);
@@ -557,8 +646,10 @@ export default {
         host.querySelector('#st-logo-file-input')?.click();
       } else if (act === 'remove-logo') {
         const d = touch(item.id);
-        if (!d.branding) d.branding = { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null };
+        if (!d.branding) d.branding = { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null, logoBg: null, hasTransparency: null };
         d.branding.logo = null;
+        d.branding.logoBg = null;
+        d.branding.hasTransparency = null;
         d.branding.detectedColor = null;
         d.branding.detectedThemeColor = null;
         d.branding.detectedPalette = [];
@@ -660,7 +751,41 @@ export default {
       updateLivePreview(d.branding.color, d.branding.themeColor, d.branding.logo);
     }
 
+    function handleLogoBgChange(color) {
+      const item = current();
+      if (!item || item.id !== 'company') return;
+      const d = touch(item.id);
+      if (!d.branding) d.branding = { logo: null, color: DEFAULT_BRAND_COLOR, themeColor: DEFAULT_BRAND_COLOR, detectedColor: null, detectedThemeColor: null, logoBg: null };
+      d.branding.logoBg = color;
+
+      host.querySelectorAll('.st-logo-bg-chip').forEach((chip) => {
+        chip.classList.toggle('is-active', chip.dataset.stLogoBg?.toUpperCase() === color?.toUpperCase());
+      });
+      const picker = host.querySelector('#st-logo-bg-custom-picker');
+      const hexInput = host.querySelector('#st-logo-bg-hex-input');
+      if (isValidHex(color)) {
+        if (picker) picker.value = color;
+        if (hexInput && hexInput !== document.activeElement) hexInput.value = color;
+      }
+
+      settle(item.id);
+      syncFoot();
+      updateLivePreview(d.branding.color, d.branding.themeColor, d.branding.logo, d.branding.logoBg);
+    }
+
     function onInput(e) {
+      const logoBgPicker = e.target.closest('#st-logo-bg-custom-picker');
+      const logoBgHex = e.target.closest('#st-logo-bg-hex-input');
+      if (logoBgPicker || logoBgHex) {
+        const val = (logoBgPicker || logoBgHex).value.trim();
+        if (logoBgHex) {
+          const formatted = val.startsWith('#') ? val : '#' + val;
+          if (isValidHex(formatted)) handleLogoBgChange(formatted);
+        } else {
+          handleLogoBgChange(val);
+        }
+        return;
+      }
       const brandHex = e.target.closest('#st-brand-hex-input');
       const brandPicker = e.target.closest('#st-brand-color-picker');
       if (brandHex || brandPicker) {
@@ -681,6 +806,9 @@ export default {
       const path = el.dataset.stField;
       pathSet(touch(item.id), path, numeric(path, el.value));
       settle(item.id);
+      if (item.id === 'company' && path === 'values.name') {
+        updateSystemCompanyTitle(el.value);
+      }
       if (errors.get(item.id)?.[path]) { delete errors.get(item.id)[path]; el.removeAttribute('aria-invalid'); const p = host.querySelector(`[data-st-error="${CSS.escape(path)}"]`); if (p) p.hidden = true; }
       syncFoot();
     }
@@ -704,8 +832,13 @@ export default {
         const res = await sendJson(`/api/settings/${encodeURIComponent(item.id)}`, 'PUT', EDIT[item.id].body(draft));
         cache.set(item.id, res.data);
         drafts.delete(item.id);
-        if (item.id === 'company' && res.data?.branding) {
-          applyBranding(res.data.branding);
+        if (item.id === 'company') {
+          const compName = res.data?.values?.name || draft.values?.name;
+          if (res.data?.branding) {
+            applyBranding({ ...res.data.branding, companyName: compName });
+          } else if (compName) {
+            updateSystemCompanyTitle(compName);
+          }
         }
         toast('Settings saved.', 'success');
       } catch (err) {
@@ -723,7 +856,8 @@ export default {
       drafts.delete(item.id); errors.delete(item.id);
       if (item.id === 'company') {
         const saved = savedPart('company');
-        if (saved?.branding) applyBranding(saved.branding);
+        if (saved?.values?.name) updateSystemCompanyTitle(saved.values.name);
+        if (saved?.branding) applyBranding({ ...saved.branding, companyName: saved?.values?.name });
       }
       page.api.refresh();
     }
@@ -732,6 +866,12 @@ export default {
       const sw = e.target.closest('[data-sp-toggle]');
       if (sw) { onToggle(sw); return; }
       if (e.target.closest('[data-st-retry]')) { const item = current(); if (item) { failed.delete(item.id); page.api.refresh(); ensureDetail(item); } return; }
+
+      const logoBgChip = e.target.closest('[data-st-logo-bg]');
+      if (logoBgChip) {
+        handleLogoBgChange(logoBgChip.dataset.stLogoBg);
+        return;
+      }
 
       const brandAct = e.target.closest('[data-st-brand-act]')?.dataset.stBrandAct;
       if (brandAct) {

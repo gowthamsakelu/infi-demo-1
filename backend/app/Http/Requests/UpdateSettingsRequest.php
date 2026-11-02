@@ -33,6 +33,8 @@ class UpdateSettingsRequest extends FormRequest
                 'branding.themeColor' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
                 'branding.detectedColor' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
                 'branding.detectedThemeColor' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
+                'branding.logoBg' => ['nullable', 'string', 'max:40'],
+                'branding.hasTransparency' => ['nullable', 'boolean'],
             ],
             'lead-sources' => [
                 'sources' => ['required', 'array', 'min:1', 'max:30'],

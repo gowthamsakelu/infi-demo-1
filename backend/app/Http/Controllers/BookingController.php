@@ -174,6 +174,82 @@ class BookingController extends Controller
     }
 
     /**
+     * Update customer details and status of a booking.
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $booking = Booking::find($id);
+        if (!$booking) {
+            return response()->json(['status' => 'error', 'message' => 'Booking not found'], 404);
+        }
+
+        $data = $request->validate([
+            'name' => 'nullable|string|max:120',
+            'phone' => 'nullable|string|max:30',
+            'email' => 'nullable|email|max:120',
+            'location' => 'nullable|string|max:150',
+            'travel_dates' => 'nullable|string|max:100',
+            'budget' => 'nullable|string|max:50',
+            'status' => 'nullable|string|in:Pending,Confirmed,Ongoing,Completed,Cancelled,Paid,Part Paid',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $customer = $booking->customer ?? [];
+        if (isset($data['name'])) {
+            $customer['name'] = $data['name'];
+            $customer['initials'] = collect(explode(' ', $data['name']))->map(fn($w) => $w[0] ?? '')->take(2)->implode('');
+            $guests = $booking->guests ?? [];
+            if (!empty($guests)) {
+                $guests[0]['name'] = $data['name'];
+                $booking->guests = $guests;
+            }
+        }
+        if (isset($data['phone'])) {
+            $customer['phone'] = $data['phone'];
+            $guests = $booking->guests ?? [];
+            if (!empty($guests)) {
+                $guests[0]['phone'] = $data['phone'];
+                $booking->guests = $guests;
+            }
+        }
+        if (isset($data['email'])) $customer['email'] = $data['email'];
+        if (isset($data['location'])) $customer['location'] = $data['location'];
+        if (isset($data['travel_dates'])) {
+            $customer['travelDates'] = $data['travel_dates'];
+            $booking->dates = $data['travel_dates'];
+        }
+        if (isset($data['budget'])) {
+            $customer['budgetEst'] = $data['budget'];
+            $booking->price = $data['budget'];
+        }
+        if (isset($data['status'])) {
+            $booking->status = $data['status'];
+            $booking->status_class = match($data['status']) {
+                'Confirmed' => 'status-confirmed',
+                'Paid' => 'status-paid',
+                'Part Paid' => 'status-part-paid',
+                'Ongoing' => 'status-ongoing',
+                'Completed' => 'status-completed',
+                default => 'status-pending'
+            };
+            $customer['status'] = $data['status'];
+        }
+        if (isset($data['notes'])) {
+            $customer['shortDetails'] = $data['notes'];
+            $booking->notes = $data['notes'];
+        }
+
+        $booking->customer = $customer;
+        $booking->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Booking updated successfully',
+            'data' => $booking
+        ]);
+    }
+
+    /**
      * Return team members, vendors, and contacts.
      */
     public function metadata(): JsonResponse

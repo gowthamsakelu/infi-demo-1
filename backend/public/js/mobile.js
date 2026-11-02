@@ -20,6 +20,7 @@ import { openItineraryBuilder } from './shared/itinerary-builder-ui.js';
 import { scheduleHtml } from './shared/schedule.js';
 import { openMoreSheet } from './shared/nav-ui.js';
 import { goToPage } from './shared/page-host.js';
+import { getBranding } from './shared/branding.js';
 import { matchesCategory } from './shared/booking-filters.js';
 import { openAddInquiry } from './shared/add-inquiry.js';
 import { addButtonHtml, setShellAddAction } from './shared/add-button.js';
@@ -71,7 +72,7 @@ export function createMobileView(container, options = {}) {
               </svg>
             </div>
             <div class="brand-text-col">
-              <h2>Ruyi Admin</h2>
+              <h2>${esc(getBranding().companyName || 'Ruyi Admin')}</h2>
               <p id="mobile-header-subtitle">Bookings • 28 Total</p>
             </div>
           </div>
@@ -844,7 +845,7 @@ export function createMobileView(container, options = {}) {
                   </svg>
                 ` : ''}
               </div>
-              <img src="${m.avatar}" class="vendor-avatar" style="border-radius: 50%;" alt="${m.name}" />
+              <img src="${m.avatar}" class="vendor-avatar" data-crm-logo="true" data-logo-src="${m.avatar}" style="border-radius: 50%;" alt="${m.name}" />
               <div class="vendor-info">
                 <h4>${m.name}</h4>
                 <p>${m.role} • ${m.phone}</p>
@@ -879,7 +880,7 @@ export function createMobileView(container, options = {}) {
                   </svg>
                 ` : ''}
               </div>
-              <img src="${v.image}" class="vendor-avatar" alt="${v.name}" />
+              <img src="${v.image}" class="vendor-avatar" data-crm-logo="true" data-logo-src="${v.image}" alt="${v.name}" />
               <div class="vendor-info">
                 <h4>${v.name}</h4>
                 <p>${v.service ? `${v.service} • ` : ''}${v.phone}</p>
@@ -919,7 +920,7 @@ export function createMobileView(container, options = {}) {
                   </svg>
                 ` : ''}
               </div>
-              <img src="${c.avatar}" class="vendor-avatar" style="border-radius: 50%;" alt="${esc(c.name)}" />
+              <img src="${c.avatar}" class="vendor-avatar" data-crm-logo="true" data-logo-src="${c.avatar}" style="border-radius: 50%;" alt="${esc(c.name)}" />
               <div class="vendor-info">
                 <h4>${esc(c.name)}</h4>
                 <p>${c.role} • ${esc(c.phone)}</p>
@@ -1370,7 +1371,13 @@ export function createMobileView(container, options = {}) {
     window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
     loadFollowUps();
     loadInquiries();
-    syncBookingPayments().then(() => renderCards());
+    syncBookingPayments().then(() => {
+      bookingsData.splice(0, bookingsData.length, ...INITIAL_BOOKINGS);
+      if (page === 'bookings') {
+        bookings = bookingsData;
+        renderCards();
+      }
+    });
     container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach((b) => {
       b.addEventListener('click', () => goToPage(b.dataset.route));
     });
@@ -1630,6 +1637,35 @@ export function createMobileView(container, options = {}) {
         }
         if (destVal) {
           activeModalBooking.destination = destVal;
+        }
+
+        if (activeModalBooking.kind === 'inquiry') {
+          fetch(`/api/inquiries/${encodeURIComponent(activeModalBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              customer_name: nameVal,
+              customer_phone: phoneVal,
+              customer_email: emailVal || null,
+              location: locVal || null,
+              trip: destVal || null,
+              notes: notesVal || null,
+            })
+          }).catch(() => {});
+        } else {
+          fetch(`/api/bookings/${encodeURIComponent(activeModalBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              name: nameVal,
+              phone: phoneVal,
+              email: emailVal || null,
+              location: locVal || null,
+              travel_dates: datesVal || null,
+              budget: budgetVal || null,
+              notes: notesVal || null
+            })
+          }).catch(() => {});
         }
 
         closeMobileEditCustomerModal();
@@ -1896,6 +1932,13 @@ export function createMobileView(container, options = {}) {
 
       if (e.target.closest('#btn-done-special-req') || e.target.closest('#close-special-req-modal-btn')) {
         closeSpecialReqModal();
+        if (activeModalBooking && activeModalBooking.kind !== 'inquiry') {
+          fetch(`/api/bookings/${encodeURIComponent(activeModalBooking.id)}/special-requirements`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ special_requirements: activeModalBooking.specialRequirements || [] })
+          }).catch(() => {});
+        }
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Special requirements updated successfully!', type: 'success' }
         }));
@@ -2182,10 +2225,34 @@ export function createMobileView(container, options = {}) {
 
       // Confirm Booking
       if (e.target.closest('#mobile-confirm-booking-btn')) {
-        if (activeModalBooking?.kind === 'inquiry') { toast(`Inquiry ${activeModalBooking.id} (${activeModalBooking.title}) confirmed.`, 'success'); return; }
-        window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { message: `Booking ${activeModalBooking.id} (${activeModalBooking.title}) confirmed successfully!`, type: 'success' }
-        }));
+        if (activeModalBooking?.kind === 'inquiry') {
+          activeModalBooking.status = 'Hot';
+          activeModalBooking.statusClass = 'status-inq-hot';
+          fetch(`/api/inquiries/${encodeURIComponent(activeModalBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ status: 'hot' })
+          }).catch(() => {});
+          toast(`Inquiry ${activeModalBooking.id} (${activeModalBooking.title}) confirmed.`, 'success');
+          renderCards();
+          renderSheetHeader();
+          return;
+        }
+        if (activeModalBooking) {
+          activeModalBooking.status = 'Confirmed';
+          activeModalBooking.statusClass = 'status-confirmed';
+          if (activeModalBooking.customer) activeModalBooking.customer.status = 'Confirmed';
+          fetch(`/api/bookings/${encodeURIComponent(activeModalBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ status: 'Confirmed' })
+          }).catch(() => {});
+          renderCards();
+          renderSheetHeader();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Booking ${activeModalBooking.id} (${activeModalBooking.title}) confirmed successfully!`, type: 'success' }
+          }));
+        }
         return;
       }
     });

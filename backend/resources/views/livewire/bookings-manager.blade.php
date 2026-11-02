@@ -13,7 +13,7 @@
                         </svg>
                     </div>
                     <div class="brand-text-col">
-                        <h2>Ruyi Admin</h2>
+                        <h2>{{ \App\Models\AppSetting::read('company', [])['name'] ?? 'Ruyi Admin' }}</h2>
                         <p>Travel Operations</p>
                     </div>
                 </div>
@@ -876,7 +876,7 @@
             <header class="mobile-top-header">
                 <div class="mobile-header-row">
                     <div class="brand-text-col">
-                        <h2>Ruyi Admin</h2>
+                        <h2>{{ \App\Models\AppSetting::read('company', [])['name'] ?? 'Ruyi Admin' }}</h2>
                         <p>Travel Operations</p>
                     </div>
                     <button class="icon-bell-btn" wire:click="showToast('No new notifications', 'info')">

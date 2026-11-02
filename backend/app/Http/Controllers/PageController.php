@@ -24,6 +24,8 @@ class PageController extends Controller
         $branding = \App\Http\Controllers\Pages\SettingsController::brandingData();
         $brandColor = htmlspecialchars($branding['color'] ?: '#2563EB', ENT_QUOTES, 'UTF-8');
         $primaryColor = htmlspecialchars($branding['themeColor'] ?: $brandColor, ENT_QUOTES, 'UTF-8');
+        $companyName = htmlspecialchars($branding['companyName'] ?: 'Ruyi Admin', ENT_QUOTES, 'UTF-8');
+        $html = str_replace('<title>Ruyi Admin', "<title>{$companyName}", $html);
         $brandingJson = json_encode($branding, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
 
         $cleanHex1 = ltrim($brandColor, '#');
@@ -47,7 +49,8 @@ class PageController extends Controller
         $primaryShadow = "rgba({$r1}, {$g1}, {$b1}, 0.25)";
         $primaryRing = "rgba({$r1}, {$g1}, {$b1}, 0.15)";
 
-        $injections = "<style id=\"app-branding-theme\">:root { --brand-color: {$brandColor}; --primary: {$brandColor}; --primary-accent: {$primaryColor}; --primary-gradient: {$brandColor}; --primary-gradient-subtle: {$primaryLight}; --primary-light: {$primaryLight}; --primary-border: {$primaryBorder}; --primary-shadow: {$primaryShadow}; --primary-ring: {$primaryRing}; }\n";
+        $primaryGradient = "linear-gradient(135deg, {$brandColor} 0%, {$primaryColor} 100%)";
+        $injections = "<style id=\"app-branding-theme\">:root { --brand-color: {$brandColor}; --primary: {$primaryColor}; --primary-accent: {$primaryColor}; --primary-gradient: {$primaryGradient}; --primary-gradient-subtle: {$primaryLight}; --primary-light: {$primaryLight}; --primary-border: {$primaryBorder}; --primary-shadow: {$primaryShadow}; --primary-ring: {$primaryRing}; }\n";
         $injections .= "  .ks-avatar-badge { background: {$brandColor} !important; color: #FFFFFF !important; }\n";
         $injections .= "  .row-avatar { background: {$primaryLight} !important; color: {$brandColor} !important; border-color: {$primaryBorder} !important; }\n";
         $injections .= "  .compact-tab-btn.active, .tab-pill.active { background: {$brandColor} !important; color: #FFFFFF !important; border-color: transparent !important; }\n";

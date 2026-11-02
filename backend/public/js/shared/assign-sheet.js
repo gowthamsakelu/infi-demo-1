@@ -59,7 +59,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
       <header class="asg-header"><h3 id="asg-title">Assign to</h3>
         <button type="button" class="sheet-close-btn" data-asg-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
       <div class="asg-summary">
-        ${summary ? `<div class="asg-thumb asg-icon">${summary.iconHtml || ''}</div>` : first.image ? `<div class="asg-thumb"><img src="${esc(first.image)}" alt="" width="48" height="48" /></div>` : `<div class="row-avatar">${esc(initials(first.name))}</div>`}
+        ${summary ? `<div class="asg-thumb asg-icon">${summary.iconHtml || ''}</div>` : first.image ? `<div class="asg-thumb" data-crm-logo="true" data-logo-src="${esc(first.image)}"><img src="${esc(first.image)}" alt="" width="48" height="48" /></div>` : `<div class="row-avatar">${esc(initials(first.name))}</div>`}
         <div class="asg-summary-info"><h4>${summary ? esc(summary.title) : `${items.length} ${noun} Selected`}</h4><p>${summary ? esc(summary.subtitle || '') : esc(items.map((i) => i.id).join(', '))}</p></div>
         ${summary && summary.badge ? `<span class="tag-activity-pill">${esc(summary.badge)}</span>` : items.length === 1 && first.badge ? `<span class="status-pill ${esc(first.badgeClass || '')}"><span class="dot"></span>${esc(first.badge)}</span>` : ''}
       </div>
@@ -109,7 +109,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
       return `<div class="vendor-item-card ${on ? 'selected' : ''}" role="radio" aria-checked="${on}" tabindex="0" data-asg-pick="${esc(p.id)}">
         <div class="vendor-item-left">
           <div class="custom-radio ${on ? 'checked' : ''}">${on ? icon('check', { size: 10, stroke: 3 }) : ''}</div>
-          ${p.avatar ? `<img src="${esc(p.avatar)}" class="vendor-avatar" style="border-radius:50%;" alt="" />` : `<div class="row-avatar asg-mini-avatar">${esc(initials(p.name))}</div>`}
+          ${p.avatar ? `<img src="${esc(p.avatar)}" class="vendor-avatar" data-crm-logo="true" data-logo-src="${esc(p.avatar)}" style="border-radius:50%;" alt="" />` : `<div class="row-avatar asg-mini-avatar">${esc(initials(p.name))}</div>`}
           <div class="vendor-info"><h4>${esc(p.name)}</h4><p>${esc(p.sub)}</p></div>
         </div>
         ${p.badge ? `<span class="asg-badge">${esc(p.badge)}</span>` : ''}

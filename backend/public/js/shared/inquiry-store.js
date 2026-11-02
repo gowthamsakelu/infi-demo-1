@@ -185,7 +185,7 @@ export async function savePayment(bookingId, status) {
   } catch { return false; }
 }
 
-/** On load, apply saved payment statuses to the in-memory bookings. */
+/** On load, apply saved database records to the in-memory bookings. */
 export async function syncBookingPayments() {
   try {
     const res = await fetch('/api/bookings', { headers: { Accept: 'application/json' } });
@@ -193,9 +193,16 @@ export async function syncBookingPayments() {
     const rows = (await res.json()).data || [];
     rows.forEach((r) => {
       const b = INITIAL_BOOKINGS.find((x) => x.id === r.id);
-      if (!b) return;
-      if (b.status !== r.status) { b.status = r.status; b.statusClass = r.status_class; }
+      if (!b) {
+        INITIAL_BOOKINGS.push(r);
+        return;
+      }
+      Object.assign(b, r);
+      if (b.status !== r.status) { b.status = r.status; b.statusClass = r.status_class || r.statusClass; }
       if (Array.isArray(r.itinerary_days) && r.itinerary_days.length) b.itineraryDays = r.itinerary_days;
+      if (Array.isArray(r.special_requirements)) b.specialRequirements = r.special_requirements;
+      if (Array.isArray(r.guests)) { b.guests = r.guests; b.pax = r.guests.length; }
+      if (r.customer) b.customer = r.customer;
       if (r.assigned_to && r.assigned_to.name) b.assignedTo = { ...(b.assignedTo || {}), name: r.assigned_to.name, avatar: r.assigned_to.avatar || b.assignedTo?.avatar || '' };
       markSaved(b);
     });

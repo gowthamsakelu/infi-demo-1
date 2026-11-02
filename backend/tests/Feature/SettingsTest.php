@@ -243,8 +243,28 @@ class SettingsTest extends TestCase
         $this->assertNull($branding['detectedColor']);
     }
 
+    public function test_company_branding_includes_company_name(): void
+    {
+        $body = [
+            'values' => ['name' => 'Acme Holidays', 'phone' => '', 'email' => '', 'website' => '', 'address' => ''],
+            'preferences' => ['autoAssign' => true, 'sendQuoteWhatsapp' => true, 'dailySummary' => true, 'showGst' => false],
+            'branding' => [
+                'logo' => null,
+                'color' => '#2563EB',
+                'themeColor' => '#2563EB',
+            ],
+        ];
+
+        $res = $this->putJson('/api/settings/company', $body)->assertOk();
+        $this->assertSame('Acme Holidays', $res->json('data.branding.companyName'));
+
+        $brandRes = $this->getJson('/api/branding')->assertOk()->json('data');
+        $this->assertSame('Acme Holidays', $brandRes['companyName']);
+    }
+
     public function test_home_serves_injected_branding_style_and_script(): void
     {
+        AppSetting::write('company', ['name' => 'Custom Travels']);
         AppSetting::write('branding', [
             'logo' => 'branding/sample.png',
             'color' => '#E11D48',
@@ -253,6 +273,8 @@ class SettingsTest extends TestCase
         ]);
 
         $html = $this->get('/')->assertOk()->getContent();
+        $this->assertStringContainsString('<title>Custom Travels', $html);
+        $this->assertStringContainsString('"companyName":"Custom Travels"', $html);
         $this->assertStringContainsString('--brand-color: #E11D48;', $html);
         $this->assertStringContainsString('--primary: #4F46E5;', $html);
         $this->assertStringContainsString('--primary-gradient: linear-gradient(135deg, #E11D48 0%, #4F46E5 100%);', $html);

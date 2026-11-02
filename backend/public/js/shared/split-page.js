@@ -14,6 +14,7 @@ import { bindListKeys } from './split-view.js';
 import { bindSwipe, bindChipSwipe, slideIn } from './swipe.js';
 import { hasOpenLayer } from './sheet.js';
 import { getParams, setParams, subscribe } from './page-state.js';
+import { getBranding } from './branding.js';
 
 const isPhone = () => document.documentElement.dataset.layout === 'mobile';
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -23,17 +24,24 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
    ------------------------------------------------------------------------------------------------ */
 
 /** The phone header: brand icon, "Ruyi Admin", this page's line, the bell and the account badge (as on every phone page). */
-const phoneHeader = (line) => `
+const phoneHeader = (line) => {
+  const b = getBranding();
+  const logoHtml = b.logo
+    ? `<div class="brand-icon-box has-custom-logo" data-logo-src="${esc(b.logo)}"><img src="${esc(b.logo)}" alt="Company Logo" class="brand-logo-img"></div>`
+    : `<div class="brand-icon-box">${icon('plane', { size: 24, stroke: 2.2 })}</div>`;
+
+  return `
   <div class="mobile-app-header">
     <div class="app-brand-left">
-      <div class="brand-icon-box">${icon('plane', { size: 24, stroke: 2.2 })}</div>
-      <div class="brand-text-col"><h2>Ruyi Admin</h2><p class="sp-header-line">${esc(line)}</p></div>
+      ${logoHtml}
+      <div class="brand-text-col"><h2>${esc(b.companyName || 'Ruyi Admin')}</h2><p class="sp-header-line">${esc(line)}</p></div>
     </div>
     <div class="app-header-right">
       <button class="icon-bell-btn" type="button" data-sp-bell aria-label="Notifications">${icon('bell', { size: 22 })}<span class="bell-dot"></span></button>
       <button type="button" class="ks-avatar-badge" title="Karan Sapalia" aria-haspopup="menu" aria-label="Account menu">KS</button>
     </div>
   </div>`;
+};
 
 
 /** The detail header: the shared sheet header (shared/detail-sheet.js), with the round X on the phone. */

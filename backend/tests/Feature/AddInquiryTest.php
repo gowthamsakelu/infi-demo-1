@@ -180,4 +180,27 @@ class AddInquiryTest extends TestCase
         $this->postJson('/api/inquiries', ['name' => 'X', 'itinerary' => $itinerary])->assertUnprocessable();
         $this->assertSame(0, Inquiry::count());
     }
+
+    public function test_inquiry_can_be_updated(): void
+    {
+        $inquiry = Inquiry::create([
+            'id' => 'INQ-1001',
+            'customer_name' => 'Rahul',
+            'customer_phone' => '+91 99887 76655',
+            'trip' => 'Goa',
+            'category' => 'TOUR',
+            'status' => 'new',
+        ]);
+
+        $this->putJson('/api/inquiries/INQ-1001', [
+            'customer_name' => 'Rahul Verma',
+            'status' => 'hot',
+            'notes' => 'Confirmed booking interest',
+        ])->assertOk()->assertJsonPath('success', true);
+
+        $inquiry->refresh();
+        $this->assertSame('Rahul Verma', $inquiry->customer_name);
+        $this->assertSame('hot', $inquiry->status);
+        $this->assertSame('Confirmed booking interest', $inquiry->notes);
+    }
 }

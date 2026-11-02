@@ -318,8 +318,80 @@
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   transition: background-color var(--motion-fast) var(--ease-out);
+  background: transparent;
+}
+
+.st-brand-logo-thumb-box.logo-bg-white {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+.st-brand-logo-thumb-box.logo-bg-dark,
+.st-brand-logo-thumb-box.logo-bg-black {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
+}
+
+.st-brand-logo-thumb-box.logo-bg-custom {
+  border: 1px solid #CBD5E1 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+.st-brand-logo-thumb-box.logo-bg-as-uploaded {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: none !important;
+}
+
+/* Logo Background Color Selection */
+.st-logo-bg-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #E2E8F0;
+  width: 100%;
+}
+
+.st-logo-bg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--motion-fast) var(--ease-out);
+}
+
+.st-logo-bg-chip:hover {
+  border-color: #CBD5E1;
+  background: #F8FAFC;
+}
+
+.st-logo-bg-chip.is-active {
+  border-color: var(--brand-color, #2563EB) !important;
+  background: var(--brand-light, #EFF6FF) !important;
+  color: var(--brand-color, #2563EB) !important;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--brand-color, #2563EB);
+}
+
+.st-logo-bg-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
 .st-brand-logo-thumb {

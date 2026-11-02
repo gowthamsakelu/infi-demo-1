@@ -55,6 +55,70 @@ class Booking extends Model
         'end_date' => 'date:Y-m-d',
     ];
 
+    protected $appends = [
+        'typeClass',
+        'statusClass',
+        'travelDateFull',
+        'rawPrice',
+        'assignedStatus',
+        'assignedTo',
+        'specialRequirements',
+        'itineraryDays',
+        'guest',
+    ];
+
+    public function getTypeClassAttribute(): ?string
+    {
+        return $this->attributes['type_class'] ?? null;
+    }
+
+    public function getStatusClassAttribute(): ?string
+    {
+        return $this->attributes['status_class'] ?? null;
+    }
+
+    public function getTravelDateFullAttribute(): ?string
+    {
+        return $this->attributes['travel_date_full'] ?? null;
+    }
+
+    public function getRawPriceAttribute(): int
+    {
+        return (int) ($this->attributes['raw_price'] ?? 0);
+    }
+
+    public function getAssignedStatusAttribute(): ?string
+    {
+        return $this->attributes['assigned_status'] ?? null;
+    }
+
+    public function getAssignedToAttribute(): ?array
+    {
+        $val = $this->attributes['assigned_to'] ?? null;
+        return is_string($val) ? json_decode($val, true) : $val;
+    }
+
+    public function getSpecialRequirementsAttribute(): array
+    {
+        $val = $this->attributes['special_requirements'] ?? [];
+        return is_string($val) ? (json_decode($val, true) ?: []) : ($val ?: []);
+    }
+
+
+
+    public function getGuestAttribute(): array
+    {
+        $guests = $this->guests ?? [];
+        $primary = collect($guests)->firstWhere('isPrimary', true) ?? ($guests[0] ?? []);
+        return [
+            'name' => $primary['name'] ?? ($this->customer['name'] ?? 'Guest'),
+            'phone' => $primary['phone'] ?? ($this->customer['phone'] ?? ''),
+            'email' => $primary['email'] ?? ($this->customer['email'] ?? ''),
+            'age' => $primary['age'] ?? 30,
+            'isPrimary' => true,
+        ];
+    }
+
     public function itineraryKind(): string
     {
         return 'booking';

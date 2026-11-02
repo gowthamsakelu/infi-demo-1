@@ -91,12 +91,18 @@ class SettingsController extends Controller
         $brandColor = !empty($saved['color']) ? $saved['color'] : '#2563EB';
         $themeColor = !empty($saved['themeColor']) ? $saved['themeColor'] : $brandColor;
 
+        $company = AppSetting::read('company', []);
+        $companyName = !empty($company['name']) ? $company['name'] : 'Ruyi Admin';
+
         return [
+            'companyName' => $companyName,
             'logo' => $url,
             'color' => $brandColor,
             'themeColor' => $themeColor,
             'detectedColor' => $saved['detectedColor'] ?? null,
             'detectedThemeColor' => $saved['detectedThemeColor'] ?? null,
+            'logoBg' => $saved['logoBg'] ?? null,
+            'hasTransparency' => isset($saved['hasTransparency']) ? (bool) $saved['hasTransparency'] : null,
         ];
     }
 
@@ -134,6 +140,8 @@ class SettingsController extends Controller
                 'themeColor' => $themeColor,
                 'detectedColor' => $data['branding']['detectedColor'] ?? null,
                 'detectedThemeColor' => $data['branding']['detectedThemeColor'] ?? null,
+                'logoBg' => $data['branding']['logoBg'] ?? null,
+                'hasTransparency' => isset($data['branding']['hasTransparency']) ? (bool) $data['branding']['hasTransparency'] : null,
             ]);
         }
     }

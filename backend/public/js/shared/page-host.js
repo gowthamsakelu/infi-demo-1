@@ -7,6 +7,7 @@ import { toast } from './ui.js';
 import { confirmDialog } from './sheet.js';
 import { setAddAction } from './add-button.js';
 import { getJson } from './http.js';
+import { updateSystemLogos, updateSystemCompanyTitle } from './branding.js';
 
 let current = null; // { key, host, instance, token }
 let token = 0;
@@ -112,6 +113,8 @@ export async function mountPage(key, host) {
   if (mine !== token) { instance?.destroy?.(); return; }
   current = { key, host, instance };
   mounting = null;
+  updateSystemLogos();
+  updateSystemCompanyTitle();
   setTimeout(() => host.classList.remove('is-entering'), 260);
   prefetchPages(key);
 }

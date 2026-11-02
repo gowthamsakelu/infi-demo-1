@@ -21,6 +21,7 @@ import { openAddInquiry } from './shared/add-inquiry.js';
 import { addButtonHtml, setShellAddAction } from './shared/add-button.js';
 import { paneLayout, selectedParam, writeSelected, chooseRecord, bindListKeys } from './shared/split-view.js';
 import { createDesktopTeam } from './team-desktop.js';
+import { getBranding } from './shared/branding.js';
 
 export function createDesktopView(container) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -53,7 +54,7 @@ export function createDesktopView(container) {
             </svg>
           </div>
           <div class="brand-text-col">
-            <h2>Ruyi Admin</h2>
+            <h2>${esc(getBranding().companyName || 'Ruyi Admin')}</h2>
             <p>Travel Operations</p>
           </div>
         </div>
@@ -1270,7 +1271,7 @@ export function createDesktopView(container) {
             <div class="custom-radio ${isSel ? 'checked' : ''}">
               ${isSel ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
             </div>
-            <img src="${item.avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
+            <img src="${item.avatar}" class="crm-logo-img" data-crm-logo="true" data-logo-src="${item.avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
             <div class="vendor-info">
               <h4 style="font-size: 13.5px; margin: 0;">${item.name}</h4>
               <p style="font-size: 12px; color: #64748B; margin: 0;">${item.sub}</p>
@@ -1401,7 +1402,13 @@ export function createDesktopView(container) {
     window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
     loadFollowUps();
     loadInquiries();
-    syncBookingPayments().then(() => renderTable());
+    syncBookingPayments().then(() => {
+      bookingsData.splice(0, bookingsData.length, ...INITIAL_BOOKINGS);
+      if (page === 'bookings') {
+        bookings = bookingsData;
+        renderTable();
+      }
+    });
 
     bindSidebar(container.querySelector('.desktop-sidebar'));
 
@@ -1703,6 +1710,13 @@ export function createDesktopView(container) {
 
       if (e.target.closest('#desktop-btn-done-special-req') || e.target.closest('#close-desktop-special-req-modal-btn')) {
         closeDesktopSpecialReqModal();
+        if (activeBooking && activeBooking.kind !== 'inquiry') {
+          fetch(`/api/bookings/${encodeURIComponent(activeBooking.id)}/special-requirements`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ special_requirements: activeBooking.specialRequirements || [] })
+          }).catch(() => {});
+        }
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Special requirements updated successfully!', type: 'success' }
         }));
@@ -2048,6 +2062,35 @@ export function createDesktopView(container) {
           activeBooking.notes = notes;
         }
 
+        if (activeBooking.kind === 'inquiry') {
+          fetch(`/api/inquiries/${encodeURIComponent(activeBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              customer_name: name,
+              customer_phone: phone || null,
+              customer_email: email || null,
+              location: location || null,
+              notes: notes || null,
+            })
+          }).catch(() => {});
+        } else {
+          fetch(`/api/bookings/${encodeURIComponent(activeBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              name,
+              phone,
+              email,
+              location,
+              travel_dates: dates,
+              budget,
+              status,
+              notes
+            })
+          }).catch(() => {});
+        }
+
         container.querySelector('#desktop-edit-customer-modal')?.classList.remove('open');
         renderDetailPanel();
         renderTable();
@@ -2121,10 +2164,29 @@ export function createDesktopView(container) {
       // Confirm Booking Button inside Drawer
       if (e.target.closest('#desktop-confirm-booking-btn')) {
         if (activeBooking?.kind === 'inquiry') {
+          activeBooking.status = 'Hot';
+          activeBooking.statusClass = 'status-inq-hot';
+          fetch(`/api/inquiries/${encodeURIComponent(activeBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ status: 'hot' })
+          }).catch(() => {});
           toast(`Inquiry ${activeBooking.id} (${activeBooking.title}) confirmed.`, 'success');
+          renderTable();
+          renderDetailPanel();
           return;
         }
         if (activeBooking) {
+          activeBooking.status = 'Confirmed';
+          activeBooking.statusClass = 'status-confirmed';
+          if (activeBooking.customer) activeBooking.customer.status = 'Confirmed';
+          fetch(`/api/bookings/${encodeURIComponent(activeBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ status: 'Confirmed' })
+          }).catch(() => {});
+          renderTable();
+          renderDetailPanel();
           window.dispatchEvent(new CustomEvent('show-toast', {
             detail: { message: `Booking ${activeBooking.id} (${activeBooking.title}) confirmed successfully! Vouchers sent.`, type: 'success' }
           }));
