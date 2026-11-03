@@ -30,6 +30,15 @@ return [
         'base_url' => env('GOOGLE_PLACES_BASE_URL', 'https://places.googleapis.com'),
     ],
 
+    // Rayna B2B Tour API
+    'rayna' => [
+        'mode' => env('RAYNA_MODE', 'mock'),
+        'base_url' => env('RAYNA_BASE_URL', 'https://api.raynab2b.com'),
+        'token' => env('RAYNA_TOKEN'),
+        'timeout' => (int) env('RAYNA_TIMEOUT', 30),
+        'image_base' => env('RAYNA_IMAGE_BASE', 'https://d2cazmkfw8kdtj.cloudfront.net'),
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],
