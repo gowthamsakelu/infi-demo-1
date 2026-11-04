@@ -1,0 +1,147 @@
+{
+  "name": "Rayna B2B Tour API",
+  "docsUrl": ["https://raynab2b.com/introduction.aspx", "https://www.raynab2b.ae/api/Introduction.aspx"],
+  "support": {"technical": "xmloutsupport@raynatours.com", "sales": "online@raynab2b.com"},
+  "connection": {
+    "method": "POST",
+    "contentType": "application/json",
+    "encoding": "UTF-8",
+    "https": true,
+    "staticIpWhitelistRequired": true,
+    "baseUrl": "UNKNOWN - ask Rayna account manager (separate Test and Live URLs)",
+    "auth": "UNCONFIRMED - docs only say 'Access token'. Assumed header 'Authorization: Bearer <token>'. Confirm with Rayna.",
+    "testEnvironment": "Email support to start testing; test bookings are not sent to suppliers; product set differs from Live.",
+    "logRetention": "Keep booking and cancellation request/response logs at least 6 months."
+  },
+  "dateFormats": {
+    "allowed": ["MM/dd/yyyy", "MM-dd-yyyy", "yyyy-MM-dd", "yyyy/MM/dd", "MM.dd.yyyy"],
+    "note": "Error 112 text says MM-DD-YYYY. Policy endpoint requires travelDate yyyy-MM-dd and currentDate yyyy/MM/dd/HH/mm. Policy response fromDate/toDate are MM-DD-YYYY."
+  },
+  "imageBase": "https://d2cazmkfw8kdtj.cloudfront.net",
+  "imageExample": "https://d2cazmkfw8kdtj.cloudfront.net/Tour-Images/false-4850/fly-fish.jpg",
+  "imageSizes": {"front": "270x180", "gallery": "900x500", "background": "1902x572"},
+  "flow": [
+    "countries -> cities",
+    "tourlist (tourId, contractId, price) and tourstaticdata (names, images, isSlot, onlyChild)",
+    "touroption (transferId, tourOptionId, prices)",
+    "timeslot ONLY if option isSlot = true",
+    "availability",
+    "tour/policy (cancellation charges, optional display)",
+    "bookings (use adultRate/childRate from touroption; lower than system price = error 100)",
+    "GetBookedTickets ONLY if booking result downloadRequired = true",
+    "cancelbooking when needed"
+  ],
+  "responseEnvelope": {"statuscode": 200, "error": "string|null", "url": "CDN path", "count": 0, "result": []},
+  "transferTypes": [
+    {"id": 41865, "name": "Without Transfer"},
+    {"id": 41843, "name": "Sharing Transfer"},
+    {"id": 41844, "name": "Private Transfer"},
+    {"id": 43129, "name": "Private Boat Without Transfers"},
+    {"id": 43110, "name": "Pvt Yacht Without Transfer"}
+  ],
+  "httpStatus": {"200": "OK", "400": "Bad request", "401": "Unauthorized", "403": "Forbidden", "404": "Not found", "500": "Server error", "503": "Unavailable"},
+  "customErrorCodes": {
+    "100": "AdultRate or ChildRate is lower than system price",
+    "101": "Insufficient credit limit",
+    "102": "Travel date must not be before current date",
+    "103": "Adult must be more than zero",
+    "104": "Pickup details compulsory for Private/Sharing transfer",
+    "105": "Start time compulsory",
+    "106": "Pax type missing or invalid",
+    "107": "Tour not available",
+    "108": "Event id / start date and time incorrect",
+    "109": "Wrong city id",
+    "110": "Tour not available for this city",
+    "111": "Travel date compulsory",
+    "112": "Travel date must be MM-DD-YYYY",
+    "113": "Invalid transfer type"
+  },
+  "bookingStatuses": {
+    "Success": "referenceNo is guaranteed proof of reservation",
+    "Rejected": "price change, no allocation, stop sale, sold out or session timeout; amount credited to your Rayna wallet instantly",
+    "Cancelled": "not confirmed at supplier, or cancelled by user"
+  },
+  "endpoints": [
+    {
+      "name": "countries", "path": "/api/Tour/countries", "method": "POST",
+      "request": {},
+      "response": {"result": [{"countryId": 0, "countryName": ""}]}
+    },
+    {
+      "name": "cities", "path": "/api/Tour/cities", "method": "POST",
+      "request": {"CountryId": 0},
+      "response": {"result": [{"cityId": 0, "cityName": ""}]}
+    },
+    {
+      "name": "tourStaticData", "path": "/api/Tour/tourstaticdata", "method": "POST",
+      "request": {"countryId": 0, "cityId": 0},
+      "response": {"result": [{"tourId": 0, "countryId": 0, "countryName": "", "cityId": 0, "cityName": "", "tourName": "", "reviewCount": 0, "rating": 0.0, "duration": "", "imagePath": "", "imageCaptionName": "", "cityTourTypeId": 0, "cityTourType": "", "tourShortDescription": "", "cancellationPolicyName": "", "isSlot": false, "onlyChild": false, "contractId": 0}]}
+    },
+    {
+      "name": "tourStaticDataById", "path": "/api/Tour/tourStaticDataById", "method": "POST",
+      "request": {"countryId": 0, "cityId": 0, "tourId": 0, "contractId": 0, "travelDate": "yyyy-MM-dd"},
+      "response": {"result": [{"tourId": 0, "tourName": "", "departurePoint": "", "reportingTime": "", "tourLanguage": "", "tourDescription": "", "tourInclusion": "", "raynaToursAdvantage": "", "whatsInThisTour": "", "importantInformation": "", "itenararyDescription": "", "usefulInformation": "", "faqDetails": "", "termsAndConditions": "", "cancellationPolicyName": "", "cancellationPolicyDescription": "", "childCancellationPolicyName": "", "childCancellationPolicyDescription": "", "childAge": "", "infantAge": "", "infantCount": 0, "isSlot": false, "onlyChild": false, "contractId": 0, "tourImages": [{"imagePath": "", "imageCaptionName": "", "isFrontImage": false, "isBannerImage": false, "isBannerRotateImage": false}], "tourReview": [{"reviewId": 0, "reviewTitle": "", "reviewContent": "", "visitMonth": "", "rating": 0, "guestName": ""}]}]}
+    },
+    {
+      "name": "tourOptionStaticData", "path": "/api/Tour/touroptionstaticdata", "method": "POST",
+      "request": {"tourId": 0, "contractId": 0},
+      "response": {"result": {"touroption": [{"tourOptionId": 0, "optionName": "", "minPax": 0, "maxPax": 0, "duration": "", "timeZone": ""}], "operationdays": [{"tourOptionId": 0, "monday": true, "tuesday": true, "wednesday": true, "thursday": true, "friday": true, "saturday": true, "sunday": true}], "specialdates": [], "transfertime": [{"tourOptionId": 0, "transferType": "", "transferTime": "", "duration": ""}]}},
+      "note": "Doc sample shows result as an object with these four keys."
+    },
+    {
+      "name": "tourList (price)", "path": "/api/Tour/tourlist", "method": "POST",
+      "request": {"countryId": 0, "cityId": 0, "travelDate": "yyyy-MM-dd"},
+      "response": {"result": [{"tourId": 0, "contractId": 0, "amount": 0.0, "discount": 0.0, "sortOrder": 0}]}
+    },
+    {
+      "name": "tourOptions", "path": "/api/Tour/touroption", "method": "POST",
+      "request": {"tourId": 0, "contractId": 0, "travelDate": "yyyy-MM-dd", "noOfAdult": 1, "noOfChild": 0, "noOfInfant": 0},
+      "response": {"result": [{"tourId": 0, "tourOptionId": 0, "transferId": 0, "transferName": "", "adultPrice": 0.0, "childPrice": 0.0, "infantPrice": 0.0, "withoutDiscountAmount": 0.0, "finalAmount": 0.0, "startTime": "", "departureTime": "", "disableChild": false, "disableInfant": false, "allowTodaysBooking": true, "cutOff": 0, "isSlot": false, "isDefaultTransfer": 0, "rateKey": "", "inventoryId": 0}]}
+    },
+    {
+      "name": "tourTimeslot", "path": "/api/Tour/timeslot", "method": "POST",
+      "request": {"tourId": 0, "tourOptionId": 0, "travelDate": "yyyy-MM-dd", "transferId": 0, "adult": 1, "child": 0, "contractId": 0},
+      "response": {"result": [{"tourOptionId": 0, "timeSlotId": "", "timeSlot": "", "available": 0, "adultPrice": 0.0, "childPrice": 0.0, "isDynamicPrice": false}]},
+      "note": "Use only when option isSlot=true. If isDynamicPrice=false use the price from touroption."
+    },
+    {
+      "name": "tourAvailability", "path": "/api/Tour/availability", "method": "POST",
+      "request": {"tourId": 0, "tourOptionId": 0, "transferId": 0, "travelDate": "yyyy-MM-dd", "adult": 1, "child": 0, "infant": 0, "contractId": 0},
+      "response": {"result": [{"status": 1, "message": "success", "productType": 0}]},
+      "note": "message == 'success' means bookable. Other messages are human-readable reasons (date-only, date range, stop sell, child/infant not allowed, transfer not available, tickets unavailable)."
+    },
+    {
+      "name": "tourCancellationPolicy", "path": "/api/Tour/policy", "method": "POST",
+      "request": {"tourId": 0, "travelDate": "yyyy-MM-dd", "startTime": "HH:mm", "currentDate": "yyyy/MM/dd/HH/mm", "contractId": 0, "tourOptionId": 0},
+      "response": {"statuscode": 200, "error": null, "currency": "AED", "currencysymbol": "", "errormessage": "", "count": 0, "result": [{"tourId": 0, "optionId": 0, "fromDate": "MM-DD-YYYY", "toDate": "MM-DD-YYYY", "percentage": 100}]}
+    },
+    {
+      "name": "tourBooking", "path": "/api/Booking/bookings", "method": "POST",
+      "request": {
+        "uniqueNo": 0,
+        "TourDetails": [{"serviceUniqueId": 0, "tourId": 0, "optionId": 0, "adult": 1, "child": 0, "infant": 0, "tourDate": "yyyy-MM-dd", "timeSlotId": 0, "startTime": "", "transferId": 0, "pickup": "", "adultRate": 0.0, "childRate": 0.0, "serviceTotal": "adultRate+childRate"}],
+        "passengers": [{"serviceType": "tour", "prefix": "Mr.", "firstName": "", "lastName": "", "email": "", "mobile": "", "nationality": "", "message": "", "leadPassenger": 1, "paxType": "Adult", "clientReferenceNo": ""}]
+      },
+      "requestNotes": [
+        "uniqueNo: your own booking id, must be unique per booking",
+        "serviceUniqueId: unique per tour in the booking, max 6 digits; may equal uniqueNo when booking one tour",
+        "optionId = tourOptionId from touroption; timeSlotId only if isSlot",
+        "pickup mandatory for Private/Sharing transfer (error 104)",
+        "one passengers entry per pax; leadPassenger 1 for the lead, 0 for others; paxType Adult|Child|Infant"
+      ],
+      "response": {"result": [{"refernceNo": "", "status": "Success|Rejected|Cancelled", "bookingId": 0, "downloadRequired": true, "serviceUniqueId": "", "servicetype": "tour", "confirmationNo": ""}]},
+      "note": "Note the API's own spelling 'refernceNo'. Never auto-retry a booking: it can create duplicates."
+    },
+    {
+      "name": "ticketDetails", "path": "/api/Booking/GetBookedTickets", "method": "POST",
+      "request": {"uniqNO": 0, "referenceNo": "", "bookedOption": [{"serviceUniqueId": 0, "bookingId": 0}]},
+      "response": {"statuscode": 200, "error": null, "result": {"bookingId": 0, "referenceNo": "", "BookingStatus": "", "ticketURL": "", "optionName": "", "validity": "", "validityExtraDetails": "", "printType": "barcode|QR", "slot": "", "pnrNumber": "", "ticketDetails": [{"barCode": "", "type": "", "noOfAdult": 0, "noOfchild": 0}]}},
+      "note": "Request key is 'uniqNO' (sic). Call only when booking downloadRequired is true."
+    },
+    {
+      "name": "tourCancellation", "path": "/api/Booking/cancelbooking", "method": "POST",
+      "request": {"bookingId": 0, "referenceNo": "", "cancellationReason": ""},
+      "response": {"result": []}
+    }
+  ]
+}
