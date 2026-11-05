@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Http\Controllers\Concerns\ReadsRuyi;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveTourPackageRequest;
 use App\Models\Inquiry;
 use App\Models\TourPackage;
 use App\Support\DummyData;
 use App\Support\DataUrlImage;
+use App\Support\Ruyi\RuyiPages;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -15,8 +17,14 @@ use Illuminate\Support\Facades\Schema;
 /** Tour Packages page: the list carries what a row shows; the detail adds the day-wise itinerary (in the itinerary builder shape) and the inquiries. */
 class TourPackageController extends Controller
 {
+    use ReadsRuyi;
+
     public function index(): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'package'], $this->ruyi()->all('packages')));
+        }
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('tour-packages')]);
         }
@@ -30,8 +38,25 @@ class TourPackageController extends Controller
         return response()->json(['success' => true, 'data' => $rows->map(fn (TourPackage $p) => $this->row($p))->values()]);
     }
 
-    public function show(int $id): JsonResponse
+    /** The id is text: a Ruyi package is PKG_425, a record of this app's own table is a number. */
+    public function show(string $id): JsonResponse
     {
+        if ($this->ruyiOn() && ! ctype_digit($id)) {
+            return $this->fromRuyi(function () use ($id) {
+                foreach ($this->ruyi()->all('packages') as $package) {
+                    if (($package['id'] ?? null) === $id) {
+                        return RuyiPages::packageDetail($package);
+                    }
+                }
+                abort(404);
+            });
+        }
+
+        if (! ctype_digit($id)) {
+            abort(404);
+        }
+        $id = (int) $id;
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::detail('tour-packages', $id) ?? abort(404)]);
         }
@@ -42,7 +67,7 @@ class TourPackageController extends Controller
     /** Add a package from the wizard. With dummy data on nothing is written: the record is returned for the page to keep in memory. */
     public function store(SaveTourPackageRequest $request): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
         }
 
@@ -59,7 +84,7 @@ class TourPackageController extends Controller
     /** The id is a number on the real tables; with dummy data it can be an id the wizard made this session ("new-..."), kept in memory. */
     public function update(SaveTourPackageRequest $request, string $tourPackage): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
         }
 

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Http\Controllers\Concerns\ReadsRuyi;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateBlogPostRequest;
 use App\Models\BlogPost;
 use App\Support\DataUrlImage;
 use App\Support\DummyData;
+use App\Support\Ruyi\RuyiPages;
 use Illuminate\Support\Carbon;
 use App\Http\Requests\SaveBlogPostRequest;
 use Illuminate\Support\Str;
@@ -15,8 +17,18 @@ use Illuminate\Http\JsonResponse;
 /** Blogs page: the four stat cards are real sums over blog_posts, and the list is the articles, newest first. */
 class BlogController extends Controller
 {
+    use ReadsRuyi;
+
     public function index(): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(function () {
+                $posts = array_map([RuyiPages::class, 'blogPost'], $this->ruyi()->all('blogs'));
+
+                return ['stats' => ['total' => count($posts), 'views' => 0, 'leads' => 0, 'converted' => 0], 'posts' => $posts];
+            });
+        }
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::file('blogs')]);
         }
@@ -30,8 +42,13 @@ class BlogController extends Controller
     }
 
     /** Publish now, schedule, or move back to draft. */
-    public function update(UpdateBlogPostRequest $request, BlogPost $post): JsonResponse
+    public function update(UpdateBlogPostRequest $request, string $postId): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->ruyiReadOnly();
+        }
+
+        $post = BlogPost::query()->findOrFail((int) $postId);
         $status = $request->input('status');
         $data = ['status' => $status];
         if ($status === 'published' && (! $post->published_at || $post->published_at->isFuture())) {
@@ -68,6 +85,10 @@ class BlogController extends Controller
     /** Delete an article. With dummy data nothing is deleted: the page drops it from its in-memory list. */
     public function destroy(string $post): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->ruyiReadOnly();
+        }
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
         }
@@ -80,7 +101,7 @@ class BlogController extends Controller
     /** Add an article from the wizard. With dummy data nothing is written. */
     public function store(SaveBlogPostRequest $request): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
         }
 
@@ -92,7 +113,7 @@ class BlogController extends Controller
     /** Save the article the wizard was opened on (the id is a string: with dummy data it can be one the page made this session). */
     public function save(SaveBlogPostRequest $request, string $post): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
         }
 

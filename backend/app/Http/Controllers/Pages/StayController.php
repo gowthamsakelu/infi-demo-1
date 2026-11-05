@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Http\Controllers\Concerns\ReadsRuyi;
 use App\Http\Controllers\Controller;
 use App\Models\SavedHotel;
 use App\Support\DummyData;
@@ -10,11 +11,20 @@ use App\Http\Requests\SaveStayRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
-/** Stays page. Reads `saved_hotels`, the table the itinerary builder's hotel search fills, with its rooms and rates. */
+/**
+ * Stays page. Reads `saved_hotels`, the table the itinerary builder's hotel search fills, with its rooms and rates.
+ * While RUYI_PAGES is on (the default) it shows the live Ruyi Travels hotels instead, read only: Add and Edit write nothing anywhere.
+ */
 class StayController extends Controller
 {
+    use ReadsRuyi;
+
     public function index(): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(fn () => array_map(fn (array $h) => $this->ruyiRow($h), $this->ruyi()->all('hotels')));
+        }
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('stays')]);
         }
@@ -22,8 +32,25 @@ class StayController extends Controller
         return response()->json(['success' => true, 'data' => Cache::remember('pages.stays.index', 60, fn () => SavedHotel::query()->orderBy('id')->get()->map(fn ($h) => $this->row($h))->values()->all())]);
     }
 
-    public function show(int $id): JsonResponse
+    /** The id is text: a Ruyi hotel is HTL_537, a record of this app's own table is a number. */
+    public function show(string $id): JsonResponse
     {
+        if ($this->ruyiOn() && ! ctype_digit($id)) {
+            return $this->fromRuyi(function () use ($id) {
+                foreach ($this->ruyi()->all('hotels') as $hotel) {
+                    if (($hotel['id'] ?? null) === $id) {
+                        return $this->ruyiDetail($hotel);
+                    }
+                }
+                abort(404);
+            });
+        }
+
+        if (! ctype_digit($id)) {
+            abort(404);
+        }
+        $id = (int) $id;
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::detail('stays', $id) ?? abort(404)]);
         }
@@ -67,10 +94,47 @@ class StayController extends Controller
         ];
     }
 
-    /** Add a stay from the wizard. With dummy data nothing is written. */
+    /** A Ruyi hotel as a list row. The Ruyi list has no rating, review count, room count or booking count, so those stay empty. */
+    private function ruyiRow(array $h): array
+    {
+        return [
+            'id' => $h['id'],
+            'image' => $h['image'],
+            'name' => $h['name'] ?? 'Untitled stay',
+            'city' => $h['city'] ?? $h['locality'],
+            'region' => $h['state'] ?? $h['destination'],
+            'tag' => $h['tag'] ?: 'hotel',
+            'status' => 'active',
+            'rating' => null,
+            'reviews' => 0,
+            'roomsCount' => null,
+            'price' => $h['price'],
+            'bookings' => 0,
+        ];
+    }
+
+    /** The detail pane: the same row plus what the Ruyi list does have (address, amenities). No rooms or rates, no revenue: the list does not carry them. */
+    private function ruyiDetail(array $h): array
+    {
+        return $this->ruyiRow($h) + [
+            'address' => $h['address'],
+            'phone' => null,
+            'email' => null,
+            'description' => null,
+            'amenities' => $h['inclusions'] ?? [],
+            'inclusions' => [],
+            'exclusions' => [],
+            'extraCharges' => [],
+            'priceNote' => 'Live listing from ruyitravels.com (read only). Rooms, rates and bookings are not in the public list.',
+            'revenue' => null,
+            'rooms' => [],
+        ];
+    }
+
+    /** Add a stay from the wizard. With dummy data, or the live Ruyi data, nothing is written: the page keeps the record in memory. */
     public function store(SaveStayRequest $request): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
         }
 
@@ -83,7 +147,7 @@ class StayController extends Controller
     /** Save the stay the wizard was opened on (the id is a string: with dummy data it can be one the page made this session). */
     public function save(SaveStayRequest $request, string $stay): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
         }
 

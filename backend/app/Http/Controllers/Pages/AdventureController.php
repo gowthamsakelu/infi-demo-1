@@ -2,18 +2,26 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Http\Controllers\Concerns\ReadsRuyi;
 use App\Http\Controllers\Controller;
 use App\Models\SavedActivity;
 use App\Support\DummyData;
 use App\Support\DataUrlImage;
+use App\Support\Ruyi\RuyiPages;
 use App\Http\Requests\SaveAdventureRequest;
 use Illuminate\Http\JsonResponse;
 
 /** Adventures page. Reads `saved_activities`, the table the itinerary builder's activity search fills. A record is small, so the list carries all of it. */
 class AdventureController extends Controller
 {
+    use ReadsRuyi;
+
     public function index(): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'adventure'], $this->ruyi()->all('activities')));
+        }
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('adventures')]);
         }
@@ -49,7 +57,7 @@ class AdventureController extends Controller
     /** Add an adventure from the wizard. With dummy data nothing is written. */
     public function store(SaveAdventureRequest $request): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
         }
 
@@ -61,7 +69,7 @@ class AdventureController extends Controller
     /** Save the adventure the wizard was opened on (the id is a string: with dummy data it can be one the page made this session). */
     public function save(SaveAdventureRequest $request, string $activity): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
         }
 

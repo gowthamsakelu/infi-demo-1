@@ -9,8 +9,8 @@ import { pill, tag, tile, statRow, sectionTitle, detailGrid, rowGroup, linkRow, 
 import { card, optionsOf, place, filled, inclusionsCard, bulletCard, overviewCard, heroImage } from './catalog-ui.js';
 
 // HOTEL is blue, VILLA yellow, RESORT teal (the shared tag colours)
-const TAG_KIND = { hotel: 'resort', villa: 'villa', resort: 'activity' };
-const TAG_LABEL = { hotel: 'Hotel', villa: 'Villa', resort: 'Resort' };
+const TAG_KIND = { hotel: 'resort', villa: 'villa', resort: 'activity', pg: 'villa', rent: 'villa' };
+const TAG_LABEL = { hotel: 'Hotel', villa: 'Villa', resort: 'Resort', pg: 'PG', rent: 'Rental' };
 const PLANS = [['stay', 'Only stay'], ['breakfast', '+ Breakfast'], ['map', '+ Breakfast & Dinner'], ['all', 'All meals']];
 const rating = (s) => (s.rating != null ? `★ ${s.rating}` : '');
 
@@ -168,6 +168,7 @@ export default {
         { key: 'hotels', label: 'Hotels', test: (s) => s.tag === 'hotel' },
         { key: 'villas', label: 'Villas', test: (s) => s.tag === 'villa' },
         { key: 'resorts', label: 'Resorts', test: (s) => s.tag === 'resort' },
+        { key: 'pg', label: 'PG', test: (s) => s.tag === 'pg' },
       ],
       filter: {
         allLabel: 'All Cities',
