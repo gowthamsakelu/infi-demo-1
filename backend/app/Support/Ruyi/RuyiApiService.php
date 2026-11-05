@@ -70,6 +70,47 @@ class RuyiApiService
         return $rows;
     }
 
+    /** Whether the admin pages should show the live Ruyi data (RUYI_PAGES, on by default). */
+    public function pagesOn(): bool
+    {
+        return (bool) config('services.ruyi.pages', true);
+    }
+
+    /**
+     * Every row of a list: page after page, the next page starting where the rows so far end, until a page brings nothing new
+     * (an empty page, or the same rows again) or `$maxPages` is reached. Kept for a few minutes so the admin pages do not hit the Ruyi site on every click.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function all(string $kind, int $maxPages = 25): array
+    {
+        $load = function () use ($kind, $maxPages): array {
+            $rows = [];
+            $seen = [];
+            for ($page = 0; $page < $maxPages; $page++) {
+                $new = 0;
+                foreach ($this->list($kind, count($rows)) as $row) {
+                    $id = $row['id'] ?? null;
+                    if ($id === null || isset($seen[$id])) {
+                        continue;
+                    }
+                    $seen[$id] = true;
+                    $rows[] = $row;
+                    $new++;
+                }
+                if ($new === 0) {
+                    break;
+                }
+            }
+
+            return $rows;
+        };
+
+        $seconds = (int) config('services.ruyi.all_cache_seconds', 300);
+
+        return $seconds > 0 ? Cache::remember('ruyi.all.'.$kind, $seconds, $load) : $load();
+    }
+
     /** Ask the Ruyi site for one page. The request is a POST with the page in the query string, exactly like the Postman collection. */
     private function fetch(string $kind, int $row, ?string $filters): array
     {
@@ -153,6 +194,7 @@ class RuyiApiService
                 'id' => self::str($r['BLOG_ID'] ?? null),
                 'title' => self::str($r['TITLE'] ?? null),
                 'excerpt' => self::text($r['DESCRIPTION'] ?? null, 240),
+                'content' => self::paragraphs($r['DESCRIPTION'] ?? null, 6000),
                 'image' => $image,
                 'createdDate' => self::str($r['CREATED_DATE'] ?? null),
                 'createdAt' => self::isoDate($r['CREATED_DATE'] ?? null),
@@ -175,7 +217,7 @@ class RuyiApiService
                 continue;
             }
             $value = is_string($value) ? trim($value) : $value;
-            if (is_string($value) && (strlen($value) > 300 || str_starts_with($value, 'data:'))) {
+            if (is_string($value) && (strlen($value) > 1000 || str_starts_with($value, 'data:'))) {
                 continue;
             }
             $out[lcfirst(str_replace(' ', '', ucwords(strtolower(str_replace('_', ' ', (string) $key)))))] = $value;
@@ -234,8 +276,26 @@ class RuyiApiService
         }
         $s = preg_replace('#<(script|style)\b.*?</\1>#is', ' ', $s) ?? $s;
         $s = preg_replace('#<img\b[^>]*>#i', ' ', $s) ?? $s;
+        $s = preg_replace('#</(p|div|h[1-6]|li|ul|ol|tr|td)>|<br\s*/?>#i', ' ', $s) ?? $s;
         $s = html_entity_decode(strip_tags($s), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $s = trim(preg_replace('/\s+/u', ' ', $s) ?? $s);
+
+        return $s === '' ? null : mb_strimwidth($s, 0, $max, '…', 'UTF-8');
+    }
+
+    /** Like text(), but headings, paragraphs, list items and line breaks stay as blank-line separated paragraphs (for an article's body). */
+    private static function paragraphs(mixed $v, int $max): ?string
+    {
+        $s = self::str($v);
+        if ($s === null) {
+            return null;
+        }
+        $s = preg_replace('#<(script|style)\b.*?</\1>#is', ' ', $s) ?? $s;
+        $s = preg_replace('#<img\b[^>]*>#i', ' ', $s) ?? $s;
+        $s = preg_replace('#</(p|div|h[1-6]|li|ul|ol|tr)>|<br\s*/?>#i', "\n\n", $s) ?? $s;
+        $s = html_entity_decode(strip_tags($s), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $lines = array_map(fn ($l) => trim((string) preg_replace('/[ \t\x{00A0}]+/u', ' ', $l)), preg_split('/\R/u', $s) ?: []);
+        $s = trim((string) preg_replace("/\n{3,}/", "\n\n", implode("\n", $lines)));
 
         return $s === '' ? null : mb_strimwidth($s, 0, $max, '…', 'UTF-8');
     }

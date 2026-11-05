@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Http\Controllers\Concerns\ReadsRuyi;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateTransportRequest;
 use App\Models\VehicleType;
 use App\Support\DummyData;
 use App\Support\DataUrlImage;
+use App\Support\Ruyi\RuyiPages;
 use App\Http\Requests\SaveVehicleRequest;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
@@ -14,8 +16,21 @@ use Illuminate\Http\JsonResponse;
 /** Transport page. It reads and edits the itinerary builder's own `vehicle_types`; nothing is copied. */
 class TransportController extends Controller
 {
+    use ReadsRuyi;
+
     public function index(): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(function () {
+                $rows = [];
+                foreach ($this->ruyi()->all('transport') as $i => $vehicle) {
+                    $rows[] = RuyiPages::vehicle($vehicle, $i + 1);
+                }
+
+                return $rows;
+            });
+        }
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('transport')]);
         }
@@ -23,8 +38,14 @@ class TransportController extends Controller
         return response()->json(['success' => true, 'data' => VehicleType::query()->orderBy('popularity_rank')->orderBy('id')->get()->map(fn ($v) => $this->row($v))->values()]);
     }
 
-    public function update(UpdateTransportRequest $request, VehicleType $vehicleType): JsonResponse
+    /** The id is text on the live Ruyi list (TRN_26): those cannot be changed here. */
+    public function update(UpdateTransportRequest $request, string $vehicleType): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->ruyiReadOnly();
+        }
+
+        $vehicleType = VehicleType::query()->findOrFail((int) $vehicleType);
         $vehicleType->update($request->validated());
 
         return response()->json(['success' => true, 'data' => $this->row($vehicleType->refresh())]);
@@ -51,7 +72,7 @@ class TransportController extends Controller
     /** Add a vehicle from the wizard. With dummy data nothing is written. */
     public function store(SaveVehicleRequest $request): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
         }
 
@@ -66,7 +87,7 @@ class TransportController extends Controller
     /** Save the vehicle the wizard was opened on (the id is a string: with dummy data it can be one the page made this session). */
     public function save(SaveVehicleRequest $request, string $vehicleType): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
         }
 
