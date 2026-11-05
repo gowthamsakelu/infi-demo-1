@@ -39,6 +39,13 @@ return [
         'image_base' => env('RAYNA_IMAGE_BASE', 'https://d2cazmkfw8kdtj.cloudfront.net'),
     ],
 
+    // Live Ruyi Travels website API (read only lists: hotels, packages, activities, transport, blogs)
+    'ruyi' => [
+        'base_url' => env('RUYI_API_BASE', 'https://ruyitravels.com/api'),
+        'timeout' => (int) env('RUYI_TIMEOUT', 20),
+        'cache_seconds' => (int) env('RUYI_CACHE_SECONDS', 60),
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],
