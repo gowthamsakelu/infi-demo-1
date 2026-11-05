@@ -1,3 +1,4 @@
+
 # Render Infrastructure as Code (Blueprint)
 # Documentation: https://render.com/docs/blueprint-spec
 
@@ -13,35 +14,47 @@ services:
     plan: free
     region: oregon
     healthCheckPath: /up
+
     envVars:
       - key: APP_NAME
         value: "Ruyi Admin"
+
       - key: APP_ENV
         value: production
+
       - key: APP_DEBUG
         value: "false"
+
       - key: APP_KEY
         generateValue: true
+
       - key: LOG_CHANNEL
         value: stderr
+
       - key: DB_CONNECTION
         value: sqlite
+
       - key: DB_DATABASE
         value: /var/www/html/database/database.sqlite
+
       - key: SESSION_DRIVER
         value: database
+
       - key: CACHE_STORE
         value: database
+
       - key: QUEUE_CONNECTION
         value: database
 
   # ---------------------------------------------------------------------------
-  # 2. Standalone Frontend Demo (Free Render Static Site)
+  # 2. Standalone Frontend Demo (Static Site)
   # ---------------------------------------------------------------------------
-  - type: static
+  - type: web
     name: ruyi-admin-frontend
+    runtime: static
     buildCommand: ""
     staticPublishPath: ./frontend
+
     routes:
       - type: rewrite
         source: /*
