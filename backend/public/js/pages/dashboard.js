@@ -97,7 +97,11 @@ export default {
       const hostEl = container.querySelector('.dash-range-host');
       if (hostEl) {
         renderTabs(hostEl, { tabs: RANGES.map(([key, label]) => ({ key, label })), active: state.period, variant: 'mobile', attr: 'data-dash-period' });
-        hostEl.querySelector('[data-dash-period="custom"]')?.insertAdjacentHTML('afterbegin', icon('calendar', { size: 14, stroke: 2.2 }));
+        // Ensure no stray/duplicate icons are inserted into the Custom tab pill
+        const customBtn = hostEl.querySelector('[data-dash-period="custom"]');
+        if (customBtn) {
+          customBtn.querySelectorAll('svg').forEach((el) => el.remove());
+        }
       }
       const line = container.querySelector('.dash-range-line');
       if (line) line.innerHTML = `${icon('calendar', { size: 14, stroke: 2 })}<span>${esc(rangeText())}</span>${icon('chevronDown', { size: 14, stroke: 2.2 })}`;

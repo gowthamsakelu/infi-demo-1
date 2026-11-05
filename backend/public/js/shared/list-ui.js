@@ -25,7 +25,12 @@ export function renderTabs(host, { tabs, active, variant = 'desktop', attr = 'da
       button.classList.toggle('active', on);
       if (button.getAttribute('aria-selected') !== String(on)) button.setAttribute('aria-selected', String(on));
       const caption = variant === 'mobile' ? `${label(t)}${t.count == null ? '' : ' '}` : `${label(t)}${t.count == null ? '' : ` (${t.count})`}`;
-      if (button.firstChild.nodeValue !== caption) button.firstChild.nodeValue = caption;
+      const textNode = Array.from(button.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
+      if (textNode) {
+        if (textNode.nodeValue !== caption) textNode.nodeValue = caption;
+      } else if (button.firstChild && button.firstChild.nodeType === Node.TEXT_NODE) {
+        if (button.firstChild.nodeValue !== caption) button.firstChild.nodeValue = caption;
+      }
       if (variant === 'mobile') {
         let badge = button.querySelector('.pill-badge');
         if (t.count == null) badge?.remove();
