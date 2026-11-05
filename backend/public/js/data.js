@@ -214,7 +214,7 @@ export const INITIAL_BOOKINGS = [
         "time": "13 Jan • 10:15 AM",
         "title": "Assigned to Rahul Mehta",
         "desc": "Rahul assigned as tour coordinator.",
-        "user": "Karan Sapalia"
+        "user": "Arjun Kapoor"
       }
     ]
   },
@@ -2232,7 +2232,7 @@ export const STAFF_MEMBERS = [
   { id: 'ST-02', name: 'Priya Sharma', role: 'Trip Coordinator', phone: '+91 98765 00222', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80', activeTrips: 3 },
   { id: 'ST-03', name: 'Amit Patel', role: 'Senior Dispatch Lead', phone: '+91 98765 00333', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80', activeTrips: 5 },
   { id: 'ST-04', name: 'Vikram Sethi', role: 'Fleet & Logistics Lead', phone: '+91 98765 00444', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80', activeTrips: 2 },
-  { id: 'ST-05', name: 'Karan Sapalia', role: 'Head of Operations', phone: '+91 98765 00555', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80', activeTrips: 6 }
+  { id: 'ST-05', name: 'Arjun Kapoor', role: 'Head of Operations', phone: '+91 98765 00555', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80', activeTrips: 6 }
 ];
 
 export const VENDORS_LIST = [

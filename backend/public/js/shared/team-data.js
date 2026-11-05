@@ -15,7 +15,7 @@ export const OPERATIONS_TEAM_MEMBERS = [
     phone: '+91 98765 00111',
     joiningDate: '15 Mar 2021',
     experience: '5.5 Years',
-    reportingManager: 'Karan Sapalia (Head of Operations)',
+    reportingManager: 'Arjun Kapoor (Head of Operations)',
     officeLocation: 'Mumbai HQ — 4th Floor, Operations Wing (Desk 402)',
     bio: 'Oversees multi-day tour execution across North India and Kashmir circuits. Specialist in luxury boutique lodges, heated houseboat ops, and 24/7 mountain weather emergency dispatch.',
     metrics: {
@@ -226,7 +226,7 @@ export const OPERATIONS_TEAM_MEMBERS = [
     phone: '+91 98765 00333',
     joiningDate: '05 Jan 2020',
     experience: '6.5 Years',
-    reportingManager: 'Karan Sapalia (Head of Operations)',
+    reportingManager: 'Arjun Kapoor (Head of Operations)',
     officeLocation: 'Jaipur Logistics Hub — Station Road (Fleet Yard)',
     bio: 'Fleet management specialist with 10+ years in inter-state logistics. Directs 40+ contracted vehicles, tempo travelers, and luxury sedans across Rajasthan and North India highways.',
     metrics: {
@@ -423,7 +423,7 @@ export const OPERATIONS_TEAM_MEMBERS = [
   },
   {
     id: 'ST-05',
-    name: 'Karan Sapalia',
+    name: 'Arjun Kapoor',
     employeeId: 'EMP-2019-001',
     role: 'Head of Operations',
     department: 'Executive Operations & Strategic Dispatch',
@@ -431,7 +431,7 @@ export const OPERATIONS_TEAM_MEMBERS = [
     statusType: 'available',
     statusNote: 'On duty • Executive Command Center',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=240&q=80',
-    email: 'karan.sapalia@ruyitravel.com',
+    email: 'arjun.kapoor@ruyitravel.com',
     phone: '+91 98765 00555',
     joiningDate: '01 Jun 2019',
     experience: '7.5 Years',
@@ -607,7 +607,7 @@ export function buildTeamMember({ name, role, statusType, phone, email, empId, d
     phone,
     joiningDate: 'Today',
     experience: exp,
-    reportingManager: 'Karan Sapalia (Head of Operations)',
+    reportingManager: 'Arjun Kapoor (Head of Operations)',
     officeLocation: loc,
     bio: bio || `${role} coordinating travel operations, logistics and safety compliance.`,
     metrics: {

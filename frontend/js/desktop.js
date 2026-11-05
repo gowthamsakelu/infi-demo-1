@@ -137,9 +137,9 @@ export function createDesktopView(container) {
 
         <div class="sidebar-profile-box">
           <div class="profile-user-left">
-            <div class="ks-avatar-badge">KS</div>
+            <div class="ks-avatar-badge">AK</div>
             <div>
-              <h4>Karan Sapalia</h4>
+              <h4>Arjun Kapoor</h4>
               <p>Administrator</p>
             </div>
           </div>

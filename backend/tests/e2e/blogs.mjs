@@ -50,7 +50,7 @@ for (const [w, h] of [[1280, 800], [820, 1100], [390, 844]].filter(([x]) => !onl
     check(`${tag} columns Article / Author / Category / Views / Leads / Status`, JSON.stringify(heads) === JSON.stringify(['article', 'author', 'category', 'views', 'leads', 'status']), heads.join(','));
   }
   const firstRow = (await page.locator('.bg-row').first().innerText()).replace(/\s+/g, ' ');
-  check(`${tag} a row shows the article, author, category tag, views, leads and status`, /Karan Sapalia|Riya Sharma|Aman Joshi/.test(firstRow) && /TIPS|GUIDE|ITINERARY/.test(firstRow) && /Draft|Published|Scheduled/.test(firstRow), firstRow);
+  check(`${tag} a row shows the article, author, category tag, views, leads and status`, /Arjun Kapoor|Riya Sharma|Aman Joshi/.test(firstRow) && /TIPS|GUIDE|ITINERARY/.test(firstRow) && /Draft|Published|Scheduled/.test(firstRow), firstRow);
   check(`${tag} long titles are single-line with ellipsis`, await page.evaluate(() => [...document.querySelectorAll('.bg-art b')].every((e) => e.getBoundingClientRect().height < 26 && getComputedStyle(e).textOverflow === 'ellipsis')));
   check(`${tag} pills and tags never wrap`, await page.evaluate(() => [...document.querySelectorAll('.bg-row .status-pill, .bg-row .card-type-badge')].every((e) => e.getBoundingClientRect().height < 32)));
   check(`${tag} nothing in a row overlaps its neighbour`, await page.evaluate(() => [...document.querySelectorAll('.bg-row')].every((row) => {

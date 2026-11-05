@@ -165,7 +165,7 @@ export function createDesktopTeam({ colHost, detailHost, splitHost, isActive, on
         phone,
         joiningDate: 'Today',
         experience: exp,
-        reportingManager: 'Karan Sapalia (Head of Operations)',
+        reportingManager: 'Arjun Kapoor (Head of Operations)',
         officeLocation: loc,
         bio: bio || `${role} coordinating travel operations, logistics and safety compliance.`,
         metrics: {

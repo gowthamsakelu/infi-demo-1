@@ -48,7 +48,7 @@ class BlogsTest extends TestCase
         $this->assertSame(2, $posts->where('status', 'draft')->count());
         $this->assertSame(2, $posts->where('status', 'scheduled')->count());
         $this->assertEqualsCanonicalizing(['guide', 'itinerary', 'tips'], $posts->pluck('category')->unique()->values()->all());
-        $this->assertContains('Karan Sapalia', $posts->pluck('author')->all());
+        $this->assertContains('Arjun Kapoor', $posts->pluck('author')->all());
     }
 
     public function test_publishing_and_moving_back_to_draft_save_with_patch(): void

@@ -75,7 +75,7 @@ export function createMobileView(container, options = {}) {
               </svg>
               <span class="bell-dot" id="mobile-bell-dot"></span>
             </button>
-            <div class="ks-avatar-badge" title="Karan Sapalia">KS</div>
+            <div class="ks-avatar-badge" title="Arjun Kapoor">AK</div>
           </div>
         </div>
 

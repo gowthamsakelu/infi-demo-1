@@ -187,7 +187,7 @@ export default {
               ${icon('bell', { size: 22 })}
               <span class="bell-dot"></span>
             </button>
-            <button type="button" class="ks-avatar-badge" title="${esc(adminName || 'Karan Sapalia')}" aria-haspopup="menu" aria-label="Account menu">KS</button>
+            <button type="button" class="ks-avatar-badge" title="${esc(adminName || 'Arjun Kapoor')}" aria-haspopup="menu" aria-label="Account menu">AK</button>
           </div>
         </div>
       `;
@@ -196,7 +196,7 @@ export default {
     function renderWelcomeLeftInner(adminName, d) {
       const timeStr = formatLocalTime();
       const greeting = getTimeGreeting();
-      const name = adminName || 'Karan Sapalia';
+      const name = adminName || 'Arjun Kapoor';
       const dateText = d?.current_date ? d.current_date.replace(/^[A-Za-z]+,\s*/, '') : '28 Oct 2026';
       return `
         <div class="dash-welcome-title-row">

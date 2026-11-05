@@ -146,7 +146,7 @@ class DashboardController extends Controller
     private function buildDashboardData(string $period, $user): array
     {
         $admin = [
-            'name' => $user?->name ?? 'Karan Sapalia',
+            'name' => $user?->name ?? 'Arjun Kapoor',
             'email' => $user?->email ?? 'admin@ruyitravel.com',
             'role' => $user?->role ?? 'admin',
             'title' => $user?->title ?? 'Tour Operations Manager & Admin',

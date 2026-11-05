@@ -22,7 +22,7 @@ class UserController extends Controller
 {
     public function index(): JsonResponse
     {
-        $order = ['Rahul Mehta', 'Priya Sharma', 'Amit Patel', 'Vikram Sethi', 'Deepak Chopra', 'Karan Sapalia'];
+        $order = ['Rahul Mehta', 'Priya Sharma', 'Amit Patel', 'Vikram Sethi', 'Deepak Chopra', 'Arjun Kapoor'];
         $users = User::query()->get()->sortBy(function (User $u) use ($order) {
             $idx = array_search($u->name, $order);
             return $idx === false ? 999 : $idx;
@@ -127,7 +127,7 @@ class UserController extends Controller
             'joinedFormatted' => $joinedFormatted,
             'location' => $location,
             'bio' => $bio,
-            'reportingManager' => $user->name === 'Karan Sapalia' ? 'Board of Directors' : 'Karan Sapalia',
+            'reportingManager' => $user->name === 'Arjun Kapoor' ? 'Board of Directors' : 'Arjun Kapoor',
             'department' => 'Operations',
             'permissions' => collect(Permissions::MODULES)->map(fn (string $label, string $key) => ['module' => $key, 'label' => $label] + $matrix[$key])->values(),
             'permissionsSource' => $user->isAdmin() ? 'admin' : (Permissions::isCustom($user) ? 'custom' : 'role'),
@@ -191,7 +191,7 @@ class UserController extends Controller
         $avatar = $staff?->avatar ?? null;
         $roleLabel = match ($u->name) {
             'Rahul Mehta' => 'Admin',
-            'Priya Sharma', 'Karan Sapalia' => 'Manager',
+            'Priya Sharma', 'Arjun Kapoor' => 'Manager',
             'Amit Patel', 'Vikram Sethi', 'Deepak Chopra' => 'Staff',
             default => match ($u->role) {
                 'admin' => 'Admin',
@@ -202,7 +202,7 @@ class UserController extends Controller
         };
 
         $displayStatus = match ($u->status) {
-            'active' => ($u->name === 'Karan Sapalia' ? 'In Transit' : 'Active'),
+            'active' => ($u->name === 'Arjun Kapoor' ? 'In Transit' : 'Active'),
             'pending' => 'Pending',
             'inactive' => 'Inactive',
             default => ucfirst((string) $u->status),

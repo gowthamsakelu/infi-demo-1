@@ -226,7 +226,7 @@ function toBackendModules(fm) {
 function statusKey(u) {
   const ds = (u.displayStatus || '').toLowerCase();
   const st = (u.status || '').toLowerCase();
-  if (ds === 'in transit' || u.name === 'Karan Sapalia') return 'transit';
+  if (ds === 'in transit' || u.name === 'Arjun Kapoor') return 'transit';
   if (ds === 'pending' || st === 'pending' || u.name === 'Deepak Chopra') return 'pending';
   if (ds === 'inactive' || st === 'inactive') return 'inactive';
   return 'active';
@@ -407,7 +407,7 @@ export default {
       const roleClass = roleBadgeClass(item.roleLabel);
       const phone = d?.phone || item.phone || '+91 98765 00111';
       const location = d?.location || 'Mumbai, India';
-      const manager = d?.reportingManager || 'Karan Sapalia';
+      const manager = d?.reportingManager || 'Arjun Kapoor';
       const department = d?.department || 'Operations';
       const statusLabel = item.displayStatus || STATUS_NAMES[item.status] || (sKey === 'transit' ? 'In Transit' : (sKey === 'pending' ? 'Pending' : 'Active'));
       const cleanPhone = phone.replace(/[^0-9]/g, '');
@@ -601,7 +601,7 @@ export default {
         ['Account Status', item.displayStatus || STATUS_NAMES[item.status] || 'Active'],
         ['Joined On', d?.joinedFormatted || '15 Mar 2021'],
         ['Location', d?.location || 'Mumbai, India'],
-        ['Reporting Manager', d?.reportingManager || 'Karan Sapalia'],
+        ['Reporting Manager', d?.reportingManager || 'Arjun Kapoor'],
         ['Department', d?.department || 'Operations'],
       ]);
     }

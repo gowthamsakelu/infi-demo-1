@@ -65,9 +65,9 @@ export function createDesktopView(container) {
 
         <div class="sidebar-profile-box">
           <div class="profile-user-left">
-            <button type="button" class="ks-avatar-badge" aria-haspopup="menu" aria-label="Account menu">KS</button>
+            <button type="button" class="ks-avatar-badge" aria-haspopup="menu" aria-label="Account menu">AK</button>
             <div>
-              <h4>Karan Sapalia</h4>
+              <h4>Arjun Kapoor</h4>
               <p>Administrator</p>
             </div>
           </div>

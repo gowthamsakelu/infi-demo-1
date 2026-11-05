@@ -624,7 +624,7 @@ class BookingsManager extends Component
             'iconBg' => 'icon-blue',
             'title' => 'Operations Note',
             'desc' => trim($this->newNoteText),
-            'author' => 'By Karan Sapalia (Admin)'
+            'author' => 'By Arjun Kapoor (Admin)'
         ];
 
         $customer['leadFlow'] = $leadFlow;

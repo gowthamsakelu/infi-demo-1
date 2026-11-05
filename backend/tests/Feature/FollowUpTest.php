@@ -13,7 +13,7 @@ class FollowUpTest extends TestCase
 
     private function inquiry(): Inquiry
     {
-        Staff::create(['id' => 'ST-05', 'name' => 'Karan Sapalia', 'role' => 'Head of Operations', 'phone' => '+91 98765 00555', 'active_trips' => 0]);
+        Staff::create(['id' => 'ST-05', 'name' => 'Arjun Kapoor', 'role' => 'Head of Operations', 'phone' => '+91 98765 00555', 'active_trips' => 0]);
 
         return Inquiry::create([
             'id' => 'INQ-1', 'customer_name' => 'Rohan Malhotra', 'customer_phone' => '+91 99884 84884',
@@ -27,7 +27,7 @@ class FollowUpTest extends TestCase
 
         $this->postJson("/api/inquiries/{$inq->id}/follow-ups", [
             'type' => 'follow_up', 'date' => '2026-12-01', 'time' => '10:30', 'comment' => 'Send itinerary',
-        ])->assertCreated()->assertJsonPath('data.created_by_name', 'Karan Sapalia');
+        ])->assertCreated()->assertJsonPath('data.created_by_name', 'Arjun Kapoor');
 
         $this->assertDatabaseHas('follow_ups', ['inquiry_id' => 'INQ-1', 'customer_phone' => '9988484884', 'type' => 'follow_up']);
 
@@ -78,7 +78,7 @@ class FollowUpTest extends TestCase
         $inq = $this->inquiry();
 
         $this->postJson('/api/inquiries/assign', ['ids' => [$inq->id], 'staff_id' => 'ST-05'])
-            ->assertOk()->assertJsonPath('data.0.assigned_to_name', 'Karan Sapalia');
+            ->assertOk()->assertJsonPath('data.0.assigned_to_name', 'Arjun Kapoor');
         $this->assertDatabaseHas('inquiries', ['id' => 'INQ-1', 'assigned_to_id' => 'ST-05']);
         $this->postJson('/api/inquiries/assign', ['ids' => [$inq->id], 'assignee_id' => 'V-01', 'assignee_name' => 'Adventure World'])
             ->assertOk()->assertJsonPath('data.0.assigned_to_name', 'Adventure World');
@@ -92,7 +92,7 @@ class FollowUpTest extends TestCase
 
         $this->postJson("/api/inquiries/{$inq->id}/notes", ['comment' => ' Prefers morning calls '])
             ->assertCreated()->assertJsonPath('data.type', 'note')->assertJsonPath('data.comment', 'Prefers morning calls');
-        $this->getJson('/api/follow-ups?phone=9988484884')->assertJsonPath('data.0.type', 'note')->assertJsonPath('data.0.created_by_name', 'Karan Sapalia');
+        $this->getJson('/api/follow-ups?phone=9988484884')->assertJsonPath('data.0.type', 'note')->assertJsonPath('data.0.created_by_name', 'Arjun Kapoor');
 
         $this->postJson("/api/inquiries/{$inq->id}/notes", ['comment' => ''])->assertJsonValidationErrors(['comment']);
         $this->postJson("/api/inquiries/{$inq->id}/notes", ['comment' => str_repeat('a', 501)])->assertJsonValidationErrors(['comment']);

@@ -5,7 +5,7 @@ namespace Database\Seeders\Pages;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-/** The team for Users & Permissions. Karan is the owner and the demo login (an admin); passwords are random: nobody signs in as the others yet. */
+/** The team for Users & Permissions. Arjun is the owner and the demo login (an admin); passwords are random: nobody signs in as the others yet. */
 class UserSeeder extends Seeder
 {
     public function run(): void
@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             ['Priya Sharma', 'priya.sharma@ruyitra.com', 'operations', 'Trip Coordinator', 'active', $now->copy()->subMinutes(5)],
             ['Amit Patel', 'amit.patel@ruyitra.com', 'sales', 'Senior Dispatch Lead', 'active', $now->copy()->subHour()],
             ['Vikram Sethi', 'vikram.sethi@ruyitra.com', 'sales', 'Fleet & Logistics Lead', 'active', $now->copy()->subDay()],
-            ['Karan Sapalia', config('auth.demo_email') ?: 'karan.sapalia@ruyitra.com', 'admin', 'Head of Operations', 'active', $now->copy()->subDays(2)],
+            ['Arjun Kapoor', config('auth.demo_email') ?: 'arjun.kapoor@ruyitra.com', 'admin', 'Head of Operations', 'active', $now->copy()->subDays(2)],
             ['Deepak Chopra', 'deepak.chopra@ruyitra.com', 'sales', 'Sales Executive', 'pending', null],
         ];
 

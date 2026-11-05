@@ -38,7 +38,7 @@ const phoneHeader = (line) => {
     </div>
     <div class="app-header-right">
       <button class="icon-bell-btn" type="button" data-sp-bell aria-label="Notifications">${icon('bell', { size: 22 })}<span class="bell-dot"></span></button>
-      <button type="button" class="ks-avatar-badge" title="Karan Sapalia" aria-haspopup="menu" aria-label="Account menu">KS</button>
+      <button type="button" class="ks-avatar-badge" title="Arjun Kapoor" aria-haspopup="menu" aria-label="Account menu">AK</button>
     </div>
   </div>`;
 };

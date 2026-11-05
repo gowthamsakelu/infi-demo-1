@@ -17,7 +17,7 @@ class AddInquiryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Staff::create(['id' => 'ST-05', 'name' => 'Karan Sapalia', 'role' => 'Head of Operations', 'phone' => '+91 98765 00555']);
+        Staff::create(['id' => 'ST-05', 'name' => 'Arjun Kapoor', 'role' => 'Head of Operations', 'phone' => '+91 98765 00555']);
     }
 
     private function itinerary(): array
@@ -46,7 +46,7 @@ class AddInquiryTest extends TestCase
             ->assertJsonPath('data.pax', 1)
             ->assertJsonPath('data.status', 'new')
             ->assertJsonPath('data.assigned_to_id', 'ST-05')
-            ->assertJsonPath('data.assigned_to_name', 'Karan Sapalia')
+            ->assertJsonPath('data.assigned_to_name', 'Arjun Kapoor')
             ->assertJsonPath('data.nights', null)
             ->assertJsonPath('data.travel_date', null);
 
