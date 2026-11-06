@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Http\Controllers\Concerns\ReadsRuyi;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Destination;
@@ -9,6 +10,7 @@ use App\Models\Inquiry;
 use App\Models\SavedActivity;
 use App\Models\SavedHotel;
 use App\Support\DummyData;
+use App\Support\Ruyi\RuyiPages;
 use App\Http\Requests\SaveDestinationRequest;
 use App\Support\DataUrlImage;
 use Illuminate\Support\Str;
@@ -24,8 +26,14 @@ use Illuminate\Support\Facades\Schema;
  */
 class DestinationController extends Controller
 {
+    use ReadsRuyi;
+
     public function index(): JsonResponse
     {
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'destination'], $this->ruyi()->all('destinations')));
+        }
+
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('destinations')]);
         }
@@ -130,7 +138,7 @@ class DestinationController extends Controller
     /** Add a destination from the wizard. With dummy data nothing is written: the page keeps the record in memory. */
     public function store(SaveDestinationRequest $request): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null], 201);
         }
 
@@ -143,7 +151,7 @@ class DestinationController extends Controller
     /** Save the destination the wizard was opened on. The id is a string: with dummy data it can be one the page made this session. */
     public function update(SaveDestinationRequest $request, string $destination): JsonResponse
     {
-        if (DummyData::on()) {
+        if (DummyData::on() || $this->ruyiOn()) {
             return response()->json(['success' => true, 'dummy' => true, 'data' => null]);
         }
 

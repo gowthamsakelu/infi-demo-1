@@ -125,7 +125,7 @@ return [
     */
 
     'demo_login' => (bool) env('DEMO_LOGIN', true),
-    'demo_email' => env('DEMO_LOGIN_EMAIL', 'arjun@ruyi.test'),
-    'demo_name' => env('DEMO_LOGIN_NAME', 'Arjun Kapoor'),
+    'demo_email' => env('DEMO_LOGIN_EMAIL', 'sa08gautam23@gmail.com'),
+    'demo_name' => env('DEMO_LOGIN_NAME', 'Gautham'),
 
 ];

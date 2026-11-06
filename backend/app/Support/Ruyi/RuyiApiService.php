@@ -22,6 +22,7 @@ class RuyiApiService
         'activities' => 'adventure-list',
         'transport' => 'car-list',
         'blogs' => 'blog-list',
+        'destinations' => 'dest-list',
     ];
 
     private string $baseUrl;
@@ -199,6 +200,15 @@ class RuyiApiService
                 'createdDate' => self::str($r['CREATED_DATE'] ?? null),
                 'createdAt' => self::isoDate($r['CREATED_DATE'] ?? null),
                 'destination' => self::str($r['DESTINATION'] ?? null),
+            ],
+            'destinations' => [
+                'id' => self::str($r['DESTINATION_ID'] ?? null),
+                'name' => self::str($r['TITLE'] ?? null),
+                'image' => $image,
+                'stays' => self::num($r['STAYS'] ?? null),
+                'packages' => self::num($r['PACKAGES'] ?? null),
+                'transports' => self::num($r['TRANSPORTS'] ?? null),
+                'adventures' => self::num($r['ADVENTURES'] ?? null),
             ],
             'transport' => self::transport($r, $image),
             default => [],

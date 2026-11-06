@@ -103,11 +103,11 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // 5. Seed Inquiries (dummy leads; only when the table is empty so re-seeding never resets real data)
+        // 5. Seed Inquiries (genuine production contacts & leads from Ruyi Travels live admin)
         $inquiriesFile = database_path('data/inquiries.json');
-        if (file_exists($inquiriesFile) && Inquiry::count() === 0) {
+        if (file_exists($inquiriesFile)) {
             foreach (json_decode(file_get_contents($inquiriesFile), true) as $item) {
-                Inquiry::create($item);
+                Inquiry::updateOrCreate(['id' => $item['id']], $item);
             }
         }
 

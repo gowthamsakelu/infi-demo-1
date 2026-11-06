@@ -84,7 +84,7 @@ export function createMobileView(container, options = {}) {
               </svg>
               <span class="bell-dot" id="mobile-bell-dot"></span>
             </button>
-            <button type="button" class="ks-avatar-badge" title="Arjun Kapoor" aria-haspopup="menu" aria-label="Account menu">AK</button>
+            <button type="button" class="ks-avatar-badge" title="Gautham" aria-haspopup="menu" aria-label="Account menu">G</button>
           </div>
         </div>
 

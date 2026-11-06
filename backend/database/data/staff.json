@@ -1,5 +1,13 @@
 [
   {
+    "id": "ST-00",
+    "name": "Gautham",
+    "role": "Super Administrator",
+    "phone": "+91 98765 00001",
+    "avatar": "https://ruyitravels.com/admin/img/app_icon.png",
+    "activeTrips": 0
+  },
+  {
     "id": "ST-01",
     "name": "Rahul Mehta",
     "role": "Tour Operations Manager",

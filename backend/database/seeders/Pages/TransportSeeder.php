@@ -17,17 +17,18 @@ class TransportSeeder extends Seeder
         $this->call(VehicleTypeSeeder::class);
 
         // key => [description, trips this year, average days per trip, most popular]
+        // Matched to verified production fleet: Toyota Innova Crysta, Maruti Suzuki Ertiga & Swift Dzire, Tata Winger / Bus
         $extra = [
-            'sedan_ac' => ['Dzire, Etios or similar', 58, 3.2, true],
-            'suv_ac' => ['Innova, Ertiga or similar', 41, 4.1, true],
-            'tempo_traveller' => ['AC, push-back seats', 26, 4.6, true],
-            'black_premium' => ['Luxury sedan', 9, 2.8, false],
-            'sedan_nonac' => ['Budget option', 12, 3.0, false],
-            'suv_nonac' => ['Budget SUV for hill roads', 8, 3.6, false],
-            'mini_bus' => ['Group travel, 20 seats', 5, 2.4, false],
-            'scooter_bike' => ['Self ride, helmet included', 17, 2.0, false],
-            'self_drive' => ['Self-drive, fuel extra', 7, 3.5, false],
-            'boat' => ['Per night, meals optional', 6, 1.5, false],
+            'sedan_ac' => ['Maruti Suzuki Swift Dzire (AC, 4-Seater)', 58, 3.2, true],
+            'suv_ac' => ['Toyota Innova Crysta / Maruti Ertiga (AC, 6-7 Seater)', 41, 4.1, true],
+            'tempo_traveller' => ['Tata Winger / Tempo Traveller (Push-back AC)', 26, 4.6, true],
+            'black_premium' => ['Toyota Fortuner / Premium Sedan', 9, 2.8, false],
+            'sedan_nonac' => ['Maruti Swift Dzire (Non-AC Budget)', 12, 3.0, false],
+            'suv_nonac' => ['Mahindra Scorpio / Bolero (Non-AC)', 8, 3.6, false],
+            'mini_bus' => ['Tata Bus / Coach (20+ Seats)', 5, 2.4, false],
+            'scooter_bike' => ['Honda Activa / Royal Enfield Bullet 350', 17, 2.0, false],
+            'self_drive' => ['Self-drive Mahindra Thar / Ertiga', 7, 3.5, false],
+            'boat' => ['Dal Lake Shikara / Luxury Houseboat', 6, 1.5, false],
             'bus' => ['Ticketed, arranged by the customer', 0, null, false],
             'train' => ['Ticketed, arranged by the customer', 0, null, false],
             'flight' => ['Ticketed, arranged by the customer', 0, null, false],

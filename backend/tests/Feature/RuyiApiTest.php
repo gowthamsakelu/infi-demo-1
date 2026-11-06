@@ -101,6 +101,21 @@ class RuyiApiTest extends TestCase
         app(RuyiApiService::class)->list('admin/package/add');
     }
 
+    public function test_destinations_are_fetched_and_normalized(): void
+    {
+        Http::fake(['ruyitravels.com/api/dest-list*' => Http::response([[
+            'DESTINATION_ID' => 'DST_13', 'TITLE' => 'Goa', 'IMAGE' => 'uploads/goa.jpg',
+            'STAYS' => 164, 'PACKAGES' => 26, 'TRANSPORTS' => 12, 'ADVENTURES' => 80,
+        ]])]);
+
+        $row = $this->getJson('/api/ruyi/destinations?row=0')->assertOk()->assertJson(['success' => true, 'count' => 1])->json('data.0');
+
+        $this->assertSame([
+            'id' => 'DST_13', 'name' => 'Goa', 'image' => 'https://ruyitravels.com/uploads/goa.jpg',
+            'stays' => 164, 'packages' => 26, 'transports' => 12, 'adventures' => 80,
+        ], $row);
+    }
+
     public function test_there_is_no_route_that_writes_or_deletes(): void
     {
         $methods = collect(Route::getRoutes()->getRoutes())->filter(fn ($r) => str_starts_with($r->uri(), 'api/ruyi'))->flatMap(fn ($r) => $r->methods())->unique()->values()->all();

@@ -20,6 +20,7 @@ backend/.env
 backend/.env.backup
 backend/.env.production
 backend/storage/*.key
+backend/storage/backups_pre_integration/
 backend/storage/logs/*.log
 backend/storage/framework/cache/data/*
 backend/storage/framework/sessions/*

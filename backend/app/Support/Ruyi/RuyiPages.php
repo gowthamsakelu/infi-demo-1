@@ -130,6 +130,24 @@ class RuyiPages
         ];
     }
 
+    public static function destination(array $d): array
+    {
+        $packages = (int) ($d['packages'] ?? 0);
+        $stays = (int) ($d['stays'] ?? 0);
+
+        return [
+            'id' => $d['id'],
+            'slug' => str($d['name'] ?? '')->slug()->toString(),
+            'name' => $d['name'] ?? 'Untitled destination',
+            'region' => 'India',
+            'status' => 'active',
+            'popular' => ($packages + $stays) > 10,
+            'image' => $d['image'],
+            'packages' => $packages,
+            'inquiries' => 0,
+        ];
+    }
+
     /** "A, B, C" => ['A', 'B', 'C'] */
     private static function items(mixed $v): array
     {

@@ -11,5 +11,6 @@ Route::prefix('ruyi')->group(function () {
     Route::get('/activities', [RuyiController::class, 'index'])->defaults('kind', 'activities')->middleware(Permissions::can('travel', 'view'));
     Route::get('/transport', [RuyiController::class, 'index'])->defaults('kind', 'transport')->middleware(Permissions::can('travel', 'view'));
     Route::get('/packages', [RuyiController::class, 'index'])->defaults('kind', 'packages')->middleware(Permissions::can('catalog', 'view'));
+    Route::get('/destinations', [RuyiController::class, 'index'])->defaults('kind', 'destinations')->middleware(Permissions::can('catalog', 'view'));
     Route::get('/blogs', [RuyiController::class, 'index'])->defaults('kind', 'blogs')->middleware(Permissions::can('website', 'view'));
 });

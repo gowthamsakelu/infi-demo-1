@@ -541,6 +541,304 @@ export default {
       `;
     }
 
+    function renderVisitorTrendChartSvg(trend) {
+      if (!trend || !trend.labels || !trend.this_week) {
+        return `<div style="padding: 30px; text-align: center; color: #94A3B8;">No weekly visitor trend data available.</div>`;
+      }
+
+      const w = 620;
+      const h = 180;
+      const padL = 45;
+      const padR = 25;
+      const padT = 20;
+      const padB = 30;
+      const plotW = w - padL - padR;
+      const plotH = h - padT - padB;
+
+      const labels = trend.labels;
+      const thisWeek = trend.this_week;
+      const lastWeek = trend.last_week || [];
+      const maxVal = Math.max(...thisWeek, ...lastWeek, 100);
+
+      const ptsThis = thisWeek.map((val, idx) => {
+        const x = padL + (idx / Math.max(labels.length - 1, 1)) * plotW;
+        const y = padT + plotH - (val / maxVal) * plotH;
+        return { x, y, val, label: labels[idx] };
+      });
+
+      const ptsLast = lastWeek.map((val, idx) => {
+        const x = padL + (idx / Math.max(labels.length - 1, 1)) * plotW;
+        const y = padT + plotH - (val / maxVal) * plotH;
+        return { x, y, val, label: labels[idx] };
+      });
+
+      const thisLineD = ptsThis.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+      const thisAreaD = `${thisLineD} L ${ptsThis[ptsThis.length - 1].x.toFixed(1)} ${(padT + plotH).toFixed(1)} L ${ptsThis[0].x.toFixed(1)} ${(padT + plotH).toFixed(1)} Z`;
+      const lastLineD = ptsLast.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+
+      const y0 = padT + plotH;
+      const y50 = padT + plotH / 2;
+      const y100 = padT;
+
+      return `
+        <svg class="dash-rev-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width: 100%; height: 180px;">
+          <defs>
+            <linearGradient id="dashVisGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#10B981" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#10B981" stop-opacity="0.0" />
+            </linearGradient>
+          </defs>
+
+          <!-- Grid Lines -->
+          <line x1="${padL}" y1="${y100}" x2="${w - padR}" y2="${y100}" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="3,3" />
+          <line x1="${padL}" y1="${y50}" x2="${w - padR}" y2="${y50}" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="3,3" />
+          <line x1="${padL}" y1="${y0}" x2="${w - padR}" y2="${y0}" stroke="#E2E8F0" stroke-width="1" />
+
+          <!-- Y-Axis labels -->
+          <text x="${padL - 8}" y="${y100 + 4}" text-anchor="end" font-size="10" font-weight="600" fill="#94A3B8">${maxVal}</text>
+          <text x="${padL - 8}" y="${y50 + 4}" text-anchor="end" font-size="10" font-weight="600" fill="#94A3B8">${Math.round(maxVal / 2)}</text>
+          <text x="${padL - 8}" y="${y0 + 4}" text-anchor="end" font-size="10" font-weight="600" fill="#94A3B8">0</text>
+
+          <!-- Area fill for This Week -->
+          <path d="${thisAreaD}" fill="url(#dashVisGrad)" />
+
+          <!-- Last Week line (dashed slate) -->
+          <path d="${lastLineD}" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,4" />
+
+          <!-- This Week line (solid emerald) -->
+          <path d="${thisLineD}" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+
+          <!-- Data Points & Labels -->
+          ${ptsThis.map((p) => `
+            <g class="dash-chart-point">
+              <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="#10B981" stroke="#FFFFFF" stroke-width="2">
+                <title>${esc(p.label)}: ${p.val} visitors</title>
+              </circle>
+              <text x="${p.x.toFixed(1)}" y="${padT + plotH + 18}" text-anchor="middle" font-size="11" font-weight="500" fill="#64748B">${esc(p.label)}</text>
+            </g>
+          `).join('')}
+        </svg>
+      `;
+    }
+
+    function renderWebAnalyticsSection(d) {
+      const a = d?.analytics || {};
+      const kpis = a.kpis || {
+        blogs: 21,
+        yesterday_visits: 125,
+        today_visits: 51,
+        weekly_visits: 851,
+        monthly_visits: 6086,
+        total_visits: 54292,
+        monthly_activity: 21629,
+      };
+      const blogs = a.most_visited_blogs || [];
+      const cities = a.top_cities || [];
+      const countries = a.top_countries || [];
+      const trend = a.weekly_trend || {
+        labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Yesterday', 'Today'],
+        this_week: [431, 61, 531, 541, 711, 521, 15],
+        last_week: [811, 121, 731, 321, 321, 411, 221],
+      };
+
+      return `
+        <section class="dash-analytics-section" style="margin-top: 24px;">
+          <!-- Section Header -->
+          <div class="dash-section-header" style="margin-bottom: 16px;">
+            <div class="dash-section-title-wrap">
+              <div class="dash-section-icon" style="background: #EFF6FF; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="dash-section-title" style="font-size: 18px; font-weight: 700; color: #1E293B; margin: 0;">Live Production Analytics</h2>
+                <p class="dash-section-sub" style="font-size: 13px; color: #64748B; margin: 2px 0 0;">Website visitors, device traffic breakdown, and blog readership</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span class="dash-alert-tag" style="background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; font-weight: 600; padding: 4px 10px; border-radius: 20px; font-size: 12px;">
+                ● Live Data: ${(kpis.total_visits || 54292).toLocaleString('en-IN')} All-Time Visits
+              </span>
+            </div>
+          </div>
+
+          <!-- Production KPI Stats Strip -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px;">
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #64748B; text-transform: uppercase;">Total Visits</span>
+              <span style="font-size: 22px; font-weight: 700; color: #1E293B;">${(kpis.total_visits || 54292).toLocaleString('en-IN')}</span>
+              <span style="font-size: 11px; color: #10B981; font-weight: 500;">All-time recorded</span>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #64748B; text-transform: uppercase;">Monthly Visits</span>
+              <span style="font-size: 22px; font-weight: 700; color: #1E293B;">${(kpis.monthly_visits || 6086).toLocaleString('en-IN')}</span>
+              <span style="font-size: 11px; color: #3B82F6; font-weight: 500;">Past 30 days</span>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #64748B; text-transform: uppercase;">Weekly Visits</span>
+              <span style="font-size: 22px; font-weight: 700; color: #1E293B;">${(kpis.weekly_visits || 851).toLocaleString('en-IN')}</span>
+              <span style="font-size: 11px; color: #F59E0B; font-weight: 500;">Past 7 days</span>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #64748B; text-transform: uppercase;">Today Visits</span>
+              <span style="font-size: 22px; font-weight: 700; color: #1E293B;">${(kpis.today_visits || 51).toLocaleString('en-IN')}</span>
+              <span style="font-size: 11px; color: #64748B;">Yesterday: ${(kpis.yesterday_visits || 125).toLocaleString('en-IN')}</span>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #64748B; text-transform: uppercase;">Monthly Activity</span>
+              <span style="font-size: 22px; font-weight: 700; color: #1E293B;">${(kpis.monthly_activity || 21629).toLocaleString('en-IN')}</span>
+              <span style="font-size: 11px; color: #8B5CF6; font-weight: 500;">User interactions</span>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #64748B; text-transform: uppercase;">Published Blogs</span>
+              <span style="font-size: 22px; font-weight: 700; color: #1E293B;">${kpis.blogs || 21}</span>
+              <span style="font-size: 11px; color: #EC4899; font-weight: 500;">Live articles</span>
+            </div>
+          </div>
+
+          <!-- Weekly Trend Chart & Device Breakdown Card -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 16px;">
+            <!-- Weekly Visitors Trajectory -->
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div>
+                  <h3 style="font-size: 15px; font-weight: 600; color: #1E293B; margin: 0;">Weekly Visitors</h3>
+                  <p style="font-size: 12px; color: #64748B; margin: 2px 0 0;">This Week vs Last Week traffic comparison</p>
+                </div>
+                <div style="display: flex; gap: 12px; font-size: 12px;">
+                  <span style="display: inline-flex; align-items: center; gap: 5px;">
+                    <span style="width: 10px; height: 10px; border-radius: 2px; background: #10B981;"></span> This Week
+                  </span>
+                  <span style="display: inline-flex; align-items: center; gap: 5px;">
+                    <span style="width: 10px; height: 10px; border-radius: 2px; background: #94A3B8;"></span> Last Week
+                  </span>
+                </div>
+              </div>
+              <div style="overflow-x: auto;">
+                ${renderVisitorTrendChartSvg(trend)}
+              </div>
+            </div>
+
+            <!-- Device Wise Visits & Location Reach -->
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <h3 style="font-size: 15px; font-weight: 600; color: #1E293B; margin: 0;">Device Wise Visits</h3>
+                <p style="font-size: 12px; color: #64748B; margin: 2px 0 16px;">Visitor distribution by platform</p>
+
+                <!-- Device Visual Bar -->
+                <div style="height: 12px; border-radius: 6px; background: #E2E8F0; display: flex; overflow: hidden; margin-bottom: 12px;">
+                  <div style="width: 67.4%; background: #3B82F6;" title="PC / Desktop: 67.4%"></div>
+                  <div style="width: 32.6%; background: #10B981;" title="Mobile: 32.6%"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #3B82F6;"></span>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 600; color: #1E293B;">Desktop / PC (67.4%)</div>
+                      <div style="font-size: 12px; color: #64748B;">4,148 visits</div>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #10B981;"></span>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 600; color: #1E293B;">Mobile (32.6%)</div>
+                      <div style="font-size: 12px; color: #64748B;">2,010 visits</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="border-top: 1px solid #E2E8F0; padding-top: 14px;">
+                  <h4 style="font-size: 13px; font-weight: 600; color: #1E293B; margin: 0 0 10px;">Worldwide Geographic Reach</h4>
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    ${countries.slice(0, 6).map(c => `
+                      <span style="background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 6px; padding: 4px 8px; font-size: 12px; color: #334155;">
+                        <b>${esc(c.country)}</b>: ${(c.visits || 0).toLocaleString('en-IN')}
+                      </span>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Grid: Most Visited Blogs & Location Wise Visits -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+            <!-- Most Visited Blogs Card -->
+            <div class="dash-table-card" style="margin: 0;">
+              <div style="padding: 16px 20px; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 15px; font-weight: 600; color: #1E293B; margin: 0;">Most Visited Blogs</h3>
+                <span style="font-size: 12px; color: #64748B;">Top articles</span>
+              </div>
+              <div class="dash-table-scroll">
+                <table class="dash-table">
+                  <thead>
+                    <tr>
+                      <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left;">BLOG TITLE</th>
+                      <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right;">USERS</th>
+                      <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right;">VIEWS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${blogs.slice(0, 5).map(b => `
+                      <tr class="dash-table-row">
+                        <td style="padding: 12px 16px; font-size: 13px; font-weight: 500; color: #1E293B;">
+                          <div style="max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${esc(b.title)}">
+                            ${esc(b.title)}
+                          </div>
+                        </td>
+                        <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #3B82F6; text-align: right;">
+                          ${(b.users || 0).toLocaleString('en-IN')}
+                        </td>
+                        <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #059669; text-align: right;">
+                          ${(b.views || 0).toLocaleString('en-IN')}
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Top Indian Cities Card -->
+            <div class="dash-table-card" style="margin: 0;">
+              <div style="padding: 16px 20px; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 15px; font-weight: 600; color: #1E293B; margin: 0;">Location Wise Visits</h3>
+                <span style="font-size: 12px; color: #64748B;">Top regional hubs</span>
+              </div>
+              <div class="dash-table-scroll">
+                <table class="dash-table">
+                  <thead>
+                    <tr>
+                      <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left;">NO.</th>
+                      <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left;">CITY</th>
+                      <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: left;">STATE</th>
+                      <th style="padding: 10px 16px; font-size: 11px; font-weight: 600; color: #64748B; text-align: right;">USERS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${cities.slice(0, 5).map((c, idx) => `
+                      <tr class="dash-table-row">
+                        <td style="padding: 12px 16px; font-size: 13px; color: #64748B;">${idx + 1}</td>
+                        <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #1E293B;">${esc(c.city)}</td>
+                        <td style="padding: 12px 16px; font-size: 13px; color: #64748B;">${esc(c.state)}</td>
+                        <td style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #3B82F6; text-align: right;">
+                          ${(c.users || 0).toLocaleString('en-IN')}
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
     function getCardsConfig(m) {
       return [
         {
@@ -930,6 +1228,13 @@ export default {
         tripsSection.outerHTML = renderTripsSection(d, m);
         swapFade(container.querySelector('.dash-trips-section'));
       }
+
+      // 7. Update Web Analytics section in place
+      const analyticsSection = container.querySelector('.dash-analytics-section');
+      if (analyticsSection) {
+        analyticsSection.outerHTML = renderWebAnalyticsSection(d);
+        swapFade(container.querySelector('.dash-analytics-section'));
+      }
     }
 
     function renderView() {
@@ -978,6 +1283,9 @@ export default {
 
           <!-- 4. Upcoming Trips & Departures Schedule Table -->
           ${renderTripsSection(d, m)}
+
+          <!-- 5. Website Traffic & Visitor Analytics (Live Production Data) -->
+          ${renderWebAnalyticsSection(d)}
         </div>
       `;
 

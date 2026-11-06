@@ -22,7 +22,7 @@ class UserController extends Controller
 {
     public function index(): JsonResponse
     {
-        $order = ['Rahul Mehta', 'Priya Sharma', 'Amit Patel', 'Vikram Sethi', 'Deepak Chopra', 'Arjun Kapoor'];
+        $order = ['Gautham', 'Rahul Mehta', 'Priya Sharma', 'Amit Patel', 'Vikram Sethi', 'Deepak Chopra', 'Arjun Kapoor'];
         $users = User::query()->get()->sortBy(function (User $u) use ($order) {
             $idx = array_search($u->name, $order);
             return $idx === false ? 999 : $idx;
@@ -117,9 +117,11 @@ class UserController extends Controller
         $staff = Staff::query()->where('name', $user->name)->first();
         $joinedFormatted = $user->name === 'Rahul Mehta' ? '15 Mar 2021' : ($user->created_at ? $user->created_at->format('j M Y') : '15 Mar 2021');
         $location = 'Mumbai, India';
-        $bio = $user->name === 'Rahul Mehta'
-            ? 'System administrator with 5+ years of experience in travel operations and team management.'
-            : ($user->title ? "{$user->title} with experience in travel operations and team management." : 'Travel operations and team management professional.');
+        $bio = match ($user->name) {
+            'Gautham' => 'Super Administrator with full system privileges and module access on Ruyi Travels platform.',
+            'Rahul Mehta' => 'System administrator with 5+ years of experience in travel operations and team management.',
+            default => ($user->title ? "{$user->title} with experience in travel operations and team management." : 'Travel operations and team management professional.'),
+        };
 
         return response()->json(['success' => true, 'data' => $this->row($user) + [
             'phone' => $staff?->phone ?? $user->phone ?? '+91 98765 00111',
@@ -127,7 +129,7 @@ class UserController extends Controller
             'joinedFormatted' => $joinedFormatted,
             'location' => $location,
             'bio' => $bio,
-            'reportingManager' => $user->name === 'Arjun Kapoor' ? 'Board of Directors' : 'Arjun Kapoor',
+            'reportingManager' => in_array($user->name, ['Gautham', 'Arjun Kapoor'], true) ? 'Board of Directors' : 'Gautham',
             'department' => 'Operations',
             'permissions' => collect(Permissions::MODULES)->map(fn (string $label, string $key) => ['module' => $key, 'label' => $label] + $matrix[$key])->values(),
             'permissionsSource' => $user->isAdmin() ? 'admin' : (Permissions::isCustom($user) ? 'custom' : 'role'),
@@ -188,8 +190,9 @@ class UserController extends Controller
     private function row(User $u): array
     {
         $staff = Staff::query()->where('name', $u->name)->first();
-        $avatar = $staff?->avatar ?? null;
+        $avatar = $staff?->avatar ?? ($u->name === 'Gautham' ? 'https://ruyitravels.com/admin/img/app_icon.png' : null);
         $roleLabel = match ($u->name) {
+            'Gautham' => 'Admin',
             'Rahul Mehta' => 'Admin',
             'Priya Sharma', 'Arjun Kapoor' => 'Manager',
             'Amit Patel', 'Vikram Sethi', 'Deepak Chopra' => 'Staff',

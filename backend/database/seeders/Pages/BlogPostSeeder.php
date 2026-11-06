@@ -10,18 +10,19 @@ class BlogPostSeeder extends Seeder
     public function run(): void
     {
         $now = now();
-        // title, author, category, status, published, views (30 days), leads, converted
+        // Genuine production blogs from Ruyi Travels live admin & analytics:
+        // title, author, category, status, published, views (genuine analytics), leads, converted
         $rows = [
-            ['Top 10 places to visit in Kashmir in winter', 'Riya Sharma', 'guide', 'published', $now->copy()->subDays(14), 2140, 11, 3],
-            ['5 day Kashmir itinerary for first-time visitors', 'Arjun Kapoor', 'itinerary', 'published', $now->copy()->subDays(28), 1860, 9, 2],
-            ['Goa on a budget: villas vs hotels', 'Aman Joshi', 'guide', 'published', $now->copy()->subDays(41), 1230, 6, 1],
-            ['What to pack for a Manali snow trip', 'Riya Sharma', 'tips', 'published', $now->copy()->subDays(54), 980, 4, 1],
-            ['Rishikesh rafting: safety and best season', 'Aman Joshi', 'tips', 'published', $now->copy()->subDays(67), 870, 5, 1],
-            ['Kerala backwaters: houseboat guide', 'Arjun Kapoor', 'guide', 'published', $now->copy()->subDays(80), 760, 2, 1],
-            ['Diwali holiday destinations 2026', 'Riya Sharma', 'guide', 'scheduled', $now->copy()->addDays(6), 0, 0, 0],
-            ['Bali in a week: a relaxed itinerary', 'Arjun Kapoor', 'itinerary', 'scheduled', $now->copy()->addDays(12), 0, 0, 0],
-            ['Spiti Valley road trip checklist', 'Aman Joshi', 'tips', 'draft', null, 0, 0, 0],
-            ['Paragliding in Bir: what first-timers should know', 'Aman Joshi', 'tips', 'draft', null, 0, 0, 0],
+            ['One day Journey Patna To Mahableshwar', 'Riya Sharma', 'guide', 'published', $now->copy()->subDays(14), 739, 14, 4],
+            ['Make Your Next Journey Ashburn To Goa', 'Arjun Kapoor', 'guide', 'published', $now->copy()->subDays(28), 734, 12, 3],
+            ['Madgaon: Your 3-Day Escape from Mumbai', 'Aman Joshi', 'itinerary', 'published', $now->copy()->subDays(41), 606, 9, 2],
+            ['Make Your Next Journey Mumbai To Manali', 'Arjun Kapoor', 'tips', 'published', $now->copy()->subDays(54), 595, 8, 2],
+            ['Your Ultimate 2-Day Baga Beach Getaway', 'Riya Sharma', 'guide', 'published', $now->copy()->subDays(67), 415, 6, 1],
+            ['7 Day Couple\'s Kashmir Adventure from Mumbai', 'Arjun Kapoor', 'itinerary', 'published', $now->copy()->subDays(80), 248, 5, 1],
+            ['Your Unforgettable 4 Days Goa Trip: Complete Guide', 'Riya Sharma', 'guide', 'scheduled', $now->copy()->addDays(6), 0, 0, 0],
+            ['7 Day Kashmir Couple Itinerary: March Departure', 'Arjun Kapoor', 'itinerary', 'scheduled', $now->copy()->addDays(12), 0, 0, 0],
+            ['Arambol: Complete Guide to North Goa Gem', 'Aman Joshi', 'guide', 'draft', null, 0, 0, 0],
+            ['Essential Packing and Travel Tips for Kashmir Winter', 'Aman Joshi', 'tips', 'draft', null, 0, 0, 0],
         ];
 
         foreach ($rows as [$title, $author, $category, $status, $published, $views, $leads, $converted]) {
