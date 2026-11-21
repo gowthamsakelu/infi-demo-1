@@ -20,6 +20,10 @@ class TransportController extends Controller
 
     public function index(): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::list('transport')]);
+        }
+
         if ($this->ruyiOn()) {
             return $this->fromRuyi(function () {
                 $rows = [];
@@ -29,10 +33,6 @@ class TransportController extends Controller
 
                 return $rows;
             });
-        }
-
-        if (DummyData::on()) {
-            return response()->json(['success' => true, 'data' => DummyData::list('transport')]);
         }
 
         return response()->json(['success' => true, 'data' => VehicleType::query()->orderBy('popularity_rank')->orderBy('id')->get()->map(fn ($v) => $this->row($v))->values()]);

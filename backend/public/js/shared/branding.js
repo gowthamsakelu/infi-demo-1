@@ -11,7 +11,8 @@ const DEFAULT_PLANE_SVG = `
   </svg>`;
 
 let currentBranding = {
-  companyName: 'Ruyi Admin',
+  companyName: 'INFINITY',
+  tagline: 'infinite freights, infinite ways',
   logo: null,
   color: DEFAULT_BRAND_COLOR,
   themeColor: DEFAULT_BRAND_COLOR,
@@ -599,7 +600,7 @@ export function updateSystemLogos(logoUrl, logoBg) {
  * Updates all company name titles in headers across Desktop and Mobile layouts.
  */
 export function updateSystemCompanyTitle(name) {
-  const effectiveName = name || currentBranding.companyName || 'Ruyi Admin';
+  const effectiveName = name || currentBranding.companyName || 'INFINITY';
   currentBranding.companyName = effectiveName;
   const titles = document.querySelectorAll('.brand-text-col h2, .sidebar-brand .brand-text-col h2, .mobile-app-header .brand-text-col h2');
   titles.forEach((el) => {
@@ -616,7 +617,7 @@ export function applyBranding(branding) {
   if (!branding) return;
   const brandColor = branding.color || DEFAULT_BRAND_COLOR;
   const themeColor = branding.themeColor || brandColor || DEFAULT_BRAND_COLOR;
-  const companyName = branding.companyName || currentBranding.companyName || 'Ruyi Admin';
+  const companyName = branding.companyName || currentBranding.companyName || 'INFINITY';
 
   currentBranding = {
     companyName: companyName,
@@ -649,7 +650,7 @@ export function initBranding() {
   const initial = window.__BRANDING__ || {};
   const brandColor = initial.color || DEFAULT_BRAND_COLOR;
   const themeColor = initial.themeColor || brandColor || DEFAULT_BRAND_COLOR;
-  const companyName = initial.companyName || 'Ruyi Admin';
+  const companyName = initial.companyName || 'INFINITY';
 
   applyBranding({
     companyName: companyName,

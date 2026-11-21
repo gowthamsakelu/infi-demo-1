@@ -23,7 +23,14 @@ class InquiryController extends Controller
             $query->where('status', $request->status);
         }
         if ($request->filled('category')) {
-            $query->where('category', strtoupper($request->category));
+            $cat = $request->category;
+            $query->where(function ($q) use ($cat) {
+                $q->where('category', $cat)
+                  ->orWhere('category', strtoupper($cat))
+                  ->orWhere('trip', 'like', "%{$cat}%")
+                  ->orWhere('lead_source', 'like', "%{$cat}%")
+                  ->orWhere('freight_details', 'like', "%{$cat}%");
+            });
         }
         if ($request->filled('assigned_to')) {
             $query->where('assigned_to_id', $request->assigned_to);
@@ -216,10 +223,17 @@ class InquiryController extends Controller
             'customer_email' => 'nullable|email|max:120',
             'location' => 'nullable|string|max:150',
             'trip' => 'nullable|string|max:150',
-            'status' => 'nullable|string|in:new,ongoing,warm,hot,closed,won',
-            'notes' => 'nullable|string|max:1000',
+            'status' => 'nullable|string|max:50',
+            'notes' => 'nullable|string|max:1500',
             'budget' => 'nullable|numeric',
+            'freight_details' => 'nullable|array',
         ]);
+
+        if (isset($data['freight_details'])) {
+            $existing = $inquiry->resolveFreightDetails();
+            $merged = array_replace_recursive($existing, $data['freight_details']);
+            $data['freight_details'] = $merged;
+        }
 
         $inquiry->update(array_filter($data, fn ($v) => $v !== null));
 
@@ -268,6 +282,7 @@ class InquiryController extends Controller
             'budget' => $i->budget,
             'guests' => $i->guests ?? [],
             'itinerary_days' => $i->itinerary_days ?? [],
+            'freight_details' => $i->resolveFreightDetails(),
             'follow_up_count' => $i->followUps->count(),
             'last_follow_up' => $last ? $this->presentFollowUp($last) : null,
         ];

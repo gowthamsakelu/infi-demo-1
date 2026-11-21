@@ -1,0 +1,71 @@
+/* Banners: the card grid. Built on the shared page frame (css/pages.css). */
+.sp[data-sp="banners"] .sp-body { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; overscroll-behavior: contain; padding: 2px; }
+.bn-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: 0 0 auto; min-width: 0; }
+.bn-tabs { flex: 1 1 auto; min-width: 0; }
+.bn-tools { display: flex; align-items: center; gap: 10px; flex: none; }
+.bn-preview { white-space: nowrap; }
+
+.bn-content { flex: 1 1 auto; min-width: 0; }
+.bn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(250px, calc((100% - 32px) / 3)), 1fr)); gap: 16px; align-items: start; }
+.bn-card { min-width: 0; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 18px; box-shadow: var(--shadow-sm); }
+
+/* the picture: a fixed shape so cards never jump while images load; the gradient is also the fallback when there is no file */
+.bn-hero { position: relative; aspect-ratio: 215 / 100; overflow: hidden; color: #FFFFFF; background: linear-gradient(135deg, #1E3A8A, #3B82F6); }
+.bn-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.bn-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15, 23, 42, 0.28) 0%, rgba(15, 23, 42, 0.05) 38%, rgba(15, 23, 42, 0.72) 100%); }
+.bn-tone-blue { background: linear-gradient(135deg, #1E3A8A, #3B82F6); }
+.bn-tone-teal { background: linear-gradient(135deg, #0F766E, #2DD4BF); }
+.bn-tone-indigo { background: linear-gradient(135deg, #4338CA, #818CF8); }
+.bn-tone-amber { background: linear-gradient(135deg, #B45309, #F59E0B); }
+.bn-tone-rose { background: linear-gradient(135deg, #9D174D, #F472B6); }
+.bn-tone-green { background: linear-gradient(135deg, #166534, #4ADE80); }
+.bn-tone-sky { background: linear-gradient(135deg, #0369A1, #38BDF8); }
+.bn-tone-violet { background: linear-gradient(135deg, #6D28D9, #A78BFA); }
+.bn-pill { position: absolute; top: 12px; left: 12px; max-width: calc(100% - 72px); }
+.bn-pill .status-pill { white-space: nowrap; }
+.bn-more { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.92); color: #334155; cursor: pointer; }
+.bn-more:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.bn-copy { position: absolute; left: 16px; right: 16px; bottom: 12px; min-width: 0; }
+.bn-copy h3 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.2px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35); }
+.bn-copy p { margin: 2px 0 0; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); }
+
+.bn-info { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.bn-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.bn-row .bld-switch { height: 32px; padding: 0; border: 0; background: transparent; flex: none; }
+.bn-name { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.bn-name b, .bn-name small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bn-name b { font-size: 16px; font-weight: 800; color: #0F172A; }
+.bn-name small { font-size: 13px; color: #64748B; }
+.bn-stats { display: flex; flex-wrap: nowrap; gap: 14px; font-size: 13.5px; color: #64748B; min-width: 0; overflow: hidden; }
+.bn-stats span { white-space: nowrap; }
+.bn-stats b { font-size: 16px; font-weight: 800; color: #0F172A; }
+
+
+:where(html[data-layout="mobile"]) .sp[data-sp="banners"] .sp-body { overflow: visible; padding: 12px 0 calc(var(--safe-bottom) + 140px); }
+:where(html[data-layout="mobile"]) .bn-grid { grid-template-columns: minmax(0, 1fr); }
+:where(html[data-layout="mobile"]) .bn-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+:where(html[data-layout="mobile"]) .bn-tools { display: none; }
+
+
+/* Phone: two banners per row (one column below 340px); tablet and desktop keep their own grid. */
+@media (min-width: 340px) {
+  html[data-layout="mobile"] .bn-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+}
+html[data-layout="mobile"] .bn-card { display: flex; flex-direction: column; border-radius: 14px; }
+html[data-layout="mobile"] .bn-hero { aspect-ratio: 4 / 3; flex: none; }
+html[data-layout="mobile"] .bn-pill { top: 8px; left: 8px; max-width: calc(100% - 56px); }
+html[data-layout="mobile"] .bn-pill .status-pill { font-size: 10.5px; }
+html[data-layout="mobile"] .bn-more { top: 6px; right: 6px; width: 36px; height: 36px; }
+html[data-layout="mobile"] .bn-copy { left: 10px; right: 10px; bottom: 8px; }
+html[data-layout="mobile"] .bn-copy h3 { font-size: 14px; line-height: 1.2; }
+html[data-layout="mobile"] .bn-copy p { font-size: 11.5px; }
+html[data-layout="mobile"] .bn-info { flex: 1 1 auto; padding: 10px; gap: 8px; }
+html[data-layout="mobile"] .bn-row { align-items: flex-start; gap: 6px; }
+html[data-layout="mobile"] .bn-row .bld-switch { width: 44px; height: 36px; margin: -2px -4px 0 0; }
+html[data-layout="mobile"] .bn-name b { font-size: 13.5px; line-height: 1.25; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+html[data-layout="mobile"] .bn-name small { font-size: 11.5px; }
+html[data-layout="mobile"] .bn-stats { flex-wrap: wrap; gap: 2px 10px; font-size: 11.5px; margin-top: auto; overflow: visible; }
+html[data-layout="mobile"] .bn-stats b { font-size: 13px; }
+/* the floating Add button and the bottom nav never cover the last row (the page box has to grow with its content for the padding to count) */
+html[data-layout="mobile"] .sp[data-sp="banners"] { height: auto; }
+html[data-layout="mobile"] .sp[data-sp="banners"] .sp-body { flex: none; padding-bottom: calc(var(--safe-bottom, 0px) + 120px); }

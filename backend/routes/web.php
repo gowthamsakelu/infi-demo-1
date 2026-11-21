@@ -19,8 +19,13 @@ Route::middleware('auth')->group(function () {
 });
 
 
-// "Enquiries" was renamed to "Inquiries": keep old URLs working.
-Route::redirect('/enquiries', '/inquiries', 301);
-Route::redirect('/enquiries/{any}', '/inquiries', 301)->where('any', '.*');
+// 4 main pages URL aliases and redirects
+Route::redirect('/dashboard', '/#dashboard')->name('dashboard');
+Route::redirect('/enquiries', '/#inquiries', 301);
+Route::redirect('/enquiries/{any}', '/#inquiries', 301)->where('any', '.*');
 Route::redirect('/inquiries', '/#inquiries')->name('inquiries');
-Route::redirect('/calendar', '/#calendar')->name('calendar.index');
+Route::redirect('/customers', '/#customers')->name('customers');
+Route::redirect('/quotation', '/#quotation')->name('quotation');
+Route::redirect('/quotations', '/#quotation', 301);
+Route::redirect('/bookings', '/#quotation', 301);
+Route::redirect('/calendar', '/#dashboard')->name('calendar.index');

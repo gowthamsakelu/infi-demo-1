@@ -8,7 +8,19 @@ import { notificationsHtml, bindNotifications } from './shared/notifications.js'
 import { renderTabs, avatar, justAddedTag, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bindQuickNotes, rowCard, bulkBar, bindBulkBar, updateBulkBar, inlineSelectionBar, updateInlineBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
-import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
+import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments, updateInquiry } from './shared/inquiry-store.js';
+import {
+  renderFreightHeaderHtml,
+  renderFreightTabsHtml,
+  renderFreightBodyHtml,
+  renderFreightFooterHtml,
+  bindFreightBodyEvents,
+  openFreightEditModal,
+  uploadFreightDoc,
+  getFreightData,
+  cleanPhone,
+} from './shared/freight-popup.js';
+import { getCustomersList, CUSTOMER_TABS, addCustomer, subscribeCustomers } from './shared/customer-store.js';
 import { openAssign } from './shared/assign-sheet.js';
 import { openDayDialog, commit } from './shared/itinerary-dialog.js';
 import { daysOf, persist, renumber, eventKind, itemIconHtml, itemPills } from './shared/itinerary.js';
@@ -54,8 +66,8 @@ export function createDesktopView(container) {
             </svg>
           </div>
           <div class="brand-text-col">
-            <h2>${esc(getBranding().companyName || 'Ruyi Admin')}</h2>
-            <p>Travel Operations</p>
+            <h2>${esc(getBranding().companyName || 'INFINITY')}</h2>
+            <p>${esc(getBranding().tagline || 'infinite freights, infinite ways')}</p>
           </div>
         </div>
 
@@ -411,18 +423,75 @@ export function createDesktopView(container) {
           </div>
         </div>
       </div>
+
+      <!-- Desktop Modal: Add Customer Modal -->
+      <div class="modal-overlay" id="desktop-add-customer-modal">
+        <div class="modal-card" style="width: 520px; max-width: 95vw;">
+          <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              ${icon('userPlus', { size: 18, stroke: 2.2 })}
+              <h3>Add New Customer</h3>
+            </div>
+            <button class="sheet-close-btn" id="close-desktop-add-customer-btn" style="position: static;">✕</button>
+          </div>
+          <form id="desktop-form-add-customer">
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Customer Full Name *</label>
+                <input type="text" id="desktop-cust-input-name" placeholder="e.g. Ramesh Patel" required />
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label>Primary Phone *</label>
+                  <input type="tel" id="desktop-cust-input-phone" placeholder="+91 98765 43210" required />
+                </div>
+                <div class="form-group">
+                  <label>Email Address</label>
+                  <input type="email" id="desktop-cust-input-email" placeholder="customer@gmail.com" />
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label>City / Location</label>
+                  <input type="text" id="desktop-cust-input-city" placeholder="e.g. Ahmedabad, Gujarat" />
+                </div>
+                <div class="form-group">
+                  <label>Customer Type</label>
+                  <select id="desktop-cust-input-type">
+                    <option value="Family Traveler">Family</option>
+                    <option value="Couple Getaway">Couple</option>
+                    <option value="Corporate / Group">Corporate</option>
+                    <option value="Luxury Traveler">Luxury</option>
+                    <option value="Solo Traveler">Solo</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Initial Notes / Preferences</label>
+                <textarea id="desktop-cust-input-notes" rows="3" placeholder="Preferences, budget, travel requirements..." style="width: 100%; border: 1px solid #CBD5E1; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 13px; resize: vertical;"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button type="button" class="action-pill-btn" id="desktop-btn-cancel-add-customer">Cancel</button>
+              <button type="submit" class="btn-primary-desktop" id="desktop-btn-save-add-customer" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Customer</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   `;
 
   // Render Table Rows
   const BOOKING_TABS = [
-    { key: 'All Bookings', label: 'All Bookings', short: 'All' },
-    { key: 'New Bookings', label: 'New Bookings', short: 'New' },
+    { key: 'All Quotations', label: 'All Quotations', short: 'All' },
+    { key: 'New Bookings', label: 'New Quotes', short: 'New' },
     { key: 'Assigned', label: 'Assigned', short: 'Assigned' },
-    { key: 'Ongoing', label: 'Ongoing', short: 'Ongoing' },
+    { key: 'Ongoing', label: 'Confirmed', short: 'Confirmed' },
   ];
   const isInquiries = () => page === 'inquiries';
-  const tabDefs = () => (isInquiries() ? INQUIRY_TABS : BOOKING_TABS);
+  const isCustomers = () => page === 'customers';
+  const isQuotation = () => page === 'quotation' || page === 'bookings';
+  const tabDefs = () => (isInquiries() ? INQUIRY_TABS : isCustomers() ? CUSTOMER_TABS : BOOKING_TABS);
   const allKey = () => tabDefs()[0].key;
 
   function matchesSearch(b) {
@@ -448,8 +517,9 @@ export function createDesktopView(container) {
     },
   });
 
-  const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Amount</th>${TH_ACTION}</tr>`;
-  const THEAD_INQUIRIES = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Nights</th><th>Travel Date</th><th class="col-secondary">Assigned To</th><th>Status</th><th class="col-note" style="min-width: 150px;">Quick Note</th>${TH_ACTION}</tr>`;
+  const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip / Package</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Quote Amount</th>${TH_ACTION}</tr>`;
+  const THEAD_INQUIRIES = `<tr>${TH_CHECK}<th class="col-main">Lead / Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Nights</th><th>Travel Date</th><th class="col-secondary">Assigned To</th><th>Status</th><th class="col-note" style="min-width: 150px;">Quick Note</th>${TH_ACTION}</tr>`;
+  const THEAD_CUSTOMERS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Contact &amp; City</th><th class="col-secondary">Customer Type</th><th>Total Trips</th><th class="col-secondary">Assigned Agent</th><th>Status</th><th>Total Spend</th>${TH_ACTION}</tr>`;
 
   const checkboxCell = (b) => `
     <td style="width: 44px; padding-left: 20px; padding-right: 0;" class="td-checkbox-cell">
@@ -494,6 +564,20 @@ export function createDesktopView(container) {
         ${assignedCell(b)}
         <td>${statusPill(b)}</td>
         <td class="col-note">${quickNote(b)}</td>
+        ${actionCell(b)}
+      </tr>`;
+  }
+
+  function customerRow(b, isRowActive) {
+    return `
+      <tr class="${rowClass(b, isRowActive)}" data-desktop-row-id="${b.id}" style="cursor: pointer;">
+        ${checkboxCell(b)}${customerCell(b)}
+        <td><span class="cell-strong">${esc(b.customer?.location || 'India')}</span><div class="cell-sub">${esc(b.customer?.email || '—')}</div></td>
+        <td class="col-secondary"><span class="cell-strong">${esc(b.customer?.customerType || 'Individual')}</span><div class="cell-sub">Source: ${esc(b.customer?.leadSource || 'Direct')}</div></td>
+        <td><span class="cell-strong">${b.pax} ${b.pax === 1 ? 'Trip' : 'Trips'}</span><div class="cell-sub">${esc(b.dates || 'Recent')}</div></td>
+        ${assignedCell(b)}
+        <td>${statusPill(b)}</td>
+        <td><span class="cell-amount">${esc(b.price)}</span></td>
         ${actionCell(b)}
       </tr>`;
   }
@@ -562,7 +646,7 @@ export function createDesktopView(container) {
 
   // Reading pane (PC and tablet): the list is always on the left and the pane on the right. Nothing is selected by itself: the pane shows
   // "Select a booking / an inquiry" until a row is clicked, and goes back to that when the selected record leaves the list or Esc is pressed.
-  const paneEnabled = () => paneLayout() && (page === 'bookings' || page === 'inquiries');
+  const paneEnabled = () => paneLayout() && (page === 'quotation' || page === 'bookings' || page === 'inquiries' || page === 'customers');
   function reconcileSelection(filtered) {
     if (!paneEnabled()) return false;
     if (isInquiries() && (!inquiryState.loaded || inquiryState.failed)) return false;
@@ -590,13 +674,14 @@ export function createDesktopView(container) {
     const drawer = container.querySelector('#desktop-details-drawer');
     drawer.classList.add('is-empty');
     container.querySelector('#desktop-sheet-header').innerHTML = '';
-    container.querySelector('#desktop-sheet-body').innerHTML = selectEmptyState(isInquiries() ? 'an inquiry' : 'a booking');
+    container.querySelector('#desktop-sheet-body').innerHTML = selectEmptyState(isInquiries() ? 'an inquiry' : isCustomers() ? 'a customer' : 'a quotation');
   }
 
   function renderTable() {
     const tbody = container.querySelector('#desktop-table-body');
     if (!tbody) return;
     const inquiry = isInquiries();
+    const customer = isCustomers();
 
     const { base, filtered } = visibleRecords();
     const hadDetail = isDetailDrawerOpen;
@@ -612,9 +697,9 @@ export function createDesktopView(container) {
     renderTabs(container.querySelector('#desktop-tabs-host'), { tabs, active: activeTab, variant: 'desktop', attr: 'data-d-tab' });
     renderTabs(container.querySelector('#desktop-compact-tabs-host'), { tabs, active: activeTab, variant: 'compact', attr: 'data-d-tab' });
 
-    const what = inquiry ? 'inquiries' : 'bookings';
+    const what = inquiry ? 'inquiries & leads' : customer ? 'customers' : 'quotations';
     container.querySelectorAll('#desktop-table-search-input, #desktop-compact-search-input').forEach(i => { i.placeholder = `Search ${what}...`; });
-    container.querySelector('#desktop-thead').innerHTML = inquiry ? THEAD_INQUIRIES : THEAD_BOOKINGS;
+    container.querySelector('#desktop-thead').innerHTML = inquiry ? THEAD_INQUIRIES : customer ? THEAD_CUSTOMERS : THEAD_BOOKINGS;
 
     const compact = container.querySelector('#desktop-compact-list-items');
     const keepScroll = compact ? compact.scrollTop : 0;
@@ -629,7 +714,7 @@ export function createDesktopView(container) {
       tbody.innerHTML = emptyState({ title: `No ${what} found`, text: 'No results matching your query. Try resetting filters.', colspanRow: 10 });
       if (compact) compact.innerHTML = emptyState({ title: `No ${what} found`, text: 'Try resetting filters.', resetId: 'btn-reset-filters-compact' });
     } else {
-      tbody.innerHTML = filtered.map(b => (inquiry ? inquiryRow : bookingRow)(b, activeBooking && activeBooking.id === b.id)).join('');
+      tbody.innerHTML = filtered.map(b => (inquiry ? inquiryRow : customer ? customerRow : bookingRow)(b, activeBooking && activeBooking.id === b.id)).join('');
       if (compact) compact.innerHTML = filtered.map(b => compactCard(b, activeBooking && activeBooking.id === b.id)).join('');
     }
     if (compact) {
@@ -662,7 +747,7 @@ export function createDesktopView(container) {
   // A click, a keyboard move or a new record: select it, remember it in the URL (one history step) and redraw the list.
   function openDrawer(booking, { push = true } = {}) {
     showDetail(booking);
-    if (page === 'bookings' || page === 'inquiries') { if (paneLayout()) writeSelected(booking.id, { push }); }
+    if (page === 'quotation' || page === 'bookings' || page === 'inquiries' || page === 'customers') { if (paneLayout()) writeSelected(booking.id, { push }); }
     renderTable();
     container.querySelector('#desktop-compact-list-items .list-row-card.active')?.scrollIntoView({ block: 'nearest' });
   }
@@ -680,6 +765,93 @@ export function createDesktopView(container) {
     if (render) renderTable();
   }
 
+  function bindDesktopFreightFooter(footerEl, b) {
+    if (!footerEl) return;
+    const primaryBtn = footerEl.querySelector('#desktop-freight-primary-btn');
+    if (primaryBtn) {
+      primaryBtn.addEventListener('click', async () => {
+        const action = primaryBtn.dataset.freightAction;
+        if (action === 'convert-to-enquiry') {
+          try {
+            const freight_details = {
+              ...(b.freight_details || {}),
+              record_type: 'enquiry',
+              stage: 'Received',
+            };
+            const updated = await updateInquiry(b.id, {
+              status: 'ongoing',
+              freight_details,
+            });
+            b.status = 'Ongoing';
+            b.statusClass = 'status-inq-ongoing';
+            b.freight_details = freight_details;
+            if (updated) Object.assign(b, updated);
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Lead for ${b.guest?.name || b.customer_name || 'customer'} successfully converted to Enquiry!`, type: 'success' }
+            }));
+            renderTable();
+            renderDetailPanel();
+          } catch (err) {
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: err.message || 'Failed to convert lead', type: 'warning' }
+            }));
+          }
+        } else if (action === 'create-quotation') {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Quotation builder initiated for ${b.guest?.name || b.customer_name || 'enquiry'}. Opening quotation draft...`, type: 'success' }
+          }));
+        } else if (action === 'confirm-shipment') {
+          if (!b.freight_details) b.freight_details = {};
+          b.freight_details.shipment = b.freight_details.shipment || {};
+          b.freight_details.shipment.has_shipment = true;
+          b.freight_details.stage = 'Customs (Active)';
+          b.status = 'Ongoing';
+          b.statusClass = 'status-inq-ongoing';
+          try {
+            updateInquiry(b.id, {
+              status: 'ongoing',
+              freight_details: b.freight_details,
+            }).catch(() => {});
+          } catch (_) {}
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Shipment confirmed! Operational work order generated.`, type: 'success' }
+          }));
+          renderDetailPanel();
+          renderTable();
+        }
+      });
+    }
+
+    footerEl.querySelector('#desktop-freight-act-call')?.addEventListener('click', () => {
+      const d = getFreightData(b);
+      window.location.href = `tel:${cleanPhone(d.phone)}`;
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: `Connecting call to ${d.name} (${d.phone})...`, type: 'info' }
+      }));
+    });
+
+    footerEl.querySelector('#desktop-freight-act-msg')?.addEventListener('click', () => {
+      const d = getFreightData(b);
+      const url = `https://wa.me/${cleanPhone(d.phone)}?text=${encodeURIComponent(`Hi ${d.name}, this is Ruyi Operations regarding shipment dossier #${b.id}.`)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: `Opening WhatsApp chat with ${d.name}...`, type: 'success' }
+      }));
+    });
+
+    footerEl.querySelector('#desktop-freight-act-fwd')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'Freight dossier forwarded to operations team.', type: 'success' }
+      }));
+    });
+
+    footerEl.querySelector('#desktop-freight-act-more')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'More options: Export PDF, Print Dossier, Reassign Agent.', type: 'info' }
+      }));
+    });
+  }
+
   // Render Details inside Drawer
   function renderDetailPanel() {
     const headerEl = container.querySelector('#desktop-sheet-header');
@@ -688,7 +860,84 @@ export function createDesktopView(container) {
     if (!headerEl || !bodyEl || !activeBooking) return;
 
     const b = activeBooking;
-    if (countBadge) countBadge.textContent = b.guests.length;
+    const isFreight = page === 'inquiries' || b.kind === 'inquiry';
+    const tabsNav = container.querySelector('.desktop-tabs-nav');
+    const footerEl = container.querySelector('#desktop-drawer-footer');
+
+    if (isFreight) {
+      if (!['customer-details', 'requirements', 'shipment-docs', 'updates'].includes(activeDetailTab)) {
+        activeDetailTab = 'customer-details';
+      }
+      if (tabsNav) {
+        tabsNav.innerHTML = renderFreightTabsHtml(activeDetailTab, { attr: 'data-dt-tab' });
+      }
+      if (footerEl) {
+        footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: false });
+        bindDesktopFreightFooter(footerEl, b);
+      }
+
+      headerEl.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: 'close-desktop-detail-btn', isMobile: false });
+      const closeBtn = headerEl.querySelector('#close-desktop-detail-btn');
+      if (closeBtn) closeBtn.addEventListener('click', () => closeDrawer());
+
+      bodyEl.classList.add('is-freight-scroll');
+      bodyEl.innerHTML = renderFreightBodyHtml(b, activeDetailTab);
+      bindFreightBodyEvents(bodyEl, b, (updated) => {
+        if (updated) {
+          Object.assign(b, updated);
+          if (b.raw) Object.assign(b.raw, updated);
+        }
+        renderTable();
+        renderDetailPanel();
+      });
+
+      return;
+    }
+
+    bodyEl.classList.remove('is-freight-scroll');
+
+    // Reset tabsNav and footerEl to standard if coming from freight
+    if (!['customer-details', 'guests', 'itinerary', 'updates'].includes(activeDetailTab)) {
+      activeDetailTab = 'customer-details';
+    }
+    if (tabsNav && !tabsNav.querySelector('[data-dt-tab="guests"]')) {
+      tabsNav.innerHTML = `
+        <button class="sheet-tab-btn ${activeDetailTab === 'customer-details' ? 'active' : ''}" data-dt-tab="customer-details">Customer Details</button>
+        <button class="sheet-tab-btn ${activeDetailTab === 'guests' ? 'active' : ''}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">0</span>)</button>
+        <button class="sheet-tab-btn ${activeDetailTab === 'itinerary' ? 'active' : ''}" data-dt-tab="itinerary">Itinerary</button>
+        <button class="sheet-tab-btn ${activeDetailTab === 'updates' ? 'active' : ''}" data-dt-tab="updates">Updates</button>
+      `;
+    }
+    if (footerEl && !footerEl.querySelector('#desktop-confirm-booking-btn')) {
+      footerEl.innerHTML = `
+        <button class="btn-confirm-booking" id="desktop-confirm-booking-btn">Confirm Booking</button>
+        <div class="sheet-quick-actions-grid desktop-quick-actions-grid">
+          <button class="quick-action-col-btn btn-act-call" id="desktop-act-call" title="Call">
+            ${icon('phone', { size: 20, stroke: 2.2 })}
+            <span>Call</span>
+          </button>
+          <button class="quick-action-col-btn btn-act-msg" id="desktop-act-msg" title="Message">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>Message</span>
+          </button>
+          <button class="quick-action-col-btn btn-act-fwd" id="desktop-act-fwd" title="Forward">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m22 2-7 20-4-9-9-4Z"/>
+              <path d="M22 2 11 13"/>
+            </svg>
+            <span>Forward</span>
+          </button>
+          <button class="quick-action-col-btn btn-act-more" id="desktop-act-more" title="More">
+            ${icon('more', { size: 20, stroke: 2.2 })}
+            <span>More</span>
+          </button>
+        </div>
+      `;
+    }
+
+    if (countBadge) countBadge.textContent = b.guests ? b.guests.length : 0;
 
     // Header: Unified, comprehensive Trip & Booking Header
     const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n => n[0]).join('') || 'CU');
@@ -1332,7 +1581,7 @@ export function createDesktopView(container) {
       renderTable();
     }
 
-    // Page routing: Bookings <-> Inquiries share one workspace (table, split view, detail pane)
+    // Page routing: Enquirey & Leads <-> Customers <-> Quotation share one workspace (table, split view, detail pane)
     const scrollMemory = {};
     function route() {
       const next = currentPage();
@@ -1340,19 +1589,36 @@ export function createDesktopView(container) {
       page = next;
       const scroller = container.querySelector('.desktop-full-table-view');
       if (changed) {
-        scrollMemory[page === 'inquiries' ? 'bookings' : 'inquiries'] = scroller ? scroller.scrollTop : 0;
+        scrollMemory[page] = scroller ? scroller.scrollTop : 0;
         if (isDetailDrawerOpen) closeDrawer({ user: false, render: false });
-        bookings = page === 'inquiries' ? inquiryState.list : bookingsData;
+        if (page === 'inquiries') {
+          bookings = inquiryState.list;
+        } else if (page === 'customers') {
+          bookings = getCustomersList();
+        } else {
+          bookings = bookingsData;
+        }
         bookings.forEach(b => { b.selected = false; });
         activeTab = allKey();
       }
-      container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
+      container.querySelector('#nav-dashboard')?.classList.toggle('active', page === 'dashboard');
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
+      container.querySelector('#nav-customers')?.classList.toggle('active', page === 'customers');
+      container.querySelector('#nav-quotation')?.classList.toggle('active', page === 'quotation' || page === 'bookings');
+      container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'quotation' || page === 'bookings');
       container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
       container.querySelector('#nav-team')?.classList.toggle('active', page === 'team');
-      if (page === 'team') setShellAddAction('Add Member', () => window.dispatchEvent(new CustomEvent('open-add-team-member-modal'))); // the one shared Add; hosted pages set their own
-      else if (page !== 'inquiries' && page !== 'bookings') setShellAddAction(null);
-      else setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') })); // Bookings has no add flow of its own: it opens the same one
+
+      if (page === 'inquiries') {
+        setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') }));
+      } else if (page === 'quotation' || page === 'bookings') {
+        setShellAddAction('Add Quotation', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') }));
+      } else if (page === 'customers') {
+        setShellAddAction('Add Customer', () => openAddCustomerModal());
+      } else {
+        setShellAddAction(null);
+      }
+
       container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
       container.querySelector('#desktop-workspace-split')?.classList.toggle('team-mode', page === 'team');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
@@ -1367,16 +1633,41 @@ export function createDesktopView(container) {
       if (changed && page !== 'team') {
         teamView.selectMember(null, false);
       }
-      if (topSearch) topSearch.placeholder = page === 'team' ? 'Search team members by name or role...' : 'Search by name, trip, destination, or phone...';
-      container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking');
+      if (topSearch) {
+        topSearch.placeholder = page === 'customers'
+          ? 'Search customers by name, phone, email, city...'
+          : page === 'inquiries'
+            ? 'Search inquiries & leads by name, trip, destination, or phone...'
+            : 'Search quotations by ID, customer, trip, destination, or phone...';
+      }
+      const confirmBtn = container.querySelector('#desktop-confirm-booking-btn');
+      if (confirmBtn) {
+        confirmBtn.textContent = page === 'inquiries'
+          ? 'Confirm Inquiry'
+          : page === 'customers'
+            ? 'Customer Profile'
+            : 'Confirm Quotation';
+      }
       applyParams();
       if (changed && scroller) scroller.scrollTop = scrollMemory[page] || 0;
     }
     subscribePage(route);
     subscribeInquiries((ids) => {
-      if (inquiryState.loaded && !inquiryState.failed) container.querySelector('#sidebar-inquiries-badge').textContent = inquiryState.list.length;
+      if (inquiryState.loaded && !inquiryState.failed) {
+        const inqBadge = container.querySelector('#sidebar-inquiries-badge');
+        if (inqBadge) inqBadge.textContent = inquiryState.list.length;
+      }
       if (page !== 'inquiries') return;
       bookings = inquiryState.list;
+      if (activeBooking) activeBooking = bookings.find(b => b.id === activeBooking.id) || null;
+      if (ids && ids.length) patchRows(ids); else renderTable();
+      if (isDetailDrawerOpen && activeBooking) renderDetailPanel();
+    });
+    subscribeCustomers((ids) => {
+      const custBadge = container.querySelector('#sidebar-customers-badge');
+      if (custBadge) custBadge.textContent = getCustomersList().length;
+      if (page !== 'customers') return;
+      bookings = getCustomersList();
       if (activeBooking) activeBooking = bookings.find(b => b.id === activeBooking.id) || null;
       if (ids && ids.length) patchRows(ids); else renderTable();
       if (isDetailDrawerOpen && activeBooking) renderDetailPanel();
@@ -1385,10 +1676,10 @@ export function createDesktopView(container) {
       if (isDetailDrawerOpen && activeDetailTab === 'customer-details' && activeBooking) renderDetailPanel();
     });
     window.addEventListener('layout-changed', () => { if (isDetailDrawerOpen) closeDrawer({ user: false, render: false }); renderTable(); });
-    // The centred popups of the detail panel (customer, special requirements, event details / edit): a backdrop click, Esc and Cancel act like their round X
-    const POPUPS = '#desktop-edit-customer-modal, #desktop-special-req-modal, #desktop-activity-details-modal, #desktop-edit-activity-modal';
+    // The centred popups of the detail panel: a backdrop click, Esc and Cancel act like their round X
+    const POPUPS = '#desktop-edit-customer-modal, #desktop-special-req-modal, #desktop-activity-details-modal, #desktop-edit-activity-modal, #desktop-add-followup-modal, #desktop-add-customer-modal';
     container.querySelectorAll(POPUPS).forEach((ov) => ov.addEventListener('click', (e) => {
-      if (e.target === ov || e.target.closest('#desktop-btn-cancel-special-req')) ov.querySelector('.sheet-close-btn')?.click();
+      if (e.target === ov || e.target.closest('#desktop-btn-cancel-special-req, #desktop-btn-cancel-add-customer')) ov.querySelector('.sheet-close-btn')?.click();
     }));
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
@@ -1397,14 +1688,52 @@ export function createDesktopView(container) {
       e.stopImmediatePropagation();
       open.querySelector('.sheet-close-btn')?.click();
     }, true);
+
+    function openAddCustomerModal() {
+      const modal = container.querySelector('#desktop-add-customer-modal');
+      if (!modal) return;
+      modal.classList.add('open');
+      modal.querySelector('#desktop-cust-input-name')?.focus();
+    }
+    const addCustForm = container.querySelector('#desktop-form-add-customer');
+    if (addCustForm) {
+      addCustForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = container.querySelector('#desktop-cust-input-name').value.trim();
+        const phone = container.querySelector('#desktop-cust-input-phone').value.trim();
+        const email = container.querySelector('#desktop-cust-input-email').value.trim();
+        const location = container.querySelector('#desktop-cust-input-city').value.trim();
+        const customerType = container.querySelector('#desktop-cust-input-type').value;
+        const notes = container.querySelector('#desktop-cust-input-notes').value.trim();
+        if (!name) return;
+        const record = addCustomer({ name, phone, email, location, customerType, notes });
+        container.querySelector('#desktop-add-customer-modal').classList.remove('open');
+        addCustForm.reset();
+        toast(`Customer "${name}" added successfully!`, 'success');
+        showNewInquiry(record);
+      });
+    }
+    container.querySelector('#close-desktop-add-customer-btn')?.addEventListener('click', () => {
+      container.querySelector('#desktop-add-customer-modal').classList.remove('open');
+    });
+    container.querySelector('#desktop-btn-cancel-add-customer')?.addEventListener('click', () => {
+      container.querySelector('#desktop-add-customer-modal').classList.remove('open');
+    });
+
     container.addEventListener('click', (e) => { if (e.target.id === 'desktop-workspace-split' && isDetailDrawerOpen) closeDrawer(); });
     bindListKeys(container.querySelector('#desktop-compact-list-items'), { getList: () => visibleRecords().filtered, getActiveId: () => activeBooking?.id, onSelect: (b) => openDrawer(b, { push: false }) });
     window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
     loadFollowUps();
     loadInquiries();
+    const custBadgeInit = container.querySelector('#sidebar-customers-badge');
+    if (custBadgeInit) custBadgeInit.textContent = getCustomersList().length;
+    const quoteBadgeInit = container.querySelector('#sidebar-quotation-badge');
+    if (quoteBadgeInit) quoteBadgeInit.textContent = bookingsData.length;
     syncBookingPayments().then(() => {
       bookingsData.splice(0, bookingsData.length, ...INITIAL_BOOKINGS);
-      if (page === 'bookings') {
+      const quoteBadge = container.querySelector('#sidebar-quotation-badge');
+      if (quoteBadge) quoteBadge.textContent = bookingsData.length;
+      if (page === 'quotation' || page === 'bookings') {
         bookings = bookingsData;
         renderTable();
       }
@@ -1520,11 +1849,15 @@ export function createDesktopView(container) {
     route();
 
     // Detail Panel Tabs
-    container.querySelectorAll('[data-dt-tab]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        switchDetailTab(btn.dataset.dtTab);
+    const dtTabsNav = container.querySelector('.desktop-tabs-nav');
+    if (dtTabsNav) {
+      dtTabsNav.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-dt-tab]');
+        if (btn && btn.dataset.dtTab) {
+          switchDetailTab(btn.dataset.dtTab);
+        }
       });
-    });
+    }
 
     // Backdrop click closes drawer
     const backdrop = container.querySelector('#desktop-drawer-backdrop');
@@ -1572,6 +1905,67 @@ export function createDesktopView(container) {
       // Drawer Close Button (delegated)
       if (e.target.closest('#close-desktop-detail-btn')) {
         closeDrawer();
+        return;
+      }
+
+      // Delegated Freight Footer Action Buttons (Confirm Shipment, Call, Message, Forward, More)
+      if (e.target.closest('#desktop-freight-primary-btn')) {
+        if (activeBooking) {
+          if (!activeBooking.freight_details) activeBooking.freight_details = {};
+          activeBooking.freight_details.shipment = activeBooking.freight_details.shipment || {};
+          activeBooking.freight_details.shipment.has_shipment = true;
+          activeBooking.freight_details.stage = 'Customs (Active)';
+          activeBooking.status = 'Ongoing';
+          activeBooking.statusClass = 'status-inq-ongoing';
+          try {
+            updateInquiry(activeBooking.id, {
+              status: 'ongoing',
+              freight_details: activeBooking.freight_details,
+            }).catch(() => {});
+          } catch (_) {}
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Shipment confirmed! Operational work order generated.`, type: 'success' }
+          }));
+          renderDetailPanel();
+          renderTable();
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-freight-act-call')) {
+        if (activeBooking) {
+          const d = getFreightData(activeBooking);
+          window.location.href = `tel:${cleanPhone(d.phone)}`;
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Connecting call to ${d.name} (${d.phone})...`, type: 'info' }
+          }));
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-freight-act-msg')) {
+        if (activeBooking) {
+          const d = getFreightData(activeBooking);
+          const url = `https://wa.me/${cleanPhone(d.phone)}?text=${encodeURIComponent(`Hi ${d.name}, this is Ruyi Operations regarding shipment dossier #${activeBooking.id}.`)}`;
+          window.open(url, '_blank', 'noopener,noreferrer');
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Opening WhatsApp chat with ${d.name}...`, type: 'success' }
+          }));
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-freight-act-fwd')) {
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: 'Freight dossier forwarded to operations team.', type: 'success' }
+        }));
+        return;
+      }
+
+      if (e.target.closest('#desktop-freight-act-more')) {
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: 'More options: Export PDF, Print Dossier, Reassign Agent.', type: 'info' }
+        }));
         return;
       }
       if (e.target.closest('#desktop-view-booking') && activeBooking) {
@@ -1715,7 +2109,7 @@ export function createDesktopView(container) {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ special_requirements: activeBooking.specialRequirements || [] })
-          }).catch(() => {});
+          }).catch(() => { });
         }
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Special requirements updated successfully!', type: 'success' }
@@ -2073,7 +2467,7 @@ export function createDesktopView(container) {
               location: location || null,
               notes: notes || null,
             })
-          }).catch(() => {});
+          }).catch(() => { });
         } else {
           fetch(`/api/bookings/${encodeURIComponent(activeBooking.id)}`, {
             method: 'PUT',
@@ -2088,7 +2482,7 @@ export function createDesktopView(container) {
               status,
               notes
             })
-          }).catch(() => {});
+          }).catch(() => { });
         }
 
         container.querySelector('#desktop-edit-customer-modal')?.classList.remove('open');
@@ -2170,7 +2564,7 @@ export function createDesktopView(container) {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ status: 'hot' })
-          }).catch(() => {});
+          }).catch(() => { });
           toast(`Inquiry ${activeBooking.id} (${activeBooking.title}) confirmed.`, 'success');
           renderTable();
           renderDetailPanel();
@@ -2184,7 +2578,7 @@ export function createDesktopView(container) {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ status: 'Confirmed' })
-          }).catch(() => {});
+          }).catch(() => { });
           renderTable();
           renderDetailPanel();
           window.dispatchEvent(new CustomEvent('show-toast', {

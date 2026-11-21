@@ -7,7 +7,7 @@ services:
   # 1. Laravel 12 Backend + Livewire Web Service (Docker)
   # ---------------------------------------------------------------------------
   - type: web
-    name: ruyi-admin-backend
+    name: infinity-crm-backend
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
@@ -17,7 +17,7 @@ services:
 
     envVars:
       - key: APP_NAME
-        value: "Ruyi Admin"
+        value: "INFINITY CRM"
 
       - key: APP_ENV
         value: production
@@ -50,7 +50,7 @@ services:
   # 2. Standalone Frontend Demo (Static Site)
   # ---------------------------------------------------------------------------
   - type: web
-    name: ruyi-admin-frontend
+    name: infinity-crm-frontend
     runtime: static
     buildCommand: ""
     staticPublishPath: ./frontend

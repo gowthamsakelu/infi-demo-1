@@ -44,11 +44,19 @@ export function lockScroll() {
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-export function toast(message, type = 'info') {
-  window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type } }));
+/** `action` ({ label, onClick }) adds a link to the toast, e.g. "View". */
+export function toast(message, type = 'info', action = null) {
+  window.dispatchEvent(new CustomEvent('show-toast', { detail: { message, type, action } }));
 }
 
+/** Text that is safe inside an HTML attribute and inside a quoted string of an inline handler (quotes and backslashes dropped). */
+export const jsq = (v) => esc(String(v ?? '').replace(/[\\'"`$<>\r\n]/g, ' '));
+
+/** What an inquiry saved without a name is called everywhere. */
+export const UNNAMED_LEAD = 'Unnamed lead';
+
 export function initials(name) {
+  if (name === UNNAMED_LEAD) return '?';
   return (String(name || '').replace(/^(mr|mrs|ms|dr)\.?\s+/i, '').split(/\s+/).filter(Boolean).slice(0, 2).map((n) => n[0]).join('') || 'CU').toUpperCase();
 }
 
@@ -69,7 +77,7 @@ export function searchBox({ id, placeholder, value = '', variant = 'desktop' }) 
  */
 export function statusTabs({ tabs, active, variant = 'desktop', attr = 'data-tab' }) {
   if (variant === 'mobile') {
-    return `<div class="category-filter-tabs" role="tablist">${tabs.map((t) => `
+    return `<div class="category-filter-tabs scroll-row" role="tablist">${tabs.map((t) => `
       <button class="tab-pill ${t.key === active ? 'active' : ''}" role="tab" aria-selected="${t.key === active}" ${attr}="${esc(t.key)}">
         ${esc(t.label)} <span class="pill-badge">${t.count}</span>
       </button>`).join('')}</div>`;
@@ -143,12 +151,21 @@ export function checkbox({ checked, attr, id, label }) {
 }
 
 /** Close `el` on outside click or Esc. Returns a disposer. */
+/** A layer opened by a tap ignores outside presses for this long, so the tap (or its ghost click) that opened it cannot close it. */
+export const OPEN_GUARD_MS = 350;
+export function armedAfterOpen() {
+  const opened = performance.now();
+  return () => performance.now() - opened > OPEN_GUARD_MS;
+}
+
 export function dismissOnOutside(el, onClose, ignore = []) {
+  const armed = armedAfterOpen();
   const down = (e) => {
-    if (el.contains(e.target) || ignore.some((n) => n && n.contains(e.target))) return;
+    if (!armed() || el.contains(e.target) || ignore.some((n) => n && n.contains(e.target))) return;
     onClose();
   };
-  const key = (e) => { if (e.key === 'Escape') onClose(); };
+  // Esc is used up by the open overlay, so nothing behind it (such as the detail pane) reacts to the same key press.
+  const key = (e) => { if (e.key === 'Escape') { e.preventDefault(); onClose(); } };
   document.addEventListener('mousedown', down, true);
   document.addEventListener('touchstart', down, true);
   document.addEventListener('keydown', key);
@@ -158,6 +175,25 @@ export function dismissOnOutside(el, onClose, ignore = []) {
     document.removeEventListener('keydown', key);
   };
 }
+
+/**
+ * Backdrop press-to-close: only when the press AND the click both began on the backdrop itself, and not during OPEN_GUARD_MS after opening.
+ * A drag that starts inside the sheet and ends on the backdrop, or the tap that opened the layer, does not close it.
+ */
+export function backdropDismiss(overlay, onClose) {
+  const armed = armedAfterOpen();
+  let pressedOnBackdrop = false;
+  const down = (e) => { pressedOnBackdrop = e.target === overlay; };
+  const click = (e) => {
+    const start = pressedOnBackdrop;
+    pressedOnBackdrop = false;
+    if (start && armed() && e.target === overlay) onClose();
+  };
+  overlay.addEventListener('pointerdown', down);
+  overlay.addEventListener('click', click);
+  return () => { overlay.removeEventListener('pointerdown', down); overlay.removeEventListener('click', click); };
+}
+
 
 /**
  * Floating menu anchored to a trigger. Fixed-positioned so scroll containers never clip it.
@@ -176,10 +212,11 @@ export function openRowMenu(trigger, items, onSelect) {
     <button class="dropdown-item-btn ${it.danger ? 'item-danger' : ''}" role="menuitem" data-menu-key="${it.key}">
       ${icon(it.icon, { size: 15 })}<span>${esc(it.label)}</span>
     </button>`).join('');
+  const initialRect = trigger.getBoundingClientRect();
+  // One dropdown for every screen size: fixed layer, right edge on the trigger's, downward (upward when there is no room), kept 8px inside the screen.
   menu.style.visibility = 'hidden';
   document.body.appendChild(menu);
-
-  const r = trigger.getBoundingClientRect();
+  const r = initialRect;
   const mw = menu.offsetWidth;
   const mh = menu.offsetHeight;
   const left = Math.max(8, Math.min(r.right - mw, window.innerWidth - mw - 8));
@@ -196,13 +233,13 @@ export function openRowMenu(trigger, items, onSelect) {
 
   trigger.setAttribute('aria-expanded', 'true');
   afterPaint(() => menu.classList.add('open'));
-  menu.focus({ preventScroll: true }); // the menu itself, never an input
+  menu.focus({ preventScroll: true }); // focus stays on the menu, never an input
 
   const dispose = dismissOnOutside(menu, () => close(), [trigger]);
   // Close when the page scrolls the trigger away from where the menu was placed.
   const onScroll = () => {
     const now = trigger.getBoundingClientRect();
-    if (Math.abs(now.top - r.top) > 2 || Math.abs(now.left - r.left) > 2) close();
+    if (Math.abs(now.top - initialRect.top) > 2 || Math.abs(now.left - initialRect.left) > 2) close();
   };
   window.addEventListener('resize', onScroll);
   window.addEventListener('scroll', onScroll, true);
@@ -210,6 +247,7 @@ export function openRowMenu(trigger, items, onSelect) {
   menu.addEventListener('click', (e) => {
     const b = e.target.closest('[data-menu-key]');
     if (!b) return;
+    e.stopPropagation(); // the tap that picks an item is not a tap on anything under the menu
     close();
     onSelect(b.dataset.menuKey);
   });
@@ -280,12 +318,24 @@ export function skeletonCards(n = 5) {
 export function skeletonRows(cols, n = 8) {
   return Array.from({ length: n }, () => `<tr class="skel-row" aria-hidden="true">${Array.from({ length: cols }, () => '<td><div class="skel"></div></td>').join('')}</tr>`).join('');
 }
-export function errorState({ title, text, retryId }) {
-  return `<div class="state-box is-error" role="alert"><h4>${esc(title)}</h4><p>${esc(text)}</p><button class="btn-secondary-desktop" id="${retryId}" style="height:36px;">Try again</button></div>`;
-}
-
 /** The detail pane when nothing is selected (PC and tablet): "Select a booking" and one muted line. `noun` is "a booking", "an inquiry", "a package" ... */
 export function selectEmptyState(noun, hint = 'Choose an item from the list to see its details here.') {
   return `<div class="state-box detail-empty"><div class="state-box-ico">${icon('eye', { size: 22 })}</div><h4>Select ${esc(noun)}</h4><p>${esc(hint)}</p></div>`;
 }
 
+/** The sentence under "Could not load ...": no answer from the server vs. a server error. Never the raw error text. */
+export function loadErrorText(error, what = 'this') {
+  if (error?.kind === 'network') return "Can't reach the server. Check your connection and try again.";
+  if (error?.kind === 'server') return `Something went wrong loading ${what}. Try again.`;
+  return 'Check your connection and try again.';
+}
+
+/**
+ * The one "could not load" state: round icon, normal heading, one muted line, the white outlined "Try again" button.
+ * `error` (an ApiError) picks the sentence; `what` is "settings", "packages" ...; `retryId` or `retryAttr` (e.g. 'data-st-retry') is the page's hook.
+ */
+export function errorState({ title, text, retryId = '', retryAttr = '', error = null, what = '' }) {
+  const line = error || what ? loadErrorText(error, what) : text;
+  const hook = retryAttr || `id="${esc(retryId)}"`;
+  return `<div class="state-box is-error" role="alert"><div class="state-box-ico">${icon('alertCircle', { size: 22 })}</div><h4>${esc(title)}</h4><p>${esc(line)}</p><button type="button" class="btn-secondary-desktop" ${hook}>Try again</button></div>`;
+}

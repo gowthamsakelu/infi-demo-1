@@ -1,18 +1,50 @@
 // Itinerary data helpers (days + events) and persistence, shared by Bookings and Inquiries.
-import { toast } from './ui.js';
+import { toast, esc } from './ui.js';
+import { icon } from './icons.js';
 
-export const EVENT_TYPES = [
-  { value: 'sightseeing', label: 'Sightseeing / Tour', icon: 'camera', iconKey: 'camera' },
-  { value: 'transport', label: 'Transport / Bus', icon: 'bus', iconKey: 'bus' },
-  { value: 'hotel', label: 'Hotel / Accommodation', icon: 'bed', iconKey: 'bed' },
-  { value: 'activity', label: 'Sport / Adventure', icon: 'raft', iconKey: 'raft' },
-  { value: 'food', label: 'Restaurant / Meal', icon: 'utensils', iconKey: 'restaurant' },
-];
+/** Label and icon of an event for the Assign sheet summary card. */
+export function eventKind(item) {
+  const key = { stay: ['Hotel', 'bed'], hotel: ['Hotel', 'bed'], transport: ['Transport', 'bus'], bus: ['Transport', 'bus'], meal: ['Meal', 'utensils'], food: ['Meal', 'utensils'], note: ['Note', 'note'] }[item.type];
+  return key ? { label: key[0], icon: key[1] } : { label: 'Activity', icon: 'camera' };
+}
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const MON = Object.fromEntries(MONTHS.map((m, i) => [m.toLowerCase(), i]));
 
 export const kindOf = (b) => (b.kind === 'inquiry' ? 'inquiries' : 'bookings');
+
+// Icon of an event on the timeline: the stored icon first, then the event type (older and newer names both work).
+const ICON_KEY = { bus: 'bus', transport: 'bus', bed: 'bed', hotel: 'bed', stay: 'bed', camera: 'camera', sightseeing: 'camera', raft: 'raft', activity: 'raft', restaurant: 'restaurant', food: 'restaurant', meal: 'restaurant', note: 'note' };
+const ICON_NAME = { bus: 'bus', bed: 'bed', camera: 'camera', raft: 'raft', restaurant: 'utensils', note: 'note' };
+export function itemIconHtml(item, size = 18) {
+  const key = ICON_KEY[item.icon] || ICON_KEY[item.type] || 'restaurant';
+  return `<div class="item-icon-box item-icon-${key}">${icon(ICON_NAME[key], { size })}</div>`;
+}
+
+/** "Not included" / "Staff only" pills shown on an event card. */
+export function itemPills(item) {
+  const out = [];
+  if (item.inclusion === 'not_included') out.push('<span class="pill-not-included" title="Not included in the package">Not included</span>');
+  if (item.type === 'note' && item.visibleToCustomer === false) out.push(`<span class="pill-staff-only" title="Staff only">${icon('lock', { size: 11, stroke: 2.4 })}Staff only</span>`);
+  return out.join('');
+}
+
+/** First and last day of the trip as Dates ([null, null] when unknown). */
+export function tripRange(b) {
+  const start = tripStart(b);
+  if (!start) return [null, null];
+  if (b.kind === 'inquiry') {
+    const end = new Date(start);
+    end.setDate(end.getDate() + Math.max(0, (Number(b.raw?.nights) || 0)));
+    return [start, end];
+  }
+  const text = b.travelDateFull || b.dates || '';
+  const m = text.match(/(\d{1,2})\s+([A-Za-z]{3})\s*[-–]\s*(\d{1,2})\s+([A-Za-z]{3})/);
+  if (!m) return [start, start];
+  const end = new Date(start.getFullYear(), MON[m[4].toLowerCase()], Number(m[3]));
+  if (end < start) end.setFullYear(end.getFullYear() + 1);
+  return [start, end];
+}
 
 /** First day of the trip as a Date, from the booking text ("18 Nov - 20 Nov 2024 (...)") or the inquiry travel date. */
 export function tripStart(b) {
@@ -41,17 +73,6 @@ export function dateForDay(b, n) {
 export const daysOf = (b) => (b.itineraryDays = b.itineraryDays || []);
 export const dayName = (n) => `Day ${n}`;
 
-/** Build the next (empty) day for a booking / inquiry. */
-export function makeDay(b, title = '') {
-  const n = daysOf(b).length + 1;
-  return { day: dayName(n), date: dateForDay(b, n) || 'TBD', title: title.trim() || undefined, items: [] };
-}
-
-export function makeEvent({ title, subtitle, type }) {
-  const t = EVENT_TYPES.find((x) => x.value === type) || EVENT_TYPES[0];
-  return { id: `IT-EVT-${Date.now()}-${Math.floor(Math.random() * 1000)}`, type: t.value, icon: t.iconKey, title: title.trim(), subtitle: subtitle.trim() || 'Scheduled event', assigned: null, completed: false };
-}
-
 /** Renumber "Day n" labels (and dates, when the trip has a start date) after a day is removed. */
 export function renumber(b) {
   daysOf(b).forEach((d, i) => { d.day = dayName(i + 1); const dt = dateForDay(b, i + 1); if (dt) d.date = dt; });
@@ -65,11 +86,11 @@ const clone = (v) => JSON.parse(JSON.stringify(v));
  */
 export const snapshot = (b) => clone(daysOf(b));
 
-export async function saveItinerary(b, before, { onRollback } = {}) {
+export async function saveItinerary(b, before, { onRollback, meta } = {}) {
   try {
     const res = await fetch(`/api/${kindOf(b)}/${encodeURIComponent(b.id)}/itinerary`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ days: daysOf(b) }),
+      body: JSON.stringify({ days: daysOf(b), ...(meta ? { meta } : {}) }),
     });
     if (!res.ok) throw new Error(String(res.status));
     return true;

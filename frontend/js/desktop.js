@@ -2,20 +2,38 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, selectEmptyState, toast, openRowMenu, closeRowMenu, esc, initials, skeletonRows, errorState, checkbox } from './shared/ui.js';
+import { searchBox, emptyState, selectEmptyState, toast, openRowMenu, closeRowMenu, esc, jsq, initials, skeletonRows, errorState, checkbox } from './shared/ui.js';
 import { selectedOf, setSelected, toggleRow } from './shared/selection.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
-import { renderTabs, avatar, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bindQuickNotes, rowCard, bulkBar, bindBulkBar, updateBulkBar, inlineSelectionBar, updateInlineBar } from './shared/list-ui.js';
+import { renderTabs, avatar, justAddedTag, categoryBadge, statusPill, rowActionButtons, rowMenuItems, assignItems, quickNote, bindQuickNotes, rowCard, bulkBar, bindBulkBar, updateBulkBar, inlineSelectionBar, updateInlineBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
-import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
+import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments, updateInquiry } from './shared/inquiry-store.js';
+import {
+  renderFreightHeaderHtml,
+  renderFreightTabsHtml,
+  renderFreightBodyHtml,
+  renderFreightFooterHtml,
+  bindFreightBodyEvents,
+  openFreightEditModal,
+  uploadFreightDoc,
+  getFreightData,
+  cleanPhone,
+} from './shared/freight-popup.js';
+import { getCustomersList, CUSTOMER_TABS, addCustomer, subscribeCustomers } from './shared/customer-store.js';
 import { openAssign } from './shared/assign-sheet.js';
 import { openDayDialog, commit } from './shared/itinerary-dialog.js';
 import { daysOf, persist, renumber, eventKind, itemIconHtml, itemPills } from './shared/itinerary.js';
 import { openItineraryBuilder } from './shared/itinerary-builder-ui.js';
+import { scheduleHtml } from './shared/schedule.js';
+import { sidebarNavHtml, bindSidebar } from './shared/nav-ui.js';
 import { matchesCategory } from './shared/booking-filters.js';
 import { createDesktopCalendar } from './calendar-desktop.js';
+import { openAddInquiry } from './shared/add-inquiry.js';
+import { addButtonHtml, setShellAddAction } from './shared/add-button.js';
+import { paneLayout, selectedParam, writeSelected, chooseRecord, bindListKeys } from './shared/split-view.js';
 import { createDesktopTeam } from './team-desktop.js';
+import { getBranding } from './shared/branding.js';
 
 export function createDesktopView(container) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -30,6 +48,7 @@ export function createDesktopView(container) {
   let selectedCategory = 'ALL';
   let activeBooking = null; // Default: closed popup, table is full-width!
   let isDetailDrawerOpen = false;
+  let wantedId = null; // ?selected= from the address bar
   let activeDetailTab = 'customer-details';
   let guestSearchQuery = '';
   let showAllGuests = false;
@@ -47,97 +66,18 @@ export function createDesktopView(container) {
             </svg>
           </div>
           <div class="brand-text-col">
-            <h2>Ruyi Admin</h2>
-            <p>Travel Operations</p>
+            <h2>${esc(getBranding().companyName || 'INFINITY')}</h2>
+            <p>${esc(getBranding().tagline || 'infinite freights, infinite ways')}</p>
           </div>
         </div>
 
-        <nav class="sidebar-nav">
-          <span class="nav-section-title">Menu</span>
-          <a class="sidebar-nav-item" href="#dashboard" id="nav-dashboard">
-            <div class="nav-left">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="7" height="9" x="3" y="3" rx="1"/>
-                <rect width="7" height="5" x="14" y="3" rx="1"/>
-                <rect width="7" height="9" x="14" y="12" rx="1"/>
-                <rect width="7" height="5" x="3" y="16" rx="1"/>
-              </svg>
-              <span>Dashboard</span>
-            </div>
-          </a>
-
-          <a class="sidebar-nav-item ${currentPage() === 'bookings' ? 'active' : ''}" href="#bookings" id="nav-bookings">
-            <div class="nav-left">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                <rect width="20" height="14" x="2" y="6" rx="2"/>
-              </svg>
-              <span>Bookings</span>
-            </div>
-            <span class="sidebar-badge" id="sidebar-total-badge">28</span>
-          </a>
-
-          <a class="sidebar-nav-item ${currentPage() === 'inquiries' ? 'active' : ''}" href="#inquiries" id="nav-inquiries">
-            <div class="nav-left">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span>Inquiries</span>
-            </div>
-            <span class="sidebar-badge" id="sidebar-inquiries-badge">8</span>
-          </a>
-
-          <a class="sidebar-nav-item ${currentPage() === 'calendar' ? 'active' : ''}" href="#calendar" id="nav-calendar">
-            <div class="nav-left">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                <line x1="16" x2="16" y1="2" y2="6"/>
-                <line x1="8" x2="8" y1="2" y2="6"/>
-                <line x1="3" x2="21" y1="10" y2="10"/>
-              </svg>
-              <span>Calendar</span>
-            </div>
-          </a>
-
-          <a class="sidebar-nav-item ${currentPage() === 'team' ? 'active' : ''}" href="#team" id="nav-team">
-            <div class="nav-left">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-              <span>Operations Team</span>
-            </div>
-            <span class="sidebar-badge" id="sidebar-team-badge">5</span>
-          </a>
-
-          <span class="nav-section-title nav-section-team-title" id="nav-section-operations" style="cursor: pointer;" title="Operations Team Roster">Staff Members</span>
-          ${STAFF_MEMBERS.map(s => `
-            <div class="sidebar-nav-item staff-member-item" data-staff-id="${s.id}" style="cursor: pointer;" title="View ${s.name}'s profile and trips">
-              <div class="nav-left">
-                <img src="${s.avatar}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;" />
-                <span style="font-size: 13px;">${s.name}</span>
-              </div>
-              <span class="sidebar-badge" style="font-size: 10px;">${s.activeTrips} trips</span>
-            </div>
-          `).join('')}
-
-          <span class="nav-section-title">System</span>
-          <a class="sidebar-nav-item" href="#settings" id="nav-settings">
-            <div class="nav-left">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
-              <span>Settings</span>
-            </div>
-          </a>
+        <nav class="sidebar-nav" aria-label="Main">
+          ${sidebarNavHtml(currentPage())}
         </nav>
 
         <div class="sidebar-profile-box">
           <div class="profile-user-left">
-            <div class="ks-avatar-badge">G</div>
+            <button type="button" class="ks-avatar-badge" aria-haspopup="menu" aria-label="Account menu">G</button>
             <div>
               <h4>Gautham</h4>
               <p>Administrator</p>
@@ -157,6 +97,7 @@ export function createDesktopView(container) {
           </div>
 
           <div class="desktop-header-actions">
+            ${addButtonHtml('desktop-page-add')}
             <div class="desktop-notification-wrapper" style="position: relative;">
               <button class="icon-bell-btn" id="desktop-bell-btn" title="Notifications" aria-label="Notifications">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -173,6 +114,7 @@ export function createDesktopView(container) {
         <!-- Body with Table and Inline Details (Clean, Spacious & Outlook Split View) -->
         <div class="desktop-body">
           <div class="desktop-content-col">
+            <div id="desktop-page-host"></div>
             <!-- Workspace Split: Table + Inline Details Pane (Outlook Style) -->
             <div class="desktop-workspace-split" id="desktop-workspace-split">
               <!-- Left Column: Master View (Full Table when closed, Slim Outlook Master List when open) -->
@@ -204,9 +146,6 @@ export function createDesktopView(container) {
                         <input type="text" id="desktop-compact-search-input" placeholder="Search bookings..." value="${searchQuery}" aria-label="Search" />
                       </div>
                       <span id="desktop-compact-filter-slot"></span>
-                      <button class="btn-expand-full-table" id="desktop-btn-expand-table" title="Expand to Full Table View" aria-label="Expand to full table">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                      </button>
                       ${inlineSelectionBar('compact')}
                     </div>
                     <div id="desktop-compact-tabs-host"></div>
@@ -238,7 +177,7 @@ export function createDesktopView(container) {
                 </div>
 
                 <!-- Navigation Tabs -->
-                <div class="sheet-tabs-nav desktop-tabs-nav">
+                <div class="sheet-tabs-nav desktop-tabs-nav scroll-row">
                   <button class="sheet-tab-btn ${activeDetailTab === 'customer-details' ? 'active' : ''}" data-dt-tab="customer-details">Customer Details</button>
                   <button class="sheet-tab-btn ${activeDetailTab === 'guests' ? 'active' : ''}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">0</span>)</button>
                   <button class="sheet-tab-btn ${activeDetailTab === 'itinerary' ? 'active' : ''}" data-dt-tab="itinerary">Itinerary</button>
@@ -288,7 +227,7 @@ export function createDesktopView(container) {
         <div class="modal-card">
           <div class="modal-header">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
                 <line x1="16" x2="8" y1="13" y2="13"/>
@@ -317,6 +256,7 @@ export function createDesktopView(container) {
             </div>
           </div>
           <div class="modal-footer">
+            <button class="btn-secondary-desktop" id="desktop-btn-cancel-special-req" type="button">Cancel</button>
             <button class="btn-confirm-booking" id="desktop-btn-done-special-req" style="height: 40px; font-size: 13.5px; border-radius: 10px;">Save & Apply</button>
           </div>
         </div>
@@ -382,7 +322,7 @@ export function createDesktopView(container) {
         <div class="modal-card" style="width: 520px; max-width: 95vw;">
           <div class="modal-header">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
@@ -447,7 +387,7 @@ export function createDesktopView(container) {
         <div class="modal-card" style="width: 500px; max-width: 95vw;">
           <div class="modal-header">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="3 11 22 2 13 21 11 13 3 11"/>
               </svg>
               <h3>Add Follow-up Entry</h3>
@@ -483,18 +423,75 @@ export function createDesktopView(container) {
           </div>
         </div>
       </div>
+
+      <!-- Desktop Modal: Add Customer Modal -->
+      <div class="modal-overlay" id="desktop-add-customer-modal">
+        <div class="modal-card" style="width: 520px; max-width: 95vw;">
+          <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              ${icon('userPlus', { size: 18, stroke: 2.2 })}
+              <h3>Add New Customer</h3>
+            </div>
+            <button class="sheet-close-btn" id="close-desktop-add-customer-btn" style="position: static;">✕</button>
+          </div>
+          <form id="desktop-form-add-customer">
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Customer Full Name *</label>
+                <input type="text" id="desktop-cust-input-name" placeholder="e.g. Ramesh Patel" required />
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label>Primary Phone *</label>
+                  <input type="tel" id="desktop-cust-input-phone" placeholder="+91 98765 43210" required />
+                </div>
+                <div class="form-group">
+                  <label>Email Address</label>
+                  <input type="email" id="desktop-cust-input-email" placeholder="customer@gmail.com" />
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label>City / Location</label>
+                  <input type="text" id="desktop-cust-input-city" placeholder="e.g. Ahmedabad, Gujarat" />
+                </div>
+                <div class="form-group">
+                  <label>Customer Type</label>
+                  <select id="desktop-cust-input-type">
+                    <option value="Family Traveler">Family</option>
+                    <option value="Couple Getaway">Couple</option>
+                    <option value="Corporate / Group">Corporate</option>
+                    <option value="Luxury Traveler">Luxury</option>
+                    <option value="Solo Traveler">Solo</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Initial Notes / Preferences</label>
+                <textarea id="desktop-cust-input-notes" rows="3" placeholder="Preferences, budget, travel requirements..." style="width: 100%; border: 1px solid #CBD5E1; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 13px; resize: vertical;"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button type="button" class="action-pill-btn" id="desktop-btn-cancel-add-customer">Cancel</button>
+              <button type="submit" class="btn-primary-desktop" id="desktop-btn-save-add-customer" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Customer</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   `;
 
   // Render Table Rows
   const BOOKING_TABS = [
-    { key: 'All Bookings', label: 'All Bookings', short: 'All' },
-    { key: 'New Bookings', label: 'New Bookings', short: 'New' },
+    { key: 'All Quotations', label: 'All Quotations', short: 'All' },
+    { key: 'New Bookings', label: 'New Quotes', short: 'New' },
     { key: 'Assigned', label: 'Assigned', short: 'Assigned' },
-    { key: 'Ongoing', label: 'Ongoing', short: 'Ongoing' },
+    { key: 'Ongoing', label: 'Confirmed', short: 'Confirmed' },
   ];
   const isInquiries = () => page === 'inquiries';
-  const tabDefs = () => (isInquiries() ? INQUIRY_TABS : BOOKING_TABS);
+  const isCustomers = () => page === 'customers';
+  const isQuotation = () => page === 'quotation' || page === 'bookings';
+  const tabDefs = () => (isInquiries() ? INQUIRY_TABS : isCustomers() ? CUSTOMER_TABS : BOOKING_TABS);
   const allKey = () => tabDefs()[0].key;
 
   function matchesSearch(b) {
@@ -520,8 +517,9 @@ export function createDesktopView(container) {
     },
   });
 
-  const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Amount</th>${TH_ACTION}</tr>`;
-  const THEAD_INQUIRIES = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Nights</th><th>Travel Date</th><th class="col-secondary">Assigned To</th><th>Status</th><th class="col-note" style="min-width: 150px;">Quick Note</th>${TH_ACTION}</tr>`;
+  const THEAD_BOOKINGS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Trip / Package</th><th class="col-secondary">Pax &amp; Duration</th><th>Travel Dates</th><th class="col-secondary">Assigned To</th><th>Status</th><th>Quote Amount</th>${TH_ACTION}</tr>`;
+  const THEAD_INQUIRIES = `<tr>${TH_CHECK}<th class="col-main">Lead / Customer</th><th>Trip</th><th class="col-secondary">Pax &amp; Nights</th><th>Travel Date</th><th class="col-secondary">Assigned To</th><th>Status</th><th class="col-note" style="min-width: 150px;">Quick Note</th>${TH_ACTION}</tr>`;
+  const THEAD_CUSTOMERS = `<tr>${TH_CHECK}<th class="col-main">Customer</th><th>Contact &amp; City</th><th class="col-secondary">Customer Type</th><th>Total Trips</th><th class="col-secondary">Assigned Agent</th><th>Status</th><th>Total Spend</th>${TH_ACTION}</tr>`;
 
   const checkboxCell = (b) => `
     <td style="width: 44px; padding-left: 20px; padding-right: 0;" class="td-checkbox-cell">
@@ -534,13 +532,13 @@ export function createDesktopView(container) {
       <div class="table-booking-cell">
         <div class="table-thumb">${avatar(b.guest.name, 'row-avatar-fill')}</div>
         <div class="table-booking-info">
-          <h4 class="cust-name-line"><span class="cust-name">${esc(b.guest.name)}</span>${b.kind === 'inquiry' ? '' : categoryBadge(b)}</h4>
+          <h4 class="cust-name-line"><span class="cust-name">${esc(b.guest.name)}</span>${b.kind === 'inquiry' ? justAddedTag(b) : categoryBadge(b)}</h4>
           <p>${esc(b.guest.phone)}</p>
         </div>
       </div>
     </td>`;
   const assignedCell = (b) => `<td class="col-secondary"><span class="assigned-name">${esc(b.assignedTo.name)}</span></td>`;
-  const rowClass = (b, isRowActive) => `${isRowActive ? 'row-selected row-active' : ''} ${b.selected ? 'row-checked' : ''}`;
+  const rowClass = (b, isRowActive) => `${isRowActive ? 'row-selected row-active' : ''} ${b.selected ? 'row-checked' : ''} ${b.justAdded ? 'is-fresh' : ''}`;
 
   function bookingRow(b, isRowActive) {
     return `
@@ -561,11 +559,25 @@ export function createDesktopView(container) {
       <tr class="${rowClass(b, isRowActive)}" data-desktop-row-id="${b.id}" style="cursor: pointer;">
         ${checkboxCell(b)}${customerCell(b)}
         <td><span class="cell-strong">${esc(b.title)}</span><div class="cell-sub">${b.id}</div></td>
-        <td class="col-secondary"><span class="cell-strong">${b.pax} Pax</span><div class="cell-sub">${esc(b.duration)}</div></td>
+        <td class="col-secondary"><span class="cell-strong">${b.pax ? `${b.pax} Pax` : '—'}</span><div class="cell-sub">${esc(b.duration || '—')}</div></td>
         <td><span class="cell-date">${esc(b.dates)}</span></td>
         ${assignedCell(b)}
         <td>${statusPill(b)}</td>
         <td class="col-note">${quickNote(b)}</td>
+        ${actionCell(b)}
+      </tr>`;
+  }
+
+  function customerRow(b, isRowActive) {
+    return `
+      <tr class="${rowClass(b, isRowActive)}" data-desktop-row-id="${b.id}" style="cursor: pointer;">
+        ${checkboxCell(b)}${customerCell(b)}
+        <td><span class="cell-strong">${esc(b.customer?.location || 'India')}</span><div class="cell-sub">${esc(b.customer?.email || '—')}</div></td>
+        <td class="col-secondary"><span class="cell-strong">${esc(b.customer?.customerType || 'Individual')}</span><div class="cell-sub">Source: ${esc(b.customer?.leadSource || 'Direct')}</div></td>
+        <td><span class="cell-strong">${b.pax} ${b.pax === 1 ? 'Trip' : 'Trips'}</span><div class="cell-sub">${esc(b.dates || 'Recent')}</div></td>
+        ${assignedCell(b)}
+        <td>${statusPill(b)}</td>
+        <td><span class="cell-amount">${esc(b.price)}</span></td>
         ${actionCell(b)}
       </tr>`;
   }
@@ -625,22 +637,69 @@ export function createDesktopView(container) {
     syncSelectionUI();
   }
 
+  // The records the list shows right now (search, category and tab applied).
+  function visibleRecords() {
+    const catValue = selectedCategory === 'ALL' ? '' : selectedCategory;
+    const base = bookings.filter(b => matchesSearch(b) && matchesCategory(b, catValue));
+    return { base, filtered: base.filter(b => activeTab === allKey() || b.category === activeTab) };
+  }
+
+  // Reading pane (PC and tablet): the list is always on the left and the pane on the right. Nothing is selected by itself: the pane shows
+  // "Select a booking / an inquiry" until a row is clicked, and goes back to that when the selected record leaves the list or Esc is pressed.
+  const paneEnabled = () => paneLayout() && (page === 'quotation' || page === 'bookings' || page === 'inquiries' || page === 'customers');
+  function reconcileSelection(filtered) {
+    if (!paneEnabled()) return false;
+    if (isInquiries() && (!inquiryState.loaded || inquiryState.failed)) return false;
+    const split = container.querySelector('#desktop-workspace-split');
+    const drawer = container.querySelector('#desktop-details-drawer');
+    split.classList.add('has-open-detail');
+    drawer.classList.add('open');
+    const wanted = wantedId; // ?selected= from the address bar
+    wantedId = null;
+    const keep = wanted ? filtered.find((r) => String(r.id) === String(wanted)) : activeBooking && filtered.find((r) => r.id === activeBooking.id);
+    if (!keep) {
+      if (activeBooking || !drawer.classList.contains('is-empty')) showSelectEmpty();
+      writeSelected(null);
+      return true;
+    }
+    if (keep !== activeBooking || drawer.classList.contains('is-empty')) showDetail(keep);
+    writeSelected(keep.id);
+    return true;
+  }
+
+  /** The pane with nothing selected: the shared "Select ..." empty state. */
+  function showSelectEmpty() {
+    activeBooking = null;
+    isDetailDrawerOpen = true;
+    const drawer = container.querySelector('#desktop-details-drawer');
+    drawer.classList.add('is-empty');
+    container.querySelector('#desktop-sheet-header').innerHTML = '';
+    container.querySelector('#desktop-sheet-body').innerHTML = selectEmptyState(isInquiries() ? 'an inquiry' : isCustomers() ? 'a customer' : 'a quotation');
+  }
+
   function renderTable() {
     const tbody = container.querySelector('#desktop-table-body');
     if (!tbody) return;
     const inquiry = isInquiries();
-    const catValue = selectedCategory === 'ALL' ? '' : selectedCategory;
+    const customer = isCustomers();
 
-    const base = bookings.filter(b => matchesSearch(b) && matchesCategory(b, catValue));
-    const filtered = base.filter(b => activeTab === allKey() || b.category === activeTab);
+    const { base, filtered } = visibleRecords();
+    const hadDetail = isDetailDrawerOpen;
+    const before = activeBooking;
+    if (reconcileSelection(filtered) && !hadDetail) {
+      // first automatic open (page load, page switch, back to a list): no slide-in, the pane is simply there
+      const split = container.querySelector('#desktop-workspace-split');
+      split.classList.add('no-anim');
+      requestAnimationFrame(() => requestAnimationFrame(() => split.classList.remove('no-anim')));
+    }
 
     const tabs = tabDefs().map(t => ({ ...t, count: t.key === allKey() ? base.length : base.filter(b => b.category === t.key).length }));
     renderTabs(container.querySelector('#desktop-tabs-host'), { tabs, active: activeTab, variant: 'desktop', attr: 'data-d-tab' });
     renderTabs(container.querySelector('#desktop-compact-tabs-host'), { tabs, active: activeTab, variant: 'compact', attr: 'data-d-tab' });
 
-    const what = inquiry ? 'inquiries' : 'bookings';
+    const what = inquiry ? 'inquiries & leads' : customer ? 'customers' : 'quotations';
     container.querySelectorAll('#desktop-table-search-input, #desktop-compact-search-input').forEach(i => { i.placeholder = `Search ${what}...`; });
-    container.querySelector('#desktop-thead').innerHTML = inquiry ? THEAD_INQUIRIES : THEAD_BOOKINGS;
+    container.querySelector('#desktop-thead').innerHTML = inquiry ? THEAD_INQUIRIES : customer ? THEAD_CUSTOMERS : THEAD_BOOKINGS;
 
     const compact = container.querySelector('#desktop-compact-list-items');
     const keepScroll = compact ? compact.scrollTop : 0;
@@ -655,39 +714,142 @@ export function createDesktopView(container) {
       tbody.innerHTML = emptyState({ title: `No ${what} found`, text: 'No results matching your query. Try resetting filters.', colspanRow: 10 });
       if (compact) compact.innerHTML = emptyState({ title: `No ${what} found`, text: 'Try resetting filters.', resetId: 'btn-reset-filters-compact' });
     } else {
-      tbody.innerHTML = filtered.map(b => (inquiry ? inquiryRow : bookingRow)(b, activeBooking && activeBooking.id === b.id)).join('');
+      tbody.innerHTML = filtered.map(b => (inquiry ? inquiryRow : customer ? customerRow : bookingRow)(b, activeBooking && activeBooking.id === b.id)).join('');
       if (compact) compact.innerHTML = filtered.map(b => compactCard(b, activeBooking && activeBooking.id === b.id)).join('');
     }
-    if (compact) compact.scrollTop = keepScroll;
+    if (compact) {
+      compact.scrollTop = keepScroll;
+      compact.setAttribute('role', 'listbox');
+      compact.setAttribute('aria-label', `${what}`);
+      compact.setAttribute('tabindex', '0');
+      compact.setAttribute('aria-activedescendant', activeBooking ? `opt-${activeBooking.id}` : '');
+      if (activeBooking && activeBooking !== before) compact.querySelector('.list-row-card.active')?.scrollIntoView({ block: 'nearest' });
+    }
 
     syncBulkBars();
   }
 
   // Open & Close Detail Pane (Outlook Inline Split View)
-  function openDrawer(booking) {
+  // Show a record in the pane without touching the list (the list is drawn by renderTable).
+  function showDetail(booking) {
     activeBooking = booking;
     isDetailDrawerOpen = true;
+    const drawer = container.querySelector('#desktop-details-drawer');
+    drawer.classList.remove('is-empty');
     renderDetailPanel();
     // On the Calendar page the primary action only applies to pending bookings.
     const confirmBtn = container.querySelector('#desktop-confirm-booking-btn');
     if (page === 'calendar' && booking.status !== 'Pending') confirmBtn?.style.setProperty('display', 'none', 'important'); else confirmBtn?.style.removeProperty('display');
-    const split = container.querySelector('#desktop-workspace-split');
-    const drawer = container.querySelector('#desktop-details-drawer');
-    split.classList.add('has-open-detail');
+    container.querySelector('#desktop-workspace-split').classList.add('has-open-detail');
     drawer.classList.add('open');
+  }
+
+  // A click, a keyboard move or a new record: select it, remember it in the URL (one history step) and redraw the list.
+  function openDrawer(booking, { push = true } = {}) {
+    showDetail(booking);
+    if (page === 'quotation' || page === 'bookings' || page === 'inquiries' || page === 'customers') { if (paneLayout()) writeSelected(booking.id, { push }); }
     renderTable();
     container.querySelector('#desktop-compact-list-items .list-row-card.active')?.scrollIntoView({ block: 'nearest' });
   }
 
-  function closeDrawer() {
+  // `user: true` (the default): on the Bookings / Inquiries lists the X and Esc deselect (the pane stays, showing "Select ..."); elsewhere the pane closes.
+  function closeDrawer({ user = true, render = true } = {}) {
+    if (user && paneEnabled()) { showSelectEmpty(); writeSelected(null); if (render) renderTable(); return; }
     activeBooking = null;
     isDetailDrawerOpen = false;
     const split = container.querySelector('#desktop-workspace-split');
     const drawer = container.querySelector('#desktop-details-drawer');
     split.classList.remove('has-open-detail');
-    drawer.classList.remove('open');
+    drawer.classList.remove('open', 'is-empty');
     calendar.clearSelection();
-    renderTable();
+    if (render) renderTable();
+  }
+
+  function bindDesktopFreightFooter(footerEl, b) {
+    if (!footerEl) return;
+    const primaryBtn = footerEl.querySelector('#desktop-freight-primary-btn');
+    if (primaryBtn) {
+      primaryBtn.addEventListener('click', async () => {
+        const action = primaryBtn.dataset.freightAction;
+        if (action === 'convert-to-enquiry') {
+          try {
+            const freight_details = {
+              ...(b.freight_details || {}),
+              record_type: 'enquiry',
+              stage: 'Received',
+            };
+            const updated = await updateInquiry(b.id, {
+              status: 'ongoing',
+              freight_details,
+            });
+            b.status = 'Ongoing';
+            b.statusClass = 'status-inq-ongoing';
+            b.freight_details = freight_details;
+            if (updated) Object.assign(b, updated);
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Lead for ${b.guest?.name || b.customer_name || 'customer'} successfully converted to Enquiry!`, type: 'success' }
+            }));
+            renderTable();
+            renderDetailPanel();
+          } catch (err) {
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: err.message || 'Failed to convert lead', type: 'warning' }
+            }));
+          }
+        } else if (action === 'create-quotation') {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Quotation builder initiated for ${b.guest?.name || b.customer_name || 'enquiry'}. Opening quotation draft...`, type: 'success' }
+          }));
+        } else if (action === 'confirm-shipment') {
+          if (!b.freight_details) b.freight_details = {};
+          b.freight_details.shipment = b.freight_details.shipment || {};
+          b.freight_details.shipment.has_shipment = true;
+          b.freight_details.stage = 'Customs (Active)';
+          b.status = 'Ongoing';
+          b.statusClass = 'status-inq-ongoing';
+          try {
+            updateInquiry(b.id, {
+              status: 'ongoing',
+              freight_details: b.freight_details,
+            }).catch(() => {});
+          } catch (_) {}
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Shipment confirmed! Operational work order generated.`, type: 'success' }
+          }));
+          renderDetailPanel();
+          renderTable();
+        }
+      });
+    }
+
+    footerEl.querySelector('#desktop-freight-act-call')?.addEventListener('click', () => {
+      const d = getFreightData(b);
+      window.location.href = `tel:${cleanPhone(d.phone)}`;
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: `Connecting call to ${d.name} (${d.phone})...`, type: 'info' }
+      }));
+    });
+
+    footerEl.querySelector('#desktop-freight-act-msg')?.addEventListener('click', () => {
+      const d = getFreightData(b);
+      const url = `https://wa.me/${cleanPhone(d.phone)}?text=${encodeURIComponent(`Hi ${d.name}, this is Ruyi Operations regarding shipment dossier #${b.id}.`)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: `Opening WhatsApp chat with ${d.name}...`, type: 'success' }
+      }));
+    });
+
+    footerEl.querySelector('#desktop-freight-act-fwd')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'Freight dossier forwarded to operations team.', type: 'success' }
+      }));
+    });
+
+    footerEl.querySelector('#desktop-freight-act-more')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'More options: Export PDF, Print Dossier, Reassign Agent.', type: 'info' }
+      }));
+    });
   }
 
   // Render Details inside Drawer
@@ -698,7 +860,84 @@ export function createDesktopView(container) {
     if (!headerEl || !bodyEl || !activeBooking) return;
 
     const b = activeBooking;
-    if (countBadge) countBadge.textContent = b.guests.length;
+    const isFreight = page === 'inquiries' || b.kind === 'inquiry';
+    const tabsNav = container.querySelector('.desktop-tabs-nav');
+    const footerEl = container.querySelector('#desktop-drawer-footer');
+
+    if (isFreight) {
+      if (!['customer-details', 'requirements', 'shipment-docs', 'updates'].includes(activeDetailTab)) {
+        activeDetailTab = 'customer-details';
+      }
+      if (tabsNav) {
+        tabsNav.innerHTML = renderFreightTabsHtml(activeDetailTab, { attr: 'data-dt-tab' });
+      }
+      if (footerEl) {
+        footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: false });
+        bindDesktopFreightFooter(footerEl, b);
+      }
+
+      headerEl.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: 'close-desktop-detail-btn', isMobile: false });
+      const closeBtn = headerEl.querySelector('#close-desktop-detail-btn');
+      if (closeBtn) closeBtn.addEventListener('click', () => closeDrawer());
+
+      bodyEl.classList.add('is-freight-scroll');
+      bodyEl.innerHTML = renderFreightBodyHtml(b, activeDetailTab);
+      bindFreightBodyEvents(bodyEl, b, (updated) => {
+        if (updated) {
+          Object.assign(b, updated);
+          if (b.raw) Object.assign(b.raw, updated);
+        }
+        renderTable();
+        renderDetailPanel();
+      });
+
+      return;
+    }
+
+    bodyEl.classList.remove('is-freight-scroll');
+
+    // Reset tabsNav and footerEl to standard if coming from freight
+    if (!['customer-details', 'guests', 'itinerary', 'updates'].includes(activeDetailTab)) {
+      activeDetailTab = 'customer-details';
+    }
+    if (tabsNav && !tabsNav.querySelector('[data-dt-tab="guests"]')) {
+      tabsNav.innerHTML = `
+        <button class="sheet-tab-btn ${activeDetailTab === 'customer-details' ? 'active' : ''}" data-dt-tab="customer-details">Customer Details</button>
+        <button class="sheet-tab-btn ${activeDetailTab === 'guests' ? 'active' : ''}" data-dt-tab="guests">Guests (<span id="desktop-guest-count-badge">0</span>)</button>
+        <button class="sheet-tab-btn ${activeDetailTab === 'itinerary' ? 'active' : ''}" data-dt-tab="itinerary">Itinerary</button>
+        <button class="sheet-tab-btn ${activeDetailTab === 'updates' ? 'active' : ''}" data-dt-tab="updates">Updates</button>
+      `;
+    }
+    if (footerEl && !footerEl.querySelector('#desktop-confirm-booking-btn')) {
+      footerEl.innerHTML = `
+        <button class="btn-confirm-booking" id="desktop-confirm-booking-btn">Confirm Booking</button>
+        <div class="sheet-quick-actions-grid desktop-quick-actions-grid">
+          <button class="quick-action-col-btn btn-act-call" id="desktop-act-call" title="Call">
+            ${icon('phone', { size: 20, stroke: 2.2 })}
+            <span>Call</span>
+          </button>
+          <button class="quick-action-col-btn btn-act-msg" id="desktop-act-msg" title="Message">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>Message</span>
+          </button>
+          <button class="quick-action-col-btn btn-act-fwd" id="desktop-act-fwd" title="Forward">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m22 2-7 20-4-9-9-4Z"/>
+              <path d="M22 2 11 13"/>
+            </svg>
+            <span>Forward</span>
+          </button>
+          <button class="quick-action-col-btn btn-act-more" id="desktop-act-more" title="More">
+            ${icon('more', { size: 20, stroke: 2.2 })}
+            <span>More</span>
+          </button>
+        </div>
+      `;
+    }
+
+    if (countBadge) countBadge.textContent = b.guests ? b.guests.length : 0;
 
     // Header: Unified, comprehensive Trip & Booking Header
     const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n => n[0]).join('') || 'CU');
@@ -716,16 +955,16 @@ export function createDesktopView(container) {
         </button>
       </div>
       <div class="sheet-customer-header">
-        <div class="customer-avatar-badge">${initials}</div>
+        <div class="customer-avatar-badge">${esc(initials)}</div>
         <div class="customer-header-info">
           <div class="customer-title-row">
-            <h2 class="customer-name-title">${custName}</h2>
+            <h2 class="customer-name-title">${esc(custName)}</h2>
             <span class="status-pill ${b.statusClass}">
               <span class="dot"></span>
               ${b.status}
             </span>
           </div>
-          <p class="customer-trip-subtitle">${b.title}</p>
+          <p class="customer-trip-subtitle">${esc(b.title)}</p>
           <div class="customer-meta-chips">
             <span class="meta-chip">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -740,7 +979,7 @@ export function createDesktopView(container) {
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
-              ${b.duration}
+              ${esc(b.duration || '—')}
             </span>
             <span class="meta-dot">•</span>
             <span class="meta-chip">
@@ -759,7 +998,7 @@ export function createDesktopView(container) {
 
     // Re-bind close button
     const closeBtn = headerEl.querySelector('#close-desktop-detail-btn');
-    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', () => closeDrawer());
 
     // Body content by tab
     if (activeDetailTab === 'customer-details') {
@@ -810,14 +1049,14 @@ export function createDesktopView(container) {
               <!-- Left Column: Row 1 -->
               <div class="info-cell">
                 <span class="info-label">Customer Name</span>
-                <span class="info-value-bold">${c.name}</span>
+                <span class="info-value-bold">${esc(c.name)}</span>
               </div>
               <!-- Right Column: Row 1 -->
               <div class="info-cell info-cell-email">
                 <span class="info-label">Email</span>
                 <div class="contact-value-row">
-                  <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
-                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
+                  <span class="info-value-text email-text-val" title="${esc(c.email)}">${esc(c.email)}</span>
+                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${jsq(c.email)}...', type: 'info' }}))">
                     ${icon('mail', { size: 12 })}
                   </button>
                 </div>
@@ -827,12 +1066,12 @@ export function createDesktopView(container) {
               <div class="info-cell info-cell-contact">
                 <span class="info-label">Primary Contact</span>
                 <div class="contact-value-row">
-                  <span class="info-value-bold phone-number-val">${c.phone}</span>
+                  <span class="info-value-bold phone-number-val">${esc(c.phone)}</span>
                   <div class="contact-action-btns">
-                    <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
+                    <button class="mini-icon-btn btn-call-green" title="Call ${jsq(c.phone)}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${jsq(c.name)} (${jsq(c.phone)})...', type: 'info' }}))">
                       ${icon('phone', { size: 12, stroke: 2.5 })}
                     </button>
-                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
+                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${jsq(c.name)}...', type: 'success' }}))">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.892.524 3.662 1.435 5.176L2.05 21.95a.6.6 0 0 0 .736.736l4.774-1.385A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Zm3.906 14.153c-.225.63-1.127 1.196-1.55 1.258-.42.062-.958.088-1.55-.102-.38-.122-.87-.282-1.49-.55-2.617-1.13-4.326-3.79-4.457-3.963-.13-.174-1.065-1.417-1.065-2.702 0-1.286.674-1.92.913-2.18.239-.261.52-.326.695-.326.174 0 .348.002.5.01.16.007.375-.06.587.447.218.522.74 1.804.805 1.935.066.13.11.283.022.457-.087.174-.13.283-.26.435-.13.152-.273.34-.39.456-.13.13-.265.272-.114.533.152.261.674 1.11 1.447 1.8 1 .892 1.84 1.168 2.1 1.3.26.13.413.11.565-.065.152-.174.652-.761.826-1.022.174-.26.348-.217.587-.13.239.087 1.522.717 1.783.848.26.13.435.195.5.304.065.109.065.63-.16 1.26Z" fill="#16A34A"/>
                       </svg>
@@ -843,29 +1082,29 @@ export function createDesktopView(container) {
               <!-- Right Column: Row 2 -->
               <div class="info-cell">
                 <span class="info-label">Lead Source</span>
-                <span class="info-value-text">${c.leadSource || 'Website'}</span>
+                <span class="info-value-text">${esc(c.leadSource || 'Website')}</span>
               </div>
 
               <!-- Left Column: Row 3 -->
               <div class="info-cell">
                 <span class="info-label">Travel Dates</span>
-                <span class="info-value-text">${c.travelDates || b.dates}</span>
+                <span class="info-value-text">${esc(c.travelDates || b.dates)}</span>
               </div>
               <!-- Right Column: Row 3 -->
               <div class="info-cell">
                 <span class="info-label">Location</span>
-                <span class="info-value-text">${c.location || 'New Delhi, Delhi'}</span>
+                <span class="info-value-text">${esc(c.location || 'New Delhi, Delhi')}</span>
               </div>
 
               <!-- Left Column: Row 4 -->
               <div class="info-cell">
                 <span class="info-label">Preferred Destination</span>
-                <span class="info-value-text">${c.preferredDestination || b.destination}</span>
+                <span class="info-value-text">${esc(c.preferredDestination || b.destination)}</span>
               </div>
               <!-- Right Column: Row 4 -->
               <div class="info-cell">
                 <span class="info-label">Budget (Est.)</span>
-                <span class="info-value-bold" style="color: #0F172A;">${c.budgetEst || b.price}</span>
+                <span class="info-value-bold" style="color: #0F172A;">${esc(c.budgetEst || b.price)}</span>
               </div>
 
               <!-- Left Column: Row 5 -->
@@ -897,7 +1136,7 @@ export function createDesktopView(container) {
                 </svg>
                 <span>Short Details</span>
               </div>
-              <p class="short-details-text">${c.shortDetails || b.notes || 'Trip details logged into operations queue.'}</p>
+              <p class="short-details-text">${esc(c.shortDetails || b.notes || 'Trip details logged into operations queue.')}</p>
             </div>
           </div>
 
@@ -912,13 +1151,6 @@ export function createDesktopView(container) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              ${b.kind === 'inquiry' ? '' : `<button class="btn-add-followup" id="btn-add-followup-action">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" x2="12" y1="5" y2="19"/>
-                  <line x1="5" x2="19" y1="12" y2="12"/>
-                </svg>
-                Add Follow-up
-              </button>`}
             </div>
 
             <div class="lead-journey-timeline">
@@ -943,7 +1175,7 @@ export function createDesktopView(container) {
           <div class="special-req-header">
             <div class="special-req-title-left">
               <div class="special-req-icon-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                   <line x1="16" x2="8" y1="13" y2="13"/>
@@ -964,7 +1196,7 @@ export function createDesktopView(container) {
           <div class="special-req-chips-list">
             ${reqs.length > 0 ? reqs.map(r => `
               <span class="special-req-chip">
-                <span class="req-chip-icon">${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+                <span class="req-chip-icon">${getSpecialReqIconSvg(r.icon, r.color || 'var(--primary, #2563EB)')}</span>
                 <span class="req-chip-text">${r.text}</span>
               </span>
             `).join('') : `
@@ -993,15 +1225,15 @@ export function createDesktopView(container) {
               <div class="guest-left-info">
                 <div class="guest-num-badge">${g.id}</div>
                 <div class="guest-name-col">
-                  <h4>${g.name}</h4>
-                  <p>Age ${g.age} ${g.role ? `• ${g.role}` : ''}</p>
+                  <h4>${esc(g.name)}</h4>
+                  <p>${g.age !== '' && g.age != null ? `Age ${esc(g.age)}` : 'Age not added'}${g.role ? ` • ${esc(g.role)}` : ''}</p>
                 </div>
               </div>
               <div class="guest-right-actions">
-                <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${g.name} (${g.phone})...', type: 'info' }}))">
+                <button class="circle-action-btn btn-phone" title="Call ${jsq(g.name)}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${jsq(g.name)} (${jsq(g.phone)})...', type: 'info' }}))">
                   ${icon('phone', { size: 14, stroke: 2.2 })}
                 </button>
-                <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${g.name}" aria-label="More options">
+                <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${esc(g.name)}" aria-label="More options">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="1.5"/>
                     <circle cx="12" cy="5" r="1.5"/>
@@ -1040,123 +1272,7 @@ export function createDesktopView(container) {
         });
       }
     } else if (activeDetailTab === 'itinerary') {
-      const days = b.itineraryDays || [];
-      bodyEl.innerHTML = `
-        <div class="itinerary-tab-content">
-          <div class="itinerary-section-header-bar">
-            <div class="section-header-left" style="display: flex; align-items: center; gap: 8px;">
-              <div class="section-icon-circle blue-circle" style="width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; color: #2563EB;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                  <line x1="16" x2="16" y1="2" y2="6"/>
-                  <line x1="8" x2="8" y1="2" y2="6"/>
-                  <line x1="3" x2="21" y1="10" y2="10"/>
-                </svg>
-              </div>
-              <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
-            </div>
-            <div class="itin-actions"><button class="btn-add-event-pill" id="desktop-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
-          </div>
-
-          <div class="itinerary-v2-container">
-          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Use Add Event to create the first day.</p></div>` : ''}
-          ${days.map((d, dayIdx) => `
-            <div class="itinerary-day-section">
-              <div class="timeline-day-col">
-                <div class="day-head"><span class="day-badge-text">${d.day}</span><button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button></div><span class="day-date-sub">${d.date}</span>${d.title ? `<span class="day-title-sub">${esc(d.title)}</span>` : ''}
-              </div>
-              <div class="timeline-track-col">
-                <div class="timeline-line-track"></div>
-                <div class="timeline-dot-node"></div>
-              </div>
-              <div class="timeline-items-col">
-                ${d.items.length ? '' : '<p class="day-empty">No events yet</p>'}
-                ${d.items.map(item => `
-                  <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-desktop-itinerary-item-id="${item.id}">
-                    <div class="item-left-content">
-                      ${itemIconHtml(item)}
-                      <div class="item-text-info">
-                        <h4 class="item-text-title">${esc(item.title)}</h4>
-                        <p class="item-text-sub">${esc(item.subtitle)}</p>
-                      </div>
-                    </div>
-                    <div class="item-right-content">
-                      ${itemPills(item)}
-                      ${item.completed ? `
-                        <span class="completed-pill-badge" title="Completed">
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                          Completed
-                        </span>
-                      ` : ''}
-                      ${item.assigned && item.assigned.isAssigned ? `
-                        <span class="assigned-pill-badge">Assigned</span>
-                        <img src="${item.assigned.avatar}" class="assigned-avatar-mini" alt="${item.assigned.name}" title="Assigned to ${item.assigned.name}" />
-                      ` : ''}
-                      <button class="item-menu-btn" data-trigger-desktop-item-menu="${item.id}" data-trigger-item-menu="${item.id}" title="Actions">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                          <circle cx="12" cy="12" r="1.5"/>
-                          <circle cx="12" cy="5" r="1.5"/>
-                          <circle cx="12" cy="19" r="1.5"/>
-                        </svg>
-                      </button>
-
-                      ${openDropdownItemId === item.id ? `
-                        <div class="item-dropdown-menu" id="desktop-active-item-dropdown">
-                          <button class="dropdown-item-btn" data-desktop-dropdown-act="assign" data-dropdown-act="assign" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                              <circle cx="9" cy="7" r="4"/>
-                              <line x1="19" x2="19" y1="8" y2="14"/>
-                              <line x1="22" x2="16" y1="11" y2="11"/>
-                            </svg>
-                            <span>Assign</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-desktop-dropdown-act="details" data-dropdown-act="details" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                              <polyline points="14 2 14 8 20 8"/>
-                              <line x1="16" x2="8" y1="13" y2="13"/>
-                              <line x1="16" x2="8" y1="17" y2="17"/>
-                              <polyline points="10 9 9 9 8 9"/>
-                            </svg>
-                            <span>View Details</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-desktop-dropdown-act="edit" data-dropdown-act="edit" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-                              <path d="m15 5 4 4"/>
-                            </svg>
-                            <span>Edit</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-desktop-dropdown-act="complete" data-dropdown-act="complete" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <rect width="18" height="18" x="3" y="3" rx="2"/>
-                              <polyline points="9 12 11 14 15 10"/>
-                            </svg>
-                            <span>${item.completed ? 'Mark as Incomplete' : 'Mark Complete'}</span>
-                          </button>
-                          <button class="dropdown-item-btn item-remove" data-desktop-dropdown-act="remove" data-dropdown-act="remove" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <polyline points="3 6 5 6 21 6"/>
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                              <line x1="10" x2="10" y1="11" y2="17"/>
-                              <line x1="14" x2="14" y1="11" y2="17"/>
-                            </svg>
-                            <span>Remove</span>
-                          </button>
-                        </div>
-                      ` : ''}
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
-          </div>
-        </div>
-      `;
+      bodyEl.innerHTML = scheduleHtml(b.itineraryDays || [], { side: 'desktop', openItemId: openDropdownItemId });
     } else if (activeDetailTab === 'updates') {
       bodyEl.innerHTML = `
         <div class="updates-list">
@@ -1212,7 +1328,7 @@ export function createDesktopView(container) {
     listEl.innerHTML = reqs.length > 0 ? reqs.map(r => `
       <div class="editable-req-item">
         <div class="editable-req-item-left">
-          <span>${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+          <span>${getSpecialReqIconSvg(r.icon, r.color || 'var(--primary, #2563EB)')}</span>
           <span>${r.text}</span>
         </div>
         <button class="btn-delete-req-pill" data-desktop-delete-req-id="${r.id}" title="Remove requirement">
@@ -1225,7 +1341,7 @@ export function createDesktopView(container) {
       const alreadyHas = reqs.some(r => r.text.toLowerCase() === p.text.toLowerCase());
       return `
         <button class="preset-chip-btn ${alreadyHas ? 'is-active' : ''}" data-desktop-preset-text="${p.text}" data-desktop-preset-icon="${p.icon}" data-desktop-preset-color="${p.color}">
-          ${getSpecialReqIconSvg(p.icon, alreadyHas ? '#2563EB' : p.color)}
+          ${getSpecialReqIconSvg(p.icon, alreadyHas ? 'var(--primary, #2563EB)' : p.color)}
           <span>${alreadyHas ? '✓ ' + p.text : p.text}</span>
         </button>
       `;
@@ -1299,9 +1415,9 @@ export function createDesktopView(container) {
               </div>
             </div>
           ` : `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 10px;">
-              <span style="font-size: 12.5px; color: #1E40AF; font-weight: 600;">No vendor or staff assigned yet</span>
-              <button class="action-pill-btn" id="desktop-btn-modal-details-assign-now" style="background: #2563EB; color: #FFFFFF; border: none; padding: 5px 12px; font-size: 12px;">Assign Now</button>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--primary-light, #EFF6FF); border: 1px solid var(--primary-border, #DBEAFE); border-radius: 10px;">
+              <span style="font-size: 12.5px; color: var(--primary, #1E40AF); font-weight: 600;">No vendor or staff assigned yet</span>
+              <button class="action-pill-btn" id="desktop-btn-modal-details-assign-now" style="background: var(--primary-gradient, var(--primary, #2563EB)); color: #FFFFFF; border: none; padding: 5px 12px; font-size: 12px;">Assign Now</button>
             </div>
           `}
         </div>
@@ -1404,7 +1520,7 @@ export function createDesktopView(container) {
             <div class="custom-radio ${isSel ? 'checked' : ''}">
               ${isSel ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
             </div>
-            <img src="${item.avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
+            <img src="${item.avatar}" class="crm-logo-img" data-crm-logo="true" data-logo-src="${item.avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" />
             <div class="vendor-info">
               <h4 style="font-size: 13.5px; margin: 0;">${item.name}</h4>
               <p style="font-size: 12px; color: #64748B; margin: 0;">${item.sub}</p>
@@ -1458,13 +1574,14 @@ export function createDesktopView(container) {
       searchQuery = q.q || '';
       activeTab = tabDefs().some(t => t.key === q.tab) ? q.tab : allKey();
       selectedCategory = q.category || 'ALL';
+      wantedId = q.selected || null;
       categoryFilter.setValue(q.category || '');
       [topSearch, tableSearch, compactSearch].forEach((el) => { if (el && document.activeElement !== el) el.value = searchQuery; });
       if (topClear) topClear.style.display = searchQuery ? 'block' : 'none';
       renderTable();
     }
 
-    // Page routing: Bookings <-> Inquiries share one workspace (table, split view, detail pane)
+    // Page routing: Enquirey & Leads <-> Customers <-> Quotation share one workspace (table, split view, detail pane)
     const scrollMemory = {};
     function route() {
       const next = currentPage();
@@ -1472,16 +1589,36 @@ export function createDesktopView(container) {
       page = next;
       const scroller = container.querySelector('.desktop-full-table-view');
       if (changed) {
-        scrollMemory[page === 'inquiries' ? 'bookings' : 'inquiries'] = scroller ? scroller.scrollTop : 0;
-        if (isDetailDrawerOpen) closeDrawer();
-        bookings = page === 'inquiries' ? inquiryState.list : bookingsData;
+        scrollMemory[page] = scroller ? scroller.scrollTop : 0;
+        if (isDetailDrawerOpen) closeDrawer({ user: false, render: false });
+        if (page === 'inquiries') {
+          bookings = inquiryState.list;
+        } else if (page === 'customers') {
+          bookings = getCustomersList();
+        } else {
+          bookings = bookingsData;
+        }
         bookings.forEach(b => { b.selected = false; });
         activeTab = allKey();
       }
-      container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'bookings');
+      container.querySelector('#nav-dashboard')?.classList.toggle('active', page === 'dashboard');
       container.querySelector('#nav-inquiries')?.classList.toggle('active', page === 'inquiries');
+      container.querySelector('#nav-customers')?.classList.toggle('active', page === 'customers');
+      container.querySelector('#nav-quotation')?.classList.toggle('active', page === 'quotation' || page === 'bookings');
+      container.querySelector('#nav-bookings')?.classList.toggle('active', page === 'quotation' || page === 'bookings');
       container.querySelector('#nav-calendar')?.classList.toggle('active', page === 'calendar');
       container.querySelector('#nav-team')?.classList.toggle('active', page === 'team');
+
+      if (page === 'inquiries') {
+        setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') }));
+      } else if (page === 'quotation' || page === 'bookings') {
+        setShellAddAction('Add Quotation', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#desktop-page-add') }));
+      } else if (page === 'customers') {
+        setShellAddAction('Add Customer', () => openAddCustomerModal());
+      } else {
+        setShellAddAction(null);
+      }
+
       container.querySelector('#desktop-workspace-split')?.classList.toggle('calendar-mode', page === 'calendar');
       container.querySelector('#desktop-workspace-split')?.classList.toggle('team-mode', page === 'team');
       if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
@@ -1496,15 +1633,41 @@ export function createDesktopView(container) {
       if (changed && page !== 'team') {
         teamView.selectMember(null, false);
       }
-      if (topSearch) topSearch.placeholder = page === 'team' ? 'Search team members by name or role...' : 'Search by name, trip, destination, or phone...';
-      container.querySelector('#desktop-confirm-booking-btn') && (container.querySelector('#desktop-confirm-booking-btn').textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking');
+      if (topSearch) {
+        topSearch.placeholder = page === 'customers'
+          ? 'Search customers by name, phone, email, city...'
+          : page === 'inquiries'
+            ? 'Search inquiries & leads by name, trip, destination, or phone...'
+            : 'Search quotations by ID, customer, trip, destination, or phone...';
+      }
+      const confirmBtn = container.querySelector('#desktop-confirm-booking-btn');
+      if (confirmBtn) {
+        confirmBtn.textContent = page === 'inquiries'
+          ? 'Confirm Inquiry'
+          : page === 'customers'
+            ? 'Customer Profile'
+            : 'Confirm Quotation';
+      }
       applyParams();
       if (changed && scroller) scroller.scrollTop = scrollMemory[page] || 0;
     }
     subscribePage(route);
     subscribeInquiries((ids) => {
+      if (inquiryState.loaded && !inquiryState.failed) {
+        const inqBadge = container.querySelector('#sidebar-inquiries-badge');
+        if (inqBadge) inqBadge.textContent = inquiryState.list.length;
+      }
       if (page !== 'inquiries') return;
       bookings = inquiryState.list;
+      if (activeBooking) activeBooking = bookings.find(b => b.id === activeBooking.id) || null;
+      if (ids && ids.length) patchRows(ids); else renderTable();
+      if (isDetailDrawerOpen && activeBooking) renderDetailPanel();
+    });
+    subscribeCustomers((ids) => {
+      const custBadge = container.querySelector('#sidebar-customers-badge');
+      if (custBadge) custBadge.textContent = getCustomersList().length;
+      if (page !== 'customers') return;
+      bookings = getCustomersList();
       if (activeBooking) activeBooking = bookings.find(b => b.id === activeBooking.id) || null;
       if (ids && ids.length) patchRows(ids); else renderTable();
       if (isDetailDrawerOpen && activeBooking) renderDetailPanel();
@@ -1512,33 +1675,84 @@ export function createDesktopView(container) {
     subscribeFollowUps(() => {
       if (isDetailDrawerOpen && activeDetailTab === 'customer-details' && activeBooking) renderDetailPanel();
     });
-    window.addEventListener('layout-changed', () => { if (isDetailDrawerOpen) closeDrawer(); });
+    window.addEventListener('layout-changed', () => { if (isDetailDrawerOpen) closeDrawer({ user: false, render: false }); renderTable(); });
+    // The centred popups of the detail panel: a backdrop click, Esc and Cancel act like their round X
+    const POPUPS = '#desktop-edit-customer-modal, #desktop-special-req-modal, #desktop-activity-details-modal, #desktop-edit-activity-modal, #desktop-add-followup-modal, #desktop-add-customer-modal';
+    container.querySelectorAll(POPUPS).forEach((ov) => ov.addEventListener('click', (e) => {
+      if (e.target === ov || e.target.closest('#desktop-btn-cancel-special-req, #desktop-btn-cancel-add-customer')) ov.querySelector('.sheet-close-btn')?.click();
+    }));
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const open = container.querySelector(POPUPS.split(', ').map((x) => `${x}.open`).join(', '));
+      if (!open) return;
+      e.stopImmediatePropagation();
+      open.querySelector('.sheet-close-btn')?.click();
+    }, true);
+
+    function openAddCustomerModal() {
+      const modal = container.querySelector('#desktop-add-customer-modal');
+      if (!modal) return;
+      modal.classList.add('open');
+      modal.querySelector('#desktop-cust-input-name')?.focus();
+    }
+    const addCustForm = container.querySelector('#desktop-form-add-customer');
+    if (addCustForm) {
+      addCustForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = container.querySelector('#desktop-cust-input-name').value.trim();
+        const phone = container.querySelector('#desktop-cust-input-phone').value.trim();
+        const email = container.querySelector('#desktop-cust-input-email').value.trim();
+        const location = container.querySelector('#desktop-cust-input-city').value.trim();
+        const customerType = container.querySelector('#desktop-cust-input-type').value;
+        const notes = container.querySelector('#desktop-cust-input-notes').value.trim();
+        if (!name) return;
+        const record = addCustomer({ name, phone, email, location, customerType, notes });
+        container.querySelector('#desktop-add-customer-modal').classList.remove('open');
+        addCustForm.reset();
+        toast(`Customer "${name}" added successfully!`, 'success');
+        showNewInquiry(record);
+      });
+    }
+    container.querySelector('#close-desktop-add-customer-btn')?.addEventListener('click', () => {
+      container.querySelector('#desktop-add-customer-modal').classList.remove('open');
+    });
+    container.querySelector('#desktop-btn-cancel-add-customer')?.addEventListener('click', () => {
+      container.querySelector('#desktop-add-customer-modal').classList.remove('open');
+    });
+
     container.addEventListener('click', (e) => { if (e.target.id === 'desktop-workspace-split' && isDetailDrawerOpen) closeDrawer(); });
+    bindListKeys(container.querySelector('#desktop-compact-list-items'), { getList: () => visibleRecords().filtered, getActiveId: () => activeBooking?.id, onSelect: (b) => openDrawer(b, { push: false }) });
     window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
     loadFollowUps();
     loadInquiries();
-    syncBookingPayments().then(() => renderTable());
-
-    container.querySelectorAll('a.sidebar-nav-item[href="#bookings"], a.sidebar-nav-item[href="#inquiries"], a.sidebar-nav-item[href="#calendar"], a.sidebar-nav-item[href="#team"]').forEach((a) => {
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        navigate(a.getAttribute('href').slice(1));
-      });
+    const custBadgeInit = container.querySelector('#sidebar-customers-badge');
+    if (custBadgeInit) custBadgeInit.textContent = getCustomersList().length;
+    const quoteBadgeInit = container.querySelector('#sidebar-quotation-badge');
+    if (quoteBadgeInit) quoteBadgeInit.textContent = bookingsData.length;
+    syncBookingPayments().then(() => {
+      bookingsData.splice(0, bookingsData.length, ...INITIAL_BOOKINGS);
+      const quoteBadge = container.querySelector('#sidebar-quotation-badge');
+      if (quoteBadge) quoteBadge.textContent = bookingsData.length;
+      if (page === 'quotation' || page === 'bookings') {
+        bookings = bookingsData;
+        renderTable();
+      }
     });
 
-    const opsHeader = container.querySelector('#nav-section-operations');
-    if (opsHeader) {
-      opsHeader.addEventListener('click', (e) => {
-        e.preventDefault();
-        navigate('team');
-      });
-    }
+    bindSidebar(container.querySelector('.desktop-sidebar'));
 
-    // Pages that are not built yet: stay on the current page and say so (no hash change, no mismatch)
-    container.querySelectorAll('a.sidebar-nav-item[href="#dashboard"], a.sidebar-nav-item[href="#settings"]').forEach((a) => {
-      a.addEventListener('click', (e) => { e.preventDefault(); toast(`${a.textContent.trim()} is coming soon.`, 'info'); });
-    });
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries, #btn-retry-inquiries-c')) loadInquiries(); });
+
+    // Add Inquiry: the one wizard. After a save the list shows everything again, the new row is selected and the lists are at the top.
+    const toTop = () => {
+      const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      container.querySelectorAll('.desktop-full-table-view, #desktop-compact-list-items').forEach((el) => el.scrollTo({ top: 0, behavior }));
+      window.scrollTo({ top: 0, behavior });
+    };
+    function showNewInquiry(row) {
+      setParams({ q: null, tab: null, category: null, selected: paneLayout() ? row.id : null }, { push: false });
+      requestAnimationFrame(toTop);
+    }
 
     // Bulk bar: select all / clear / search / filter / Assign
     for (const prefix of ['desktop', 'compact']) {
@@ -1635,15 +1849,19 @@ export function createDesktopView(container) {
     route();
 
     // Detail Panel Tabs
-    container.querySelectorAll('[data-dt-tab]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        switchDetailTab(btn.dataset.dtTab);
+    const dtTabsNav = container.querySelector('.desktop-tabs-nav');
+    if (dtTabsNav) {
+      dtTabsNav.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-dt-tab]');
+        if (btn && btn.dataset.dtTab) {
+          switchDetailTab(btn.dataset.dtTab);
+        }
       });
-    });
+    }
 
     // Backdrop click closes drawer
     const backdrop = container.querySelector('#desktop-drawer-backdrop');
-    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', () => closeDrawer());
 
     bindNotifications({ bell: container.querySelector('#desktop-bell-btn'), panel: container.querySelector('#desktop-notifications-dropdown'), dot: container.querySelector('#desktop-bell-dot') });
 
@@ -1687,6 +1905,67 @@ export function createDesktopView(container) {
       // Drawer Close Button (delegated)
       if (e.target.closest('#close-desktop-detail-btn')) {
         closeDrawer();
+        return;
+      }
+
+      // Delegated Freight Footer Action Buttons (Confirm Shipment, Call, Message, Forward, More)
+      if (e.target.closest('#desktop-freight-primary-btn')) {
+        if (activeBooking) {
+          if (!activeBooking.freight_details) activeBooking.freight_details = {};
+          activeBooking.freight_details.shipment = activeBooking.freight_details.shipment || {};
+          activeBooking.freight_details.shipment.has_shipment = true;
+          activeBooking.freight_details.stage = 'Customs (Active)';
+          activeBooking.status = 'Ongoing';
+          activeBooking.statusClass = 'status-inq-ongoing';
+          try {
+            updateInquiry(activeBooking.id, {
+              status: 'ongoing',
+              freight_details: activeBooking.freight_details,
+            }).catch(() => {});
+          } catch (_) {}
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Shipment confirmed! Operational work order generated.`, type: 'success' }
+          }));
+          renderDetailPanel();
+          renderTable();
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-freight-act-call')) {
+        if (activeBooking) {
+          const d = getFreightData(activeBooking);
+          window.location.href = `tel:${cleanPhone(d.phone)}`;
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Connecting call to ${d.name} (${d.phone})...`, type: 'info' }
+          }));
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-freight-act-msg')) {
+        if (activeBooking) {
+          const d = getFreightData(activeBooking);
+          const url = `https://wa.me/${cleanPhone(d.phone)}?text=${encodeURIComponent(`Hi ${d.name}, this is Ruyi Operations regarding shipment dossier #${activeBooking.id}.`)}`;
+          window.open(url, '_blank', 'noopener,noreferrer');
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Opening WhatsApp chat with ${d.name}...`, type: 'success' }
+          }));
+        }
+        return;
+      }
+
+      if (e.target.closest('#desktop-freight-act-fwd')) {
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: 'Freight dossier forwarded to operations team.', type: 'success' }
+        }));
+        return;
+      }
+
+      if (e.target.closest('#desktop-freight-act-more')) {
+        window.dispatchEvent(new CustomEvent('show-toast', {
+          detail: { message: 'More options: Export PDF, Print Dossier, Reassign Agent.', type: 'info' }
+        }));
         return;
       }
       if (e.target.closest('#desktop-view-booking') && activeBooking) {
@@ -1815,7 +2094,7 @@ export function createDesktopView(container) {
             id: 'SR-' + Date.now(),
             icon: 'leaf',
             text: val,
-            color: '#2563EB'
+            color: 'var(--primary, #2563EB)'
           });
           input.value = '';
           renderDesktopSpecialReqModalContent();
@@ -1825,6 +2104,13 @@ export function createDesktopView(container) {
 
       if (e.target.closest('#desktop-btn-done-special-req') || e.target.closest('#close-desktop-special-req-modal-btn')) {
         closeDesktopSpecialReqModal();
+        if (activeBooking && activeBooking.kind !== 'inquiry') {
+          fetch(`/api/bookings/${encodeURIComponent(activeBooking.id)}/special-requirements`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ special_requirements: activeBooking.specialRequirements || [] })
+          }).catch(() => { });
+        }
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Special requirements updated successfully!', type: 'success' }
         }));
@@ -2069,12 +2355,6 @@ export function createDesktopView(container) {
         return;
       }
 
-      // Expand to Full Table View Button
-      if (e.target.closest('#desktop-btn-expand-table')) {
-        closeDrawer();
-        return;
-      }
-
       // Action button "View" or Row Click -> Open Popup Drawer!
       const openBtn = e.target.closest('[data-open-detail]');
       const row = e.target.closest('[data-desktop-row-id]');
@@ -2176,24 +2456,41 @@ export function createDesktopView(container) {
           activeBooking.notes = notes;
         }
 
+        if (activeBooking.kind === 'inquiry') {
+          fetch(`/api/inquiries/${encodeURIComponent(activeBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              customer_name: name,
+              customer_phone: phone || null,
+              customer_email: email || null,
+              location: location || null,
+              notes: notes || null,
+            })
+          }).catch(() => { });
+        } else {
+          fetch(`/api/bookings/${encodeURIComponent(activeBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              name,
+              phone,
+              email,
+              location,
+              travel_dates: dates,
+              budget,
+              status,
+              notes
+            })
+          }).catch(() => { });
+        }
+
         container.querySelector('#desktop-edit-customer-modal')?.classList.remove('open');
         renderDetailPanel();
         renderTable();
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Customer details updated successfully!', type: 'success' }
         }));
-        return;
-      }
-
-      // Open Add Follow-up Modal (App-based modal, no browser popups)
-      if (e.target.closest('#desktop-add-followup-btn') || e.target.closest('#btn-add-followup-action')) {
-        if (activeBooking?.kind === 'inquiry') { openFollowUpModal(activeBooking.raw); return; }
-        const modal = container.querySelector('#desktop-add-followup-modal');
-        if (modal) {
-          container.querySelector('#desktop-modal-followup-title').value = '';
-          container.querySelector('#desktop-modal-followup-desc').value = '';
-          modal.classList.add('open');
-        }
         return;
       }
 
@@ -2261,10 +2558,29 @@ export function createDesktopView(container) {
       // Confirm Booking Button inside Drawer
       if (e.target.closest('#desktop-confirm-booking-btn')) {
         if (activeBooking?.kind === 'inquiry') {
+          activeBooking.status = 'Hot';
+          activeBooking.statusClass = 'status-inq-hot';
+          fetch(`/api/inquiries/${encodeURIComponent(activeBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ status: 'hot' })
+          }).catch(() => { });
           toast(`Inquiry ${activeBooking.id} (${activeBooking.title}) confirmed.`, 'success');
+          renderTable();
+          renderDetailPanel();
           return;
         }
         if (activeBooking) {
+          activeBooking.status = 'Confirmed';
+          activeBooking.statusClass = 'status-confirmed';
+          if (activeBooking.customer) activeBooking.customer.status = 'Confirmed';
+          fetch(`/api/bookings/${encodeURIComponent(activeBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ status: 'Confirmed' })
+          }).catch(() => { });
+          renderTable();
+          renderDetailPanel();
           window.dispatchEvent(new CustomEvent('show-toast', {
             detail: { message: `Booking ${activeBooking.id} (${activeBooking.title}) confirmed successfully! Vouchers sent.`, type: 'success' }
           }));
@@ -2321,14 +2637,6 @@ export function createDesktopView(container) {
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: `Opening booking options (Print Voucher, Duplicate, Export Invoice)...`, type: 'info' }
         }));
-        return;
-      }
-
-      // Staff member in left sidebar -> open team page with member selected!
-      const staffNav = e.target.closest('.staff-member-item');
-      if (staffNav) {
-        const staffId = staffNav.dataset.staffId;
-        navigate('team', { member: staffId });
         return;
       }
 

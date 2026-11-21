@@ -11,9 +11,21 @@ const ALIASES = {
   enquiries: 'inquiries',
   enquiry: 'inquiries',
   inquiry: 'inquiries',
-  operations: 'team',
-  'operations-team': 'team',
-  team: 'team'
+  leads: 'inquiries',
+  lead: 'inquiries',
+  'enquirey-leads': 'inquiries',
+  'enquiry-leads': 'inquiries',
+  'enquirey-and-leads': 'inquiries',
+  'enquiry-and-leads': 'inquiries',
+  customer: 'customers',
+  quotations: 'quotation',
+  quotes: 'quotation',
+  quote: 'quotation',
+  bookings: 'quotation',
+  booking: 'quotation',
+  operations: 'customers',
+  'operations-team': 'customers',
+  team: 'customers',
 };
 
 export function currentPage() {
@@ -44,10 +56,11 @@ export function setParams(patch, { push = true, silent = false } = {}) {
 
 /** Go to another page; filters and search do not carry over (unless `params` sets them for the new page). */
 export function navigate(page, params = {}) {
-  if (page === currentPage() && !location.search && !Object.keys(params).length) return;
+  const target = ALIASES[page] || page;
+  if (target === currentPage() && !location.search && !Object.keys(params).length) return;
   // Route immediately. Async page mounts animate their content after it is styled;
   // a document snapshot here captures the loading frame and delays rapid taps.
-  history.pushState(null, '', buildUrl(new URLSearchParams(params), page));
+  history.pushState(null, '', buildUrl(new URLSearchParams(params), target));
   notify();
 }
 
@@ -69,7 +82,7 @@ export function subscribe(fn) {
   else if (!location.hash) history.replaceState(null, '', `${location.pathname}${location.search}#dashboard`);
 })();
 
-// Old "#enquiries" links keep working.
+// Old "#enquiries" or "#bookings" links keep working.
 const rawHash = location.hash.replace(/^#/, '').toLowerCase();
 if (ALIASES[rawHash]) history.replaceState(null, '', buildUrl(new URLSearchParams(location.search), ALIASES[rawHash]));
 

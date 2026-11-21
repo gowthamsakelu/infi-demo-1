@@ -1,0 +1,85 @@
+// Draws the navigation from shared/nav.js: the PC sidebar groups and the phone "More" sheet, and keeps their active state and badges.
+import { icon } from './icons.js';
+import { getJson } from './http.js';
+import { esc } from './ui.js';
+import { openSheet } from './sheet.js';
+import { NAV, NAV_ITEMS, BOTTOM_BAR } from './nav.js';
+import { goToPage } from './page-host.js';
+import { currentPage } from './page-state.js';
+
+/* Pages the signed-in person may not view (from GET /api/me/permissions). The server still refuses their data; this only keeps the links out of sight. */
+let hiddenPages = new Set();
+
+/** Hide the links to pages the person cannot view, and a group title when all of its pages are hidden. */
+function applyAccess() {
+  document.querySelectorAll('[data-nav]').forEach((el) => { el.hidden = hiddenPages.has(el.dataset.nav); });
+  document.querySelectorAll('.sidebar-nav .nav-section-title').forEach((title) => {
+    let next = title.nextElementSibling;
+    let any = false;
+    while (next && !next.classList.contains('nav-section-title')) { if (!next.hidden) any = true; next = next.nextElementSibling; }
+    title.hidden = !any;
+  });
+}
+
+getJson('/api/me/permissions').then((me) => {
+  hiddenPages = new Set(Object.entries(me.pages || {}).filter(([, a]) => !a.view).map(([key]) => key));
+  applyAccess();
+}).catch(() => {});
+
+/** The sidebar's four groups (Menu, Catalog, Website, System). */
+export function sidebarNavHtml(active) {
+  return NAV.map((group) => `
+    <span class="nav-section-title" ${group.items.every((i) => hiddenPages.has(i.key)) ? 'hidden' : ''}>${esc(group.title)}</span>
+    ${group.items.map((i) => `
+      <a class="sidebar-nav-item ${i.key === active ? 'active' : ''}" ${hiddenPages.has(i.key) ? 'hidden' : ''} href="#${i.key}" id="nav-${i.key}" data-nav="${i.key}" ${i.key === active ? 'aria-current="page"' : ''}>
+        <div class="nav-left">${icon(i.icon, { size: 20, stroke: 2 })}<span>${esc(i.label)}</span></div>
+        ${i.badgeId ? `<span class="sidebar-badge" id="${i.badgeId}">${esc(i.badge)}</span>` : ''}
+      </a>`).join('')}`).join('');
+}
+
+/** Mark the open page in every place the navigation is drawn. */
+export function syncNavActive(page = currentPage()) {
+  document.querySelectorAll('[data-nav]').forEach((el) => {
+    const on = el.dataset.nav === page;
+    el.classList.toggle('active', on);
+    if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
+  });
+  // On the phone, "More" lights up for any page the bottom bar does not show.
+  document.querySelectorAll('.mobile-bottom-nav [data-more]').forEach((el) => el.classList.toggle('active', !BOTTOM_BAR.includes(page)));
+}
+
+/** Sidebar links go through goToPage, which asks before leaving a page with unsaved changes. */
+export function bindSidebar(root) {
+  root.addEventListener('click', (e) => {
+    const link = e.target.closest('a[data-nav]');
+    if (!link) return;
+    e.preventDefault();
+    goToPage(link.dataset.nav);
+  });
+}
+
+/** The phone's "More" screen: every accessible page not in the bottom bar. */
+export function openMoreSheet({ returnFocus } = {}) {
+  const items = NAV_ITEMS.filter((i) => !BOTTOM_BAR.includes(i.key) && !hiddenPages.has(i.key));
+  const dlg = openSheet({
+    label: 'More',
+    cls: 'more-sheet',
+    returnFocus,
+    html: `<header class="asg-header"><h3>More</h3><button type="button" class="sheet-close-btn" data-sheet-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
+      <div class="more-body">
+          <div class="more-grid">${items.map((i) => `
+            <button type="button" class="more-tile ${i.key === currentPage() ? 'active' : ''}" data-nav="${i.key}">
+              <span class="more-ico">${icon(i.icon, { size: 20 })}</span><span class="more-label">${esc(i.label)}</span>
+            </button>`).join('')}</div>
+      </div>`,
+  });
+  dlg.ov.addEventListener('click', (e) => {
+    const tile = e.target.closest('.more-tile');
+    if (!tile) return;
+    dlg.close();
+    goToPage(tile.dataset.nav);
+  });
+  return dlg;
+}
+
+export { NAV_ITEMS };

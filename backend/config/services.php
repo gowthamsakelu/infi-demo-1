@@ -45,7 +45,7 @@ return [
         'timeout' => (int) env('RUYI_TIMEOUT', 20),
         'cache_seconds' => (int) env('RUYI_CACHE_SECONDS', 60),
         // The admin pages (Stays ...) show the live Ruyi data while this is true. Set RUYI_PAGES=false to go back to the demo data / own tables.
-        'pages' => (bool) env('RUYI_PAGES', true),
+        'pages' => (bool) env('RUYI_PAGES', false),
         'all_cache_seconds' => (int) env('RUYI_ALL_CACHE_SECONDS', 300),
     ],
 

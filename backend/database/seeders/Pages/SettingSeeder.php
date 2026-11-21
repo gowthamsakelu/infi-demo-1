@@ -10,7 +10,18 @@ class SettingSeeder extends Seeder
 {
     public function run(): void
     {
-        AppSetting::write('company', ['name' => 'Ruyi Travels', 'phone' => '+91 98200 00000', 'email' => 'hello@ruyitravels.com', 'website' => 'www.ruyitravels.com', 'address' => 'Mumbai, Maharashtra, India']);
+        AppSetting::write('company', [
+            'name' => 'INFINITY',
+            'legal_name' => 'Infinity Freight Services India Pvt. Ltd.',
+            'tagline' => 'infinite freights, infinite ways',
+            'about' => 'At Infinity Freight Services India Pvt. Ltd., we go beyond transportation—we deliver reliability, efficiency, and peace of mind. With a strong presence in the logistics and freight forwarding industry, we specialize in providing end-to-end supply chain solutions tailored to meet the evolving needs of businesses across the globe.',
+            'email' => 'operations@infinityfreight.in',
+            'phone' => '+91 22 6900 4500',
+            'website' => 'www.infinityfreight.in',
+            'address' => 'Infinity Tower, Logistics Park, Sector 18, Navi Mumbai, MH 400705, India',
+            'gst' => '27AAACI4819M1ZL',
+            'iec' => '0315082194',
+        ]);
         AppSetting::write('preferences', ['autoAssign' => true, 'sendQuoteWhatsapp' => true, 'dailySummary' => true, 'showGst' => false]);
         AppSetting::write('lead_sources', array_map(fn ($n) => ['name' => $n, 'active' => true], ['Website contact form', 'WhatsApp', 'Referral', 'Instagram', 'Google Search', 'Facebook']));
         AppSetting::write('payments', ['gstPercent' => 5, 'advancePercent' => 30, 'dueDays' => 15]);

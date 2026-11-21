@@ -169,8 +169,19 @@ export const avatar = (name, cls = '') => `<div class="row-avatar ${cls}" aria-h
 export const categoryBadge = (b, extra = '') => `<span class="card-type-badge ${b.typeClass}" ${extra}>${esc(b.type)}</span>`;
 export const statusPill = (b) => `<span class="status-pill ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>`;
 
-/** "3 Pax • 4 Nights"; the nights part only when the trip has dates, a dash when there is no guest count. */
-export const paxLine = (b) => (b.pax ? `${b.pax} Pax${b.duration ? ` • ${b.duration}` : ''}` : '—');
+/** Route or Pax line */
+export const paxLine = (b) => {
+  if (b.freight_details || b.kind === 'inquiry') {
+    const fd = b.freight_details || {};
+    const req = fd.requirements || {};
+    const mode = req.service_type || fd.mode || 'Sea Freight';
+    const origin = req.pol_origin ? req.pol_origin.split('(')[0].trim() : (fd.origin || 'Mumbai');
+    const dest = req.pod_destination ? req.pod_destination.split('(')[0].trim() : (fd.destination || 'Dubai');
+    const container = req.shipment_mode || req.container_type || fd.container || (b.pax ? `${b.pax} TEU` : 'FCL 40ft');
+    return `${mode} • ${origin} to ${dest} • ${container}`;
+  }
+  return (b.pax ? `${b.pax} Pax${b.duration ? ` • ${b.duration}` : ''}` : '—');
+};
 
 /** The tag an inquiry carries for a few seconds after it was added. */
 export const justAddedTag = (b) => (b.justAdded ? '<span class="just-added-tag">JUST ADDED</span>' : '');
@@ -234,7 +245,7 @@ export function rowCard(b, { split = false, active = false } = {}) {
           ${inquiry ? statusPill(b) : categoryBadge(b)}
         </div>
         <p class="row-trip">${esc(b.title)}</p>
-        <div class="card-meta-row">${icon('user', { size: 13 })}<span>${esc(paxLine(b))}</span></div>
+        <div class="card-meta-row">${icon(b.kind === 'inquiry' || b.freight_details ? 'ship' : 'user', { size: 13 })}<span>${esc(paxLine(b))}</span></div>
         <div class="card-meta-row">${icon('calendar', { size: 13 })}<span>${esc(b.dates)}</span></div>
       </div>
       <div class="card-right-col">

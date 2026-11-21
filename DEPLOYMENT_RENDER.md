@@ -1,6 +1,6 @@
-# Deploying Ruyi Admin on Render
+# Deploying INFINITY CRM on Render
 
-This guide outlines the complete process to deploy **Ruyi Admin** (Laravel 12 + Livewire 4 Backend & Standalone Frontend) to [Render](https://render.com/).
+This guide outlines the complete process to deploy **INFINITY CRM** (Laravel 12 + Livewire 4 Backend & Standalone Frontend) to [Render](https://render.com/).
 
 ---
 
@@ -10,28 +10,28 @@ The repository is structured to deploy smoothly on Render:
 
 | Service | Type on Render | Description | Port / Path |
 | :--- | :--- | :--- | :--- |
-| **`ruyi-admin-backend`** | **Web Service (Docker)** | Complete Laravel 12 application with Livewire 4 UI & REST APIs | Dynamic `$PORT` / `/` & `/api` |
-| **`ruyi-admin-frontend`** | **Static Site** | Standalone HTML5/CSS3/JS demonstration UI | Free Static Site / `index.html` |
+| **`infinity-crm-backend`** | **Web Service (Docker)** | Complete Laravel 12 application with Livewire 4 UI & REST APIs | Dynamic `$PORT` / `/` & `/api` |
+| **`infinity-crm-frontend`** | **Static Site** | Standalone HTML5/CSS3/JS demonstration UI | Free Static Site / `index.html` |
 
 ---
 
 ## 🚀 Method 1: 1-Click Deployment via Render Blueprint (Recommended)
 
-Render Blueprints use the pre-configured [render.yaml](file:///c:/Users/Karan%20Sapalia/Desktop/ADMIN_FINAL_Project/render.yaml) file in the root of the repository to automatically create and deploy all services.
+Render Blueprints use the pre-configured [render.yaml](render.yaml) file in the root of the repository to automatically create and deploy all services.
 
 ### Steps:
 1. **Push your code to GitHub or GitLab**:
    ```bash
    git add .
-   git commit -m "Add Render deployment configuration"
+   git commit -m "INFINITY CRM: Ready for Render deployment"
    git push origin main
    ```
 2. Log in to your [Render Dashboard](https://dashboard.render.com/).
 3. Click the **"New +"** button at the top right and select **"Blueprint"**.
 4. Connect your GitHub/GitLab repository.
-5. Render will automatically detect [`render.yaml`](file:///c:/Users/Karan%20Sapalia/Desktop/ADMIN_FINAL_Project/render.yaml) and list:
-   - `ruyi-admin-backend` (Docker Web Service)
-   - `ruyi-admin-frontend` (Static Site)
+5. Render will automatically detect [`render.yaml`](render.yaml) and list:
+   - `infinity-crm-backend` (Docker Web Service)
+   - `infinity-crm-frontend` (Static Site)
 6. Click **"Apply"**. Render will build the Docker container, run migrations and database seeders, and bring the site online!
 
 ---
@@ -44,7 +44,7 @@ If you prefer to configure services manually:
 1. In the Render Dashboard, click **New +** > **Web Service**.
 2. Connect your Git repository.
 3. Configure the service settings:
-   - **Name**: `ruyi-admin-backend`
+   - **Name**: `infinity-crm-backend`
    - **Language / Runtime**: `Docker`
    - **Branch**: `main` (or your active branch)
    - **Root Directory**: `backend` (or leave empty to use root Dockerfile)
@@ -59,7 +59,7 @@ If you prefer to configure services manually:
 
 | Key | Value | Description |
 | :--- | :--- | :--- |
-| `APP_NAME` | `Ruyi Admin` | Application Title |
+| `APP_NAME` | `INFINITY CRM` | Application Title |
 | `APP_ENV` | `production` | Production environment |
 | `APP_DEBUG` | `false` | Disable debug output for security |
 | `APP_KEY` | *(Click "Generate" or run `php artisan key:generate --show`)* | 32-character encryption key |
@@ -77,7 +77,7 @@ If you prefer to configure services manually:
 1. In Render Dashboard, click **New +** > **Static Site**.
 2. Connect your Git repository.
 3. Configure:
-   - **Name**: `ruyi-admin-frontend`
+   - **Name**: `infinity-crm-frontend`
    - **Publish Directory**: `frontend`
    - **Build Command**: *(leave empty)*
 4. Click **Create Static Site**.
@@ -96,9 +96,9 @@ The container automatically initializes `/var/www/html/database/database.sqlite`
 
 ### Option B: Render Managed PostgreSQL (Recommended for Production)
 1. In Render Dashboard, click **New +** > **PostgreSQL Database**.
-2. Name it (e.g. `ruyi-admin-db`) and create it.
+2. Name it (e.g. `infinity-crm-db`) and create it.
 3. Once provisioned, copy the **Internal Database URL** (e.g. `postgres://user:password@host/db`).
-4. In your `ruyi-admin-backend` Web Service:
+4. In your `infinity-crm-backend` Web Service:
    - Set `DB_CONNECTION`: `pgsql`
    - Set `DATABASE_URL`: paste the copied PostgreSQL internal URL.
 5. The container startup will automatically migrate and seed the PostgreSQL database!

@@ -214,6 +214,242 @@ html[data-layout] .is-pushed .sheet-close-btn:not(.dialog-back), html[data-layou
 .dd-trigger > svg:last-child:not(:first-child) { flex: none; width: 13px; height: 13px; }
 .dd-compact .dd-trigger { max-width: 168px; }
 .dd-compact .dd-label { max-width: none; }
+
+/* Drilldown Dropdown Menu (Image 1: Main Categories -> Image 2: Child Options) */
+.dd-list.dd-drilldown-card {
+  padding: 8px 6px;
+  min-width: 215px;
+  max-width: 240px;
+  width: 230px;
+  border-radius: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.05) !important;
+  max-height: min(440px, 80vh);
+  overflow-y: auto !important;
+  list-style: none;
+}
+.dd-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dd-fade-in {
+  animation: ddFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes ddFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dd-drilldown-item {
+  list-style: none;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-family: var(--font-family, 'Plus Jakarta Sans', sans-serif);
+}
+
+/* Image 1: Main Category View */
+.dd-main-reset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding: 0 12px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0F172A;
+}
+.dd-main-reset:hover {
+  background: #F8FAFC;
+  color: #0F172A;
+}
+.dd-main-reset.selected {
+  color: #2563EB;
+}
+
+.dd-categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dd-category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1E293B;
+}
+.dd-category-row:hover {
+  background: #F8FAFC;
+  color: #0F172A;
+}
+.dd-category-label {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dd-category-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+.dd-active-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #EFF6FF;
+  color: #2563EB;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dd-chevron-right {
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+}
+.dd-category-row.has-active-child {
+  color: #2563EB;
+  font-weight: 600;
+}
+.dd-category-row.has-active-child .dd-chevron-right {
+  color: #2563EB;
+}
+
+/* Image 2: Drilldown Sub-view */
+.dd-drilldown-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  color: #7F1D1D;
+  list-style: none;
+  user-select: none;
+  transition: background 0.15s ease;
+  margin-bottom: 2px;
+}
+.dd-drilldown-back:hover {
+  background: #F8FAFC;
+}
+.dd-back-chevron {
+  display: flex;
+  align-items: center;
+  color: #7F1D1D;
+  flex: none;
+}
+.dd-back-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dd-sub-reset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 38px;
+  padding: 0 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0F172A;
+}
+.dd-sub-reset:hover {
+  background: #F8FAFC;
+}
+.dd-sub-reset.selected {
+  color: #2563EB;
+}
+
+.dd-sub-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dd-sub-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #334155;
+}
+.dd-sub-option:hover {
+  background: #F8FAFC;
+  color: #0F172A;
+}
+.dd-sub-option.selected {
+  background: #EFF6FF !important;
+  color: #2563EB !important;
+  font-weight: 600;
+}
+.dd-check-icon {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  color: #2563EB;
+  flex: none;
+}
+
+/* Trigger Button styling */
+.dd-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 38px;
+  border-radius: 10px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #334155;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.dd-trigger:hover {
+  background: #F8FAFC;
+  border-color: #94A3B8;
+}
+.dd-trigger[aria-expanded="true"] {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.dd-trigger.has-active-filter {
+  border-color: #2563EB;
+  color: #2563EB;
+  background: #EFF6FF;
+}
+.dd-trigger-chevron {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+}
+.dd-trigger-chevron svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+
 /* the filter beside the search box and the tab row under it share the header's width; neither pushes the other out of it */
 .compact-header-top > .compact-search-bar { flex: 1 1 auto; min-width: 0; }
 .compact-header-top > [id$="filter-slot"], .compact-header-top > .dd-filter { flex: none; }
@@ -476,3 +712,993 @@ html[data-layout="desktop"] :is(#desktop-edit-customer-modal, #desktop-special-r
 html[data-layout="desktop"] :is(#desktop-edit-customer-modal, #desktop-special-req-modal, #desktop-activity-details-modal, #desktop-edit-activity-modal, #modal-add-guest) .modal-footer { flex: none; display: flex; justify-content: flex-end; gap: 10px; }
 html[data-layout="desktop"] :is(#desktop-special-req-modal, #desktop-activity-details-modal) .modal-footer > button { width: auto; min-width: 140px; }
 html[data-layout="desktop"] .asg-sheet.bld-sheet { max-width: 720px; }
+
+/* ==========================================================================
+   Infinity Freight CRM–ERP: Leads & Enquiries Popup Styles
+   Matches screenshot specifications pixel-for-pixel
+   ========================================================================== */
+
+.freight-header-card {
+  padding: 14px 18px 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.freight-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+.freight-header-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.freight-avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #EEF2FF;
+  color: #4F46E5;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #E0E7FF;
+}
+.freight-profile-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.freight-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.freight-customer-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1.25;
+}
+.badge-trade-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+.badge-trade-import {
+  background: #EFF6FF;
+  color: #2563EB;
+  border: 1px solid #BFDBFE;
+}
+.badge-trade-import .trade-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2563EB;
+}
+.badge-trade-export {
+  background: #FFF7ED;
+  color: #EA580C;
+  border: 1px solid #FED7AA;
+}
+.badge-trade-export .trade-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #EA580C;
+}
+
+.freight-subtitle-row {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+/* Meta Chips */
+.freight-meta-chips {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #475569;
+  font-weight: 600;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.freight-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.freight-meta-chip svg {
+  color: #64748B;
+  flex-shrink: 0;
+}
+
+/* Progress Tracker */
+/* Modern Flow Status Stepper matching reference img3 */
+.freight-flow-stepper-wrap {
+  position: relative;
+  width: 100%;
+  margin: 12px 0 2px 0;
+  padding: 8px 0 4px 0;
+  box-sizing: border-box;
+}
+
+.freight-flow-track-base {
+  position: absolute;
+  top: 18px;
+  left: 10%;
+  width: 80%;
+  height: 2.5px;
+  background: #E2E8F0;
+  z-index: 1;
+  border-radius: 2px;
+}
+
+.freight-flow-track-fill {
+  position: absolute;
+  top: 18px;
+  left: 10%;
+  height: 2.5px;
+  background: #10B981;
+  z-index: 2;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.freight-flow-steps {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  width: 100%;
+}
+
+.freight-flow-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.freight-flow-dot-box {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.freight-flow-dot {
+  display: block;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+/* 1. Done step: solid emerald green circle */
+.freight-flow-step.is-done .freight-flow-dot {
+  width: 12px;
+  height: 12px;
+  background: #10B981;
+}
+.freight-flow-step.is-done .freight-flow-label {
+  color: #374151;
+  font-weight: 500;
+}
+
+/* 2. Active step: filled purple dot with outer concentric ring/glow */
+.freight-flow-step.is-active .freight-flow-dot {
+  width: 11px;
+  height: 11px;
+  background: #7C3AED;
+  box-shadow: 0 0 0 4.5px #EDE9FE, 0 0 0 5.5px rgba(124, 58, 237, 0.16);
+}
+.freight-flow-step.is-active .freight-flow-label {
+  color: #6D28D9;
+  font-weight: 600;
+}
+
+/* 3. Pending step: hollow circle with light grey border */
+.freight-flow-step.is-pending .freight-flow-dot {
+  width: 12px;
+  height: 12px;
+  background: #FFFFFF;
+  border: 2px solid #CBD5E1;
+  box-sizing: border-box;
+}
+.freight-flow-step.is-pending .freight-flow-label {
+  color: #94A3B8;
+  font-weight: 500;
+}
+
+.freight-flow-label {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.2;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+}
+
+/* Status inq pills for Quotation Sent & Converted */
+.status-inq-quotation_sent,
+.status-inq-quoted {
+  background: #FEF3C7 !important;
+  color: #B45309 !important;
+}
+.status-inq-quotation_sent .dot,
+.status-inq-quoted .dot {
+  background: #F59E0B !important;
+}
+
+.status-inq-converted {
+  background: #DCFCE7 !important;
+  color: #15803D !important;
+}
+.status-inq-converted .dot {
+  background: #22C55E !important;
+}
+
+/* Tab Pane Container */
+.freight-tab-pane {
+  padding: 12px 18px 24px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.freight-pane-subheader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+.freight-section-title-tag {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #94A3B8;
+  letter-spacing: 0.6px;
+}
+.btn-freight-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #2563EB;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: color 0.15s ease;
+}
+.btn-freight-edit:hover {
+  color: #1D4ED8;
+}
+
+/* Info Cards */
+.freight-info-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
+  transition: border-color 0.15s ease;
+}
+.freight-info-card:hover {
+  border-color: #CBD5E1;
+}
+.freight-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.card-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.freight-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+.card-subtitle {
+  font-size: 11.5px;
+  color: #64748B;
+  font-weight: 500;
+}
+.freight-header-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.icon-box-user { background: #EFF6FF; color: #2563EB; }
+.icon-box-company { background: #EFF6FF; color: #2563EB; }
+.icon-box-cargo { background: #EDE9FE; color: #7C3AED; }
+.icon-box-temp { background: #FEF3C7; color: #D97706; }
+.icon-box-port { background: #EFF6FF; color: #2563EB; }
+.icon-box-shield { background: #F3E8FF; color: #9333EA; }
+.icon-box-manifest { background: #EFF6FF; color: #2563EB; }
+
+/* Grids */
+.freight-2col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+.freight-3col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px 14px;
+}
+.freight-grid-item {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fg-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+}
+.fg-value-bold {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+  word-break: break-word;
+}
+.fg-value-text {
+  font-size: 12.5px;
+  color: #334155;
+  word-break: break-word;
+}
+.fg-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.fg-mini-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.fg-mini-btn:hover {
+  transform: translateY(-1px);
+}
+.btn-mail-blue { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+.btn-call-green { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+.btn-wa-green { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+
+/* Status Badges */
+.status-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.pill-verified {
+  background: #ECFDF5;
+  color: #059669;
+  border: 1px solid #A7F3D0;
+}
+.pill-verified .pill-check {
+  font-size: 11px;
+  font-weight: 800;
+}
+.pill-spec {
+  background: #EFF6FF;
+  color: #2563EB;
+  border: 1px solid #BFDBFE;
+}
+.pill-pending-quote {
+  background: #FFFBEB;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+.pill-pending-review {
+  background: #FEF3C7;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+.badge-fcl-pill {
+  background: #EFF6FF;
+  color: #2563EB;
+  border: 1px solid #BFDBFE;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.badge-packaging-amber {
+  display: inline-block;
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* Short Details Card */
+.freight-short-details-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.short-details-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 6px;
+}
+.short-details-top svg {
+  color: #2563EB;
+}
+.short-details-body {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Subpills in Requirements */
+.freight-subpills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.freight-subpills-row::-webkit-scrollbar {
+  display: none;
+}
+.req-subpill {
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.req-subpill.active {
+  background: #0F172A;
+  color: #FFFFFF;
+  border-color: #0F172A;
+}
+
+/* Corridor (Port of Loading & Discharge) */
+.freight-corridor-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 4px;
+}
+.corridor-col {
+  flex: 1;
+  min-width: 0;
+}
+.corridor-dest {
+  text-align: right;
+}
+.corridor-port {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+  display: block;
+}
+.corridor-sub {
+  font-size: 11.5px;
+  color: #64748B;
+  display: block;
+  margin-top: 2px;
+}
+.corridor-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+}
+.corridor-duration {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #2563EB;
+}
+.corridor-arrow {
+  font-size: 16px;
+  color: #2563EB;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Customs Checklist */
+.customs-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.4;
+}
+.check-circle-green {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #10B981;
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9.5px;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.check-clock-amber {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #FEF3C7;
+  color: #D97706;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9.5px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.text-delivery-red { color: #DC2626 !important; }
+.text-seal-green { color: #059669 !important; }
+
+/* Docs Tab */
+.freight-docs-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 10px 0;
+}
+.docs-section-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+.docs-section-sub {
+  font-size: 11.5px;
+  color: #64748B;
+  margin-top: 1px;
+  display: block;
+}
+.btn-upload-compliance {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #4F46E5;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-upload-compliance:hover {
+  background: #4338CA;
+}
+
+.freight-docs-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.freight-doc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.freight-doc-row:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+.doc-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.doc-icon-sq {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.doc-icon-red { background: #FEE2E2; color: #DC2626; }
+.doc-icon-blue { background: #DBEAFE; color: #2563EB; }
+.doc-icon-purple { background: #EDE9FE; color: #7C3AED; }
+.doc-icon-orange { background: #FFEDD5; color: #EA580C; }
+.doc-icon-green { background: #DCFCE7; color: #16A34A; }
+.doc-meta-col {
+  min-width: 0;
+}
+.doc-title-row {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-meta-row {
+  font-size: 11.5px;
+  color: #64748B;
+  margin-top: 2px;
+}
+.doc-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.text-pending-amber {
+  color: #B45309 !important;
+  font-weight: 500;
+}
+.doc-view-btn, .doc-upload-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1.5px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #64748B;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.doc-view-btn .doc-view-icon {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  color: #2563EB;
+}
+.doc-view-btn:hover {
+  background: #EFF6FF;
+  border-color: #93C5FD;
+}
+.doc-view-btn:hover .doc-view-icon {
+  opacity: 1;
+}
+.doc-upload-btn:hover {
+  background: #FEF3C7;
+  color: #B45309;
+  border-color: #FDE68A;
+}
+
+/* Updates Tab Timeline */
+.freight-updates-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.updates-header-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+.updates-live-sync {
+  font-size: 11.5px;
+  color: #94A3B8;
+  font-weight: 500;
+}
+.freight-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.timeline-item {
+  display: flex;
+  gap: 14px;
+  position: relative;
+}
+.timeline-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.dot-blue { background: #2563EB; box-shadow: 0 0 0 3px #DBEAFE; }
+.dot-green { background: #10B981; box-shadow: 0 0 0 3px #DCFCE7; }
+.dot-grey { background: #94A3B8; box-shadow: 0 0 0 3px #F1F5F9; }
+.timeline-line {
+  width: 2px;
+  flex: 1;
+  min-height: 40px;
+  background: #E2E8F0;
+  margin: 4px 0;
+}
+.timeline-body {
+  padding-bottom: 20px;
+}
+.timeline-item-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 3px 0;
+}
+.timeline-item-desc {
+  font-size: 12px;
+  color: #475569;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+.timeline-item-meta {
+  font-size: 11.5px;
+  color: #94A3B8;
+  font-weight: 500;
+}
+
+/* Bottom Action Bar */
+.freight-footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.btn-confirm-shipment {
+  width: 100%;
+  height: 46px;
+  border-radius: 12px;
+  background: #4F46E5;
+  color: #FFFFFF;
+  border: none;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-confirm-shipment:hover {
+  background: #4338CA;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+}
+.freight-bottom-actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+}
+.freight-action-pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.freight-action-pill-btn:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+.freight-action-pill-btn.act-call svg { stroke: #10B981; color: #10B981; }
+.freight-action-pill-btn.act-message svg { stroke: #6366F1; color: #6366F1; }
+.freight-action-pill-btn.act-forward svg { stroke: #6366F1; color: #6366F1; }
+.freight-action-pill-btn.act-more svg { stroke: #64748B; color: #64748B; }
+
+/* Freight Popup Drawer & Scrolling Stability */
+.desktop-details-drawer #desktop-sheet-body,
+.desktop-details-drawer .desktop-body-scroll,
+.sheet-body-scroll.is-freight-scroll,
+.sheet-body-scroll:has(.freight-tab-pane) {
+  padding: 0 !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  pointer-events: auto !important;
+}
+
+/* Sleek, visible scrollbar on desktop so users can see scroll progress and drag */
+.desktop-details-drawer .desktop-body-scroll,
+#desktop-sheet-body {
+  scrollbar-width: thin !important;
+  scrollbar-color: #CBD5E1 transparent !important;
+}
+.desktop-details-drawer .desktop-body-scroll::-webkit-scrollbar,
+#desktop-sheet-body::-webkit-scrollbar {
+  display: block !important;
+  width: 6px !important;
+}
+.desktop-details-drawer .desktop-body-scroll::-webkit-scrollbar-track,
+#desktop-sheet-body::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.desktop-details-drawer .desktop-body-scroll::-webkit-scrollbar-thumb,
+#desktop-sheet-body::-webkit-scrollbar-thumb {
+  display: block !important;
+  background-color: #CBD5E1 !important;
+  border-radius: 999px !important;
+}
+.desktop-details-drawer .desktop-body-scroll::-webkit-scrollbar-thumb:hover,
+#desktop-sheet-body::-webkit-scrollbar-thumb:hover {
+  background-color: #94A3B8 !important;
+}
+
+.freight-tab-pane {
+  padding: 14px 20px 48px 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  box-sizing: border-box !important;
+  min-height: min-content !important;
+  width: 100% !important;
+  overflow: visible !important;
+}
+
+/* Freight Footer and Clickable Buttons */
+.desktop-drawer-footer {
+  position: relative !important;
+  z-index: 20 !important;
+  pointer-events: auto !important;
+}
+.btn-confirm-shipment,
+.freight-action-pill-btn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  user-select: none !important;
+}
+.btn-confirm-shipment *,
+.freight-action-pill-btn * {
+  pointer-events: none !important;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .freight-header-card {
+    padding: 12px 14px 10px 14px;
+    gap: 6px;
+  }
+  .freight-tab-pane {
+    padding: 10px 14px 24px 14px;
+    gap: 10px;
+  }
+  .freight-info-card {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+  .freight-bottom-actions-row {
+    gap: 6px;
+  }
+  .freight-action-pill-btn {
+    font-size: 11px;
+    gap: 4px;
+    padding: 0 4px;
+  }
+  .freight-action-pill-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+  .freight-2col-grid {
+    gap: 10px 12px;
+  }
+  .freight-tracker-stages {
+    gap: 4px;
+  }
+  .freight-stage {
+    font-size: 9.5px;
+    padding: 2px 3px;
+  }
+  .freight-stage.is-active {
+    padding: 2px 6px;
+    font-size: 9.5px;
+  }
+  #freight-edit-form [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+

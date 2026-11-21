@@ -663,11 +663,12 @@ class BookingsManager extends Component
         }
 
         if ($this->category !== 'ALL') {
-            if ($this->category === 'VILLA') {
-                $query->whereIn('type', ['VILLA', 'RESORT']);
-            } else {
-                $query->where('type', $this->category);
-            }
+            $cat = $this->category;
+            $query->where(function ($q) use ($cat) {
+                $q->where('type', $cat)
+                  ->orWhere('title', 'like', "%{$cat}%")
+                  ->orWhere('freight_details', 'like', "%{$cat}%");
+            });
         }
 
         if (!empty(trim($this->search))) {
@@ -692,11 +693,12 @@ class BookingsManager extends Component
     {
         $query = Booking::query();
         if ($this->category !== 'ALL') {
-            if ($this->category === 'VILLA') {
-                $query->whereIn('type', ['VILLA', 'RESORT']);
-            } else {
-                $query->where('type', $this->category);
-            }
+            $cat = $this->category;
+            $query->where(function ($q) use ($cat) {
+                $q->where('type', $cat)
+                  ->orWhere('title', 'like', "%{$cat}%")
+                  ->orWhere('freight_details', 'like', "%{$cat}%");
+            });
         }
         $all = $query->get();
         $totalBookings = $all->count();

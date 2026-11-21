@@ -21,12 +21,12 @@ class TourPackageController extends Controller
 
     public function index(): JsonResponse
     {
-        if ($this->ruyiOn()) {
-            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'package'], $this->ruyi()->all('packages')));
-        }
-
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('tour-packages')]);
+        }
+
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'package'], $this->ruyi()->all('packages')));
         }
 
         if (! Schema::hasTable('tour_packages')) { // migrations not run on this database yet: an empty list, not a server error
@@ -41,6 +41,10 @@ class TourPackageController extends Controller
     /** The id is text: a Ruyi package is PKG_425, a record of this app's own table is a number. */
     public function show(string $id): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::detail('tour-packages', $id) ?? abort(404)]);
+        }
+
         if ($this->ruyiOn() && ! ctype_digit($id)) {
             return $this->fromRuyi(function () use ($id) {
                 foreach ($this->ruyi()->all('packages') as $package) {
@@ -56,10 +60,6 @@ class TourPackageController extends Controller
             abort(404);
         }
         $id = (int) $id;
-
-        if (DummyData::on()) {
-            return response()->json(['success' => true, 'data' => DummyData::detail('tour-packages', $id) ?? abort(404)]);
-        }
 
         return response()->json(['success' => true, 'data' => $this->detail(TourPackage::query()->findOrFail($id))]);
     }

@@ -2,19 +2,40 @@ import { INITIAL_BOOKINGS, STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST, SPECIAL_R
 import { icon } from './shared/icons.js';
 import { createMobileCalendar } from './calendar-mobile.js';
 import { createMobileTeam } from './team-mobile.js';
+import { OPERATIONS_TEAM_MEMBERS } from './shared/team-data.js';
+import { bindSwipe, bindChipSwipe, slideIn } from './shared/swipe.js';
 import { notificationsHtml, bindNotifications } from './shared/notifications.js';
 import { currentPage, getParams, setParams, navigate, subscribe as subscribePage } from './shared/page-state.js';
 import { createCategoryFilter } from './shared/dropdown-filter.js';
-import { searchBox, emptyState, toast, openRowMenu, esc, skeletonCards, errorState } from './shared/ui.js';
+import { searchBox, emptyState, toast, openRowMenu, esc, jsq, skeletonCards, errorState } from './shared/ui.js';
 import { renderTabs, bindQuickNotes, rowCard, rowMenuItems, assignItems, bulkBar, bindBulkBar, updateBulkBar } from './shared/list-ui.js';
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
-import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
+import { detailHeaderHtml, sheetHandleHtml } from './shared/detail-sheet.js';
+import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments, updateInquiry } from './shared/inquiry-store.js';
+import {
+  renderFreightHeaderHtml,
+  renderFreightTabsHtml,
+  renderFreightBodyHtml,
+  renderFreightFooterHtml,
+  bindFreightBodyEvents,
+  openFreightEditModal,
+  uploadFreightDoc,
+  getFreightData,
+  cleanPhone,
+} from './shared/freight-popup.js';
+import { getCustomersList, CUSTOMER_TABS, addCustomer, subscribeCustomers } from './shared/customer-store.js';
 import { openAssign } from './shared/assign-sheet.js';
 import { openDayDialog, commit } from './shared/itinerary-dialog.js';
 import { daysOf, persist, renumber, eventKind, itemIconHtml, itemPills } from './shared/itinerary.js';
 import { openItineraryBuilder } from './shared/itinerary-builder-ui.js';
+import { scheduleHtml } from './shared/schedule.js';
+import { openMoreSheet } from './shared/nav-ui.js';
+import { goToPage } from './shared/page-host.js';
+import { getBranding } from './shared/branding.js';
 import { matchesCategory } from './shared/booking-filters.js';
+import { openAddInquiry } from './shared/add-inquiry.js';
+import { addButtonHtml, setShellAddAction } from './shared/add-button.js';
 
 export function createMobileView(container, options = {}) {
   const bookingsData = [...INITIAL_BOOKINGS];
@@ -63,8 +84,8 @@ export function createMobileView(container, options = {}) {
               </svg>
             </div>
             <div class="brand-text-col">
-              <h2>Ruyi Admin</h2>
-              <p id="mobile-header-subtitle">Bookings • 28 Total</p>
+              <h2>${esc(getBranding().companyName || 'INFINITY')}</h2>
+              <p id="mobile-header-subtitle">${esc(getBranding().tagline || 'infinite freights, infinite ways')}</p>
             </div>
           </div>
           <div class="app-header-right">
@@ -75,7 +96,7 @@ export function createMobileView(container, options = {}) {
               </svg>
               <span class="bell-dot" id="mobile-bell-dot"></span>
             </button>
-            <div class="ks-avatar-badge" title="Gautham">G</div>
+            <button type="button" class="ks-avatar-badge" title="Gautham" aria-haspopup="menu" aria-label="Account menu">G</button>
           </div>
         </div>
 
@@ -98,13 +119,16 @@ export function createMobileView(container, options = {}) {
         <div id="mobile-team-page" hidden></div>
       </div>
 
+      <div id="mobile-page-host" class="mobile-screen-content"></div>
+      ${addButtonHtml('mobile-page-add', true)}
+
       <!-- Notifications: the same panel as on PC, across the screen under the header -->
       <div class="notif-backdrop" id="mobile-notif-backdrop" hidden></div>
       <div class="notifications-panel mobile-notifications" id="mobile-notifications" role="dialog" aria-label="Notifications" hidden>${notificationsHtml()}</div>
 
       <!-- Bottom Navigation Bar (Fixed) -->
       <div class="mobile-bottom-nav">
-        <button class="nav-item">
+        <button class="nav-item ${currentPage() === 'dashboard' ? 'active' : ''}" data-route="dashboard">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect width="7" height="9" x="3" y="3" rx="1"/>
             <rect width="7" height="5" x="14" y="3" rx="1"/>
@@ -113,36 +137,23 @@ export function createMobileView(container, options = {}) {
           </svg>
           Dashboard
         </button>
-        <button class="nav-item ${currentPage() === 'bookings' ? 'active' : ''}" data-route="bookings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-            <rect width="20" height="14" x="2" y="6" rx="2"/>
-          </svg>
-          Bookings
-        </button>
         <button class="nav-item ${currentPage() === 'inquiries' ? 'active' : ''}" data-route="inquiries">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          Inquiries
+          Enquirey &amp; Leads
         </button>
-        <button class="nav-item ${currentPage() === 'calendar' ? 'active' : ''}" data-route="calendar">
+        <button class="nav-item ${currentPage() === 'customers' ? 'active' : ''}" data-route="customers">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-            <line x1="16" x2="16" y1="2" y2="6"/>
-            <line x1="8" x2="8" y1="2" y2="6"/>
-            <line x1="3" x2="21" y1="10" y2="10"/>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
-          Calendar
+          Customers
         </button>
-        <button class="nav-item">
+        <button class="nav-item ${currentPage() === 'quotation' || currentPage() === 'bookings' ? 'active' : ''}" data-route="quotation">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="7" height="7" x="3" y="3" rx="1"/>
-            <rect width="7" height="7" x="14" y="3" rx="1"/>
-            <rect width="7" height="7" x="14" y="14" rx="1"/>
-            <rect width="7" height="7" x="3" y="14" rx="1"/>
+            <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>
           </svg>
-          More
+          Quotation
         </button>
       </div>
 
@@ -156,12 +167,14 @@ export function createMobileView(container, options = {}) {
           <!-- Populated dynamically -->
         </div>
 
-        <!-- Sheet Navigation Tabs (Customer Details, Guests, Itinerary, Updates) -->
-        <div class="sheet-tabs-nav">
-          <button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
-          <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
-          <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
-          <button class="sheet-tab-btn ${activeModalTab === 'updates' ? 'active' : ''}" data-sheet-tab="updates">Updates</button>
+        <!-- Sheet Navigation Tabs -->
+        <div class="sheet-tabs-nav scroll-row">
+          ${(page === 'inquiries' || bookings[0]?.kind === 'inquiry')
+            ? renderFreightTabsHtml('customer-details', { attr: 'data-sheet-tab' })
+            : `<button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
+               <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
+               <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
+               <button class="sheet-tab-btn ${activeModalTab === 'updates' ? 'active' : ''}" data-sheet-tab="updates">Updates</button>`}
         </div>
 
         <!-- Sheet Body Scroll Content -->
@@ -171,30 +184,32 @@ export function createMobileView(container, options = {}) {
 
         <!-- Sheet Sticky Footer Action Section -->
         <div class="sheet-sticky-footer">
-          <button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
-          <div class="sheet-quick-actions-grid">
-            <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
-              ${icon('phone', { size: 20, stroke: 2.2 })}
-              <span>Call</span>
-            </button>
-            <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span>Message</span>
-            </button>
-            <button class="quick-action-col-btn btn-act-fwd" id="sheet-act-fwd">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m22 2-7 20-4-9-9-4Z"/>
-                <path d="M22 2 11 13"/>
-              </svg>
-              <span>Forward</span>
-            </button>
-            <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
-              ${icon('more', { size: 20, stroke: 2.2 })}
-              <span>More</span>
-            </button>
-          </div>
+          ${(page === 'inquiries' || bookings[0]?.kind === 'inquiry')
+            ? renderFreightFooterHtml(bookings[0], { isMobile: true })
+            : `<button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
+               <div class="sheet-quick-actions-grid">
+                 <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
+                   ${icon('phone', { size: 20, stroke: 2.2 })}
+                   <span>Call</span>
+                 </button>
+                 <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                   </svg>
+                   <span>Message</span>
+                 </button>
+                 <button class="quick-action-col-btn btn-act-fwd" id="sheet-act-fwd">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                     <path d="m22 2-7 20-4-9-9-4Z"/>
+                     <path d="M22 2 11 13"/>
+                   </svg>
+                   <span>Forward</span>
+                 </button>
+                 <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
+                   ${icon('more', { size: 20, stroke: 2.2 })}
+                   <span>More</span>
+                 </button>
+               </div>`}
         </div>
       </div>
 
@@ -203,7 +218,7 @@ export function createMobileView(container, options = {}) {
         <div class="modal-card">
           <div class="modal-header">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
                 <line x1="16" x2="8" y1="13" y2="13"/>
@@ -227,12 +242,13 @@ export function createMobileView(container, options = {}) {
               <label>Add Custom Requirement</label>
               <div style="display: flex; gap: 8px;">
                 <input type="text" id="modal-custom-req-input" placeholder="e.g. Extra pillows, Non-smoking room" style="flex: 1;" />
-                <button class="btn-primary-desktop" id="btn-add-custom-req" style="padding: 0 16px; border-radius: 10px; font-size: 13px; font-weight: 700; white-space: nowrap;">Add</button>
+                <button class="btn-primary-desktop" id="btn-add-custom-req">Add</button>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn-confirm-booking" id="btn-done-special-req" style="height: 40px; font-size: 13.5px; border-radius: 10px;">Save & Apply</button>
+            <button class="btn-secondary-desktop" id="btn-cancel-special-req" type="button">Cancel</button>
+            <button class="btn-confirm-booking" id="btn-done-special-req">Save & Apply</button>
           </div>
         </div>
       </div>
@@ -248,12 +264,10 @@ export function createMobileView(container, options = {}) {
             <button class="sheet-close-btn" id="close-modal-details-btn" style="position: static;">✕</button>
           </div>
           <div class="modal-body" id="modal-details-body-content"></div>
-          <div class="modal-footer" style="display: flex; gap: 8px; justify-content: space-between;">
-            <button class="action-pill-btn" id="btn-modal-details-toggle-complete" style="padding: 8px 14px; font-size: 12.5px;">Mark Completed</button>
-            <div style="display: flex; gap: 8px;">
-              <button class="action-pill-btn" id="btn-modal-details-edit-trigger" style="padding: 8px 14px; font-size: 12.5px;">Edit</button>
-              <button class="btn-primary-desktop" id="btn-modal-details-close-btn" style="padding: 8px 16px; border-radius: 10px; font-size: 13px;">Close</button>
-            </div>
+          <div class="modal-footer">
+            <button class="action-pill-btn" id="btn-modal-details-toggle-complete">Mark Completed</button>
+            <button class="action-pill-btn" id="btn-modal-details-edit-trigger">Edit</button>
+            <button class="btn-primary-desktop" id="btn-modal-details-close-btn">Close</button>
           </div>
         </div>
       </div>
@@ -287,7 +301,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-edit-activity">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-save-edit-activity" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Changes</button>
+            <button class="btn-primary-desktop" id="btn-save-edit-activity">Save Changes</button>
           </div>
         </div>
       </div>
@@ -350,7 +364,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-edit-customer">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-save-edit-customer" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Customer Details</button>
+            <button class="btn-primary-desktop" id="btn-save-edit-customer">Save Customer Details</button>
           </div>
         </div>
       </div>
@@ -392,7 +406,7 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-add-followup">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-submit-add-followup" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save Follow-up</button>
+            <button class="btn-primary-desktop" id="btn-submit-add-followup">Save Follow-up</button>
           </div>
         </div>
       </div>
@@ -420,8 +434,56 @@ export function createMobileView(container, options = {}) {
           </div>
           <div class="modal-footer">
             <button class="action-pill-btn" id="btn-cancel-add-assignee">Cancel</button>
-            <button class="btn-primary-desktop" id="btn-submit-add-assignee" style="padding: 8px 18px; border-radius: 10px; font-size: 13px;">Save & Assign</button>
+            <button class="btn-primary-desktop" id="btn-submit-add-assignee">Save & Assign</button>
           </div>
+        </div>
+      </div>
+
+      <!-- Mobile Modal: Add Customer Modal -->
+      <div class="modal-overlay" id="mobile-add-customer-modal">
+        <div class="modal-card" style="width: 92%; max-width: 440px;">
+          <div class="modal-header">
+            <h3>Add New Customer</h3>
+            <button class="sheet-close-btn" id="close-mobile-add-customer-btn" style="position: static;">✕</button>
+          </div>
+          <form id="mobile-form-add-customer">
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Customer Full Name *</label>
+                <input type="text" id="mob-cust-input-name" placeholder="e.g. Ramesh Patel" required />
+              </div>
+              <div class="form-group">
+                <label>Primary Phone *</label>
+                <input type="tel" id="mob-cust-input-phone" placeholder="+91 98765 43210" required />
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="mob-cust-input-email" placeholder="customer@gmail.com" />
+              </div>
+              <div class="form-group">
+                <label>City / Location</label>
+                <input type="text" id="mob-cust-input-city" placeholder="e.g. Ahmedabad, Gujarat" />
+              </div>
+              <div class="form-group">
+                <label>Customer Type</label>
+                <select id="mob-cust-input-type">
+                  <option value="Family Traveler">Family</option>
+                  <option value="Couple Getaway">Couple</option>
+                  <option value="Corporate / Group">Corporate</option>
+                  <option value="Luxury Traveler">Luxury</option>
+                  <option value="Solo Traveler">Solo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Initial Notes / Preferences</label>
+                <textarea id="mob-cust-input-notes" rows="2" placeholder="Preferences, budget, travel requirements..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="action-pill-btn" id="btn-cancel-mob-add-customer">Cancel</button>
+              <button type="submit" class="btn-primary-desktop" id="btn-submit-mob-add-customer">Save Customer</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -429,12 +491,12 @@ export function createMobileView(container, options = {}) {
 
   // Render Functions
   const BOOKING_TABS = [
-    { key: 'All Bookings', label: 'All' },
-    { key: 'New Bookings', label: 'New Bookings' },
+    { key: 'All Quotations', label: 'All' },
+    { key: 'New Bookings', label: 'New Quotes' },
     { key: 'Assigned', label: 'Assigned' },
-    { key: 'Ongoing', label: 'Ongoing' },
+    { key: 'Ongoing', label: 'Confirmed' },
   ];
-  const tabDefs = () => (page === 'inquiries' ? INQUIRY_TABS : BOOKING_TABS);
+  const tabDefs = () => (page === 'inquiries' ? INQUIRY_TABS : page === 'customers' ? CUSTOMER_TABS : BOOKING_TABS);
   const allKey = () => tabDefs()[0].key;
 
   // Update selection visuals in place (no re-render, so cards never remount or shift).
@@ -471,7 +533,8 @@ export function createMobileView(container, options = {}) {
     const listEl = container.querySelector('#mobile-cards-list');
     if (!listEl) return;
     const inquiry = page === 'inquiries';
-    const what = inquiry ? 'inquiries' : 'bookings';
+    const customer = page === 'customers';
+    const what = inquiry ? 'inquiries & leads' : customer ? 'customers' : 'quotations';
     const q = searchQuery.toLowerCase();
     const catValue = selectedCategory === 'ALL' ? '' : selectedCategory;
 
@@ -501,66 +564,110 @@ export function createMobileView(container, options = {}) {
     updateBulkBar(container, 'mobile', bookings.filter(b => b.selected).length);
   }
 
+  const getActiveModalTabs = () => (page === 'inquiries' || activeModalBooking?.kind === 'inquiry')
+    ? ['customer-details', 'requirements', 'shipment-docs', 'updates']
+    : ['customer-details', 'guests', 'itinerary', 'updates'];
+
+  function bindFreightMobileFooter(footerEl, b) {
+    if (!footerEl) return;
+    const primaryBtn = footerEl.querySelector('#mobile-freight-primary-btn');
+    if (primaryBtn) {
+      primaryBtn.addEventListener('click', async () => {
+        const action = primaryBtn.dataset.freightAction;
+        if (action === 'convert-to-enquiry') {
+          try {
+            const freight_details = {
+              ...(b.freight_details || {}),
+              record_type: 'enquiry',
+              stage: 'Received',
+            };
+            const updated = await updateInquiry(b.id, {
+              status: 'ongoing',
+              freight_details,
+            });
+            b.status = 'Ongoing';
+            b.statusClass = 'status-inq-ongoing';
+            b.freight_details = freight_details;
+            if (updated) Object.assign(b, updated);
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Lead for ${b.guest?.name || b.customer_name || 'customer'} successfully converted to Enquiry!`, type: 'success' }
+            }));
+            renderCards();
+            renderSheetHeader();
+            renderSheetBody();
+            footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: true });
+            bindFreightMobileFooter(footerEl, b);
+          } catch (err) {
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: err.message || 'Failed to convert lead', type: 'warning' }
+            }));
+          }
+        } else if (action === 'create-quotation') {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Quotation builder initiated for ${b.guest?.name || b.customer_name || 'enquiry'}. Opening quotation draft...`, type: 'success' }
+          }));
+        } else if (action === 'confirm-shipment') {
+          if (b.freight_details) {
+            b.freight_details.shipment = b.freight_details.shipment || {};
+            b.freight_details.shipment.has_shipment = true;
+          }
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Shipment confirmed! Operational work order generated.`, type: 'success' }
+          }));
+          renderSheetBody();
+          renderCards();
+        }
+      });
+    }
+
+    footerEl.querySelector('#mobile-freight-act-call')?.addEventListener('click', () => {
+      const d = getFreightData(b);
+      window.location.href = `tel:${cleanPhone(d.phone)}`;
+    });
+
+    footerEl.querySelector('#mobile-freight-act-msg')?.addEventListener('click', () => {
+      const d = getFreightData(b);
+      window.open(`https://wa.me/${cleanPhone(d.phone)}`, '_blank', 'noopener');
+    });
+
+    footerEl.querySelector('#mobile-freight-act-fwd')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'Freight dossier forwarded to operations team.', type: 'success' }
+      }));
+    });
+
+    footerEl.querySelector('#mobile-freight-act-more')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'More options: Export PDF, Print Dossier, Reassign Agent.', type: 'info' }
+      }));
+    });
+  }
+
   function renderSheetHeader() {
     const headerCard = container.querySelector('#sheet-header-card-content');
     if (!headerCard || !activeModalBooking) return;
 
     const b = activeModalBooking;
+    const isFreight = page === 'inquiries' || b.kind === 'inquiry';
+
+    if (isFreight) {
+      headerCard.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: 'mobile-sheet-close-btn', isMobile: true });
+      const closeBtn = headerCard.querySelector('#mobile-sheet-close-btn');
+      if (closeBtn) closeBtn.addEventListener('click', () => closeModal());
+      return;
+    }
+
     const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
     const custName = b.customer?.name || b.guest?.name || 'Customer';
 
     // Uniform Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
-    headerCard.innerHTML = `
-      <div class="sheet-drag-handle-bar" id="mobile-sheet-handle">
-        <div class="sheet-handle"></div>
-      </div>
-      <div class="sheet-customer-header">
-        <div class="customer-avatar-badge">${initials}</div>
-        <div class="customer-header-info">
-          <div class="customer-title-row">
-            <h2 class="customer-name-title">${custName}</h2>
-            <span class="status-pill ${b.statusClass}">
-              <span class="dot"></span>
-              ${b.status}
-            </span>
-          </div>
-          <p class="customer-trip-subtitle">${b.title}</p>
-          <div class="customer-meta-chips">
-            <span class="meta-chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-              </svg>
-              ${b.pax} Pax
-            </span>
-            <span class="meta-dot">•</span>
-            <span class="meta-chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-              ${b.duration}
-            </span>
-            <span class="meta-dot">•</span>
-            <span class="meta-chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                <line x1="16" x2="16" y1="2" y2="6"/>
-                <line x1="8" x2="8" y1="2" y2="6"/>
-                <line x1="3" x2="21" y1="10" y2="10"/>
-              </svg>
-              ${b.dates}
-            </span>
-          </div>
-        </div>
-        <button class="sheet-close-btn mobile-sheet-close-pill" id="mobile-sheet-close-btn" title="Close" aria-label="Close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-    `;
+    headerCard.innerHTML = sheetHandleHtml('mobile-sheet-handle') + detailHeaderHtml({
+      avatar: esc(initials),
+      title: custName,
+      pill: `<span class="status-pill ${b.statusClass}"><span class="dot"></span>${b.status}</span>`,
+      subtitle: b.title,
+      chips: [{ icon: 'user', text: `${b.pax} Pax` }, { icon: 'clock', text: b.duration || '—' }, { icon: 'calendar', text: b.dates }],
+    }, { close: 'id="mobile-sheet-close-btn"' });
 
     const guestBadge = container.querySelector('#sheet-guest-count-badge');
     if (guestBadge) guestBadge.textContent = b.guests.length;
@@ -572,6 +679,23 @@ export function createMobileView(container, options = {}) {
     if (!bodyEl || !activeModalBooking) return;
 
     const b = activeModalBooking;
+    const isFreight = page === 'inquiries' || b.kind === 'inquiry';
+
+    if (isFreight) {
+      bodyEl.classList.add('is-freight-scroll');
+      bodyEl.innerHTML = renderFreightBodyHtml(b, activeModalTab);
+      bindFreightBodyEvents(bodyEl, b, (updated) => {
+        if (updated) {
+          Object.assign(b, updated);
+          if (b.raw) Object.assign(b.raw, updated);
+        }
+        renderCards();
+        renderSheetHeader();
+        renderSheetBody();
+      });
+      return;
+    }
+    bodyEl.classList.remove('is-freight-scroll');
 
     // Customer Details Tab (Exact structure from Image 3 reference)
     if (activeModalTab === 'customer-details') {
@@ -622,14 +746,14 @@ export function createMobileView(container, options = {}) {
               <!-- Left Column: Row 1 -->
               <div class="info-cell">
                 <span class="info-label">Customer Name</span>
-                <span class="info-value-bold">${c.name}</span>
+                <span class="info-value-bold">${esc(c.name)}</span>
               </div>
               <!-- Right Column: Row 1 -->
               <div class="info-cell info-cell-email">
                 <span class="info-label">Email</span>
                 <div class="contact-value-row">
-                  <span class="info-value-text email-text-val" title="${c.email}">${c.email}</span>
-                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${c.email}...', type: 'info' }}))">
+                  <span class="info-value-text email-text-val" title="${esc(c.email)}">${esc(c.email)}</span>
+                  <button class="mini-icon-btn btn-mail-blue" title="Send Email" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Drafting email to ${jsq(c.email)}...', type: 'info' }}))">
                     ${icon('mail', { size: 12 })}
                   </button>
                 </div>
@@ -639,12 +763,12 @@ export function createMobileView(container, options = {}) {
               <div class="info-cell info-cell-contact">
                 <span class="info-label">Primary Contact</span>
                 <div class="contact-value-row">
-                  <span class="info-value-bold phone-number-val">${c.phone}</span>
+                  <span class="info-value-bold phone-number-val">${esc(c.phone)}</span>
                   <div class="contact-action-btns">
-                    <button class="mini-icon-btn btn-call-green" title="Call ${c.phone}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${c.name} (${c.phone})...', type: 'info' }}))">
+                    <button class="mini-icon-btn btn-call-green" title="Call ${jsq(c.phone)}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${jsq(c.name)} (${jsq(c.phone)})...', type: 'info' }}))">
                       ${icon('phone', { size: 12, stroke: 2.5 })}
                     </button>
-                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${c.name}...', type: 'success' }}))">
+                    <button class="mini-icon-btn btn-wa-green" title="WhatsApp" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Opening WhatsApp chat with ${jsq(c.name)}...', type: 'success' }}))">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.892.524 3.662 1.435 5.176L2.05 21.95a.6.6 0 0 0 .736.736l4.774-1.385A9.957 9.957 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Zm3.906 14.153c-.225.63-1.127 1.196-1.55 1.258-.42.062-.958.088-1.55-.102-.38-.122-.87-.282-1.49-.55-2.617-1.13-4.326-3.79-4.457-3.963-.13-.174-1.065-1.417-1.065-2.702 0-1.286.674-1.92.913-2.18.239-.261.52-.326.695-.326.174 0 .348.002.5.01.16.007.375-.06.587.447.218.522.74 1.804.805 1.935.066.13.11.283.022.457-.087.174-.13.283-.26.435-.13.152-.273.34-.39.456-.13.13-.265.272-.114.533.152.261.674 1.11 1.447 1.8 1 .892 1.84 1.168 2.1 1.3.26.13.413.11.565-.065.152-.174.652-.761.826-1.022.174-.26.348-.217.587-.13.239.087 1.522.717 1.783.848.26.13.435.195.5.304.065.109.065.63-.16 1.26Z" fill="#16A34A"/>
                       </svg>
@@ -655,29 +779,29 @@ export function createMobileView(container, options = {}) {
               <!-- Right Column: Row 2 -->
               <div class="info-cell">
                 <span class="info-label">Lead Source</span>
-                <span class="info-value-text">${c.leadSource || 'Website'}</span>
+                <span class="info-value-text">${esc(c.leadSource || 'Website')}</span>
               </div>
 
               <!-- Left Column: Row 3 -->
               <div class="info-cell">
                 <span class="info-label">Travel Dates</span>
-                <span class="info-value-text">${c.travelDates || b.dates}</span>
+                <span class="info-value-text">${esc(c.travelDates || b.dates)}</span>
               </div>
               <!-- Right Column: Row 3 -->
               <div class="info-cell">
                 <span class="info-label">Location</span>
-                <span class="info-value-text">${c.location || 'New Delhi, Delhi'}</span>
+                <span class="info-value-text">${esc(c.location || 'New Delhi, Delhi')}</span>
               </div>
 
               <!-- Left Column: Row 4 -->
               <div class="info-cell">
                 <span class="info-label">Preferred Destination</span>
-                <span class="info-value-text">${c.preferredDestination || b.destination}</span>
+                <span class="info-value-text">${esc(c.preferredDestination || b.destination)}</span>
               </div>
               <!-- Right Column: Row 4 -->
               <div class="info-cell">
                 <span class="info-label">Budget (Est.)</span>
-                <span class="info-value-bold" style="color: #0F172A;">${c.budgetEst || b.price}</span>
+                <span class="info-value-bold" style="color: #0F172A;">${esc(c.budgetEst || b.price)}</span>
               </div>
 
               <!-- Left Column: Row 5 -->
@@ -709,7 +833,7 @@ export function createMobileView(container, options = {}) {
                 </svg>
                 <span>Short Details</span>
               </div>
-              <p class="short-details-text">${c.shortDetails || b.notes || 'Trip details logged into operations queue.'}</p>
+              <p class="short-details-text">${esc(c.shortDetails || b.notes || 'Trip details logged into operations queue.')}</p>
             </div>
           </div>
 
@@ -724,13 +848,6 @@ export function createMobileView(container, options = {}) {
                 </div>
                 <h3>Lead Flow / Journey</h3>
               </div>
-              ${b.kind === 'inquiry' ? '' : `<button class="btn-add-followup" id="btn-add-followup-action">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" x2="12" y1="5" y2="19"/>
-                  <line x1="5" x2="19" y1="12" y2="12"/>
-                </svg>
-                Add Follow-up
-              </button>`}
             </div>
 
             <div class="lead-journey-timeline">
@@ -752,7 +869,7 @@ export function createMobileView(container, options = {}) {
           <div class="special-req-header">
             <div class="special-req-title-left">
               <div class="special-req-icon-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary, #2563EB)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                   <line x1="16" x2="8" y1="13" y2="13"/>
@@ -773,7 +890,7 @@ export function createMobileView(container, options = {}) {
           <div class="special-req-chips-list">
             ${reqs.length > 0 ? reqs.map(r => `
               <span class="special-req-chip">
-                <span class="req-chip-icon">${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+                <span class="req-chip-icon">${getSpecialReqIconSvg(r.icon, r.color || 'var(--primary, #2563EB)')}</span>
                 <span class="req-chip-text">${r.text}</span>
               </span>
             `).join('') : `
@@ -802,15 +919,15 @@ export function createMobileView(container, options = {}) {
               <div class="guest-left-info">
                 <div class="guest-num-badge">${g.id}</div>
                 <div class="guest-name-col">
-                  <h4>${g.name}</h4>
-                  <p>Age ${g.age} ${g.role ? `• ${g.role}` : ''}</p>
+                  <h4>${esc(g.name)}</h4>
+                  <p>${g.age !== '' && g.age != null ? `Age ${esc(g.age)}` : 'Age not added'}${g.role ? ` • ${esc(g.role)}` : ''}</p>
                 </div>
               </div>
               <div class="guest-right-actions">
-                <button class="circle-action-btn btn-phone" title="Call ${g.name}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${g.name} (${g.phone})...', type: 'info' }}))">
+                <button class="circle-action-btn btn-phone" title="Call ${jsq(g.name)}" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Calling ${jsq(g.name)} (${jsq(g.phone)})...', type: 'info' }}))">
                   ${icon('phone', { size: 14, stroke: 2.5 })}
                 </button>
-                <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${g.name}" aria-label="More options" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Guest options for ${g.name}: ID verified and travel pass issued.', type: 'info' }}))">
+                <button class="circle-action-btn btn-more" data-guest-menu="${g.id}" title="More options for ${jsq(g.name)}" aria-label="More options" onclick="window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Guest options for ${jsq(g.name)}: ID verified and travel pass issued.', type: 'info' }}))">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="1.5"/>
                     <circle cx="12" cy="5" r="1.5"/>
@@ -834,136 +951,7 @@ export function createMobileView(container, options = {}) {
     }
     // Itinerary Tab (Screens 1, 2, 4 from reference with Details, Edit, Mark Complete, Add Event)
     else if (activeModalTab === 'itinerary') {
-      const days = b.itineraryDays || [];
-
-      bodyEl.innerHTML = `
-        <div class="itinerary-tab-content">
-          <div class="itinerary-section-header-bar">
-            <div class="section-header-left" style="display: flex; align-items: center; gap: 8px;">
-              <div class="section-icon-circle blue-circle" style="width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; color: #2563EB;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-                  <line x1="16" x2="16" y1="2" y2="6"/>
-                  <line x1="8" x2="8" y1="2" y2="6"/>
-                  <line x1="3" x2="21" y1="10" y2="10"/>
-                </svg>
-              </div>
-              <h3 style="font-size: 14.5px; font-weight: 700; color: #0F172A; margin: 0;">Day-wise Schedule</h3>
-            </div>
-            <div class="itin-actions"><button class="btn-add-event-pill" id="mobile-add-event-btn">${icon('plus', { size: 13, stroke: 2.5 })}Add Event</button></div>
-          </div>
-
-          <div class="itinerary-v2-container">
-          ${days.length === 0 ? `<div class="state-box"><h4>No itinerary yet</h4><p>Use Add Event to create the first day.</p></div>` : ''}
-          ${days.map((dayGroup, dayIdx) => `
-            <div class="itinerary-day-section">
-              <!-- Left Day & Date Label -->
-              <div class="timeline-day-col">
-                <div class="day-head"><span class="day-badge-text">${dayGroup.day}</span><button class="day-menu-btn" data-day-menu="${dayIdx}" aria-haspopup="menu" aria-label="Day options">${icon('more', { size: 14 })}</button></div><span class="day-date-sub">${dayGroup.date}</span>${dayGroup.title ? `<span class="day-title-sub">${esc(dayGroup.title)}</span>` : ''}
-              </div>
-
-              <!-- Continuous Line & Dot Node -->
-              <div class="timeline-track-col">
-                <div class="timeline-line-track"></div>
-                <div class="timeline-dot-node"></div>
-              </div>
-
-              <!-- Activity Items for this day -->
-              <div class="timeline-items-col">
-                ${dayGroup.items.length ? '' : '<p class="day-empty">No events yet</p>'}
-                ${dayGroup.items.map(item => `
-                  <div class="itinerary-card-item ${item.completed ? 'is-completed' : ''}" data-itinerary-item-id="${item.id}">
-                    <div class="item-left-content">
-                      ${itemIconHtml(item, 20)}
-                      <div class="item-text-info">
-                        <h4 class="item-text-title">${esc(item.title)}</h4>
-                        <p class="item-text-sub">${esc(item.subtitle)}</p>
-                      </div>
-                    </div>
-
-                    <div class="item-right-content">
-                      ${itemPills(item)}
-                      <!-- Completed Pill Badge -->
-                      ${item.completed ? `
-                        <span class="completed-pill-badge" title="Completed">
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                          Completed
-                        </span>
-                      ` : ''}
-
-                      <!-- Assigned Badge & Avatar (Screen 4) -->
-                      ${item.assigned && item.assigned.isAssigned ? `
-                        <span class="assigned-pill-badge">Assigned</span>
-                        <img src="${item.assigned.avatar}" class="assigned-avatar-mini" alt="${item.assigned.name}" />
-                      ` : ''}
-
-                      <!-- Three Dots Menu Button -->
-                      <button class="item-menu-btn" data-trigger-item-menu="${item.id}" title="Item options">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="12" cy="12" r="1"/>
-                          <circle cx="12" cy="5" r="1"/>
-                          <circle cx="12" cy="19" r="1"/>
-                        </svg>
-                      </button>
-
-                      <!-- Action Context Menu (Screen 2) -->
-                      ${openDropdownItemId === item.id ? `
-                        <div class="item-dropdown-menu" id="active-item-dropdown">
-                          <button class="dropdown-item-btn" data-dropdown-act="assign" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                              <circle cx="9" cy="7" r="4"/>
-                              <line x1="19" x2="19" y1="8" y2="14"/>
-                              <line x1="22" x2="16" y1="11" y2="11"/>
-                            </svg>
-                            <span>Assign</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-dropdown-act="details" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                              <polyline points="14 2 14 8 20 8"/>
-                              <line x1="16" x2="8" y1="13" y2="13"/>
-                              <line x1="16" x2="8" y1="17" y2="17"/>
-                              <polyline points="10 9 9 9 8 9"/>
-                            </svg>
-                            <span>View Details</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-dropdown-act="edit" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-                              <path d="m15 5 4 4"/>
-                            </svg>
-                            <span>Edit</span>
-                          </button>
-                          <button class="dropdown-item-btn" data-dropdown-act="complete" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <rect width="18" height="18" x="3" y="3" rx="2"/>
-                              <polyline points="9 12 11 14 15 10"/>
-                            </svg>
-                            <span>${item.completed ? 'Mark as Incomplete' : 'Mark Complete'}</span>
-                          </button>
-                          <button class="dropdown-item-btn item-remove" data-dropdown-act="remove" data-target-id="${item.id}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <polyline points="3 6 5 6 21 6"/>
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                              <line x1="10" x2="10" y1="11" y2="17"/>
-                              <line x1="14" x2="14" y1="11" y2="17"/>
-                            </svg>
-                            <span>Remove</span>
-                          </button>
-                        </div>
-                      ` : ''}
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
-          </div>
-        </div>
-      `;
+      bodyEl.innerHTML = scheduleHtml(b.itineraryDays || [], { side: 'mobile', openItemId: openDropdownItemId });
     }
     // Updates Tab
     else if (activeModalTab === 'updates') {
@@ -1014,13 +1002,13 @@ export function createMobileView(container, options = {}) {
                   </svg>
                 ` : ''}
               </div>
-              <img src="${m.avatar}" class="vendor-avatar" style="border-radius: 50%;" alt="${m.name}" />
+              <img src="${m.avatar}" class="vendor-avatar" data-crm-logo="true" data-logo-src="${m.avatar}" style="border-radius: 50%;" alt="${m.name}" />
               <div class="vendor-info">
                 <h4>${m.name}</h4>
                 <p>${m.role} • ${m.phone}</p>
               </div>
             </div>
-            <span class="active-badge-pill" style="font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #EFF6FF; color: #2563EB; font-weight: 700; flex-shrink: 0;">
+            <span class="active-badge-pill" style="font-size: 11px; padding: 3px 8px; border-radius: 12px; background: var(--primary-light, #EFF6FF); color: var(--primary, #2563EB); font-weight: 700; flex-shrink: 0;">
               ${m.activeTrips} Trips
             </span>
           </div>
@@ -1049,13 +1037,13 @@ export function createMobileView(container, options = {}) {
                   </svg>
                 ` : ''}
               </div>
-              <img src="${v.image}" class="vendor-avatar" alt="${v.name}" />
+              <img src="${v.image}" class="vendor-avatar" data-crm-logo="true" data-logo-src="${v.image}" alt="${v.name}" />
               <div class="vendor-info">
                 <h4>${v.name}</h4>
                 <p>${v.service ? `${v.service} • ` : ''}${v.phone}</p>
               </div>
             </div>
-            <button class="item-menu-btn" onclick="event.stopPropagation(); window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Vendor options for ${v.name}: Active provider on record.', type: 'info' }}))" title="Vendor options">
+            <button class="item-menu-btn" onclick="event.stopPropagation(); window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Vendor options for ${jsq(v.name)}: Active provider on record.', type: 'info' }}))" title="Vendor options">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <circle cx="12" cy="12" r="1"/>
                 <circle cx="12" cy="5" r="1"/>
@@ -1089,14 +1077,14 @@ export function createMobileView(container, options = {}) {
                   </svg>
                 ` : ''}
               </div>
-              <img src="${c.avatar}" class="vendor-avatar" style="border-radius: 50%;" alt="${c.name}" />
+              <img src="${c.avatar}" class="vendor-avatar" data-crm-logo="true" data-logo-src="${c.avatar}" style="border-radius: 50%;" alt="${esc(c.name)}" />
               <div class="vendor-info">
-                <h4>${c.name}</h4>
-                <p>${c.role} • ${c.phone}</p>
+                <h4>${esc(c.name)}</h4>
+                <p>${c.role} • ${esc(c.phone)}</p>
                 ${c.details ? `<span style="font-size: 11px; color: #94A3B8; display: block; margin-top: 1px;">${c.details}</span>` : ''}
               </div>
             </div>
-            <a href="tel:${c.phone}" class="circle-action-btn btn-phone" style="width: 30px; height: 30px; flex-shrink: 0;" onclick="event.stopPropagation();" title="Call ${c.name}">
+            <a href="tel:${jsq(c.phone)}" class="circle-action-btn btn-phone" style="width: 30px; height: 30px; flex-shrink: 0;" onclick="event.stopPropagation();" title="Call ${jsq(c.name)}">
               ${icon('phone', { size: 14, stroke: 2.2 })}
             </a>
           </div>
@@ -1107,8 +1095,69 @@ export function createMobileView(container, options = {}) {
 
   function openModal(booking, tab = 'customer-details') {
     activeModalBooking = booking || bookings[0];
-    activeModalTab = tab;
+    const b = activeModalBooking;
+    const isFreight = page === 'inquiries' || b?.kind === 'inquiry';
+
+    if (isFreight) {
+      if (!['customer-details', 'requirements', 'shipment-docs', 'updates'].includes(tab)) {
+        activeModalTab = 'customer-details';
+      } else {
+        activeModalTab = tab;
+      }
+    } else {
+      activeModalTab = tab;
+    }
     isModalOpen = true;
+
+    const tabsNav = container.querySelector('.sheet-tabs-nav');
+    const footerEl = container.querySelector('.sheet-sticky-footer');
+
+    if (isFreight) {
+      if (tabsNav) {
+        tabsNav.innerHTML = renderFreightTabsHtml(activeModalTab, { attr: 'data-sheet-tab' });
+      }
+      if (footerEl) {
+        footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: true });
+        bindFreightMobileFooter(footerEl, b);
+      }
+    } else {
+      if (tabsNav && !tabsNav.querySelector('[data-sheet-tab="guests"]')) {
+        tabsNav.innerHTML = `
+          <button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
+          <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
+          <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
+          <button class="sheet-tab-btn ${activeModalTab === 'updates' ? 'active' : ''}" data-sheet-tab="updates">Updates</button>
+        `;
+      }
+      if (footerEl && !footerEl.querySelector('#mobile-confirm-booking-btn')) {
+        footerEl.innerHTML = `
+          <button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
+          <div class="sheet-quick-actions-grid">
+            <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
+              ${icon('phone', { size: 20, stroke: 2.2 })}
+              <span>Call</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Message</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-fwd" id="sheet-act-fwd">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m22 2-7 20-4-9-9-4Z"/>
+              </svg>
+              <span>Forward</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
+              ${icon('more', { size: 20, stroke: 2.2 })}
+              <span>More</span>
+            </button>
+          </div>
+        `;
+      }
+    }
+
     // On the Calendar page the primary action only applies to pending bookings.
     const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
     if (page === 'calendar' && activeModalBooking.status !== 'Pending') confirmBtn?.style.setProperty('display', 'none', 'important'); else confirmBtn?.style.removeProperty('display');
@@ -1142,6 +1191,7 @@ export function createMobileView(container, options = {}) {
     closeAssignSheet();
     const backdrop = container.querySelector('#mobile-sheet-backdrop');
     const sheet = container.querySelector('#mobile-bottom-sheet');
+    container.querySelector('#sheet-body-content')?.classList.remove('is-freight-scroll');
     if (backdrop) backdrop.classList.remove('open');
     if (sheet) sheet.classList.remove('open');
 
@@ -1217,7 +1267,7 @@ export function createMobileView(container, options = {}) {
     listEl.innerHTML = reqs.length > 0 ? reqs.map((r) => `
       <div class="editable-req-item">
         <div class="editable-req-item-left">
-          <span>${getSpecialReqIconSvg(r.icon, r.color || '#2563EB')}</span>
+          <span>${getSpecialReqIconSvg(r.icon, r.color || 'var(--primary, #2563EB)')}</span>
           <span>${r.text}</span>
         </div>
         <button class="btn-delete-req-pill" data-delete-req-id="${r.id}" title="Remove requirement">
@@ -1230,7 +1280,7 @@ export function createMobileView(container, options = {}) {
       const alreadyHas = reqs.some(r => r.text.toLowerCase() === p.text.toLowerCase());
       return `
         <button class="preset-chip-btn ${alreadyHas ? 'is-active' : ''}" data-preset-text="${p.text}" data-preset-icon="${p.icon}" data-preset-color="${p.color}">
-          ${getSpecialReqIconSvg(p.icon, alreadyHas ? '#2563EB' : p.color)}
+          ${getSpecialReqIconSvg(p.icon, alreadyHas ? 'var(--primary, #2563EB)' : p.color)}
           <span>${alreadyHas ? '✓ ' + p.text : p.text}</span>
         </button>
       `;
@@ -1306,9 +1356,9 @@ export function createMobileView(container, options = {}) {
               </div>
             </div>
           ` : `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 10px;">
-              <span style="font-size: 12.5px; color: #1E40AF; font-weight: 600;">No vendor or staff assigned yet</span>
-              <button class="action-pill-btn" id="btn-modal-details-assign-now" style="background: #2563EB; color: #FFFFFF; border: none; padding: 5px 12px; font-size: 12px;">Assign Now</button>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--primary-light, #EFF6FF); border: 1px solid var(--primary-border, #DBEAFE); border-radius: 10px;">
+              <span style="font-size: 12.5px; color: var(--primary, #1E40AF); font-weight: 600;">No vendor or staff assigned yet</span>
+              <button class="action-pill-btn" id="btn-modal-details-assign-now" style="background: var(--primary-gradient, var(--primary, #2563EB)); color: #FFFFFF; border: none; padding: 5px 12px; font-size: 12px;">Assign Now</button>
             </div>
           `}
         </div>
@@ -1483,22 +1533,48 @@ export function createMobileView(container, options = {}) {
       page = next;
       if (changed) {
         if (isModalOpen) closeModal();
-        bookings = page === 'inquiries' ? inquiryState.list : bookingsData;
+        if (page === 'inquiries') {
+          bookings = inquiryState.list;
+        } else if (page === 'customers') {
+          bookings = getCustomersList();
+        } else {
+          bookings = bookingsData;
+        }
         bookings.forEach(b => { b.selected = false; });
         activeCategory = allKey();
         const sc = container.querySelector('#mobile-screen-scroll');
-        scrollMemory[page === 'inquiries' ? 'bookings' : 'inquiries'] = sc ? sc.scrollTop : 0;
+        scrollMemory[page] = sc ? sc.scrollTop : 0;
         needRestore = true;
       }
-      container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
-      container.querySelector('#mobile-bookings-page').hidden = page === 'calendar' || page === 'team';
-      container.querySelector('#mobile-calendar-page').hidden = page !== 'calendar';
-      container.querySelector('#mobile-team-page').hidden = page !== 'team';
-      if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
-      if (page === 'team') { if (changed) team.activate(); else team.render(); }
-      if (subtitleEl) subtitleEl.textContent = page === 'calendar' ? 'Calendar' : page === 'team' ? 'Operations Team' : page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
+      container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => {
+        const r = b.dataset.route;
+        b.classList.toggle('active', r === page || (r === 'quotation' && page === 'bookings'));
+      });
+      // The shell draws Inquiries, Customers and Quotation
+      if (page === 'inquiries') setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') }));
+      else if (page === 'quotation' || page === 'bookings') setShellAddAction('Add Quotation', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') }));
+      else if (page === 'customers') setShellAddAction('Add Customer', () => openMobileAddCustomerModal());
+      else setShellAddAction(null);
+
+      container.querySelector('#mobile-bookings-page').hidden = false;
+      container.querySelector('#mobile-calendar-page').hidden = true;
+      container.querySelector('#mobile-team-page').hidden = true;
+      container.querySelector('#mobile-screen-scroll')?.classList.remove('calendar-mode');
+      if (subtitleEl) {
+        subtitleEl.textContent = page === 'inquiries' 
+          ? `Enquirey & Leads • ${inquiryState.list.length} Total` 
+          : page === 'customers' 
+          ? `Customers • ${getCustomersList().length} Total` 
+          : `Quotation • ${bookingsData.length} Total`;
+      }
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
-      if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking';
+      if (confirmBtn) {
+        confirmBtn.textContent = page === 'inquiries' 
+          ? 'Confirm Inquiry' 
+          : page === 'customers' 
+          ? 'Customer Profile' 
+          : 'Confirm Quotation';
+      }
       applyParams();
       if (needRestore) { const sc = container.querySelector('#mobile-screen-scroll'); if (sc) sc.scrollTop = scrollMemory[page] || 0; needRestore = false; }
     }
@@ -1507,7 +1583,15 @@ export function createMobileView(container, options = {}) {
       if (page !== 'inquiries') return;
       bookings = inquiryState.list;
       if (activeModalBooking) activeModalBooking = bookings.find(b => b.id === activeModalBooking.id) || activeModalBooking;
-      if (subtitleEl) subtitleEl.textContent = `Inquiries • ${inquiryState.list.length} Total`;
+      if (subtitleEl) subtitleEl.textContent = `Enquirey & Leads • ${inquiryState.list.length} Total`;
+      if (ids && ids.length) patchRows(ids); else renderCards();
+      if (isModalOpen && !(ids && ids.length)) { renderSheetHeader(); renderSheetBody(); }
+    });
+    subscribeCustomers((ids) => {
+      if (page !== 'customers') return;
+      bookings = getCustomersList();
+      if (activeModalBooking) activeModalBooking = bookings.find(b => b.id === activeModalBooking.id) || activeModalBooking;
+      if (subtitleEl) subtitleEl.textContent = `Customers • ${getCustomersList().length} Total`;
       if (ids && ids.length) patchRows(ids); else renderCards();
       if (isModalOpen && !(ids && ids.length)) { renderSheetHeader(); renderSheetBody(); }
     });
@@ -1515,20 +1599,78 @@ export function createMobileView(container, options = {}) {
       if (isModalOpen && activeModalTab === 'customer-details' && activeModalBooking) renderSheetBody();
     });
     window.addEventListener('layout-changed', () => { if (isModalOpen) closeModal(); });
+
+    function openMobileAddCustomerModal() {
+      const modal = container.querySelector('#mobile-add-customer-modal');
+      if (!modal) return;
+      modal.classList.add('open');
+      modal.querySelector('#mob-cust-input-name')?.focus();
+    }
+    const mobAddCustForm = container.querySelector('#mobile-form-add-customer');
+    if (mobAddCustForm) {
+      mobAddCustForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = container.querySelector('#mob-cust-input-name').value.trim();
+        const phone = container.querySelector('#mob-cust-input-phone').value.trim();
+        const email = container.querySelector('#mob-cust-input-email').value.trim();
+        const location = container.querySelector('#mob-cust-input-city').value.trim();
+        const customerType = container.querySelector('#mob-cust-input-type').value;
+        const notes = container.querySelector('#mob-cust-input-notes').value.trim();
+        if (!name) return;
+        const record = addCustomer({ name, phone, email, location, customerType, notes });
+        container.querySelector('#mobile-add-customer-modal').classList.remove('open');
+        mobAddCustForm.reset();
+        toast(`Customer "${name}" added successfully!`, 'success');
+        showNewInquiry(record);
+      });
+    }
+    container.querySelector('#close-mobile-add-customer-btn')?.addEventListener('click', () => {
+      container.querySelector('#mobile-add-customer-modal').classList.remove('open');
+    });
+    container.querySelector('#btn-cancel-mob-add-customer')?.addEventListener('click', () => {
+      container.querySelector('#mobile-add-customer-modal').classList.remove('open');
+    });
+
+    // The itinerary event popups (View Details, Edit) close with a tap on the dimmed backdrop and with Esc, like every other popup
+    // The same for the customer and special-requirements popups: backdrop tap, Esc and Cancel act like their round X
+    ['#mobile-special-req-modal', '#mobile-edit-customer-modal', '#mobile-add-customer-modal'].forEach((id) => container.querySelector(id)?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget || e.target.closest('#btn-cancel-special-req, #btn-cancel-mob-add-customer')) e.currentTarget.querySelector('.sheet-close-btn')?.click();
+    }));
+    container.querySelector('#mobile-activity-details-modal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeActivityDetailsModal(); });
+    container.querySelector('#mobile-edit-activity-modal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeEditActivityModal(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const form = container.querySelector('#mobile-special-req-modal.open, #mobile-edit-customer-modal.open, #mobile-add-customer-modal.open');
+      if (form) { e.stopImmediatePropagation(); form.querySelector('.sheet-close-btn')?.click(); return; }
+      const edit = container.querySelector('#mobile-edit-activity-modal.open');
+      const details = container.querySelector('#mobile-activity-details-modal.open');
+      if (!edit && !details) return;
+      e.stopImmediatePropagation(); // Esc closes the popup only; the booking sheet under it stays on the Itinerary tab
+      if (edit) closeEditActivityModal(); else closeActivityDetailsModal();
+    }, true);
     window.addEventListener('bookings-changed', (e) => patchRows(e.detail?.ids));
     loadFollowUps();
     loadInquiries();
-    syncBookingPayments().then(() => renderCards());
+    syncBookingPayments().then(() => {
+      bookingsData.splice(0, bookingsData.length, ...INITIAL_BOOKINGS);
+      if (page === 'quotation' || page === 'bookings') {
+        bookings = bookingsData;
+        renderCards();
+      }
+    });
     container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach((b) => {
-      b.addEventListener('click', () => navigate(b.dataset.route));
+      b.addEventListener('click', () => goToPage(b.dataset.route));
     });
     route();
 
-    // Pages that are not built yet: stay on the current page and say so
-    container.querySelectorAll('.mobile-bottom-nav .nav-item:not([data-route])').forEach((b) => {
-      b.addEventListener('click', () => toast(`${b.textContent.trim()} is coming soon.`, 'info'));
-    });
+    container.querySelector('#mobile-more-btn')?.addEventListener('click', (e) => openMoreSheet({ returnFocus: () => e.currentTarget }));
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries')) loadInquiries(); });
+
+    // Add Inquiry: the one wizard. After a save the list shows everything again and scrolls to the top, where the new row is.
+    function showNewInquiry(row) {
+      setParams({ q: null, tab: null, category: null }, { push: false });
+      requestAnimationFrame(() => container.querySelector('#mobile-screen-scroll')?.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
+    }
 
     // Bulk bar: select all / clear / search / filter / Assign
     bindBulkBar(container, 'mobile', {
@@ -1608,280 +1750,69 @@ export function createMobileView(container, options = {}) {
       }
     }, true);
 
-    // Categories Array for Left/Right Swiping & Filtering
-    const categories = { includes: (k) => tabDefs().some(t => t.key === k), indexOf: (k) => tabDefs().findIndex(t => t.key === k), get length() { return tabDefs().length; }, 0: null };
-    const categoryAt = (i) => tabDefs()[i].key;
-
-    function setCategory(cat, slideDir = null) {
-      if (!categories.includes(cat)) return;
+    function setCategory(cat) {
+      if (!tabDefs().some(t => t.key === cat) || cat === activeCategory) return;
       activeCategory = cat;
       setParams({ tab: cat === allKey() ? null : cat }, { silent: true });
-
-      // Update active tab buttons
-      container.querySelectorAll('.tab-pill').forEach(btn => {
-        if (btn.dataset.cat === cat) {
-          btn.classList.add('active');
-          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-
-      const listEl = container.querySelector('#mobile-cards-list');
-      if (listEl) {
-        const offset = slideDir === 'left' ? '-14px' : slideDir === 'right' ? '14px' : '0px';
-        listEl.style.transition = 'opacity 0.1s ease, transform 0.1s ease';
-        listEl.style.opacity = '0';
-        listEl.style.transform = `translateX(${offset})`;
-
-        setTimeout(() => {
-          renderCards();
-          listEl.style.transform = slideDir === 'left' ? 'translateX(14px)' : slideDir === 'right' ? 'translateX(-14px)' : 'translateX(0)';
-          void listEl.offsetHeight; // trigger reflow
-          listEl.style.transition = 'opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)';
-          listEl.style.opacity = '1';
-          listEl.style.transform = 'translateX(0)';
-        }, 60);
-      } else {
-        renderCards();
-      }
-    }
-
-    function switchCategoryByDirection(direction) {
-      const currentIndex = categories.indexOf(activeCategory);
-      let targetIndex = currentIndex;
-
-      if (direction === 'left') {
-        // Swiping left moves towards left tab ('New Bookings')
-        targetIndex = Math.max(0, currentIndex - 1);
-      } else if (direction === 'right') {
-        // Swiping right moves towards right tab ('Assigned', 'Ongoing')
-        targetIndex = Math.min(categories.length - 1, currentIndex + 1);
-      }
-
-      if (targetIndex !== currentIndex) {
-        setCategory(categoryAt(targetIndex), direction);
-      }
+      renderCards();
     }
 
     // Category Tabs click
 
-    // Left and Right Swipe / Scroll Gesture Handling
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-    let isTouchSwiping = false;
-
-    const cardsArea = container.querySelector('#mobile-cards-list');
-    const screenArea = container.querySelector('.bookings-screen') || container;
-
-    // Touch event listeners (Mobile swipe left/right)
-    // The swipe-to-change-tab gesture belongs to the Bookings / Inquiries list only: on the Calendar page (or in the
-    // header and nav) a horizontal swipe is the page's own scrolling and must never switch a list tab.
-    const inList = (t) => page !== 'calendar' && !!t.closest('#mobile-bookings-page');
-    screenArea.addEventListener('touchstart', (e) => {
-      if (isModalOpen || isAssignSheetOpen || !inList(e.target) || e.target.closest('.tabs-scroller')) { isTouchSwiping = false; return; }
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchEndX = touchStartX;
-      touchEndY = touchStartY;
-      isTouchSwiping = true;
-    }, { passive: true });
-
-    screenArea.addEventListener('touchmove', (e) => {
-      if (!isTouchSwiping || isModalOpen || isAssignSheetOpen) return;
-      touchEndX = e.touches[0].clientX;
-      touchEndY = e.touches[0].clientY;
-    }, { passive: true });
-
-    screenArea.addEventListener('touchend', (e) => {
-      if (!isTouchSwiping || isModalOpen || isAssignSheetOpen) return;
-      isTouchSwiping = false;
-      const diffX = touchEndX - touchStartX;
-      const diffY = touchEndY - touchStartY;
-      const minDistance = 35; // threshold in pixels
-
-      if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX < 0) {
-          // Swiped left -> Filters New Bookings (or moves left)
-          switchCategoryByDirection('left');
-        } else {
-          // Swiped right -> Filters Assigned / Ongoing (moves right)
-          switchCategoryByDirection('right');
-        }
-      }
-    });
-
-    // Mouse drag gesture listeners (for testing on desktop browser / mobile simulator)
-    let isMouseDownDrag = false;
-    let mouseStartX = 0;
-    let mouseStartY = 0;
-    let mouseEndX = 0;
-    let mouseEndY = 0;
-
-    screenArea.addEventListener('mousedown', (e) => {
-      if (isModalOpen || isAssignSheetOpen || e.button !== 0 || !inList(e.target)) return;
-      if (e.target.closest('button, input, select, textarea, .custom-checkbox, .card-select-checkbox')) return;
-      isMouseDownDrag = true;
-      mouseStartX = e.clientX;
-      mouseStartY = e.clientY;
-      mouseEndX = mouseStartX;
-      mouseEndY = mouseStartY;
-    });
-
-    screenArea.addEventListener('mousemove', (e) => {
-      if (!isMouseDownDrag) return;
-      mouseEndX = e.clientX;
-      mouseEndY = e.clientY;
-    });
-
-    const endMouseDrag = () => {
-      if (!isMouseDownDrag) return;
-      isMouseDownDrag = false;
-      const diffX = mouseEndX - mouseStartX;
-      const diffY = mouseEndY - mouseStartY;
-      const minDistance = 35;
-
-      if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX < 0) {
-          switchCategoryByDirection('left');
-        } else {
-          switchCategoryByDirection('right');
-        }
-      }
-    };
-
-    screenArea.addEventListener('mouseup', endMouseDrag);
-
-    // Trackpad / Horizontal wheel scroll (left and right)
-    screenArea.addEventListener('wheel', (e) => {
-      if (isModalOpen || isAssignSheetOpen) return;
-      if (Math.abs(e.deltaX) > 25 && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        if (e.deltaX < 0) {
-          switchCategoryByDirection('left');
-        } else {
-          switchCategoryByDirection('right');
-        }
-      }
-    }, { passive: true });
+    // Swiping the Bookings / Inquiries list moves to the next / previous chip: see bindChipSwipe below (one shared gesture for every list page).
 
     // Modal Sheet Left and Right Swipe / Scroll Gesture Handling (Customer Details <-> Guests <-> Itinerary <-> Updates)
     const sheetEl = container.querySelector('#mobile-bottom-sheet');
     const modalTabs = ['customer-details', 'guests', 'itinerary', 'updates'];
 
     function switchModalTabByDirection(direction) {
-      const currentIndex = modalTabs.indexOf(activeModalTab);
+      const curTabs = getActiveModalTabs();
+      const currentIndex = curTabs.indexOf(activeModalTab);
       let targetIndex = currentIndex;
 
       if (direction === 'left') {
-        // Swiping left moves towards left tab (e.g. Guests -> Customer Details, Itinerary -> Guests)
+        // Swiping left moves towards left tab
         targetIndex = Math.max(0, currentIndex - 1);
       } else if (direction === 'right') {
-        // Swiping right moves towards right tab (e.g. Guests -> Itinerary, Itinerary -> Updates)
-        targetIndex = Math.min(modalTabs.length - 1, currentIndex + 1);
+        // Swiping right moves towards right tab
+        targetIndex = Math.min(curTabs.length - 1, currentIndex + 1);
       }
 
       if (targetIndex !== currentIndex) {
-        switchTab(modalTabs[targetIndex], direction);
+        switchTab(curTabs[targetIndex], direction);
       }
     }
 
-    if (sheetEl) {
-      let sheetTouchStartX = 0;
-      let sheetTouchStartY = 0;
-      let sheetTouchEndX = 0;
-      let sheetTouchEndY = 0;
-      let isSheetTouchSwiping = false;
-
-      sheetEl.addEventListener('touchstart', (e) => {
-        if (!isModalOpen || isAssignSheetOpen) return;
-        sheetTouchStartX = e.touches[0].clientX;
-        sheetTouchStartY = e.touches[0].clientY;
-        sheetTouchEndX = sheetTouchStartX;
-        sheetTouchEndY = sheetTouchStartY;
-        isSheetTouchSwiping = true;
-      }, { passive: true });
-
-      sheetEl.addEventListener('touchmove', (e) => {
-        if (!isSheetTouchSwiping || !isModalOpen || isAssignSheetOpen) return;
-        sheetTouchEndX = e.touches[0].clientX;
-        sheetTouchEndY = e.touches[0].clientY;
-      }, { passive: true });
-
-      sheetEl.addEventListener('touchend', (e) => {
-        if (!isSheetTouchSwiping || !isModalOpen || isAssignSheetOpen) return;
-        isSheetTouchSwiping = false;
-        const diffX = sheetTouchEndX - sheetTouchStartX;
-        const diffY = sheetTouchEndY - sheetTouchStartY;
-        const minDistance = 35;
-
-        // Ensure horizontal swipe was intended rather than vertical scrolling
-        if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY) * 1.1) {
-          if (diffX < 0) {
-            switchModalTabByDirection('left');
-          } else {
-            switchModalTabByDirection('right');
-          }
-        }
+    // Swipe the tab content: next / previous tab. Swipe the header (avatar and name): next / previous record of the list behind the sheet.
+    function swipeRecord(step) {
+      if (!isModalOpen || (page !== 'bookings' && page !== 'inquiries')) return;
+      const ids = [...container.querySelectorAll('#mobile-cards-list .list-row-card[data-booking-id]')].map((el) => el.dataset.bookingId);
+      const at = ids.indexOf(activeModalBooking?.id);
+      const next = at === -1 ? null : bookings.find((b) => b.id === ids[at + step]);
+      if (!next) return; // first / last record, or the list order is not known: do nothing
+      activeModalBooking = next;
+      activeModalTab = 'customer-details';
+      openDropdownItemId = null;
+      showAllGuests = false;
+      renderSheetHeader();
+      renderSheetBody();
+      container.querySelectorAll('.sheet-tab-btn').forEach((btn) => {
+        const on = btn.dataset.sheetTab === activeModalTab;
+        btn.classList.toggle('active', on);
+        if (on) btn.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
       });
-
-      // Mouse drag gesture on bottom sheet (for testing on desktop / mobile simulator)
-      let isSheetMouseDragging = false;
-      let sheetMouseStartX = 0;
-      let sheetMouseStartY = 0;
-      let sheetMouseEndX = 0;
-      let sheetMouseEndY = 0;
-
-      sheetEl.addEventListener('mousedown', (e) => {
-        if (!isModalOpen || isAssignSheetOpen || e.button !== 0) return;
-        if (e.target.closest('button, input, select, textarea, .custom-checkbox, .mini-icon-btn, .btn-confirm-booking')) return;
-        isSheetMouseDragging = true;
-        sheetMouseStartX = e.clientX;
-        sheetMouseStartY = e.clientY;
-        sheetMouseEndX = sheetMouseStartX;
-        sheetMouseEndY = sheetMouseStartY;
-      });
-
-      sheetEl.addEventListener('mousemove', (e) => {
-        if (!isSheetMouseDragging) return;
-        sheetMouseEndX = e.clientX;
-        sheetMouseEndY = e.clientY;
-      });
-
-      const endSheetMouseDrag = () => {
-        if (!isSheetMouseDragging) return;
-        isSheetMouseDragging = false;
-        const diffX = sheetMouseEndX - sheetMouseStartX;
-        const diffY = sheetMouseEndY - sheetMouseStartY;
-        const minDistance = 35;
-
-        if (Math.abs(diffX) > minDistance && Math.abs(diffX) > Math.abs(diffY) * 1.1) {
-          if (diffX < 0) {
-            switchModalTabByDirection('left');
-          } else {
-            switchModalTabByDirection('right');
-          }
-        }
-      };
-
-      sheetEl.addEventListener('mouseup', endSheetMouseDrag);
-
-      // Trackpad / Horizontal wheel scroll on bottom sheet
-      sheetEl.addEventListener('wheel', (e) => {
-        if (!isModalOpen || isAssignSheetOpen) return;
-        if (Math.abs(e.deltaX) > 28 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.5) {
-          if (e.deltaX < 0) {
-            switchModalTabByDirection('left');
-          } else {
-            switchModalTabByDirection('right');
-          }
-        }
-      }, { passive: true });
+      const bodyEl2 = container.querySelector('#sheet-body-content');
+      if (bodyEl2) bodyEl2.scrollTop = 0;
+      slideIn(container.querySelector('#sheet-header-card-content'), step);
+      slideIn(bodyEl2, step);
     }
+    bindChipSwipe(container.querySelector('#mobile-cards-list'), container.querySelector('#mobile-tabs-host'), { enabled: () => page === 'bookings' || page === 'inquiries' });
+    const swipeOk = () => isModalOpen && !isAssignSheetOpen && !document.querySelector('.asg-overlay, .modal-overlay.open, .row-floating-menu');
+    bindSwipe(container.querySelector('#sheet-body-content'), { enabled: swipeOk, onNext: () => switchModalTabByDirection('right'), onPrev: () => switchModalTabByDirection('left') });
+    bindSwipe(container.querySelector('#sheet-header-card-content'), { enabled: swipeOk, onNext: () => swipeRecord(1), onPrev: () => swipeRecord(-1) });
 
     // Bottom sheet: Esc and swipe-down on the handle/header close it
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isModalOpen && !document.querySelector('.asg-overlay, .fu-overlay, .row-floating-menu')) closeModal(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isModalOpen && !document.querySelector('.asg-overlay, .fu-overlay, .row-floating-menu, .sheet-overlay')) closeModal(); });
     (() => {
       const sheetEl = container.querySelector('#mobile-bottom-sheet');
       let startY = null;
@@ -1989,22 +1920,41 @@ export function createMobileView(container, options = {}) {
           activeModalBooking.destination = destVal;
         }
 
+        if (activeModalBooking.kind === 'inquiry') {
+          fetch(`/api/inquiries/${encodeURIComponent(activeModalBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              customer_name: nameVal,
+              customer_phone: phoneVal,
+              customer_email: emailVal || null,
+              location: locVal || null,
+              trip: destVal || null,
+              notes: notesVal || null,
+            })
+          }).catch(() => {});
+        } else {
+          fetch(`/api/bookings/${encodeURIComponent(activeModalBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              name: nameVal,
+              phone: phoneVal,
+              email: emailVal || null,
+              location: locVal || null,
+              travel_dates: datesVal || null,
+              budget: budgetVal || null,
+              notes: notesVal || null
+            })
+          }).catch(() => {});
+        }
+
         closeMobileEditCustomerModal();
         renderCards();
         renderSheetBody();
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Customer details updated successfully!', type: 'success' }
         }));
-        return;
-      }
-
-      // Add follow-up button -> Opens app modal
-      if (e.target.closest('#btn-add-followup-action') && activeModalBooking?.kind === 'inquiry') {
-        openFollowUpModal(activeModalBooking.raw);
-        return;
-      }
-      if (e.target.closest('#btn-add-followup-action')) {
-        openMobileAddFollowupModal();
         return;
       }
 
@@ -2144,11 +2094,12 @@ export function createMobileView(container, options = {}) {
       }
 
       // Sheet Navigation Tabs
-      const sheetTabBtn = e.target.closest('.sheet-tab-btn');
+      const sheetTabBtn = e.target.closest('[data-sheet-tab]'); // the booking sheet's own tabs (the tab rows of hosted pages are not this handler's business)
       if (sheetTabBtn) {
         const targetTab = sheetTabBtn.dataset.sheetTab;
-        const currentIdx = modalTabs.indexOf(activeModalTab);
-        const targetIdx = modalTabs.indexOf(targetTab);
+        const curTabs = getActiveModalTabs();
+        const currentIdx = curTabs.indexOf(activeModalTab);
+        const targetIdx = curTabs.indexOf(targetTab);
         const dir = targetIdx > currentIdx ? 'right' : (targetIdx < currentIdx ? 'left' : null);
         switchTab(targetTab, dir);
         return;
@@ -2253,7 +2204,7 @@ export function createMobileView(container, options = {}) {
             id: 'SR-' + Date.now(),
             icon: 'leaf',
             text: val,
-            color: '#2563EB'
+            color: 'var(--primary, #2563EB)'
           });
           input.value = '';
           renderSpecialReqModalContent();
@@ -2263,6 +2214,13 @@ export function createMobileView(container, options = {}) {
 
       if (e.target.closest('#btn-done-special-req') || e.target.closest('#close-special-req-modal-btn')) {
         closeSpecialReqModal();
+        if (activeModalBooking && activeModalBooking.kind !== 'inquiry') {
+          fetch(`/api/bookings/${encodeURIComponent(activeModalBooking.id)}/special-requirements`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ special_requirements: activeModalBooking.specialRequirements || [] })
+          }).catch(() => {});
+        }
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Special requirements updated successfully!', type: 'success' }
         }));
@@ -2549,20 +2507,45 @@ export function createMobileView(container, options = {}) {
 
       // Confirm Booking
       if (e.target.closest('#mobile-confirm-booking-btn')) {
-        if (activeModalBooking?.kind === 'inquiry') { toast(`Inquiry ${activeModalBooking.id} (${activeModalBooking.title}) confirmed.`, 'success'); return; }
-        window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { message: `Booking ${activeModalBooking.id} (${activeModalBooking.title}) confirmed successfully!`, type: 'success' }
-        }));
+        if (activeModalBooking?.kind === 'inquiry') {
+          activeModalBooking.status = 'Hot';
+          activeModalBooking.statusClass = 'status-inq-hot';
+          fetch(`/api/inquiries/${encodeURIComponent(activeModalBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ status: 'hot' })
+          }).catch(() => {});
+          toast(`Inquiry ${activeModalBooking.id} (${activeModalBooking.title}) confirmed.`, 'success');
+          renderCards();
+          renderSheetHeader();
+          return;
+        }
+        if (activeModalBooking) {
+          activeModalBooking.status = 'Confirmed';
+          activeModalBooking.statusClass = 'status-confirmed';
+          if (activeModalBooking.customer) activeModalBooking.customer.status = 'Confirmed';
+          fetch(`/api/bookings/${encodeURIComponent(activeModalBooking.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ status: 'Confirmed' })
+          }).catch(() => {});
+          renderCards();
+          renderSheetHeader();
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Booking ${activeModalBooking.id} (${activeModalBooking.title}) confirmed successfully!`, type: 'success' }
+          }));
+        }
         return;
       }
     });
   }
 
   function switchTab(tab, slideDir = null) {
+    const curTabs = getActiveModalTabs();
     if (activeModalTab === tab && !slideDir) return;
     if (!slideDir && activeModalTab !== tab) {
-      const currentIdx = modalTabs.indexOf(activeModalTab);
-      const targetIdx = modalTabs.indexOf(tab);
+      const currentIdx = curTabs.indexOf(activeModalTab);
+      const targetIdx = curTabs.indexOf(tab);
       if (currentIdx !== -1 && targetIdx !== -1) {
         slideDir = targetIdx > currentIdx ? 'right' : 'left';
       }
@@ -2571,6 +2554,13 @@ export function createMobileView(container, options = {}) {
     activeModalTab = tab;
     openDropdownItemId = null;
     closeAssignSheet();
+
+    const b = activeModalBooking;
+    const isFreight = page === 'inquiries' || b?.kind === 'inquiry';
+    const tabsNav = container.querySelector('.sheet-tabs-nav');
+    if (isFreight && tabsNav && !tabsNav.querySelector('[data-sheet-tab="shipment-docs"]')) {
+      tabsNav.innerHTML = renderFreightTabsHtml(activeModalTab, { attr: 'data-sheet-tab' });
+    }
 
     renderSheetHeader();
     container.querySelectorAll('.sheet-tab-btn').forEach(btn => {
@@ -2585,7 +2575,7 @@ export function createMobileView(container, options = {}) {
     if (bodyEl && slideDir) {
       const exitOffset = slideDir === 'left' ? '18px' : '-18px';
       const enterOffset = slideDir === 'left' ? '-18px' : '18px';
-      bodyEl.style.transition = 'opacity 0.12s ease-out, transform 0.12s ease-out';
+      bodyEl.style.transition = 'opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)';
       bodyEl.style.opacity = '0.3';
       bodyEl.style.transform = `translateX(${exitOffset})`;
 
@@ -2595,7 +2585,7 @@ export function createMobileView(container, options = {}) {
         bodyEl.style.transition = 'none';
         bodyEl.style.transform = `translateX(${enterOffset})`;
         void bodyEl.offsetHeight; // Force reflow
-        bodyEl.style.transition = 'opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+        bodyEl.style.transition = 'opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out)';
         bodyEl.style.opacity = '1';
         bodyEl.style.transform = 'translateX(0)';
       }, 70);

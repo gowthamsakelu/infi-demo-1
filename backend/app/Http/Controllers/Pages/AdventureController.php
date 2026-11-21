@@ -18,12 +18,12 @@ class AdventureController extends Controller
 
     public function index(): JsonResponse
     {
-        if ($this->ruyiOn()) {
-            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'adventure'], $this->ruyi()->all('activities')));
-        }
-
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('adventures')]);
+        }
+
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'adventure'], $this->ruyi()->all('activities')));
         }
 
         return response()->json(['success' => true, 'data' => SavedActivity::query()->orderBy('id')->get()->map(fn ($a) => [

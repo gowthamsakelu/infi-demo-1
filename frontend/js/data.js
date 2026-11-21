@@ -1,2229 +1,928 @@
-// Ruyi Admin Booking Data Store
+// INFINITY Global Freight & Logistics - Master Quotations & Operations Store
 export const INITIAL_BOOKINGS = [
   {
-    "id": "BK-5027",
-    "title": "Kashmir Valley & Gulmarg Tour",
-    "type": "TOUR",
+    "id": "QT-9021",
+    "title": "1x 40ft High Cube (HC) • Commercial Electronics & Components",
+    "type": "Sea Freight",
     "typeClass": "badge-tour",
     "image": "./images/manali.jpg",
-    "pax": 3,
-    "duration": "5D / 4N",
-    "dates": "15 Jan - 20 Jan",
-    "travelDateFull": "15 Jan - 20 Jan 2025 (5D / 4N)",
-    "status": "Pending",
-    "statusClass": "status-pending",
-    "price": "₹45,000",
-    "rawPrice": 45000,
-    "category": "New Bookings",
-    "selected": false,
-    "guest": {
-      "name": "Rohan Malhotra",
-      "phone": "+91 99884 84884",
-      "email": "rohan.malhotra@gmail.com",
-      "age": 34,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Rohan Malhotra",
-      "initials": "RM",
-      "phone": "+91 99884 84884",
-      "email": "rohan.malhotra@gmail.com",
-      "location": "Chandigarh, Punjab",
-      "leadSource": "Google Search",
-      "preferredDestination": "Srinagar, Gulmarg, Pahalgam",
-      "travelDates": "15 Jan – 20 Jan 2025",
-      "customerType": "Family (3 Pax)",
-      "budgetEst": "₹ 45,000 – 50,000",
-      "status": "Pending",
-      "shortDetails": "Winter snow trip to Srinagar, Gulmarg, and Pahalgam. Requested luxury heated houseboat stay on Dal Lake, Gondola Phase 1 & 2 tickets, and heated private 4x4 cab.",
-      "leadFlow": [
-        {
-          "date": "12 Jan",
-          "time": "11:00 AM",
-          "type": "call",
-          "iconBg": "icon-blue",
-          "title": "Initial Inquiry (Call)",
-          "desc": "Discussed snow season dates, Gulmarg gondola availability, and Dal Lake houseboat stay.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "12 Jan",
-          "time": "03:30 PM",
-          "type": "whatsapp",
-          "iconBg": "icon-green",
-          "title": "Shared Itinerary (WhatsApp)",
-          "desc": "Sent 5D/4N Kashmir winter itinerary with hotel options and private 4x4 cab inclusions.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "13 Jan",
-          "time": "02:00 PM",
-          "type": "email",
-          "iconBg": "icon-blue",
-          "title": "Sent Quote & Package Breakdown (Email)",
-          "desc": "Dispatched detailed quote for 3 pax with Gondola pass booking process.",
-          "author": "By Ruyi Admin"
-        }
-      ]
-    },
-    "destination": "Srinagar, Gulmarg, Pahalgam",
-    "bookingType": "Tour Package",
-    "services": "Houseboat Stay, 4x4 Cab, Gondola Pass, Sightseeing",
-    "assignedStatus": "Assigned",
-    "assignedTo": {
-      "name": "Rahul Mehta",
-      "role": "Operations Lead",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-    },
-    "notes": "Winter package requested. Needs snow boots & phase 2 gondola passes pre-booked.",
-    "specialRequirements": [
-      {
-        "id": "sr-kash-1",
-        "icon": "flame",
-        "text": "Room Heating / Bukhari Needed",
-        "color": "#EF4444"
-      },
-      {
-        "id": "sr-kash-2",
-        "icon": "coffee",
-        "text": "Daily Breakfast & Kahwa Included",
-        "color": "#F59E0B"
-      },
-      {
-        "id": "sr-kash-3",
-        "icon": "shield",
-        "text": "Child Snow Safety Gear",
-        "color": "#2563EB"
-      }
-    ],
-    "guests": [
-      {
-        "id": 1,
-        "name": "Rohan Malhotra",
-        "age": 34,
-        "role": "Primary Contact",
-        "phone": "+91 99884 84884"
-      },
-      {
-        "id": 2,
-        "name": "Pooja Malhotra",
-        "age": 32,
-        "role": "Adult",
-        "phone": "+91 99884 84885"
-      },
-      {
-        "id": 3,
-        "name": "Aarav Malhotra",
-        "age": 7,
-        "role": "Child",
-        "phone": "+91 99884 84884"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "15 Jan",
-        "items": [
-          {
-            "id": "IT-KASH-101",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Srinagar Airport Pickup",
-            "subtitle": "11:30 AM • Private 4x4 Scorpio to Dal Lake",
-            "assigned": {
-              "isAssigned": true,
-              "name": "Garhwal Luxury Transport",
-              "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
-            }
-          },
-          {
-            "id": "IT-KASH-102",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Check-in: Royal Heritage Houseboat",
-            "subtitle": "01:00 PM • Dal Lake, Srinagar (Heated rooms)",
-            "assigned": null
-          },
-          {
-            "id": "IT-KASH-103",
-            "type": "sightseeing",
-            "icon": "camera",
-            "title": "Shikara Sunset Ride & Floating Market",
-            "subtitle": "04:30 PM • 2-hour Shikara ride with Kahwa tea",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 2",
-        "date": "16 Jan",
-        "items": [
-          {
-            "id": "IT-KASH-201",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Srinagar to Gulmarg Drive",
-            "subtitle": "08:30 AM • Scenic snow drive via Tangmarg (2 hrs)",
-            "assigned": null
-          },
-          {
-            "id": "IT-KASH-202",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Gulmarg Gondola Ride (Phase 1 & 2)",
-            "subtitle": "11:00 AM • Kongdoori & Apharwat Peak skiing",
-            "assigned": {
-              "isAssigned": true,
-              "name": "Adventure World",
-              "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
-            }
-          }
-        ]
-      },
-      {
-        "day": "Day 3",
-        "date": "17 Jan",
-        "items": [
-          {
-            "id": "IT-KASH-301",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Gulmarg to Pahalgam Valley Drive",
-            "subtitle": "08:00 AM • Travel via saffron fields & Awantipora",
-            "assigned": null
-          },
-          {
-            "id": "IT-KASH-302",
-            "type": "sightseeing",
-            "icon": "camera",
-            "title": "Betaab Valley & Aru Sightseeing",
-            "subtitle": "02:00 PM • Pony ride & photography session",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "updates": [
-      {
-        "time": "12 Jan • 03:30 PM",
-        "title": "Booking Request Received",
-        "desc": "Inquiry received for 3 pax winter tour.",
-        "user": "Ruyi Admin"
-      },
-      {
-        "time": "13 Jan • 10:15 AM",
-        "title": "Assigned to Rahul Mehta",
-        "desc": "Rahul assigned as tour coordinator.",
-        "user": "Arjun Kapoor"
-      }
-    ]
-  },
-  {
-    "id": "BK-5021",
-    "title": "Haridwar – Kashi Trip",
-    "type": "TOUR",
-    "typeClass": "badge-tour",
-    "image": "./images/kedarnath.jpg",
-    "pax": 12,
-    "duration": "4D / 3N",
-    "dates": "12 Nov - 15 Nov",
-    "travelDateFull": "12 Nov - 15 Nov 2024 (4D / 3N)",
-    "status": "Paid",
-    "statusClass": "status-paid",
-    "price": "₹36,000",
-    "rawPrice": 36000,
-    "category": "Assigned",
-    "selected": false,
-    "guest": {
-      "name": "Amit Verma",
-      "phone": "+91 98765 43210",
-      "email": "amit.verma@gmail.com",
-      "age": 42,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Amit Verma",
-      "initials": "AV",
-      "phone": "+91 98765 43210",
-      "email": "amit.verma@gmail.com",
-      "location": "New Delhi, Delhi",
-      "leadSource": "Website",
-      "preferredDestination": "Haridwar, Rishikesh, Kashi",
-      "travelDates": "12 Nov – 15 Nov 2024",
-      "customerType": "Family (12 Pax)",
-      "budgetEst": "₹ 35,000 – 40,000",
-      "status": "Paid",
-      "shortDetails": "Planning a family pilgrimage tour to Haridwar, Rishikesh & Kashi. Senior citizens in group requiring comfortable AC tempo traveler, riverfront hotel stay, and priority Aarti access.",
-      "leadFlow": [
-        {
-          "date": "08 Nov",
-          "time": "10:30 AM",
-          "type": "call",
-          "iconBg": "icon-blue",
-          "title": "Initial Inquiry (Call)",
-          "desc": "Discussed Haridwar & Kashi circuit options. Inquired about senior citizen comfort and hotel heating.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "08 Nov",
-          "time": "04:15 PM",
-          "type": "whatsapp",
-          "iconBg": "icon-green",
-          "title": "Shared Itinerary (WhatsApp)",
-          "desc": "Sent customized day-wise itinerary options, tempo traveler details, and hotel pricing.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "10 Nov",
-          "time": "11:20 AM",
-          "type": "email",
-          "iconBg": "icon-blue",
-          "title": "Sent Quote & Voucher (Email)",
-          "desc": "Dispatched booking voucher #BK-5021, payment receipt, and coordinator contact details.",
-          "author": "By Ruyi Admin"
-        }
-      ]
-    },
-    "destination": "Haridwar, Rishikesh, Kashi",
-    "bookingType": "Tour Package",
-    "services": "Hotel (3N), Cab, Sightseeing, Guide",
-    "assignedStatus": "Assigned • Paid",
-    "assignedTo": {
-      "name": "Rahul Mehta",
-      "role": "Tour Manager",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-    },
-    "notes": "Senior citizens, need comfortable vehicle.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Amit Verma",
-        "age": 42,
-        "role": "Primary Contact",
-        "phone": "9876543210"
-      },
-      {
-        "id": 2,
-        "name": "Neha Verma",
-        "age": 38,
-        "role": "Adult",
-        "phone": "9876543211"
-      },
-      {
-        "id": 3,
-        "name": "Rohan Verma",
-        "age": 16,
-        "role": "Teen",
-        "phone": "9876543212"
-      },
-      {
-        "id": 4,
-        "name": "Pooja Verma",
-        "age": 14,
-        "role": "Child",
-        "phone": "9876543213"
-      },
-      {
-        "id": 5,
-        "name": "Rajesh Verma",
-        "age": 68,
-        "role": "Senior",
-        "phone": "9876543214"
-      },
-      {
-        "id": 6,
-        "name": "Sunita Verma",
-        "age": 64,
-        "role": "Senior",
-        "phone": "9876543215"
-      },
-      {
-        "id": 7,
-        "name": "Aarav Verma",
-        "age": 10,
-        "role": "Child",
-        "phone": "9876543216"
-      },
-      {
-        "id": 8,
-        "name": "Ananya Verma",
-        "age": 8,
-        "role": "Child",
-        "phone": "9876543217"
-      },
-      {
-        "id": 9,
-        "name": "Vikram Singh",
-        "age": 45,
-        "role": "Family Friend",
-        "phone": "9876543218"
-      },
-      {
-        "id": 10,
-        "name": "Meera Singh",
-        "age": 41,
-        "role": "Family Friend",
-        "phone": "9876543219"
-      },
-      {
-        "id": 11,
-        "name": "Kabir Singh",
-        "age": 15,
-        "role": "Teen",
-        "phone": "9876543220"
-      },
-      {
-        "id": 12,
-        "name": "Priya Singh",
-        "age": 12,
-        "role": "Child",
-        "phone": "9876543221"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-1",
-        "icon": "leaf",
-        "text": "Vegetarian Food",
-        "color": "#16A34A"
-      },
-      {
-        "id": "SR-2",
-        "icon": "bed",
-        "text": "2 Connecting Rooms",
-        "color": "#2563EB"
-      },
-      {
-        "id": "SR-3",
-        "icon": "accessibility",
-        "text": "Wheelchair Assistance",
-        "color": "#2563EB"
-      },
-      {
-        "id": "SR-4",
-        "icon": "waves",
-        "text": "Near Beach",
-        "color": "#0284C7"
-      },
-      {
-        "id": "SR-5",
-        "icon": "smile",
-        "text": "Kid Friendly Activities",
-        "color": "#EA580C"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "12 Nov",
-        "items": [
-          {
-            "id": "IT-101",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Delhi → Haridwar",
-            "subtitle": "06:00 AM • Pickup from Delhi",
-            "assigned": null
-          },
-          {
-            "id": "IT-102",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Hotel Ganga View",
-            "subtitle": "12:00 PM • Check-in",
-            "assigned": {
-              "isAssigned": true,
-              "name": "Rahul Mehta",
-              "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-            }
-          },
-          {
-            "id": "IT-103",
-            "type": "sightseeing",
-            "icon": "camera",
-            "title": "Evening Aarti",
-            "subtitle": "06:00 PM • Har Ki Pauri",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 2",
-        "date": "13 Nov",
-        "items": [
-          {
-            "id": "IT-201",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Haridwar → Rishikesh",
-            "subtitle": "08:00 AM • Travel (3 hrs)",
-            "assigned": null
-          },
-          {
-            "id": "IT-202",
-            "type": "activity",
-            "icon": "raft",
-            "title": "River Rafting (16 km)",
-            "subtitle": "10:00 AM • Rishikesh",
-            "tag": "Activity",
-            "image": "./images/rishikesh.jpg",
-            "assigned": {
-              "isAssigned": true,
-              "name": "Adventure World",
-              "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
-            }
-          },
-          {
-            "id": "IT-203",
-            "type": "food",
-            "icon": "restaurant",
-            "title": "Lunch at Local Restaurant",
-            "subtitle": "01:00 PM • Rishikesh",
-            "assigned": null
-          },
-          {
-            "id": "IT-204",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Hotel Ganges Retreat",
-            "subtitle": "Check-in",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 3",
-        "date": "14 Nov",
-        "items": [
-          {
-            "id": "IT-301",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Rishikesh → Kashi",
-            "subtitle": "07:00 AM • Travel (8 hrs)",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "itinerary": [
-      {
-        "day": "Day 1",
-        "date": "12 Nov",
-        "title": "Delhi to Haridwar & Ganga Aarti",
-        "desc": "06:00 AM pickup from Delhi. Check-in at Hotel Ganga View at 12:00 PM. Evening divine Aarti at Har Ki Pauri."
-      },
-      {
-        "day": "Day 2",
-        "date": "13 Nov",
-        "title": "Rishikesh River Rafting (16 km) & Retreat",
-        "desc": "08:00 AM travel to Rishikesh (3 hrs). 10:00 AM 16 km White water river rafting. 01:00 PM local lunch & check-in at Hotel Ganges Retreat."
-      },
-      {
-        "day": "Day 3",
-        "date": "14 Nov",
-        "title": "Rishikesh to Kashi Heritage Drive",
-        "desc": "07:00 AM morning departure towards Varanasi / Kashi (8 hrs scenic drive)."
-      }
-    ],
-    "updates": [
-      {
-        "time": "10:45 AM, Today",
-        "title": "Payment Confirmed",
-        "desc": "Received ₹36,000 via Razorpay (UPI - HDFC). Invoice generated #INV-9921.",
-        "user": "System"
-      },
-      {
-        "time": "11:15 AM, Today",
-        "title": "Assigned to Rahul Mehta",
-        "desc": "Rahul Mehta confirmed trip coordinator role and initiated supplier booking.",
-        "user": "KS Admin"
-      },
-      {
-        "time": "12:30 PM, Today",
-        "title": "Hotel Grand Kedarnath Booked",
-        "desc": "Confirmed 3 Luxury Family Suites with heating amenities.",
-        "user": "Rahul Mehta"
-      },
-      {
-        "time": "01:00 PM, Today",
-        "title": "Welcome WhatsApp Sent",
-        "desc": "Itinerary and packing list sent to Amit Verma (+91 98765 43210).",
-        "user": "System"
-      }
-    ]
-  },
-  {
-    "id": "BK-5022",
-    "title": "Goa Beach Villa",
-    "type": "VILLA",
-    "typeClass": "badge-villa",
-    "image": "./images/goa.jpg",
-    "pax": 8,
-    "duration": "2N/3D",
-    "dates": "18 Nov - 20 Nov",
-    "travelDateFull": "18 Nov - 20 Nov 2024 (2N/3D)",
-    "status": "Part Paid",
-    "statusClass": "status-part-paid",
-    "price": "₹22,000",
-    "rawPrice": 22000,
-    "category": "Assigned",
-    "selected": false,
-    "guest": {
-      "name": "Kavita Roy",
-      "phone": "+91 98112 23344",
-      "email": "kavita.roy@gmail.com",
-      "age": 32,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Kavita Roy",
-      "initials": "KR",
-      "phone": "+91 98112 23344",
-      "email": "kavita.roy@gmail.com",
-      "location": "Mumbai, Maharashtra",
-      "leadSource": "Instagram",
-      "preferredDestination": "Candolim Beach, North Goa",
-      "travelDates": "18 Nov – 20 Nov 2024",
-      "customerType": "Friends Group (8 Pax)",
-      "budgetEst": "₹ 22,000 – 26,000",
-      "status": "Part Paid",
-      "shortDetails": "Planning a private villa weekend getaway in Candolim North Goa with friends. Interested in private pool, private chef barbecue, and river cruise.",
-      "leadFlow": [
-        {
-          "date": "14 Nov",
-          "time": "11:00 AM",
-          "type": "call",
-          "iconBg": "icon-blue",
-          "title": "Initial Inquiry (Call)",
-          "desc": "Customer called inquiring about luxury 4BHK villas with private pool near Candolim.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "14 Nov",
-          "time": "02:30 PM",
-          "type": "whatsapp",
-          "iconBg": "icon-green",
-          "title": "Shared Itinerary (WhatsApp)",
-          "desc": "Shared Villa Sol Candolim photos, chef menu options, and weekend package rates.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "15 Nov",
-          "time": "05:00 PM",
-          "type": "email",
-          "iconBg": "icon-blue",
-          "title": "Sent Quote (Email)",
-          "desc": "Sent deposit payment link of ₹10,000 and reservation confirmation agreement.",
-          "author": "By Ruyi Admin"
-        }
-      ]
-    },
-    "destination": "Candolim Beach, North Goa",
-    "bookingType": "Luxury Villa Stay",
-    "services": "Private Pool, Chef on Call, Airport Transfer",
-    "assignedStatus": "Assigned • Part Paid",
-    "assignedTo": {
-      "name": "Priya Sharma",
-      "role": "Villa Concierge",
-      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
-    },
-    "notes": "Barbecue setup needed for Saturday evening party.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Kavita Roy",
-        "age": 32,
-        "role": "Primary Contact",
-        "phone": "9811223344"
-      },
-      {
-        "id": 2,
-        "name": "Sameer Roy",
-        "age": 34,
-        "role": "Adult",
-        "phone": "9811223345"
-      },
-      {
-        "id": 3,
-        "name": "Nikhil Roy",
-        "age": 29,
-        "role": "Adult",
-        "phone": "9811223346"
-      },
-      {
-        "id": 4,
-        "name": "Ananya Sen",
-        "age": 28,
-        "role": "Adult",
-        "phone": "9811223347"
-      },
-      {
-        "id": 5,
-        "name": "Tanvi Shah",
-        "age": 31,
-        "role": "Adult",
-        "phone": "9811223348"
-      },
-      {
-        "id": 6,
-        "name": "Kunal Shah",
-        "age": 33,
-        "role": "Adult",
-        "phone": "9811223349"
-      },
-      {
-        "id": 7,
-        "name": "Arjun Das",
-        "age": 30,
-        "role": "Adult",
-        "phone": "9811223350"
-      },
-      {
-        "id": 8,
-        "name": "Sneha Das",
-        "age": 29,
-        "role": "Adult",
-        "phone": "9811223351"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-21",
-        "icon": "waves",
-        "text": "Near Beach",
-        "color": "#0284C7"
-      },
-      {
-        "id": "SR-22",
-        "icon": "utensils",
-        "text": "Barbecue Setup",
-        "color": "#EA580C"
-      },
-      {
-        "id": "SR-23",
-        "icon": "clock",
-        "text": "Late Check-out (2 PM)",
-        "color": "#D97706"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "18 Nov",
-        "items": [
-          {
-            "id": "IT-GOA-1",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Villa Check-in & Pool Drinks",
-            "subtitle": "01:00 PM • Candolim Luxury Villa",
-            "assigned": null
-          },
-          {
-            "id": "IT-GOA-2",
-            "type": "food",
-            "icon": "restaurant",
-            "title": "Sundowner Barbecue Dinner",
-            "subtitle": "07:30 PM • Chef on call setup",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 2",
-        "date": "19 Nov",
-        "items": [
-          {
-            "id": "IT-GOA-3",
-            "type": "transport",
-            "icon": "bus",
-            "title": "North Goa Beach Drive",
-            "subtitle": "11:00 AM • Anjuna & Vagator cafes",
-            "assigned": null
-          },
-          {
-            "id": "IT-GOA-4",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Private Sunset Yacht Cruise",
-            "subtitle": "05:00 PM • Mandovi River",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "itinerary": [
-      {
-        "day": "Day 1",
-        "date": "18 Nov",
-        "title": "Check-in & Sundowner Party",
-        "desc": "Welcome drinks at Candolim Villa, private pool leisure and barbecue dinner."
-      },
-      {
-        "day": "Day 2",
-        "date": "19 Nov",
-        "title": "Catamaran Cruise & Beach Club",
-        "desc": "Private yacht cruise in Mandovi river, evening at Thalassa club."
-      },
-      {
-        "day": "Day 3",
-        "date": "20 Nov",
-        "title": "Brunch & Airport Drop",
-        "desc": "Leisurely brunch prepared by in-house chef, check-out and drop off."
-      }
-    ],
-    "updates": [
-      {
-        "time": "09:00 AM, Yesterday",
-        "title": "Deposit Received",
-        "desc": "Advance deposit of ₹10,000 received. Balance ₹12,000 due at check-in.",
-        "user": "System"
-      },
-      {
-        "time": "11:20 AM, Yesterday",
-        "title": "Villa Blocked",
-        "desc": "Villa Sol Candolim locked for 18-20 Nov.",
-        "user": "Priya Sharma"
-      }
-    ]
-  },
-  {
-    "id": "BK-5023",
-    "title": "Rishikesh Rafting",
-    "type": "ACTIVITY",
-    "typeClass": "badge-activity",
-    "image": "./images/rishikesh.jpg",
-    "pax": 6,
-    "duration": "1 Day",
-    "dates": "10 Nov - 15 Nov",
-    "travelDateFull": "10 Nov - 15 Nov 2024 (1 Day Activity)",
-    "status": "Paid",
-    "statusClass": "status-paid",
-    "price": "₹9,000",
-    "rawPrice": 9000,
-    "category": "New Bookings",
-    "selected": false,
-    "guest": {
-      "name": "Deepak Chopra",
-      "phone": "+91 97115 54433",
-      "email": "deepak.c@gmail.com",
-      "age": 27,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Deepak Chopra",
-      "initials": "DC",
-      "phone": "+91 97115 54433",
-      "email": "deepak.c@gmail.com",
-      "location": "Gurugram, Haryana",
-      "leadSource": "Google Search",
-      "preferredDestination": "Shivpuri to NIM Beach, Rishikesh",
-      "travelDates": "10 Nov – 15 Nov 2024",
-      "customerType": "Adventure Group (6 Pax)",
-      "budgetEst": "₹ 9,000 – 12,000",
-      "status": "Paid",
-      "shortDetails": "Group of college friends looking for high-adrenaline 24 km white water rafting, cliff jumping, and GoPro video coverage.",
-      "leadFlow": [
-        {
-          "date": "07 Nov",
-          "time": "09:30 AM",
-          "type": "call",
-          "iconBg": "icon-blue",
-          "title": "Initial Inquiry (Call)",
-          "desc": "Group lead checked rapid conditions and safety gear certification.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "07 Nov",
-          "time": "01:00 PM",
-          "type": "whatsapp",
-          "iconBg": "icon-green",
-          "title": "Shared Itinerary (WhatsApp)",
-          "desc": "Sent 24 KM Marine Drive to NIM beach slot details and waiver documents.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "08 Nov",
-          "time": "10:15 AM",
-          "type": "email",
-          "iconBg": "icon-blue",
-          "title": "Sent Quote & Voucher (Email)",
-          "desc": "Payment of ₹9,000 verified. Guide and transport coordinator assigned.",
-          "author": "By Ruyi Admin"
-        }
-      ]
-    },
-    "destination": "Shivpuri to NIM Beach, Rishikesh",
-    "bookingType": "Adventure Sport",
-    "services": "24 KM Grade 3-4 Rafting, Cliff Jumping, GoPro Video",
-    "assignedStatus": "Assigned • Paid",
-    "assignedTo": {
-      "name": "Rahul Mehta",
-      "role": "Adventure Lead",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-    },
-    "notes": "All participants signed liability waiver; GoPro video included.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Deepak Chopra",
-        "age": 27,
-        "role": "Primary Contact",
-        "phone": "9711554433"
-      },
-      {
-        "id": 2,
-        "name": "Varun Grover",
-        "age": 28,
-        "role": "Participant",
-        "phone": "9711554434"
-      },
-      {
-        "id": 3,
-        "name": "Harshit Saxena",
-        "age": 26,
-        "role": "Participant",
-        "phone": "9711554435"
-      },
-      {
-        "id": 4,
-        "name": "Manish Tyagi",
-        "age": 27,
-        "role": "Participant",
-        "phone": "9711554436"
-      },
-      {
-        "id": 5,
-        "name": "Gaurav Bisht",
-        "age": 29,
-        "role": "Participant",
-        "phone": "9711554437"
-      },
-      {
-        "id": 6,
-        "name": "Siddharth Sen",
-        "age": 26,
-        "role": "Participant",
-        "phone": "9711554438"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-31",
-        "icon": "shield",
-        "text": "First Aid & Medical Kit",
-        "color": "#DC2626"
-      },
-      {
-        "id": "SR-32",
-        "icon": "camera",
-        "text": "GoPro 4K Recording",
-        "color": "#2563EB"
-      },
-      {
-        "id": "SR-33",
-        "icon": "leaf",
-        "text": "Vegetarian Food",
-        "color": "#16A34A"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "11 Nov",
-        "items": [
-          {
-            "id": "IT-RFT-1",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Marine Drive Briefing",
-            "subtitle": "09:00 AM • Safety instructions & gear fitment",
-            "assigned": null
-          },
-          {
-            "id": "IT-RFT-2",
-            "type": "activity",
-            "icon": "raft",
-            "title": "24 KM Grade 4 Rapids & Cliff Jump",
-            "subtitle": "10:00 AM • Shivpuri to NIM Beach",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "itinerary": [
-      {
-        "day": "Day 1",
-        "date": "11 Nov",
-        "title": "Marine Drive to NIM Beach Rafting",
-        "desc": "Safety briefing at base camp, 24 km thrilling rapids, body surfing and cliff jumping."
-      }
-    ],
-    "updates": [
-      {
-        "time": "02:15 PM, 2 days ago",
-        "title": "Paid in Full",
-        "desc": "₹9,000 paid via NetBanking.",
-        "user": "System"
-      }
-    ]
-  },
-  {
-    "id": "BK-5024",
-    "title": "Manali Resort Stay",
-    "type": "RESORT",
-    "typeClass": "badge-resort",
-    "image": "./images/manali.jpg",
-    "pax": 4,
-    "duration": "3N/4D",
-    "dates": "25 Nov - 28 Nov",
-    "travelDateFull": "25 Nov - 28 Nov 2024 (3N/4D)",
-    "status": "Pending",
-    "statusClass": "status-pending",
-    "price": "₹26,500",
-    "rawPrice": 26500,
-    "category": "Ongoing",
-    "selected": false,
-    "guest": {
-      "name": "Rohit Joshi",
-      "phone": "+91 98991 12233",
-      "email": "rohit.j@gmail.com",
-      "age": 35,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Rohit Joshi",
-      "initials": "RJ",
-      "phone": "+91 98991 12233",
-      "email": "rohit.j@gmail.com",
-      "location": "Ahmedabad, Gujarat",
-      "leadSource": "Referral",
-      "preferredDestination": "Old Manali, Himachal Pradesh",
-      "travelDates": "25 Nov – 28 Nov 2024",
-      "customerType": "Family (4 Pax)",
-      "budgetEst": "₹ 26,500 – 30,000",
-      "status": "Pending",
-      "shortDetails": "Celebrating 5th wedding anniversary with spouse and two young kids. Looking for luxury pine chalet, Solang snow excursion, and evening bonfire.",
-      "leadFlow": [
-        {
-          "date": "18 Nov",
-          "time": "12:15 PM",
-          "type": "call",
-          "iconBg": "icon-blue",
-          "title": "Initial Inquiry (Call)",
-          "desc": "Client requested cottage options with fireplace and snow view in Old Manali.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "18 Nov",
-          "time": "03:45 PM",
-          "type": "whatsapp",
-          "iconBg": "icon-green",
-          "title": "Shared Itinerary (WhatsApp)",
-          "desc": "Sent pine chalet photos, anniversary cake arrangement details, and cab options.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "19 Nov",
-          "time": "11:00 AM",
-          "type": "email",
-          "iconBg": "icon-blue",
-          "title": "Sent Quote (Email)",
-          "desc": "Sent comprehensive quote for 3N/4D with MAP meal plan and sightseeing.",
-          "author": "By Ruyi Admin"
-        }
-      ]
-    },
-    "destination": "Old Manali, Himachal Pradesh",
-    "bookingType": "Resort Holiday",
-    "services": "Cottage Suite, Breakfast & Dinner, Bonfire Night",
-    "assignedStatus": "Unassigned • Pending",
-    "assignedTo": {
-      "name": "Unassigned",
-      "role": "Support Pool",
-      "avatar": ""
-    },
-    "notes": "Couple celebrating 5th wedding anniversary.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Rohit Joshi",
-        "age": 35,
-        "role": "Primary Contact",
-        "phone": "9899112233"
-      },
-      {
-        "id": 2,
-        "name": "Aditi Joshi",
-        "age": 33,
-        "role": "Spouse",
-        "phone": "9899112234"
-      },
-      {
-        "id": 3,
-        "name": "Vihaan Joshi",
-        "age": 7,
-        "role": "Child",
-        "phone": "9899112235"
-      },
-      {
-        "id": 4,
-        "name": "Isha Joshi",
-        "age": 4,
-        "role": "Child",
-        "phone": "9899112236"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-41",
-        "icon": "smile",
-        "text": "Kid Friendly Activities",
-        "color": "#EA580C"
-      },
-      {
-        "id": "SR-42",
-        "icon": "baby",
-        "text": "Baby Crib / Cot",
-        "color": "#8B5CF6"
-      },
-      {
-        "id": "SR-43",
-        "icon": "bed",
-        "text": "2 Connecting Rooms",
-        "color": "#2563EB"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "25 Nov",
-        "items": [
-          {
-            "id": "IT-MAN-1",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Check-in at Pine Chalet",
-            "subtitle": "12:00 PM • Welcome tea & cedar walk",
-            "assigned": null
-          },
-          {
-            "id": "IT-MAN-2",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Evening Cedar Bonfire",
-            "subtitle": "07:00 PM • Private pine courtyard",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 2",
-        "date": "26 Nov",
-        "items": [
-          {
-            "id": "IT-MAN-3",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Solang Valley Snow Excursion",
-            "subtitle": "09:30 AM • Cable car & snow activities",
-            "assigned": null
-          },
-          {
-            "id": "IT-MAN-4",
-            "type": "food",
-            "icon": "restaurant",
-            "title": "Riverside Trout Dinner",
-            "subtitle": "08:00 PM • Old Manali Cafe setup",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 3",
-        "date": "27 Nov",
-        "items": [
-          {
-            "id": "IT-MAN-5",
-            "type": "activity",
-            "icon": "camera",
-            "title": "Naggar Castle & Heritage Walk",
-            "subtitle": "10:30 AM • Art gallery & historic fort",
-            "assigned": null
-          },
-          {
-            "id": "IT-MAN-6",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Vashisht Sulphur Springs",
-            "subtitle": "03:30 PM • Natural hot springs bath",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 4",
-        "date": "28 Nov",
-        "items": [
-          {
-            "id": "IT-MAN-7",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Check-out & Mall Road Transfer",
-            "subtitle": "10:00 AM • Luggage assistance & departure",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "itinerary": [
-      {
-        "day": "Day 1",
-        "date": "25 Nov",
-        "title": "Check-in at Pine Chalet",
-        "desc": "Warm cider welcome, leisure walk through cedar woods."
-      },
-      {
-        "day": "Day 2",
-        "date": "26 Nov",
-        "title": "Solang Valley Snow Trip",
-        "desc": "Cable car ride and snow sports at Solang."
-      },
-      {
-        "day": "Day 3",
-        "date": "27 Nov",
-        "title": "Naggar Castle & Cafe Crawl",
-        "desc": "Art gallery and ancient heritage castle visit."
-      },
-      {
-        "day": "Day 4",
-        "date": "28 Nov",
-        "title": "Check-out",
-        "desc": "Departure after breakfast."
-      }
-    ],
-    "updates": [
-      {
-        "time": "04:00 PM, 3 days ago",
-        "title": "Booking Request Received",
-        "desc": "Guest requested quotation for cottage upgrade.",
-        "user": "System"
-      }
-    ]
-  },
-  {
-    "id": "BK-5025",
-    "title": "Paragliding - Bir",
-    "type": "ACTIVITY",
-    "typeClass": "badge-activity",
-    "image": "./images/paragliding.jpg",
     "pax": 2,
-    "duration": "1 Day",
-    "dates": "5 Nov - 7 Nov",
-    "travelDateFull": "5 Nov - 7 Nov 2024 (1 Day Activity)",
-    "status": "Pending",
-    "statusClass": "status-pending",
-    "price": "₹6,000",
-    "rawPrice": 6000,
-    "category": "Ongoing",
-    "selected": false,
-    "guest": {
-      "name": "Akash Goel",
-      "phone": "+91 98224 46688",
-      "email": "akash.goel@gmail.com",
-      "age": 24,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Akash Goel",
-      "initials": "AG",
-      "phone": "+91 98224 46688",
-      "email": "akash.goel@gmail.com",
-      "location": "Chandigarh, Punjab",
-      "leadSource": "Instagram",
-      "preferredDestination": "Bir Billing, Himachal Pradesh",
-      "travelDates": "5 Nov – 7 Nov 2024",
-      "customerType": "Couple (2 Pax)",
-      "budgetEst": "₹ 6,000 – 8,000",
-      "status": "Pending",
-      "shortDetails": "Weekend tandem paragliding from Billing takeoff site to Bir landing ground with 4K GoPro recording.",
-      "leadFlow": [
-        {
-          "date": "02 Nov",
-          "time": "03:00 PM",
-          "type": "call",
-          "iconBg": "icon-blue",
-          "title": "Initial Inquiry (Call)",
-          "desc": "Client inquired about morning wind conditions and pilot flight certifications.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "02 Nov",
-          "time": "05:30 PM",
-          "type": "whatsapp",
-          "iconBg": "icon-green",
-          "title": "Shared Itinerary (WhatsApp)",
-          "desc": "Shared takeoff timings, safety guidelines, and 4K video recording details.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "03 Nov",
-          "time": "10:00 AM",
-          "type": "email",
-          "iconBg": "icon-blue",
-          "title": "Sent Quote (Email)",
-          "desc": "Confirmed 2 flight slots with certified pilots pending final weather clearance.",
-          "author": "By Ruyi Admin"
-        }
-      ]
-    },
-    "destination": "Bir Billing, Himachal Pradesh",
-    "bookingType": "Tandem Paragliding",
-    "services": "30 Min Tandem Flight, GoPro 4K Recording, Takeoff transfer",
-    "assignedStatus": "Unassigned • Pending",
-    "assignedTo": {
-      "name": "Unassigned",
-      "role": "Support Pool",
-      "avatar": ""
-    },
-    "notes": "Requires early morning slot for optimal wind conditions.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Akash Goel",
-        "age": 24,
-        "role": "Primary Contact",
-        "phone": "9822446688"
-      },
-      {
-        "id": 2,
-        "name": "Riya Bansal",
-        "age": 23,
-        "role": "Participant",
-        "phone": "9822446689"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-51",
-        "icon": "camera",
-        "text": "GoPro 4K Recording",
-        "color": "#2563EB"
-      },
-      {
-        "id": "SR-52",
-        "icon": "clock",
-        "text": "Early Morning Slot (7 AM)",
-        "color": "#D97706"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "5 Nov",
-        "items": [
-          {
-            "id": "IT-BIR-1",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Billing 2400m Takeoff",
-            "subtitle": "07:30 AM • Tandem flight over pine forests",
-            "assigned": null
-          },
-          {
-            "id": "IT-BIR-2",
-            "type": "food",
-            "icon": "restaurant",
-            "title": "Landing Site & Tibetan Cafe Lunch",
-            "subtitle": "12:30 PM • Organic garden cafe",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 2",
-        "date": "6 Nov",
-        "items": [
-          {
-            "id": "IT-BIR-3",
-            "type": "activity",
-            "icon": "camera",
-            "title": "Chokling Monastery & Stupa Tour",
-            "subtitle": "09:30 AM • Tibetan cultural heritage walk",
-            "assigned": null
-          },
-          {
-            "id": "IT-BIR-4",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Return Drop to Pathankot",
-            "subtitle": "04:00 PM • Private cab departure",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "itinerary": [
-      {
-        "day": "Day 1",
-        "date": "5 Nov",
-        "title": "Billing Takeoff & Landing at Bir",
-        "desc": "Transfer up to 2400m Billing launchpad, 30 min tandem flight gliding over tea gardens."
-      }
-    ],
-    "updates": [
-      {
-        "time": "11:00 AM, 4 days ago",
-        "title": "Slot Reserved",
-        "desc": "Tandem pilot assigned pending payment confirmation.",
-        "user": "System"
-      }
-    ]
-  },
-  {
-    "id": "BK-5026",
-    "title": "Delhi School IV",
-    "type": "TRANSPORT",
-    "typeClass": "badge-transport",
-    "image": "./images/delhi_school.jpg",
-    "pax": 60,
-    "duration": "2 Days",
-    "dates": "10 Oct - 11 Oct",
-    "travelDateFull": "10 Oct - 11 Oct 2024 (2 Days Educational Tour)",
-    "status": "Paid",
-    "statusClass": "status-paid",
-    "price": "₹1,20,000",
-    "rawPrice": 120000,
-    "category": "Assigned",
-    "selected": false,
-    "guest": {
-      "name": "Mrs. Vandana Sehgal",
-      "phone": "+91 98101 02030",
-      "email": "vandana.sehgal@dps.edu",
-      "age": 48,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Mrs. Vandana Sehgal",
-      "initials": "VS",
-      "phone": "+91 98101 02030",
-      "email": "vandana.sehgal@dps.edu",
-      "location": "New Delhi, Delhi",
-      "leadSource": "Corporate / School",
-      "preferredDestination": "Delhi - Agra - Mathura - Delhi",
-      "travelDates": "10 Oct – 11 Oct 2024",
-      "customerType": "School Excursion (60 Pax)",
-      "budgetEst": "₹ 1,20,000 – 1,40,000",
-      "status": "Paid",
-      "shortDetails": "Annual educational excursion for Grade 10 students visiting Taj Mahal, Agra Fort, and Fatehpur Sikri with 2 luxury BharatBenz buses and tour guides.",
-      "leadFlow": [
-        {
-          "date": "01 Oct",
-          "time": "11:00 AM",
-          "type": "call",
-          "iconBg": "icon-blue",
-          "title": "Initial Inquiry (Call)",
-          "desc": "School administration submitted formal RFP for educational transport and meals.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "03 Oct",
-          "time": "02:00 PM",
-          "type": "whatsapp",
-          "iconBg": "icon-green",
-          "title": "Shared Itinerary (WhatsApp)",
-          "desc": "Sent safety certifications, driver police verification, and detailed meal plans.",
-          "author": "By Ruyi Admin"
-        },
-        {
-          "date": "05 Oct",
-          "time": "04:30 PM",
-          "type": "email",
-          "iconBg": "icon-blue",
-          "title": "Sent Quote & Voucher (Email)",
-          "desc": "Signed contract and dispatched trip confirmation voucher #BK-5026.",
-          "author": "By Ruyi Admin"
-        }
-      ]
-    },
-    "destination": "Delhi - Agra - Mathura - Delhi",
-    "bookingType": "School Excursion & Transport",
-    "services": "2x 45-Seater BharatBenz AC Luxury Buses, Tour Guides, Meals",
-    "assignedStatus": "Assigned • Paid",
-    "assignedTo": {
-      "name": "Rahul Mehta",
-      "role": "Operations Head",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-    },
-    "notes": "Student safety protocol strictly followed, first aid kits on both buses.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Mrs. Vandana Sehgal",
-        "age": 48,
-        "role": "Lead Teacher / Primary Contact",
-        "phone": "9810102030"
-      },
-      {
-        "id": 2,
-        "name": "Mr. Rakesh Sharma",
-        "age": 44,
-        "role": "Teacher",
-        "phone": "9810102031"
-      },
-      {
-        "id": 3,
-        "name": "Ms. Geeta Nair",
-        "age": 39,
-        "role": "Teacher",
-        "phone": "9810102032"
-      },
-      {
-        "id": 4,
-        "name": "Mr. Arvind Yadav",
-        "age": 42,
-        "role": "Bus Coordinator",
-        "phone": "9810102033"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-61",
-        "icon": "shield",
-        "text": "First Aid & Medical Kit",
-        "color": "#DC2626"
-      },
-      {
-        "id": "SR-62",
-        "icon": "leaf",
-        "text": "Vegetarian Food",
-        "color": "#16A34A"
-      },
-      {
-        "id": "SR-63",
-        "icon": "smile",
-        "text": "Kid Friendly Activities",
-        "color": "#EA580C"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "10 Oct",
-        "items": [
-          {
-            "id": "IT-SCH-1",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Delhi Campus Departure",
-            "subtitle": "06:00 AM • 2x Luxury AC Buses",
-            "assigned": null
-          },
-          {
-            "id": "IT-SCH-2",
-            "type": "activity",
-            "icon": "camera",
-            "title": "Taj Mahal Guided Heritage Tour",
-            "subtitle": "11:30 AM • UNESCO Heritage guide fitment",
-            "assigned": null
-          },
-          {
-            "id": "IT-SCH-3",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Agra Fort Architectural Walk",
-            "subtitle": "03:30 PM • Historic courtyards and palaces",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 2",
-        "date": "11 Oct",
-        "items": [
-          {
-            "id": "IT-SCH-4",
-            "type": "activity",
-            "icon": "camera",
-            "title": "Fatehpur Sikri & Buland Darwaza",
-            "subtitle": "09:30 AM • Guided educational field session",
-            "assigned": null
-          },
-          {
-            "id": "IT-SCH-5",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Safe Return to Delhi Campus",
-            "subtitle": "03:00 PM • Evening tea stop & arrival at 7 PM",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "itinerary": [
-      {
-        "day": "Day 1",
-        "date": "10 Oct",
-        "title": "Delhi to Agra Heritage Visit",
-        "desc": "Taj Mahal and Agra Fort educational guided tour, overnight hotel stay."
-      },
-      {
-        "day": "Day 2",
-        "date": "11 Oct",
-        "title": "Fatehpur Sikri & Return",
-        "desc": "Buland Darwaza visit and safe return to Delhi campus by 7 PM."
-      }
-    ],
-    "updates": [
-      {
-        "time": "10:00 AM, 10 Oct",
-        "title": "Trip Completed",
-        "desc": "All 60 students and staff returned safely. Final payment settled.",
-        "user": "Rahul Mehta"
-      }
-    ]
-  },
-  {
-    "id": "BK-5028",
-    "title": "Kerala Backwaters & Munnar Hills",
-    "type": "TOUR",
-    "typeClass": "badge-tour",
-    "image": "./images/manali.jpg",
-    "pax": 4,
-    "duration": "5D / 4N",
-    "dates": "22 Nov - 26 Nov",
-    "travelDateFull": "22 Nov - 26 Nov 2024 (5D / 4N)",
-    "status": "Paid",
-    "statusClass": "status-paid",
-    "price": "₹48,000",
-    "rawPrice": 48000,
-    "category": "Ongoing",
-    "selected": false,
-    "guest": {
-      "name": "Rajesh Nambiar",
-      "phone": "+91 98450 11223",
-      "email": "rajesh.nambiar@gmail.com",
-      "age": 40,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Rajesh Nambiar",
-      "initials": "RN",
-      "phone": "+91 98450 11223",
-      "email": "rajesh.nambiar@gmail.com",
-      "location": "Bengaluru, India",
-      "leadSource": "Website Direct",
-      "preferredDestination": "Kerala, Munnar & Alleppey",
-      "travelDates": "22 Nov - 26 Nov 2024",
-      "customerType": "Family Vacationer",
-      "budgetEst": "₹50,000",
-      "status": "Active Trip",
-      "shortDetails": "Luxury houseboat cruise and tea estate cottage stay.",
-      "leadFlow": [
-        {
-          "type": "call",
-          "iconBg": "icon-green",
-          "title": "Houseboat Check-in Done",
-          "desc": "Guests checked in at Alleppey jetty on time.",
-          "author": "By Priya Sharma"
-        }
-      ]
-    },
-    "destination": "Alleppey, Munnar, Kochi",
-    "bookingType": "Tour Package",
-    "services": "Premium Houseboat (1N), Munnar Resort (3N), Private Innova",
-    "assignedStatus": "Assigned • Paid",
-    "assignedTo": {
-      "name": "Priya Sharma",
-      "role": "Trip Coordinator",
-      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80"
-    },
-    "notes": "Provide local South Indian vegetarian meals during houseboat cruise.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Rajesh Nambiar",
-        "age": 40,
-        "role": "Primary Contact",
-        "phone": "9845011223"
-      },
-      {
-        "id": 2,
-        "name": "Divya Nambiar",
-        "age": 36,
-        "role": "Adult",
-        "phone": "9845011224"
-      },
-      {
-        "id": 3,
-        "name": "Aarav Nambiar",
-        "age": 10,
-        "role": "Child",
-        "phone": "9845011225"
-      },
-      {
-        "id": 4,
-        "name": "Meera Nambiar",
-        "age": 8,
-        "role": "Child",
-        "phone": "9845011226"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-71",
-        "icon": "leaf",
-        "text": "Vegetarian Food",
-        "color": "#2563EB"
-      },
-      {
-        "id": "SR-72",
-        "icon": "smile",
-        "text": "Kid Friendly Activities",
-        "color": "#2563EB"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "22 Nov",
-        "items": [
-          {
-            "id": "IT-KER-1",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Cochin Airport Pickup",
-            "subtitle": "09:00 AM • Private AC Innova transfer",
-            "assigned": null
-          },
-          {
-            "id": "IT-KER-2",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Alleppey Luxury Houseboat Boarding",
-            "subtitle": "12:30 PM • Welcome drink & backwaters cruise",
-            "assigned": null
-          }
-        ]
-      },
-      {
-        "day": "Day 2",
-        "date": "23 Nov",
-        "items": [
-          {
-            "id": "IT-KER-3",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Scenic Drive to Munnar",
-            "subtitle": "10:00 AM • Cheeyappara waterfalls viewpoint",
-            "assigned": null
-          },
-          {
-            "id": "IT-KER-4",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Tea Valley Resort Check-in",
-            "subtitle": "02:00 PM • Valley view family cottage",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "updates": [
-      {
-        "time": "12:30 PM, 22 Nov",
-        "title": "Houseboat Cruising",
-        "desc": "Houseboat cruise underway across Vembanad lake.",
-        "user": "Priya Sharma"
-      }
-    ]
-  },
-  {
-    "id": "BK-5029",
-    "title": "Udaipur Royal Lake Villa",
-    "type": "VILLA",
-    "typeClass": "badge-villa",
-    "image": "./images/goa.jpg",
-    "pax": 6,
-    "duration": "3D / 2N",
-    "dates": "28 Nov - 30 Nov",
-    "travelDateFull": "28 Nov - 30 Nov 2024 (3D / 2N)",
-    "status": "Pending",
-    "statusClass": "status-pending",
-    "price": "₹52,000",
-    "rawPrice": 52000,
+    "duration": "4-5 Days",
+    "dates": "28 Nov - 02 Dec",
+    "travelDateFull": "Nhava Sheva (JNPT) → Jebel Ali (Dubai) • MSC ALTAIR v.2408W",
+    "status": "Confirmed",
+    "statusClass": "status-confirmed",
+    "price": "$2,450",
+    "rawPrice": 2450,
     "category": "New Bookings",
     "selected": false,
+    "destination": "Jebel Ali (Dubai, UAE)",
     "guest": {
-      "name": "Vikram Singhania",
-      "phone": "+91 98200 44556",
-      "email": "vikram.singhania@yahoo.com",
+      "name": "Rajesh Sharma",
+      "phone": "+971 50 482 9104",
+      "email": "r.sharma@globaltrade.ae",
       "age": 41,
       "isPrimary": true
     },
     "customer": {
-      "name": "Vikram Singhania",
-      "initials": "VS",
-      "phone": "+91 98200 44556",
-      "email": "vikram.singhania@yahoo.com",
-      "location": "Mumbai, India",
-      "leadSource": "WhatsApp Business",
-      "preferredDestination": "Udaipur, Rajasthan",
-      "travelDates": "28 Nov - 30 Nov 2024",
-      "customerType": "Luxury Traveler",
-      "budgetEst": "₹60,000",
-      "status": "Inquiry",
-      "shortDetails": "Lakefront royal villa with private courtyard and heritage dinner.",
+      "name": "Rajesh Sharma",
+      "companyName": "Al-Maktoum Imports LLC",
+      "initials": "RS",
+      "phone": "+971 50 482 9104",
+      "email": "r.sharma@globaltrade.ae",
+      "location": "Dubai, UAE (JAFZA)",
+      "leadSource": "Website",
+      "preferredDestination": "Jebel Ali Port, Dubai",
+      "travelDates": "28 Nov - 02 Dec 2026",
+      "customerType": "Corporate Importer (12 Shipments/yr)",
+      "budgetEst": "$2,450 - $2,800",
+      "status": "Confirmed",
+      "shortDetails": "Primary POC for recurring container shipments across GCC markets. High-priority account requiring expedited customs paperwork for inbound commercial electronics and FOB compliance.",
       "leadFlow": [
         {
+          "date": "24 Nov",
+          "time": "11:15 AM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "FOB Contract Finalized",
+          "desc": "Commercial terms and freight responsibility agreed.",
+          "author": "By INFINITY Operations"
+        },
+        {
+          "date": "26 Nov",
+          "time": "16:20 PM",
           "type": "whatsapp",
           "iconBg": "icon-green",
-          "title": "Inquiry Received",
-          "desc": "Guest requested quotation for 6 adults lakefront villa.",
-          "author": "By System"
-        }
-      ]
-    },
-    "destination": "Lake Pichola, Udaipur",
-    "bookingType": "Heritage Villa Stay",
-    "services": "Private Courtyard, Butler Service, Airport Pickup",
-    "assignedStatus": "Unassigned • Pending",
-    "assignedTo": {
-      "name": "Unassigned",
-      "role": "Staff",
-      "avatar": ""
-    },
-    "notes": "Requested candlelight terrace dinner on night 2.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Vikram Singhania",
-        "age": 41,
-        "role": "Primary Contact",
-        "phone": "9820044556"
-      },
-      {
-        "id": 2,
-        "name": "Radhika Singhania",
-        "age": 38,
-        "role": "Adult",
-        "phone": "9820044557"
-      },
-      {
-        "id": 3,
-        "name": "Siddharth Singhania",
-        "age": 35,
-        "role": "Adult",
-        "phone": "9820044558"
-      },
-      {
-        "id": 4,
-        "name": "Anushka Singhania",
-        "age": 33,
-        "role": "Adult",
-        "phone": "9820044559"
-      },
-      {
-        "id": 5,
-        "name": "Manish Agarwal",
-        "age": 40,
-        "role": "Adult",
-        "phone": "9820044560"
-      },
-      {
-        "id": 6,
-        "name": "Shalini Agarwal",
-        "age": 37,
-        "role": "Adult",
-        "phone": "9820044561"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-81",
-        "icon": "clock",
-        "text": "Late Check-out (2 PM)",
-        "color": "#2563EB"
-      },
-      {
-        "id": "SR-82",
-        "icon": "utensils",
-        "text": "Barbecue Setup",
-        "color": "#2563EB"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "28 Nov",
-        "items": [
-          {
-            "id": "IT-UDA-1",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Royal Villa Check-in",
-            "subtitle": "02:00 PM • Welcome garlands & royal welcome drinks",
-            "assigned": null
-          },
-          {
-            "id": "IT-UDA-2",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Sunset Boat Ride on Lake Pichola",
-            "subtitle": "05:30 PM • Private solar boat cruise",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "updates": [
-      {
-        "time": "11:00 AM, 18 Oct",
-        "title": "Quote Dispatched",
-        "desc": "Quotation sent to Vikram via WhatsApp.",
-        "user": "Admin"
-      }
-    ]
-  },
-  {
-    "id": "BK-5030",
-    "title": "Scuba Diving & Coral Safari",
-    "type": "ACTIVITY",
-    "typeClass": "badge-activity",
-    "image": "./images/rishikesh.jpg",
-    "pax": 2,
-    "duration": "1 Day",
-    "dates": "18 Nov",
-    "travelDateFull": "18 Nov 2024 (Full Day)",
-    "status": "Paid",
-    "statusClass": "status-paid",
-    "price": "₹14,500",
-    "rawPrice": 14500,
-    "category": "Assigned",
-    "selected": false,
-    "guest": {
-      "name": "Aditya Roy",
-      "phone": "+91 97110 88990",
-      "email": "aditya.roy@hotmail.com",
-      "age": 27,
-      "isPrimary": true
-    },
-    "customer": {
-      "name": "Aditya Roy",
-      "initials": "AR",
-      "phone": "+91 97110 88990",
-      "email": "aditya.roy@hotmail.com",
-      "location": "Pune, India",
-      "leadSource": "Instagram Ad",
-      "preferredDestination": "Netrani Island, Murudeshwar",
-      "travelDates": "18 Nov 2024",
-      "customerType": "Adventure Enthusiast",
-      "budgetEst": "₹15,000",
-      "status": "Confirmed",
-      "shortDetails": "Certified boat scuba diving package with underwater GoPro photos.",
-      "leadFlow": [
+          "title": "Gate-In Verification",
+          "desc": "Container docked at JNPT with 24.1 MT gross tare.",
+          "author": "By INFINITY Operations"
+        },
         {
+          "date": "Today",
+          "time": "10:45 AM",
           "type": "call",
-          "iconBg": "icon-green",
-          "title": "Dive Master Assigned",
-          "desc": "Instructor Rahul confirmed for 18 Nov dive session.",
-          "author": "By Rahul Mehta"
+          "iconBg": "icon-blue",
+          "title": "Customs EDI Accepted",
+          "desc": "Dubai Customs transaction ID #AE-DXB-98319 pre-cleared.",
+          "author": "By INFINITY Operations"
         }
       ]
     },
-    "destination": "Netrani Island, Karnataka",
-    "bookingType": "Adventure Activity",
-    "services": "PADI Certified Dive Master, Boat Ride, Full Diving Kit",
-    "assignedStatus": "Assigned • Paid",
-    "assignedTo": {
-      "name": "Rahul Mehta",
-      "role": "Adventure Lead",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-    },
-    "notes": "Medical fitness self-declaration received and approved.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Aditya Roy",
-        "age": 27,
-        "role": "Primary Contact",
-        "phone": "9711088990"
+    "freight_details": {
+      "trade_type": "IMPORT",
+      "designation": "Sr. Procurement Manager",
+      "subtitle": "Sr. Sales Manager • Company LTD",
+      "company": {
+        "name": "Al-Maktoum Imports LLC",
+        "type": "LLC",
+        "industry": "Commercial Electronics",
+        "location": "Dubai, UAE (JAFZA)",
+        "established": "2012 (12 Years)",
+        "email": "info@almaktoum-imports.com",
+        "phone": "+971 4 881 4000",
+        "address": "Suite 402, JAFZA One, Jebel Ali Free Zone, Dubai, UAE"
       },
-      {
-        "id": 2,
-        "name": "Kavya Sen",
-        "age": 25,
-        "role": "Adult",
-        "phone": "9711088991"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-91",
-        "icon": "shield",
-        "text": "First Aid & Medical Kit",
-        "color": "#2563EB"
-      }
-    ],
+      "requirements": {
+        "service_type": "Sea Freight",
+        "trade_type": "Import",
+        "shipment_mode": "FCL 40ft",
+        "container_type": "1x 40ft High Cube (HC)",
+        "cargo_classification": "Electronics & Industrial Machinery parts",
+        "gross_weight": "24 Metric Tons (MT)",
+        "storage_env": "Ambient dry cargo",
+        "barrier_type": "Moisture-resistant desiccant barrier",
+        "pol_origin": "JNPT (Mumbai, IN)",
+        "pol_sub": "Nhava Sheva Port",
+        "transit_duration": "4-5 Days",
+        "pod_destination": "Jebel Ali (Dubai, UAE)",
+        "pod_sub": "Terminal 2 Berth",
+        "customs_status": "Pending Quote Confirmation",
+        "delivery_window": "28 Nov 2026",
+        "delivery_sub": "Must clear Dubai customs for factory installation",
+        "incoterms": "FOB Origin",
+        "incoterms_sub": "Pre-carriage by supplier, Ocean freight consignee"
+      },
+      "stage": "Transit",
+      "shipment": {
+        "has_shipment": true,
+        "mode_pill": "FCL/FCL",
+        "container_no": "TGHU928310-4",
+        "seal_number": "SL-884129",
+        "vessel_voyage": "MSC ALTAIR v.2408W"
+      },
+      "priority": "Urgent",
+      "lead_source": "Website"
+    },
     "itineraryDays": [
       {
-        "day": "Day 1",
-        "date": "18 Nov",
+        "day": 1,
+        "title": "Factory Loading & Container Gate-In",
         "items": [
           {
-            "id": "IT-DIV-1",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Harbor Speedboat Departure",
-            "subtitle": "07:30 AM • 45-min ride to Netrani Island dive site",
-            "assigned": null
+            "time": "08:30 AM",
+            "type": "activity",
+            "icon": "box",
+            "title": "Container Stuffing & VGM Verification",
+            "subtitle": "Gross weight tare verified at 24.1 MT."
           },
           {
-            "id": "IT-DIV-2",
-            "type": "activity",
-            "icon": "raft",
-            "title": "Tandem Scuba Dive (12m Depth)",
-            "subtitle": "09:30 AM • PADI Master guided coral dive & photos",
-            "assigned": null
+            "time": "02:00 PM",
+            "type": "transit",
+            "icon": "truck",
+            "title": "Port Gate-In at JNPT Terminal",
+            "subtitle": "E-seal SL-884129 verified by port customs."
           }
         ]
-      }
-    ],
-    "updates": [
+      },
       {
-        "time": "03:00 PM, 17 Oct",
-        "title": "Kit Prepared",
-        "desc": "Oxygen cylinders and wet suits reserved for 2 pax.",
-        "user": "Rahul Mehta"
+        "day": 2,
+        "title": "Berthing & Ocean Loading",
+        "items": [
+          {
+            "time": "06:00 AM",
+            "type": "transit",
+            "icon": "ship",
+            "title": "Loading onto MSC ALTAIR v.2408W",
+            "subtitle": "Deck position under-deck bay 14."
+          },
+          {
+            "time": "08:00 PM",
+            "type": "transit",
+            "icon": "ship",
+            "title": "Vessel Sailing from Nhava Sheva",
+            "subtitle": "Direct maritime corridor via Arabian Sea."
+          }
+        ]
+      },
+      {
+        "day": 3,
+        "title": "Ocean Transit",
+        "items": [
+          {
+            "time": "12:00 PM",
+            "type": "transit",
+            "icon": "route",
+            "title": "Open Sea Passage",
+            "subtitle": "Vessel steaming at 18.5 knots on schedule."
+          }
+        ]
+      },
+      {
+        "day": 4,
+        "title": "Discharge & JAFZA Final Delivery",
+        "items": [
+          {
+            "time": "09:00 AM",
+            "type": "activity",
+            "icon": "anchor",
+            "title": "Arrival at Jebel Ali Terminal 2",
+            "subtitle": "Gantry crane offloading and quay transfer."
+          },
+          {
+            "time": "03:30 PM",
+            "type": "activity",
+            "icon": "truck",
+            "title": "Bonded Delivery to Consignee Warehouse",
+            "subtitle": "POD signed by Al-Maktoum Imports warehouse manager."
+          }
+        ]
       }
     ]
   },
   {
-    "id": "BK-5031",
-    "title": "Mumbai – Pune Luxury Traveler",
-    "type": "TRANSPORT",
-    "typeClass": "badge-transport",
+    "id": "QT-9022",
+    "title": "2x 40ft High Cube (HC) • Consumer Electronics & Smart TVs",
+    "type": "Air Freight",
+    "typeClass": "badge-tour",
     "image": "./images/manali.jpg",
-    "pax": 15,
-    "duration": "2 Days",
-    "dates": "25 Nov - 26 Nov",
-    "travelDateFull": "25 Nov - 26 Nov 2024 (2 Days)",
-    "status": "Pending",
-    "statusClass": "status-pending",
-    "price": "₹18,500",
-    "rawPrice": 18500,
-    "category": "New Bookings",
+    "pax": 4,
+    "duration": "12-14 Days",
+    "dates": "01 Dec - 14 Dec",
+    "travelDateFull": "Chiwan (Shenzhen) → JNPT (Mumbai) • MAERSK MC-KINNEY MOLLER v.2410E",
+    "status": "In Transit",
+    "statusClass": "status-ongoing",
+    "price": "$4,600",
+    "rawPrice": 4600,
+    "category": "Ongoing",
     "selected": false,
+    "destination": "JNPT (Mumbai, IN)",
     "guest": {
-      "name": "Sunita Deshmukh",
-      "phone": "+91 98220 77889",
-      "email": "sunita.deshmukh@gmail.com",
+      "name": "Subhasis Chatterjee",
+      "phone": "+91 98201 44520",
+      "email": "subhasis.c@zenithelectronics.com",
       "age": 46,
       "isPrimary": true
     },
     "customer": {
-      "name": "Sunita Deshmukh",
-      "initials": "SD",
-      "phone": "+91 98220 77889",
-      "email": "sunita.deshmukh@gmail.com",
-      "location": "Pune, India",
-      "leadSource": "Phone Referral",
-      "preferredDestination": "Mumbai - Lonavala - Pune",
-      "travelDates": "25 Nov - 26 Nov 2024",
-      "customerType": "Corporate Group",
-      "budgetEst": "₹20,000",
-      "status": "Pending Approval",
-      "shortDetails": "17-seater Force Urbania luxury transfer for corporate offsite.",
+      "name": "Subhasis Chatterjee",
+      "companyName": "Zenith Global Electronics Ltd",
+      "initials": "SC",
+      "phone": "+91 98201 44520",
+      "email": "subhasis.c@zenithelectronics.com",
+      "location": "Mumbai, India",
+      "leadSource": "Referral",
+      "preferredDestination": "Nhava Sheva Port, Mumbai",
+      "travelDates": "01 Dec - 14 Dec 2026",
+      "customerType": "Industrial Manufacturer (24 FEU/yr)",
+      "budgetEst": "$4,600 - $5,000",
+      "status": "In Transit",
+      "shortDetails": "Leading consumer electronics brand importing display panels from Shenzhen. Consistent monthly volume requiring priority berthing and prompt custom clearance.",
       "leadFlow": [
         {
+          "date": "25 Nov",
+          "time": "14:00 PM",
           "type": "call",
           "iconBg": "icon-blue",
-          "title": "Vehicle Availability Checked",
-          "desc": "Force Urbania AC traveler available with Mohan Rawat.",
-          "author": "By Admin"
+          "title": "Advance IGM Manifest Filed",
+          "desc": "Customs EDI accepted pre-arrival declaration.",
+          "author": "By INFINITY Operations"
+        },
+        {
+          "date": "Today",
+          "time": "09:15 AM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "RMS Facilitation Cleared",
+          "desc": "Bill of Entry #891024 assessed with zero inspection.",
+          "author": "By INFINITY Operations"
         }
       ]
     },
-    "destination": "Mumbai to Pune Expressway",
-    "bookingType": "Fleet Transfer",
-    "services": "17-Seater AC Luxury Tempo Traveler, Tolls & Permits Included",
-    "assignedStatus": "Unassigned • Pending",
-    "assignedTo": {
-      "name": "Unassigned",
-      "role": "Staff",
-      "avatar": ""
-    },
-    "notes": "Overnight parking at Lonavala resort arranged by client.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Sunita Deshmukh",
-        "age": 46,
-        "role": "Primary Contact",
-        "phone": "9822077889"
+    "freight_details": {
+      "trade_type": "EXPORT",
+      "designation": "VP Supply Chain & Operations",
+      "subtitle": "VP Supply Chain • Zenith Global Electronics",
+      "company": {
+        "name": "Zenith Global Electronics Ltd",
+        "type": "Public Ltd",
+        "industry": "Consumer Electronics",
+        "location": "Mumbai / Shenzhen",
+        "established": "2008 (16 Years)",
+        "email": "supplychain@zenithelectronics.com",
+        "phone": "+91 22 2855 8900",
+        "address": "Zenith Tech Park, MIDC Andheri East, Mumbai 400093"
       },
-      {
-        "id": 2,
-        "name": "Pramod Deshmukh",
-        "age": 49,
-        "role": "Adult",
-        "phone": "9822077890"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-101",
-        "icon": "shield",
-        "text": "First Aid & Medical Kit",
-        "color": "#2563EB"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "25 Nov",
-        "items": [
-          {
-            "id": "IT-TR-1",
-            "type": "transport",
-            "icon": "bus",
-            "title": "BKC Mumbai Corporate Pickup",
-            "subtitle": "07:00 AM • Luxury Tempo Traveler boarding",
-            "assigned": null
-          },
-          {
-            "id": "IT-TR-2",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Lonavala Offsite Venue Arrival",
-            "subtitle": "10:30 AM • Expressway drive & safe arrival",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "updates": [
-      {
-        "time": "04:00 PM, 16 Oct",
-        "title": "Inquiry Logged",
-        "desc": "Corporate transfer route verified.",
-        "user": "Admin"
-      }
-    ]
+      "requirements": {
+        "service_type": "Air Freight",
+        "trade_type": "Export",
+        "shipment_mode": "FCL 40ft",
+        "container_type": "2x 40ft High Cube (HC)",
+        "cargo_classification": "Consumer Electronics & Smart Displays",
+        "gross_weight": "36.5 Metric Tons (MT)",
+        "storage_env": "Ambient dry cargo",
+        "barrier_type": "Moisture-resistant desiccant barrier",
+        "pol_origin": "Chiwan (Shenzhen, CN)",
+        "pol_sub": "Chiwan Container Terminal",
+        "transit_duration": "12-14 Days",
+        "pod_destination": "JNPT (Mumbai, IN)",
+        "pod_sub": "GTI Terminal Berth 1",
+        "customs_status": "Verified & Gate Cleared",
+        "delivery_window": "14 Dec 2026",
+        "delivery_sub": "Expedited bonded trucking to Pune assembly hub",
+        "incoterms": "CIF Nhava Sheva",
+        "incoterms_sub": "Cost, Insurance & Freight prepaid by supplier"
+      },
+      "stage": "Transit",
+      "shipment": {
+        "has_shipment": true,
+        "mode_pill": "FCL/FCL",
+        "container_no": "MSCU718290-2",
+        "seal_number": "SL-772910",
+        "vessel_voyage": "MAERSK MC-KINNEY MOLLER v.2410E"
+      },
+      "priority": "High",
+      "lead_source": "Referral"
+    }
   },
   {
-    "id": "BK-5032",
-    "title": "Goa Airport Express Shuttle",
-    "type": "TRANSPORT",
-    "typeClass": "badge-transport",
-    "image": "./images/goa.jpg",
-    "pax": 8,
-    "duration": "1 Day",
-    "dates": "14 Nov",
-    "travelDateFull": "14 Nov 2024 (Single Day)",
-    "status": "Paid",
-    "statusClass": "status-paid",
-    "price": "₹8,500",
-    "rawPrice": 8500,
-    "category": "Ongoing",
+    "id": "QT-9023",
+    "title": "4x 20ft ISO Tank Containers • Specialty Linear Alkyl Benzene",
+    "type": "Road Transport",
+    "typeClass": "badge-tour",
+    "image": "./images/manali.jpg",
+    "pax": 4,
+    "duration": "4-5 Days",
+    "dates": "03 Dec - 08 Dec",
+    "travelDateFull": "Mundra (Gujarat) → Hamriyah Port (Sharjah) • CMA CGM MARCO POLO v.1904W",
+    "status": "Confirmed",
+    "statusClass": "status-confirmed",
+    "price": "$7,800",
+    "rawPrice": 7800,
+    "category": "Assigned",
     "selected": false,
+    "destination": "Hamriyah Port (Sharjah, UAE)",
     "guest": {
-      "name": "Devendra Joshi",
-      "phone": "+91 98900 11447",
-      "email": "devendra.joshi@gmail.com",
-      "age": 36,
+      "name": "Tariq Al-Mansoor",
+      "phone": "+971 55 921 7840",
+      "email": "t.mansoor@indogulf-fze.com",
+      "age": 48,
       "isPrimary": true
     },
     "customer": {
-      "name": "Devendra Joshi",
-      "initials": "DJ",
-      "phone": "+91 98900 11447",
-      "email": "devendra.joshi@gmail.com",
-      "location": "Goa, India",
-      "leadSource": "Hotel Partner",
-      "preferredDestination": "Mopa Airport to Candolim",
-      "travelDates": "14 Nov 2024",
-      "customerType": "VIP Family Group",
-      "budgetEst": "₹9,000",
-      "status": "Active Trip",
-      "shortDetails": "Airport meet & greet with luxury 9-seater luggage carrier van.",
+      "name": "Tariq Al-Mansoor",
+      "companyName": "Indo-Gulf Petrochemical FZE",
+      "initials": "TM",
+      "phone": "+971 55 921 7840",
+      "email": "t.mansoor@indogulf-fze.com",
+      "location": "Sharjah, UAE",
+      "leadSource": "Email",
+      "preferredDestination": "Hamriyah Port, Sharjah",
+      "travelDates": "03 Dec - 08 Dec 2026",
+      "customerType": "Global Petrochem Exporter (50 Tanks/yr)",
+      "budgetEst": "$7,800 - $8,500",
+      "status": "Confirmed",
+      "shortDetails": "Major petrochemical refiner moving liquid bulk ISO tanks on India-Gulf corridor. Regular quarterly contract tender.",
       "leadFlow": [
         {
+          "date": "Yesterday",
+          "time": "11:00 AM",
           "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Hazmat Gate-In Permitted",
+          "desc": "Chemical safety officer approved MSDS Class 9 paperwork.",
+          "author": "By INFINITY Operations"
+        },
+        {
+          "date": "Today",
+          "time": "14:20 PM",
+          "type": "whatsapp",
           "iconBg": "icon-green",
-          "title": "Flight Landed on Time",
-          "desc": "IndiGo 6E-204 landed at Manohar International Airport.",
-          "author": "By Amit Patel"
+          "title": "Loaded on Vessel",
+          "desc": "ISO Tanks secured on CMA CGM MARCO POLO.",
+          "author": "By INFINITY Operations"
         }
       ]
     },
-    "destination": "Mopa Airport to North Goa",
-    "bookingType": "Airport Shuttle",
-    "services": "Urbania Luxury Van, Meet & Greet at Arrivals Gate",
-    "assignedStatus": "Assigned • Paid",
-    "assignedTo": {
-      "name": "Amit Patel",
-      "role": "Fleet Manager",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80"
-    },
-    "notes": "Flight tracking active. Placard with name Devendra Joshi ready.",
-    "guests": [
-      {
-        "id": 1,
-        "name": "Devendra Joshi",
-        "age": 36,
-        "role": "Primary Contact",
-        "phone": "9890011447"
+    "freight_details": {
+      "trade_type": "IMPORT",
+      "designation": "Director of Global Logistics",
+      "subtitle": "Director of Global Logistics • Indo-Gulf Petrochem",
+      "company": {
+        "name": "Indo-Gulf Petrochemical FZE",
+        "type": "FZE",
+        "industry": "Petrochemicals & Solvents",
+        "location": "Hamriyah Free Zone, Sharjah",
+        "established": "2005 (19 Years)",
+        "email": "trade@indogulf-fze.com",
+        "phone": "+971 6 526 1122",
+        "address": "Plot 4A, Phase 2, Hamriyah Free Zone, Sharjah, UAE"
       },
-      {
-        "id": 2,
-        "name": "Pallavi Joshi",
-        "age": 33,
-        "role": "Adult",
-        "phone": "9890011448"
-      }
-    ],
-    "specialRequirements": [
-      {
-        "id": "SR-111",
-        "icon": "shield",
-        "text": "First Aid & Medical Kit",
-        "color": "#2563EB"
-      }
-    ],
-    "itineraryDays": [
-      {
-        "day": "Day 1",
-        "date": "14 Nov",
-        "items": [
-          {
-            "id": "IT-AIR-1",
-            "type": "transport",
-            "icon": "bus",
-            "title": "Airport Gate Meet & Greet",
-            "subtitle": "11:15 AM • Mopa Terminal 1 VIP pickup",
-            "assigned": null
-          },
-          {
-            "id": "IT-AIR-2",
-            "type": "hotel",
-            "icon": "bed",
-            "title": "Resort Drop-off Candolim",
-            "subtitle": "12:45 PM • Direct non-stop transfer",
-            "assigned": null
-          }
-        ]
-      }
-    ],
-    "updates": [
-      {
-        "time": "11:20 AM, 14 Nov",
-        "title": "Guests Boarded",
-        "desc": "Guests seated in van, departure towards Candolim.",
-        "user": "Amit Patel"
-      }
-    ]
+      "requirements": {
+        "service_type": "Road Transport",
+        "trade_type": "Import",
+        "shipment_mode": "ISO Tank FCL",
+        "container_type": "4x 20ft ISO Tank Containers",
+        "cargo_classification": "Specialty Linear Alkyl Benzene (Class 9)",
+        "gross_weight": "84 Metric Tons (MT)",
+        "storage_env": "Liquid Bulk / Insulated Tank",
+        "barrier_type": "Steam-Heated Pressure Tank",
+        "pol_origin": "Mundra (Gujarat, IN)",
+        "pol_sub": "Mundra Port MICT Berth",
+        "transit_duration": "4-5 Days",
+        "pod_destination": "Hamriyah Port (Sharjah, UAE)",
+        "pod_sub": "Liquid Bulk Terminal Berth 3",
+        "customs_status": "Hazmat Declaration Cleared",
+        "delivery_window": "08 Dec 2026",
+        "delivery_sub": "Direct discharge to shore tanks",
+        "incoterms": "CFR Sharjah",
+        "incoterms_sub": "Freight paid to destination port"
+      },
+      "stage": "Transit",
+      "shipment": {
+        "has_shipment": true,
+        "mode_pill": "ISO/TANK",
+        "container_no": "INLU401928-8",
+        "seal_number": "SL-661029",
+        "vessel_voyage": "CMA CGM MARCO POLO v.1904W"
+      },
+      "priority": "Medium",
+      "lead_source": "Email"
+    }
+  },
+  {
+    "id": "QT-9024",
+    "title": "1x 40ft Flat Rack (FR) • CNC Machined Automotive Crankshafts",
+    "type": "Project Cargo",
+    "typeClass": "badge-tour",
+    "image": "./images/manali.jpg",
+    "pax": 2,
+    "duration": "18-20 Days",
+    "dates": "08 Dec - 27 Dec",
+    "travelDateFull": "JNPT (Mumbai) → Hamburg Port (Germany) • HAPAG-LLOYD AL DAHNA v.2409W",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "$5,200",
+    "rawPrice": 5200,
+    "category": "New Bookings",
+    "selected": false,
+    "destination": "Hamburg Port, Germany",
+    "guest": {
+      "name": "Vikram Singhania",
+      "phone": "+91 98220 89100",
+      "email": "v.singhania@blueanchor-auto.in",
+      "age": 43,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Vikram Singhania",
+      "companyName": "Blue Anchor Automotive India Pvt Ltd",
+      "initials": "VS",
+      "phone": "+91 98220 89100",
+      "email": "v.singhania@blueanchor-auto.in",
+      "location": "Pune, India",
+      "leadSource": "Phone",
+      "preferredDestination": "Hamburg Port, Germany",
+      "travelDates": "08 Dec - 27 Dec 2026",
+      "customerType": "Automotive Tier-1 OEM",
+      "budgetEst": "$5,200 - $5,600",
+      "status": "Pending",
+      "shortDetails": "Tier-1 automotive supplier shipping precision engine blocks to European assembly lines. Zero tolerance for moisture damage or transit shocks.",
+      "leadFlow": [
+        {
+          "date": "Yesterday",
+          "time": "17:00 PM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Flat Rack Lashing Verified",
+          "desc": "Surveyor approved 16mm certified chain lashing points.",
+          "author": "By INFINITY Operations"
+        },
+        {
+          "date": "Today",
+          "time": "11:30 AM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Let Export Order (LEO) Issued",
+          "desc": "Indian Customs granted LEO under duty drawback scheme.",
+          "author": "By INFINITY Operations"
+        }
+      ]
+    },
+    "freight_details": {
+      "trade_type": "EXPORT",
+      "designation": "Head of Global Procurement",
+      "subtitle": "Head of Procurement • Blue Anchor Automotive",
+      "company": {
+        "name": "Blue Anchor Automotive India Pvt Ltd",
+        "type": "Private Ltd",
+        "industry": "Automotive Precision OEM",
+        "location": "Pune, Maharashtra",
+        "established": "2010 (14 Years)",
+        "email": "procurement@blueanchor-auto.in",
+        "phone": "+91 20 6688 4000",
+        "address": "Plot C-12, Chakan Industrial Area Phase 2, Pune 410501"
+      },
+      "requirements": {
+        "service_type": "Project Cargo",
+        "trade_type": "Export",
+        "shipment_mode": "Special Equipment (FR)",
+        "container_type": "1x 40ft Flat Rack (FR)",
+        "cargo_classification": "CNC Machined Heavy Crankshafts",
+        "gross_weight": "21 Metric Tons (MT)",
+        "storage_env": "OOG Covered Tarpaulin",
+        "barrier_type": "VCI Anti-Corrosion Foil Wrap",
+        "pol_origin": "JNPT (Mumbai, IN)",
+        "pol_sub": "NSFT Terminal",
+        "transit_duration": "18-20 Days",
+        "pod_destination": "Hamburg (Germany)",
+        "pod_sub": "Burchardkai Container Terminal (CTB)",
+        "customs_status": "Export Shipping Bill Filed",
+        "delivery_window": "27 Dec 2026",
+        "delivery_sub": "Direct delivery to OEM automotive plant near Wolfsburg",
+        "incoterms": "DDP Hamburg",
+        "incoterms_sub": "Delivered Duty Paid including German import customs"
+      },
+      "stage": "Transit",
+      "shipment": {
+        "has_shipment": true,
+        "mode_pill": "OOG/FR",
+        "container_no": "HLCU920183-5",
+        "seal_number": "SL-991204",
+        "vessel_voyage": "HAPAG-LLOYD AL DAHNA v.2409W"
+      },
+      "priority": "Low",
+      "lead_source": "Phone"
+    }
+  },
+  {
+    "id": "QT-9025",
+    "title": "1x 40ft Reefer (RF) • Temperature Controlled Vaccines (2°C to 8°C)",
+    "type": "Customs Clearance",
+    "typeClass": "badge-tour",
+    "image": "./images/manali.jpg",
+    "pax": 2,
+    "duration": "6-7 Days",
+    "dates": "05 Dec - 12 Dec",
+    "travelDateFull": "Chennai Port → Khalifa Port (Abu Dhabi) • COSCO SHIPPING GEMINI v.032E",
+    "status": "In Transit",
+    "statusClass": "status-ongoing",
+    "price": "$4,950",
+    "rawPrice": 4950,
+    "category": "Ongoing",
+    "selected": false,
+    "destination": "Khalifa Port, Abu Dhabi",
+    "guest": {
+      "name": "Dr. Aisha Al-Nuaimi",
+      "phone": "+971 52 884 9201",
+      "email": "a.nuaimi@emiratespharma.ae",
+      "age": 39,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Dr. Aisha Al-Nuaimi",
+      "companyName": "Emirates Pharma Distribution LLC",
+      "initials": "AN",
+      "phone": "+971 52 884 9201",
+      "email": "a.nuaimi@emiratespharma.ae",
+      "location": "Abu Dhabi, UAE (KEZAD)",
+      "leadSource": "LinkedIn / Social Media",
+      "preferredDestination": "Khalifa Port, Abu Dhabi",
+      "travelDates": "05 Dec - 12 Dec 2026",
+      "customerType": "Cold Chain Healthcare Distributor",
+      "budgetEst": "$4,950 - $5,300",
+      "status": "In Transit",
+      "shortDetails": "Critical life sciences shipment requiring active continuous genset power from factory to vessel to port. Monitored 24/7 by IoT temperature sensors.",
+      "leadFlow": [
+        {
+          "date": "Yesterday",
+          "time": "15:30 PM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "MoHAP Fast Track Approved",
+          "desc": "Customs green channel granted for refrigerated medical goods.",
+          "author": "By INFINITY Operations"
+        },
+        {
+          "date": "Today",
+          "time": "12:00 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Active Genset Log Steady",
+          "desc": "Carrier reefer telemetry reporting steady 4.2°C.",
+          "author": "By INFINITY Operations"
+        }
+      ]
+    },
+    "freight_details": {
+      "trade_type": "IMPORT",
+      "designation": "Cold Chain & Logistics Director",
+      "subtitle": "Cold Chain Director • Emirates Pharma Distribution",
+      "company": {
+        "name": "Emirates Pharma Distribution LLC",
+        "type": "LLC",
+        "industry": "Pharmaceuticals & Life Sciences",
+        "location": "Abu Dhabi, UAE (KEZAD)",
+        "established": "2015 (11 Years)",
+        "email": "coldchain@emiratespharma.ae",
+        "phone": "+971 2 449 8800",
+        "address": "KEZAD Logistics Hub A, Khalifa Economic Zones, Abu Dhabi, UAE"
+      },
+      "requirements": {
+        "service_type": "Customs Clearance",
+        "trade_type": "Import",
+        "shipment_mode": "Reefer Container (RF)",
+        "container_type": "1x 40ft High Cube Reefer (RF)",
+        "cargo_classification": "Injectable Vaccines & Biotech Proteins",
+        "gross_weight": "18 Metric Tons (MT)",
+        "storage_env": "Reefer Set at +4°C (Range +2°C to +8°C)",
+        "barrier_type": "Continuous Telemetry Cold Chain",
+        "pol_origin": "Chennai Port (IN)",
+        "pol_sub": "DP World Chennai Container Terminal",
+        "transit_duration": "6-7 Days",
+        "pod_destination": "Khalifa Port (Abu Dhabi, UAE)",
+        "pod_sub": "Cold Storage Berth 2",
+        "customs_status": "MoHAP Fast-Track Clearance",
+        "delivery_window": "12 Dec 2026",
+        "delivery_sub": "Immediate reefer genset truck dispatch to cold warehouse",
+        "incoterms": "CIP Abu Dhabi",
+        "incoterms_sub": "Carriage and Insurance Paid to destination hub"
+      },
+      "stage": "Transit",
+      "shipment": {
+        "has_shipment": true,
+        "mode_pill": "REEFER/ACTIVE",
+        "container_no": "MNBU881029-4",
+        "seal_number": "SL-449102",
+        "vessel_voyage": "COSCO SHIPPING GEMINI v.032E"
+      },
+      "priority": "Urgent",
+      "lead_source": "LinkedIn / Social Media"
+    }
+  },
+  {
+    "id": "QT-9026",
+    "title": "2x 20ft Standard (GP) • Industrial Precision Bearings & Linear Guides",
+    "type": "Sea Freight",
+    "typeClass": "badge-tour",
+    "image": "./images/manali.jpg",
+    "pax": 2,
+    "duration": "8-9 Days",
+    "dates": "04 Dec - 13 Dec",
+    "travelDateFull": "Mundra → Singapore Port (PSA) • EVER GIVEN v.2411E",
+    "status": "Paid",
+    "statusClass": "status-paid",
+    "price": "$1,950",
+    "rawPrice": 1950,
+    "category": "All Bookings",
+    "selected": false,
+    "destination": "Singapore (PSA)",
+    "guest": {
+      "name": "David Chen",
+      "phone": "+65 9182 7701",
+      "email": "d.chen@apex-transworld.sg",
+      "age": 44,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "David Chen",
+      "companyName": "Apex TransWorld Logistics Pte Ltd",
+      "initials": "DC",
+      "phone": "+65 9182 7701",
+      "email": "d.chen@apex-transworld.sg",
+      "location": "Singapore (Jurong Port)",
+      "leadSource": "Existing Customer",
+      "preferredDestination": "Singapore PSA Terminal",
+      "travelDates": "04 Dec - 13 Dec 2026",
+      "customerType": "Regional Logistics Hub",
+      "budgetEst": "$1,950 - $2,200",
+      "status": "Paid",
+      "shortDetails": "Singapore regional logistics hub managing weekly feeder distributions to ASEAN manufacturing sites. High priority for schedule integrity.",
+      "leadFlow": [
+        {
+          "date": "Yesterday",
+          "time": "14:15 PM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Transshipment Slot Booked",
+          "desc": "Connecting feeder slot confirmed at Pasir Panjang.",
+          "author": "By INFINITY Operations"
+        },
+        {
+          "date": "Today",
+          "time": "08:00 AM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Vessel Sailing on Schedule",
+          "desc": "EVER GIVEN cleared Malacca Strait on schedule.",
+          "author": "By INFINITY Operations"
+        }
+      ]
+    },
+    "freight_details": {
+      "trade_type": "EXPORT",
+      "designation": "Regional Supply Chain Head",
+      "subtitle": "Regional Head • Apex TransWorld Logistics",
+      "company": {
+        "name": "Apex TransWorld Logistics Pte Ltd",
+        "type": "Pte Ltd",
+        "industry": "Industrial Equipment & Logistics",
+        "location": "Singapore (Jurong Port)",
+        "established": "2001 (25 Years)",
+        "email": "operations@apex-transworld.sg",
+        "phone": "+65 6890 2200",
+        "address": "12 Jurong Port Road, Singapore 619090"
+      },
+      "requirements": {
+        "service_type": "Sea Freight",
+        "trade_type": "Export",
+        "shipment_mode": "FCL 20ft",
+        "container_type": "2x 20ft Standard (GP)",
+        "cargo_classification": "Precision Bearings & Linear Motion Guides",
+        "gross_weight": "28 Metric Tons (MT)",
+        "storage_env": "Ambient dry cargo",
+        "barrier_type": "Heavy Wooden Boxed / Desiccant",
+        "pol_origin": "Mundra (Gujarat, IN)",
+        "pol_sub": "Adani Mundra Port (CT4)",
+        "transit_duration": "8-9 Days",
+        "pod_destination": "Singapore (PSA)",
+        "pod_sub": "Pasir Panjang Terminal Berth P14",
+        "customs_status": "Customs Manifest Lodged",
+        "delivery_window": "13 Dec 2026",
+        "delivery_sub": "Direct transshipment to Jakarta feeder vessel",
+        "incoterms": "FOB Mundra",
+        "incoterms_sub": "Consignee manages ocean freight and transshipment"
+      },
+      "stage": "Transit",
+      "shipment": {
+        "has_shipment": true,
+        "mode_pill": "FCL/FCL",
+        "container_no": "APXU201948-1",
+        "seal_number": "SL-881902",
+        "vessel_voyage": "EVER GIVEN v.2411E"
+      },
+      "priority": "High",
+      "lead_source": "Existing Customer"
+    }
+  },
+  {
+    "id": "QT-9027",
+    "title": "Air Charter Freight • Aerospace Avionics & Testing Equipment",
+    "type": "Air Freight",
+    "typeClass": "badge-tour",
+    "image": "./images/manali.jpg",
+    "pax": 1,
+    "duration": "18 Hours",
+    "dates": "29 Nov - 30 Nov",
+    "travelDateFull": "Tokyo Narita (NRT) → Bengaluru (BLR) • JAL CARGO JL-7801 (B777F)",
+    "status": "In Transit",
+    "statusClass": "status-ongoing",
+    "price": "$6,400",
+    "rawPrice": 6400,
+    "category": "Ongoing",
+    "selected": false,
+    "destination": "Bengaluru Airport (BLR)",
+    "guest": {
+      "name": "Kenji Sato",
+      "phone": "+81 3 5500 8120",
+      "email": "k.sato@nippon-aircargo.jp",
+      "age": 47,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Kenji Sato",
+      "companyName": "Nippon Express Air Cargo Partner",
+      "initials": "KS",
+      "phone": "+81 3 5500 8120",
+      "email": "k.sato@nippon-aircargo.jp",
+      "location": "Narita, Japan / Bengaluru",
+      "leadSource": "Website",
+      "preferredDestination": "Bengaluru Airport (BLR)",
+      "travelDates": "29 Nov - 30 Nov 2026",
+      "customerType": "Aerospace High-Tech Logistics",
+      "budgetEst": "$6,400 - $7,000",
+      "status": "In Transit",
+      "shortDetails": "Mission-critical aerospace avionics requiring time-definite air charter. High value insurance and instant EDI customs pre-lodgement.",
+      "leadFlow": [
+        {
+          "date": "Today",
+          "time": "10:00 AM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Pre-Arrival EDI Accepted",
+          "desc": "Air Cargo Customs pre-cleared shipment for immediate delivery.",
+          "author": "By INFINITY Operations"
+        },
+        {
+          "date": "Today",
+          "time": "13:10 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Flight JL-7801 Departed NRT",
+          "desc": "Airborne en route to BLR. ETA 19:45 IST.",
+          "author": "By INFINITY Operations"
+        }
+      ]
+    },
+    "freight_details": {
+      "trade_type": "IMPORT",
+      "designation": "Global Airfreight Project Manager",
+      "subtitle": "Airfreight Lead • Nippon Express Partner",
+      "company": {
+        "name": "Nippon Express India Cargo Partner",
+        "type": "Corporation",
+        "industry": "Aerospace & High-Tech Logistics",
+        "location": "Narita, Japan / Bengaluru, India",
+        "established": "1998 (28 Years)",
+        "email": "aircargo@nippon-aircargo.jp",
+        "phone": "+81 3 5500 8100",
+        "address": "Cargo Area 2, Narita International Airport, Chiba, Japan"
+      },
+      "requirements": {
+        "service_type": "Air Freight",
+        "trade_type": "Import",
+        "shipment_mode": "Air Expedited (B777F)",
+        "container_type": "PMC Pallet Unit (ULD)",
+        "cargo_classification": "Aircraft Navigation & Avionics Calibrators",
+        "gross_weight": "1,450 kg",
+        "storage_env": "Pressurized Aircraft Main Deck",
+        "barrier_type": "Anti-Static Shock-Absorbing Cases",
+        "pol_origin": "Tokyo Narita (NRT)",
+        "pol_sub": "NRT Cargo Terminal 1",
+        "transit_duration": "18 Hours",
+        "pod_destination": "Bengaluru Airport (BLR)",
+        "pod_sub": "Menzies Aviation Bobba Cargo Terminal",
+        "customs_status": "Express Courier Clearance",
+        "delivery_window": "30 Nov 2026",
+        "delivery_sub": "Immediate bonded escort delivery to HAL Aerospace division",
+        "incoterms": "FCA Narita",
+        "incoterms_sub": "Free Carrier Narita Airport, freight collect"
+      },
+      "stage": "Transit",
+      "shipment": {
+        "has_shipment": true,
+        "mode_pill": "AIR/EXPEDITED",
+        "container_no": "PMC-92018-JL",
+        "seal_number": "SL-AIR-991",
+        "vessel_voyage": "JAL CARGO Flight JL-7801 (B777-200F)"
+      },
+      "priority": "Medium",
+      "lead_source": "Website"
+    }
+  },
+  {
+    "id": "QT-9028",
+    "title": "Break-Bulk Heavy Lift • Oil & Gas Subsea Manifold Assembly",
+    "type": "Road Transport",
+    "typeClass": "badge-tour",
+    "image": "./images/manali.jpg",
+    "pax": 4,
+    "duration": "5-6 Days",
+    "dates": "10 Dec - 16 Dec",
+    "travelDateFull": "Hazira Jetty → Hamad Port (Doha, Qatar) • SAL HEAVY LIFT v.2412W",
+    "status": "Pending",
+    "statusClass": "status-pending",
+    "price": "$16,500",
+    "rawPrice": 16500,
+    "category": "New Bookings",
+    "selected": false,
+    "destination": "Hamad Port (Doha, Qatar)",
+    "guest": {
+      "name": "Rohan Mehta",
+      "phone": "+974 4492 8100",
+      "email": "r.mehta@falcon-engineering.qa",
+      "age": 49,
+      "isPrimary": true
+    },
+    "customer": {
+      "name": "Rohan Mehta",
+      "companyName": "Falcon Heavy Precision Engineering WLL",
+      "initials": "RM",
+      "phone": "+974 4492 8100",
+      "email": "r.mehta@falcon-engineering.qa",
+      "location": "Doha, Qatar",
+      "leadSource": "Referral",
+      "preferredDestination": "Hamad Port, Doha",
+      "travelDates": "10 Dec - 16 Dec 2026",
+      "customerType": "EPC Project Cargo Contractor",
+      "budgetEst": "$16,500 - $18,000",
+      "status": "Pending",
+      "shortDetails": "Offshore EPC project cargo requiring specialized heavy lift vessel with 120-ton ship gear. High precision load-out operations.",
+      "leadFlow": [
+        {
+          "date": "22 Nov",
+          "time": "11:00 AM",
+          "type": "call",
+          "iconBg": "icon-blue",
+          "title": "Vessel Nomination Accepted",
+          "desc": "SAL HEAVY LIFT scheduled for Hazira berth.",
+          "author": "By INFINITY Operations"
+        },
+        {
+          "date": "Yesterday",
+          "time": "16:45 PM",
+          "type": "whatsapp",
+          "iconBg": "icon-green",
+          "title": "Rigging Plan Approved",
+          "desc": "DNV and port safety engineers signed off on tandem lift.",
+          "author": "By INFINITY Operations"
+        }
+      ]
+    },
+    "freight_details": {
+      "trade_type": "EXPORT",
+      "designation": "Project Cargo Logistics Lead",
+      "subtitle": "Project Logistics Lead • Falcon Engineering",
+      "company": {
+        "name": "Falcon Heavy Precision Engineering WLL",
+        "type": "WLL",
+        "industry": "EPC Oil & Gas Infrastructure",
+        "location": "Ras Laffan / Doha, Qatar",
+        "established": "2006 (20 Years)",
+        "email": "projects@falcon-engineering.qa",
+        "phone": "+974 4492 8000",
+        "address": "Gate 5, Industrial Area, Doha, State of Qatar"
+      },
+      "requirements": {
+        "service_type": "Road Transport",
+        "trade_type": "Export",
+        "shipment_mode": "Break-Bulk Heavy Lift",
+        "container_type": "Break-Bulk Deck Cargo",
+        "cargo_classification": "Subsea Production Manifolds & Pipeline Valves",
+        "gross_weight": "85 Metric Tons (MT)",
+        "storage_env": "Heavy Lift Gear / Under-Deck Weather Protected",
+        "barrier_type": "Marine Heavy Wax & Shrink Encapsulated",
+        "pol_origin": "Hazira (Gujarat, IN)",
+        "pol_sub": "L&T Hazira Heavy Engineering Jetty",
+        "transit_duration": "5-6 Days",
+        "pod_destination": "Hamad Port (Doha, Qatar)",
+        "pod_sub": "General Cargo Berth 7",
+        "customs_status": "Project Import License Verified",
+        "delivery_window": "16 Dec 2026",
+        "delivery_sub": "Hydraulic multi-axle trailer haulage to Ras Laffan",
+        "incoterms": "FAS Hazira",
+        "incoterms_sub": "Free Alongside Ship Hazira Heavy Jetty"
+      },
+      "stage": "Transit",
+      "shipment": {
+        "has_shipment": true,
+        "mode_pill": "BREAK-BULK",
+        "container_no": "BB-MANIFOLD-01",
+        "seal_number": "SL-HEAVY-001",
+        "vessel_voyage": "SAL HEAVY LIFT v.2412W"
+      },
+      "priority": "Low",
+      "lead_source": "Referral"
+    }
   }
 ];
 

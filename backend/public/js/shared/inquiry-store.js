@@ -8,10 +8,18 @@ export const INQUIRY_TABS = [
   { key: 'all', label: 'All', short: 'All' },
   { key: 'new', label: 'New', short: 'New' },
   { key: 'ongoing', label: 'Ongoing', short: 'Ongoing' },
-  { key: 'warm', label: 'Warm', short: 'Warm' },
-  { key: 'hot', label: 'Hot', short: 'Hot' },
+  { key: 'quotation_sent', label: 'Quotation Sent', short: 'Quotation Sent' },
+  { key: 'converted', label: 'Converted', short: 'Converted' },
 ];
-const STATUS_LABEL = Object.fromEntries(INQUIRY_TABS.map((t) => [t.key, t.label]));
+const STATUS_LABEL = {
+  all: 'All',
+  new: 'New',
+  ongoing: 'Ongoing',
+  quotation_sent: 'Quotation Sent',
+  converted: 'Converted',
+  warm: 'Quotation Sent',
+  hot: 'Converted',
+};
 const BADGE = { TOUR: 'badge-tour', VILLA: 'badge-villa', ACTIVITY: 'badge-activity', TRANSPORT: 'badge-transport' };
 
 const state = { raw: [], list: [], loaded: false, failed: false };
@@ -47,8 +55,10 @@ export function inquiryToBooking(i, prev) {
     kind: 'inquiry',
     id: i.id,
     raw: i,
+    freight_details: i.freight_details,
+    lead_source: i.lead_source,
     title: trip || '—',
-    type: i.category,
+    type: i.freight_details?.requirements?.service_type || i.category,
     typeClass: BADGE[i.category] || 'badge-tour',
     pax: i.pax,
     duration: nights == null ? '' : `${nights} Night${nights === 1 ? '' : 's'}`,
@@ -82,7 +92,7 @@ export function inquiryToBooking(i, prev) {
     guests,
     itineraryDays: prev?.itineraryDays ?? JSON.parse(JSON.stringify(i.itinerary_days || [])),
     specialRequirements: [],
-    updates: [{ title: 'Inquiry received', time: '', desc: `${i.customer_name || 'A new lead'} inquired${trip ? ` about ${trip}` : ''}${i.lead_source ? ` via ${i.lead_source}` : ''}.`, user: 'Ruyi Admin' }],
+    updates: [{ title: 'Inquiry received', time: '', desc: `${i.customer_name || 'A new lead'} inquired${trip ? ` about ${trip}` : ''}${i.lead_source ? ` via ${i.lead_source}` : ''}.`, user: 'INFINITY Operations' }],
   };
 }
 
@@ -208,3 +218,28 @@ export async function syncBookingPayments() {
     });
   } catch { /* standalone */ }
 }
+
+/** Update an inquiry and its freight details in the database. */
+export async function updateInquiry(id, payload) {
+  let res;
+  try {
+    res = await fetch(`/api/inquiries/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error('Could not reach the server. Check your connection.');
+  }
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.message || `Could not update inquiry (${res.status}).`);
+  const updated = body.data;
+  const idx = state.raw.findIndex((x) => x.id === id);
+  if (idx !== -1) {
+    state.raw[idx] = updated;
+  }
+  rebuild();
+  notify([id]);
+  return state.list.find((b) => b.id === id);
+}
+

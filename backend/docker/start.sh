@@ -47,6 +47,9 @@ php artisan migrate --force --isolated || php artisan migrate --force
 echo "==> Running database seeders..."
 php artisan db:seed --force || echo "==> Seeding skipped or already populated"
 
+echo "==> Ensuring INFINITY Freight branding and status dataset..."
+php database/seed_freight_data.php || true
+
 # 7. Create storage symlink
 php artisan storage:link --force 2>/dev/null || true
 

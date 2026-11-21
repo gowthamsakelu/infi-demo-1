@@ -30,12 +30,12 @@ class DestinationController extends Controller
 
     public function index(): JsonResponse
     {
-        if ($this->ruyiOn()) {
-            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'destination'], $this->ruyi()->all('destinations')));
-        }
-
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('destinations')]);
+        }
+
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(fn () => array_map([RuyiPages::class, 'destination'], $this->ruyi()->all('destinations')));
         }
 
         return response()->json(['success' => true, 'data' => Cache::remember('pages.destinations.index', 60, fn () => $this->listRows())]);

@@ -5476,10 +5476,10 @@ body:has(.bottom-sheet.open) .mobile-bottom-nav,
 .status-inq-new .dot { background: #3B82F6; }
 .status-inq-ongoing { background: #CCFBF1; color: #0F766E; }
 .status-inq-ongoing .dot { background: #14B8A6; }
-.status-inq-warm { background: #FEF3C7; color: #B45309; }
-.status-inq-warm .dot { background: #F59E0B; }
-.status-inq-hot { background: #FEE2E2; color: #B91C1C; }
-.status-inq-hot .dot { background: #EF4444; }
+.status-inq-quotation_sent, .status-inq-quoted, .status-inq-warm { background: #FEF3C7; color: #B45309; }
+.status-inq-quotation_sent .dot, .status-inq-quoted .dot, .status-inq-warm .dot { background: #F59E0B; }
+.status-inq-converted, .status-inq-hot { background: #DCFCE7; color: #15803D; }
+.status-inq-converted .dot, .status-inq-hot .dot { background: #22C55E; }
 
 /* ---- Schedule / Follow-up popup ---- */
 .fu-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 8px 20px 12px; flex-shrink: 0; }

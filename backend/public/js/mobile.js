@@ -12,7 +12,19 @@ import { renderTabs, bindQuickNotes, rowCard, rowMenuItems, assignItems, bulkBar
 import { journeyFor, renderJourneyItems, subscribeFollowUps, loadFollowUps } from './shared/followups.js';
 import { openFollowUpModal } from './shared/followup-modal.js';
 import { detailHeaderHtml, sheetHandleHtml } from './shared/detail-sheet.js';
-import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments } from './shared/inquiry-store.js';
+import { inquiryState, INQUIRY_TABS, loadInquiries, subscribeInquiries, saveQuickNote, savePayment, syncBookingPayments, updateInquiry } from './shared/inquiry-store.js';
+import {
+  renderFreightHeaderHtml,
+  renderFreightTabsHtml,
+  renderFreightBodyHtml,
+  renderFreightFooterHtml,
+  bindFreightBodyEvents,
+  openFreightEditModal,
+  uploadFreightDoc,
+  getFreightData,
+  cleanPhone,
+} from './shared/freight-popup.js';
+import { getCustomersList, CUSTOMER_TABS, addCustomer, subscribeCustomers } from './shared/customer-store.js';
 import { openAssign } from './shared/assign-sheet.js';
 import { openDayDialog, commit } from './shared/itinerary-dialog.js';
 import { daysOf, persist, renumber, eventKind, itemIconHtml, itemPills } from './shared/itinerary.js';
@@ -72,8 +84,8 @@ export function createMobileView(container, options = {}) {
               </svg>
             </div>
             <div class="brand-text-col">
-              <h2>${esc(getBranding().companyName || 'Ruyi Admin')}</h2>
-              <p id="mobile-header-subtitle">Bookings • 28 Total</p>
+              <h2>${esc(getBranding().companyName || 'INFINITY')}</h2>
+              <p id="mobile-header-subtitle">${esc(getBranding().tagline || 'infinite freights, infinite ways')}</p>
             </div>
           </div>
           <div class="app-header-right">
@@ -125,36 +137,23 @@ export function createMobileView(container, options = {}) {
           </svg>
           Dashboard
         </button>
-        <button class="nav-item ${currentPage() === 'bookings' ? 'active' : ''}" data-route="bookings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-            <rect width="20" height="14" x="2" y="6" rx="2"/>
-          </svg>
-          Bookings
-        </button>
         <button class="nav-item ${currentPage() === 'inquiries' ? 'active' : ''}" data-route="inquiries">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          Inquiries
+          Enquirey &amp; Leads
         </button>
-        <button class="nav-item ${currentPage() === 'calendar' ? 'active' : ''}" data-route="calendar">
+        <button class="nav-item ${currentPage() === 'customers' ? 'active' : ''}" data-route="customers">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-            <line x1="16" x2="16" y1="2" y2="6"/>
-            <line x1="8" x2="8" y1="2" y2="6"/>
-            <line x1="3" x2="21" y1="10" y2="10"/>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
-          Calendar
+          Customers
         </button>
-        <button class="nav-item" id="mobile-more-btn" data-more aria-haspopup="dialog">
+        <button class="nav-item ${currentPage() === 'quotation' || currentPage() === 'bookings' ? 'active' : ''}" data-route="quotation">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="7" height="7" x="3" y="3" rx="1"/>
-            <rect width="7" height="7" x="14" y="3" rx="1"/>
-            <rect width="7" height="7" x="14" y="14" rx="1"/>
-            <rect width="7" height="7" x="3" y="14" rx="1"/>
+            <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>
           </svg>
-          More
+          Quotation
         </button>
       </div>
 
@@ -168,12 +167,14 @@ export function createMobileView(container, options = {}) {
           <!-- Populated dynamically -->
         </div>
 
-        <!-- Sheet Navigation Tabs (Customer Details, Guests, Itinerary, Updates) -->
+        <!-- Sheet Navigation Tabs -->
         <div class="sheet-tabs-nav scroll-row">
-          <button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
-          <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
-          <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
-          <button class="sheet-tab-btn ${activeModalTab === 'updates' ? 'active' : ''}" data-sheet-tab="updates">Updates</button>
+          ${(page === 'inquiries' || bookings[0]?.kind === 'inquiry')
+            ? renderFreightTabsHtml('customer-details', { attr: 'data-sheet-tab' })
+            : `<button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
+               <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
+               <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
+               <button class="sheet-tab-btn ${activeModalTab === 'updates' ? 'active' : ''}" data-sheet-tab="updates">Updates</button>`}
         </div>
 
         <!-- Sheet Body Scroll Content -->
@@ -183,30 +184,32 @@ export function createMobileView(container, options = {}) {
 
         <!-- Sheet Sticky Footer Action Section -->
         <div class="sheet-sticky-footer">
-          <button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
-          <div class="sheet-quick-actions-grid">
-            <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
-              ${icon('phone', { size: 20, stroke: 2.2 })}
-              <span>Call</span>
-            </button>
-            <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span>Message</span>
-            </button>
-            <button class="quick-action-col-btn btn-act-fwd" id="sheet-act-fwd">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m22 2-7 20-4-9-9-4Z"/>
-                <path d="M22 2 11 13"/>
-              </svg>
-              <span>Forward</span>
-            </button>
-            <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
-              ${icon('more', { size: 20, stroke: 2.2 })}
-              <span>More</span>
-            </button>
-          </div>
+          ${(page === 'inquiries' || bookings[0]?.kind === 'inquiry')
+            ? renderFreightFooterHtml(bookings[0], { isMobile: true })
+            : `<button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
+               <div class="sheet-quick-actions-grid">
+                 <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
+                   ${icon('phone', { size: 20, stroke: 2.2 })}
+                   <span>Call</span>
+                 </button>
+                 <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                   </svg>
+                   <span>Message</span>
+                 </button>
+                 <button class="quick-action-col-btn btn-act-fwd" id="sheet-act-fwd">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                     <path d="m22 2-7 20-4-9-9-4Z"/>
+                     <path d="M22 2 11 13"/>
+                   </svg>
+                   <span>Forward</span>
+                 </button>
+                 <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
+                   ${icon('more', { size: 20, stroke: 2.2 })}
+                   <span>More</span>
+                 </button>
+               </div>`}
         </div>
       </div>
 
@@ -435,17 +438,65 @@ export function createMobileView(container, options = {}) {
           </div>
         </div>
       </div>
+
+      <!-- Mobile Modal: Add Customer Modal -->
+      <div class="modal-overlay" id="mobile-add-customer-modal">
+        <div class="modal-card" style="width: 92%; max-width: 440px;">
+          <div class="modal-header">
+            <h3>Add New Customer</h3>
+            <button class="sheet-close-btn" id="close-mobile-add-customer-btn" style="position: static;">✕</button>
+          </div>
+          <form id="mobile-form-add-customer">
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Customer Full Name *</label>
+                <input type="text" id="mob-cust-input-name" placeholder="e.g. Ramesh Patel" required />
+              </div>
+              <div class="form-group">
+                <label>Primary Phone *</label>
+                <input type="tel" id="mob-cust-input-phone" placeholder="+91 98765 43210" required />
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="mob-cust-input-email" placeholder="customer@gmail.com" />
+              </div>
+              <div class="form-group">
+                <label>City / Location</label>
+                <input type="text" id="mob-cust-input-city" placeholder="e.g. Ahmedabad, Gujarat" />
+              </div>
+              <div class="form-group">
+                <label>Customer Type</label>
+                <select id="mob-cust-input-type">
+                  <option value="Family Traveler">Family</option>
+                  <option value="Couple Getaway">Couple</option>
+                  <option value="Corporate / Group">Corporate</option>
+                  <option value="Luxury Traveler">Luxury</option>
+                  <option value="Solo Traveler">Solo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Initial Notes / Preferences</label>
+                <textarea id="mob-cust-input-notes" rows="2" placeholder="Preferences, budget, travel requirements..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="action-pill-btn" id="btn-cancel-mob-add-customer">Cancel</button>
+              <button type="submit" class="btn-primary-desktop" id="btn-submit-mob-add-customer">Save Customer</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   `;
 
   // Render Functions
   const BOOKING_TABS = [
-    { key: 'All Bookings', label: 'All' },
-    { key: 'New Bookings', label: 'New Bookings' },
+    { key: 'All Quotations', label: 'All' },
+    { key: 'New Bookings', label: 'New Quotes' },
     { key: 'Assigned', label: 'Assigned' },
-    { key: 'Ongoing', label: 'Ongoing' },
+    { key: 'Ongoing', label: 'Confirmed' },
   ];
-  const tabDefs = () => (page === 'inquiries' ? INQUIRY_TABS : BOOKING_TABS);
+  const tabDefs = () => (page === 'inquiries' ? INQUIRY_TABS : page === 'customers' ? CUSTOMER_TABS : BOOKING_TABS);
   const allKey = () => tabDefs()[0].key;
 
   // Update selection visuals in place (no re-render, so cards never remount or shift).
@@ -482,7 +533,8 @@ export function createMobileView(container, options = {}) {
     const listEl = container.querySelector('#mobile-cards-list');
     if (!listEl) return;
     const inquiry = page === 'inquiries';
-    const what = inquiry ? 'inquiries' : 'bookings';
+    const customer = page === 'customers';
+    const what = inquiry ? 'inquiries & leads' : customer ? 'customers' : 'quotations';
     const q = searchQuery.toLowerCase();
     const catValue = selectedCategory === 'ALL' ? '' : selectedCategory;
 
@@ -512,11 +564,99 @@ export function createMobileView(container, options = {}) {
     updateBulkBar(container, 'mobile', bookings.filter(b => b.selected).length);
   }
 
+  const getActiveModalTabs = () => (page === 'inquiries' || activeModalBooking?.kind === 'inquiry')
+    ? ['customer-details', 'requirements', 'shipment-docs', 'updates']
+    : ['customer-details', 'guests', 'itinerary', 'updates'];
+
+  function bindFreightMobileFooter(footerEl, b) {
+    if (!footerEl) return;
+    const primaryBtn = footerEl.querySelector('#mobile-freight-primary-btn');
+    if (primaryBtn) {
+      primaryBtn.addEventListener('click', async () => {
+        const action = primaryBtn.dataset.freightAction;
+        if (action === 'convert-to-enquiry') {
+          try {
+            const freight_details = {
+              ...(b.freight_details || {}),
+              record_type: 'enquiry',
+              stage: 'Received',
+            };
+            const updated = await updateInquiry(b.id, {
+              status: 'ongoing',
+              freight_details,
+            });
+            b.status = 'Ongoing';
+            b.statusClass = 'status-inq-ongoing';
+            b.freight_details = freight_details;
+            if (updated) Object.assign(b, updated);
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: `Lead for ${b.guest?.name || b.customer_name || 'customer'} successfully converted to Enquiry!`, type: 'success' }
+            }));
+            renderCards();
+            renderSheetHeader();
+            renderSheetBody();
+            footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: true });
+            bindFreightMobileFooter(footerEl, b);
+          } catch (err) {
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { message: err.message || 'Failed to convert lead', type: 'warning' }
+            }));
+          }
+        } else if (action === 'create-quotation') {
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Quotation builder initiated for ${b.guest?.name || b.customer_name || 'enquiry'}. Opening quotation draft...`, type: 'success' }
+          }));
+        } else if (action === 'confirm-shipment') {
+          if (b.freight_details) {
+            b.freight_details.shipment = b.freight_details.shipment || {};
+            b.freight_details.shipment.has_shipment = true;
+          }
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { message: `Shipment confirmed! Operational work order generated.`, type: 'success' }
+          }));
+          renderSheetBody();
+          renderCards();
+        }
+      });
+    }
+
+    footerEl.querySelector('#mobile-freight-act-call')?.addEventListener('click', () => {
+      const d = getFreightData(b);
+      window.location.href = `tel:${cleanPhone(d.phone)}`;
+    });
+
+    footerEl.querySelector('#mobile-freight-act-msg')?.addEventListener('click', () => {
+      const d = getFreightData(b);
+      window.open(`https://wa.me/${cleanPhone(d.phone)}`, '_blank', 'noopener');
+    });
+
+    footerEl.querySelector('#mobile-freight-act-fwd')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'Freight dossier forwarded to operations team.', type: 'success' }
+      }));
+    });
+
+    footerEl.querySelector('#mobile-freight-act-more')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message: 'More options: Export PDF, Print Dossier, Reassign Agent.', type: 'info' }
+      }));
+    });
+  }
+
   function renderSheetHeader() {
     const headerCard = container.querySelector('#sheet-header-card-content');
     if (!headerCard || !activeModalBooking) return;
 
     const b = activeModalBooking;
+    const isFreight = page === 'inquiries' || b.kind === 'inquiry';
+
+    if (isFreight) {
+      headerCard.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: 'mobile-sheet-close-btn', isMobile: true });
+      const closeBtn = headerCard.querySelector('#mobile-sheet-close-btn');
+      if (closeBtn) closeBtn.addEventListener('click', () => closeModal());
+      return;
+    }
+
     const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
     const custName = b.customer?.name || b.guest?.name || 'Customer';
 
@@ -539,6 +679,23 @@ export function createMobileView(container, options = {}) {
     if (!bodyEl || !activeModalBooking) return;
 
     const b = activeModalBooking;
+    const isFreight = page === 'inquiries' || b.kind === 'inquiry';
+
+    if (isFreight) {
+      bodyEl.classList.add('is-freight-scroll');
+      bodyEl.innerHTML = renderFreightBodyHtml(b, activeModalTab);
+      bindFreightBodyEvents(bodyEl, b, (updated) => {
+        if (updated) {
+          Object.assign(b, updated);
+          if (b.raw) Object.assign(b.raw, updated);
+        }
+        renderCards();
+        renderSheetHeader();
+        renderSheetBody();
+      });
+      return;
+    }
+    bodyEl.classList.remove('is-freight-scroll');
 
     // Customer Details Tab (Exact structure from Image 3 reference)
     if (activeModalTab === 'customer-details') {
@@ -938,8 +1095,69 @@ export function createMobileView(container, options = {}) {
 
   function openModal(booking, tab = 'customer-details') {
     activeModalBooking = booking || bookings[0];
-    activeModalTab = tab;
+    const b = activeModalBooking;
+    const isFreight = page === 'inquiries' || b?.kind === 'inquiry';
+
+    if (isFreight) {
+      if (!['customer-details', 'requirements', 'shipment-docs', 'updates'].includes(tab)) {
+        activeModalTab = 'customer-details';
+      } else {
+        activeModalTab = tab;
+      }
+    } else {
+      activeModalTab = tab;
+    }
     isModalOpen = true;
+
+    const tabsNav = container.querySelector('.sheet-tabs-nav');
+    const footerEl = container.querySelector('.sheet-sticky-footer');
+
+    if (isFreight) {
+      if (tabsNav) {
+        tabsNav.innerHTML = renderFreightTabsHtml(activeModalTab, { attr: 'data-sheet-tab' });
+      }
+      if (footerEl) {
+        footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: true });
+        bindFreightMobileFooter(footerEl, b);
+      }
+    } else {
+      if (tabsNav && !tabsNav.querySelector('[data-sheet-tab="guests"]')) {
+        tabsNav.innerHTML = `
+          <button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
+          <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
+          <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
+          <button class="sheet-tab-btn ${activeModalTab === 'updates' ? 'active' : ''}" data-sheet-tab="updates">Updates</button>
+        `;
+      }
+      if (footerEl && !footerEl.querySelector('#mobile-confirm-booking-btn')) {
+        footerEl.innerHTML = `
+          <button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
+          <div class="sheet-quick-actions-grid">
+            <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
+              ${icon('phone', { size: 20, stroke: 2.2 })}
+              <span>Call</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Message</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-fwd" id="sheet-act-fwd">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m22 2-7 20-4-9-9-4Z"/>
+              </svg>
+              <span>Forward</span>
+            </button>
+            <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
+              ${icon('more', { size: 20, stroke: 2.2 })}
+              <span>More</span>
+            </button>
+          </div>
+        `;
+      }
+    }
+
     // On the Calendar page the primary action only applies to pending bookings.
     const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
     if (page === 'calendar' && activeModalBooking.status !== 'Pending') confirmBtn?.style.setProperty('display', 'none', 'important'); else confirmBtn?.style.removeProperty('display');
@@ -973,6 +1191,7 @@ export function createMobileView(container, options = {}) {
     closeAssignSheet();
     const backdrop = container.querySelector('#mobile-sheet-backdrop');
     const sheet = container.querySelector('#mobile-bottom-sheet');
+    container.querySelector('#sheet-body-content')?.classList.remove('is-freight-scroll');
     if (backdrop) backdrop.classList.remove('open');
     if (sheet) sheet.classList.remove('open');
 
@@ -1314,27 +1533,48 @@ export function createMobileView(container, options = {}) {
       page = next;
       if (changed) {
         if (isModalOpen) closeModal();
-        bookings = page === 'inquiries' ? inquiryState.list : bookingsData;
+        if (page === 'inquiries') {
+          bookings = inquiryState.list;
+        } else if (page === 'customers') {
+          bookings = getCustomersList();
+        } else {
+          bookings = bookingsData;
+        }
         bookings.forEach(b => { b.selected = false; });
         activeCategory = allKey();
         const sc = container.querySelector('#mobile-screen-scroll');
-        scrollMemory[page === 'inquiries' ? 'bookings' : 'inquiries'] = sc ? sc.scrollTop : 0;
+        scrollMemory[page] = sc ? sc.scrollTop : 0;
         needRestore = true;
       }
-      container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => b.classList.toggle('active', b.dataset.route === page));
-      // The shell draws Inquiries, Bookings (no add flow of its own: it opens the Inquiry one), Calendar and Team; other pages are hosted and set their own.
-      if (page === 'team') setShellAddAction('Add Member', () => window.dispatchEvent(new CustomEvent('open-add-team-member-modal')));
-      else if (page === 'inquiries' || page === 'bookings') setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') }));
+      container.querySelectorAll('.mobile-bottom-nav [data-route]').forEach(b => {
+        const r = b.dataset.route;
+        b.classList.toggle('active', r === page || (r === 'quotation' && page === 'bookings'));
+      });
+      // The shell draws Inquiries, Customers and Quotation
+      if (page === 'inquiries') setShellAddAction('Add Inquiry', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') }));
+      else if (page === 'quotation' || page === 'bookings') setShellAddAction('Add Quotation', () => openAddInquiry({ showRow: showNewInquiry, returnFocus: () => container.querySelector('#mobile-page-add') }));
+      else if (page === 'customers') setShellAddAction('Add Customer', () => openMobileAddCustomerModal());
       else setShellAddAction(null);
-      container.querySelector('#mobile-bookings-page').hidden = page === 'calendar' || page === 'team';
-      container.querySelector('#mobile-calendar-page').hidden = page !== 'calendar';
-      container.querySelector('#mobile-team-page').hidden = page !== 'team';
-      container.querySelector('#mobile-screen-scroll')?.classList.toggle('calendar-mode', page === 'calendar');
-      if (page === 'calendar') { if (changed) calendar.activate(); else calendar.render(); }
-      if (page === 'team') { if (changed) team.activate(); else team.render(); }
-      if (subtitleEl) subtitleEl.textContent = page === 'calendar' ? 'Calendar' : page === 'team' ? `Operations Team • ${OPERATIONS_TEAM_MEMBERS.length} Total` : page === 'inquiries' ? `Inquiries • ${inquiryState.list.length} Total` : 'Bookings • 28 Total';
+
+      container.querySelector('#mobile-bookings-page').hidden = false;
+      container.querySelector('#mobile-calendar-page').hidden = true;
+      container.querySelector('#mobile-team-page').hidden = true;
+      container.querySelector('#mobile-screen-scroll')?.classList.remove('calendar-mode');
+      if (subtitleEl) {
+        subtitleEl.textContent = page === 'inquiries' 
+          ? `Enquirey & Leads • ${inquiryState.list.length} Total` 
+          : page === 'customers' 
+          ? `Customers • ${getCustomersList().length} Total` 
+          : `Quotation • ${bookingsData.length} Total`;
+      }
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
-      if (confirmBtn) confirmBtn.textContent = page === 'inquiries' ? 'Confirm Inquiry' : 'Confirm Booking';
+      if (confirmBtn) {
+        confirmBtn.textContent = page === 'inquiries' 
+          ? 'Confirm Inquiry' 
+          : page === 'customers' 
+          ? 'Customer Profile' 
+          : 'Confirm Quotation';
+      }
       applyParams();
       if (needRestore) { const sc = container.querySelector('#mobile-screen-scroll'); if (sc) sc.scrollTop = scrollMemory[page] || 0; needRestore = false; }
     }
@@ -1343,7 +1583,15 @@ export function createMobileView(container, options = {}) {
       if (page !== 'inquiries') return;
       bookings = inquiryState.list;
       if (activeModalBooking) activeModalBooking = bookings.find(b => b.id === activeModalBooking.id) || activeModalBooking;
-      if (subtitleEl) subtitleEl.textContent = `Inquiries • ${inquiryState.list.length} Total`;
+      if (subtitleEl) subtitleEl.textContent = `Enquirey & Leads • ${inquiryState.list.length} Total`;
+      if (ids && ids.length) patchRows(ids); else renderCards();
+      if (isModalOpen && !(ids && ids.length)) { renderSheetHeader(); renderSheetBody(); }
+    });
+    subscribeCustomers((ids) => {
+      if (page !== 'customers') return;
+      bookings = getCustomersList();
+      if (activeModalBooking) activeModalBooking = bookings.find(b => b.id === activeModalBooking.id) || activeModalBooking;
+      if (subtitleEl) subtitleEl.textContent = `Customers • ${getCustomersList().length} Total`;
       if (ids && ids.length) patchRows(ids); else renderCards();
       if (isModalOpen && !(ids && ids.length)) { renderSheetHeader(); renderSheetBody(); }
     });
@@ -1351,16 +1599,48 @@ export function createMobileView(container, options = {}) {
       if (isModalOpen && activeModalTab === 'customer-details' && activeModalBooking) renderSheetBody();
     });
     window.addEventListener('layout-changed', () => { if (isModalOpen) closeModal(); });
+
+    function openMobileAddCustomerModal() {
+      const modal = container.querySelector('#mobile-add-customer-modal');
+      if (!modal) return;
+      modal.classList.add('open');
+      modal.querySelector('#mob-cust-input-name')?.focus();
+    }
+    const mobAddCustForm = container.querySelector('#mobile-form-add-customer');
+    if (mobAddCustForm) {
+      mobAddCustForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = container.querySelector('#mob-cust-input-name').value.trim();
+        const phone = container.querySelector('#mob-cust-input-phone').value.trim();
+        const email = container.querySelector('#mob-cust-input-email').value.trim();
+        const location = container.querySelector('#mob-cust-input-city').value.trim();
+        const customerType = container.querySelector('#mob-cust-input-type').value;
+        const notes = container.querySelector('#mob-cust-input-notes').value.trim();
+        if (!name) return;
+        const record = addCustomer({ name, phone, email, location, customerType, notes });
+        container.querySelector('#mobile-add-customer-modal').classList.remove('open');
+        mobAddCustForm.reset();
+        toast(`Customer "${name}" added successfully!`, 'success');
+        showNewInquiry(record);
+      });
+    }
+    container.querySelector('#close-mobile-add-customer-btn')?.addEventListener('click', () => {
+      container.querySelector('#mobile-add-customer-modal').classList.remove('open');
+    });
+    container.querySelector('#btn-cancel-mob-add-customer')?.addEventListener('click', () => {
+      container.querySelector('#mobile-add-customer-modal').classList.remove('open');
+    });
+
     // The itinerary event popups (View Details, Edit) close with a tap on the dimmed backdrop and with Esc, like every other popup
     // The same for the customer and special-requirements popups: backdrop tap, Esc and Cancel act like their round X
-    ['#mobile-special-req-modal', '#mobile-edit-customer-modal'].forEach((id) => container.querySelector(id)?.addEventListener('click', (e) => {
-      if (e.target === e.currentTarget || e.target.closest('#btn-cancel-special-req')) e.currentTarget.querySelector('.sheet-close-btn')?.click();
+    ['#mobile-special-req-modal', '#mobile-edit-customer-modal', '#mobile-add-customer-modal'].forEach((id) => container.querySelector(id)?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget || e.target.closest('#btn-cancel-special-req, #btn-cancel-mob-add-customer')) e.currentTarget.querySelector('.sheet-close-btn')?.click();
     }));
     container.querySelector('#mobile-activity-details-modal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeActivityDetailsModal(); });
     container.querySelector('#mobile-edit-activity-modal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeEditActivityModal(); });
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
-      const form = container.querySelector('#mobile-special-req-modal.open, #mobile-edit-customer-modal.open');
+      const form = container.querySelector('#mobile-special-req-modal.open, #mobile-edit-customer-modal.open, #mobile-add-customer-modal.open');
       if (form) { e.stopImmediatePropagation(); form.querySelector('.sheet-close-btn')?.click(); return; }
       const edit = container.querySelector('#mobile-edit-activity-modal.open');
       const details = container.querySelector('#mobile-activity-details-modal.open');
@@ -1373,7 +1653,7 @@ export function createMobileView(container, options = {}) {
     loadInquiries();
     syncBookingPayments().then(() => {
       bookingsData.splice(0, bookingsData.length, ...INITIAL_BOOKINGS);
-      if (page === 'bookings') {
+      if (page === 'quotation' || page === 'bookings') {
         bookings = bookingsData;
         renderCards();
       }
@@ -1383,7 +1663,7 @@ export function createMobileView(container, options = {}) {
     });
     route();
 
-    container.querySelector('#mobile-more-btn').addEventListener('click', (e) => openMoreSheet({ returnFocus: () => e.currentTarget }));
+    container.querySelector('#mobile-more-btn')?.addEventListener('click', (e) => openMoreSheet({ returnFocus: () => e.currentTarget }));
     container.addEventListener('click', (e) => { if (e.target.closest('#btn-retry-inquiries')) loadInquiries(); });
 
     // Add Inquiry: the one wizard. After a save the list shows everything again and scrolls to the top, where the new row is.
@@ -1486,19 +1766,20 @@ export function createMobileView(container, options = {}) {
     const modalTabs = ['customer-details', 'guests', 'itinerary', 'updates'];
 
     function switchModalTabByDirection(direction) {
-      const currentIndex = modalTabs.indexOf(activeModalTab);
+      const curTabs = getActiveModalTabs();
+      const currentIndex = curTabs.indexOf(activeModalTab);
       let targetIndex = currentIndex;
 
       if (direction === 'left') {
-        // Swiping left moves towards left tab (e.g. Guests -> Customer Details, Itinerary -> Guests)
+        // Swiping left moves towards left tab
         targetIndex = Math.max(0, currentIndex - 1);
       } else if (direction === 'right') {
-        // Swiping right moves towards right tab (e.g. Guests -> Itinerary, Itinerary -> Updates)
-        targetIndex = Math.min(modalTabs.length - 1, currentIndex + 1);
+        // Swiping right moves towards right tab
+        targetIndex = Math.min(curTabs.length - 1, currentIndex + 1);
       }
 
       if (targetIndex !== currentIndex) {
-        switchTab(modalTabs[targetIndex], direction);
+        switchTab(curTabs[targetIndex], direction);
       }
     }
 
@@ -1816,8 +2097,9 @@ export function createMobileView(container, options = {}) {
       const sheetTabBtn = e.target.closest('[data-sheet-tab]'); // the booking sheet's own tabs (the tab rows of hosted pages are not this handler's business)
       if (sheetTabBtn) {
         const targetTab = sheetTabBtn.dataset.sheetTab;
-        const currentIdx = modalTabs.indexOf(activeModalTab);
-        const targetIdx = modalTabs.indexOf(targetTab);
+        const curTabs = getActiveModalTabs();
+        const currentIdx = curTabs.indexOf(activeModalTab);
+        const targetIdx = curTabs.indexOf(targetTab);
         const dir = targetIdx > currentIdx ? 'right' : (targetIdx < currentIdx ? 'left' : null);
         switchTab(targetTab, dir);
         return;
@@ -2259,10 +2541,11 @@ export function createMobileView(container, options = {}) {
   }
 
   function switchTab(tab, slideDir = null) {
+    const curTabs = getActiveModalTabs();
     if (activeModalTab === tab && !slideDir) return;
     if (!slideDir && activeModalTab !== tab) {
-      const currentIdx = modalTabs.indexOf(activeModalTab);
-      const targetIdx = modalTabs.indexOf(tab);
+      const currentIdx = curTabs.indexOf(activeModalTab);
+      const targetIdx = curTabs.indexOf(tab);
       if (currentIdx !== -1 && targetIdx !== -1) {
         slideDir = targetIdx > currentIdx ? 'right' : 'left';
       }
@@ -2271,6 +2554,13 @@ export function createMobileView(container, options = {}) {
     activeModalTab = tab;
     openDropdownItemId = null;
     closeAssignSheet();
+
+    const b = activeModalBooking;
+    const isFreight = page === 'inquiries' || b?.kind === 'inquiry';
+    const tabsNav = container.querySelector('.sheet-tabs-nav');
+    if (isFreight && tabsNav && !tabsNav.querySelector('[data-sheet-tab="shipment-docs"]')) {
+      tabsNav.innerHTML = renderFreightTabsHtml(activeModalTab, { attr: 'data-sheet-tab' });
+    }
 
     renderSheetHeader();
     container.querySelectorAll('.sheet-tab-btn').forEach(btn => {

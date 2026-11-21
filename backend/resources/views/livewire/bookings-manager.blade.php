@@ -13,8 +13,8 @@
                         </svg>
                     </div>
                     <div class="brand-text-col">
-                        <h2>{{ \App\Models\AppSetting::read('company', [])['name'] ?? 'Ruyi Admin' }}</h2>
-                        <p>Travel Operations</p>
+                        <h2>{{ \App\Models\AppSetting::read('company', [])['name'] ?? 'INFINITY' }}</h2>
+                        <p>infinite freights, infinite ways</p>
                     </div>
                 </div>
 
@@ -161,11 +161,32 @@
                                         <input type="text" wire:model.live.debounce.200ms="search" placeholder="Search bookings..." />
                                     </div>
                                     <select wire:model.live="category" class="desktop-select-filter">
-                                        <option value="ALL">All Categories</option>
-                                        <option value="TOUR">Tour Packages</option>
-                                        <option value="VILLA">Villas & Resorts</option>
-                                        <option value="ACTIVITY">Activities & Sports</option>
-                                        <option value="TRANSPORT">Transports</option>
+                                        <option value="ALL">All Filters</option>
+                                        <optgroup label="Service Type">
+                                            <option value="Air Freight">Air Freight</option>
+                                            <option value="Sea Freight">Sea Freight</option>
+                                            <option value="Road Transport">Road Transport</option>
+                                            <option value="Project Cargo">Project Cargo</option>
+                                            <option value="Customs Clearance">Customs Clearance</option>
+                                        </optgroup>
+                                        <optgroup label="Shipment Direction">
+                                            <option value="Import">Import</option>
+                                            <option value="Export">Export</option>
+                                        </optgroup>
+                                        <optgroup label="Priority">
+                                            <option value="Urgent">Urgent</option>
+                                            <option value="High">High</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Low">Low</option>
+                                        </optgroup>
+                                        <optgroup label="Lead Source">
+                                            <option value="Website">Website</option>
+                                            <option value="Referral">Referral</option>
+                                            <option value="Email">Email</option>
+                                            <option value="Phone">Phone</option>
+                                            <option value="LinkedIn / Social Media">LinkedIn / Social Media</option>
+                                            <option value="Existing Customer">Existing Customer</option>
+                                        </optgroup>
                                     </select>
 
                                 </div>
@@ -876,8 +897,8 @@
             <header class="mobile-top-header">
                 <div class="mobile-header-row">
                     <div class="brand-text-col">
-                        <h2>{{ \App\Models\AppSetting::read('company', [])['name'] ?? 'Ruyi Admin' }}</h2>
-                        <p>Travel Operations</p>
+                        <h2>{{ \App\Models\AppSetting::read('company', [])['name'] ?? 'INFINITY' }}</h2>
+                        <p>infinite freights, infinite ways</p>
                     </div>
                     <button class="icon-bell-btn" wire:click="showToast('No new notifications', 'info')">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -900,11 +921,32 @@
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                         </svg>
                         <select wire:model.live="category" class="mobile-select-filter">
-                            <option value="ALL">All Categories</option>
-                            <option value="TOUR">Tour Packages</option>
-                            <option value="VILLA">Villas & Resorts</option>
-                            <option value="ACTIVITY">Activities & Sports</option>
-                            <option value="TRANSPORT">Transports</option>
+                            <option value="ALL">All Filters</option>
+                            <optgroup label="Service Type">
+                                <option value="Air Freight">Air Freight</option>
+                                <option value="Sea Freight">Sea Freight</option>
+                                <option value="Road Transport">Road Transport</option>
+                                <option value="Project Cargo">Project Cargo</option>
+                                <option value="Customs Clearance">Customs Clearance</option>
+                            </optgroup>
+                            <optgroup label="Shipment Direction">
+                                <option value="Import">Import</option>
+                                <option value="Export">Export</option>
+                            </optgroup>
+                            <optgroup label="Priority">
+                                <option value="Urgent">Urgent</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </optgroup>
+                            <optgroup label="Lead Source">
+                                <option value="Website">Website</option>
+                                <option value="Referral">Referral</option>
+                                <option value="Email">Email</option>
+                                <option value="Phone">Phone</option>
+                                <option value="LinkedIn / Social Media">LinkedIn / Social Media</option>
+                                <option value="Existing Customer">Existing Customer</option>
+                            </optgroup>
                         </select>
                     </div>
                 </div>

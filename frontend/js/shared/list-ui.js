@@ -12,51 +12,151 @@ import { esc, initials, contactButtons, rowMenuButton, checkbox, openRowMenu } f
  */
 export function renderTabs(host, { tabs, active, variant = 'desktop', attr = 'data-tab' }) {
   if (!host) return;
-  const scroller = variant === 'mobile' ? host.querySelector('.category-filter-tabs') : host.firstElementChild;
-  const left = scroller ? scroller.scrollLeft : 0;
+  const wrap = { mobile: 'category-filter-tabs', desktop: 'toolbar-tabs-group', compact: 'compact-tabs-nav' }[variant];
+  const scroller = host.firstElementChild;
+  const buttons = scroller ? [...scroller.children] : [];
+  const label = (t) => variant === 'compact' ? t.short || t.label : t.label;
+  // Data arrives after the first paint. Keep the scroller AND its buttons alive so
+  // count/filter updates cannot cancel an in-progress touch or reset its momentum.
+  if (scroller?.classList.contains(wrap) && buttons.length === tabs.length && buttons.every((b, i) => b.getAttribute(attr) === String(tabs[i].key))) {
+    buttons.forEach((button, i) => {
+      const t = tabs[i];
+      const on = t.key === active;
+      button.classList.toggle('active', on);
+      if (button.getAttribute('aria-selected') !== String(on)) button.setAttribute('aria-selected', String(on));
+      const caption = variant === 'mobile' ? `${label(t)}${t.count == null ? '' : ' '}` : `${label(t)}${t.count == null ? '' : ` (${t.count})`}`;
+      const textNode = Array.from(button.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
+      if (textNode) {
+        if (textNode.nodeValue !== caption) textNode.nodeValue = caption;
+      } else if (button.firstChild && button.firstChild.nodeType === Node.TEXT_NODE) {
+        if (button.firstChild.nodeValue !== caption) button.firstChild.nodeValue = caption;
+      }
+      if (variant === 'mobile') {
+        let badge = button.querySelector('.pill-badge');
+        if (t.count == null) badge?.remove();
+        else {
+          if (!badge) { badge = document.createElement('span'); badge.className = 'pill-badge'; button.append(badge); }
+          if (badge.textContent !== String(t.count)) badge.textContent = String(t.count);
+        }
+      }
+    });
+    return;
+  }
   const item = (t) => {
     const on = t.key === active;
     if (variant === 'mobile') {
-      return `<button class="tab-pill ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(t.label)} <span class="pill-badge">${t.count}</span></button>`;
+      return `<button class="tab-pill ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(t.label)}${t.count == null ? '' : ` <span class="pill-badge">${t.count}</span>`}</button>`;
     }
     const cls = variant === 'compact' ? 'compact-tab-btn' : 'desktop-tab-btn';
     const short = variant === 'compact' ? t.short || t.label : t.label;
-    return `<button class="${cls} ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(short)} (${t.count})</button>`;
+    return `<button class="${cls} ${on ? 'active' : ''}" role="tab" aria-selected="${on}" ${attr}="${esc(t.key)}">${esc(short)}${t.count == null ? '' : ` (${t.count})`}</button>`;
   };
-  const wrap = { mobile: 'category-filter-tabs', desktop: 'toolbar-tabs-group', compact: 'compact-tabs-nav' }[variant];
-  host.innerHTML = `<div class="${wrap} tabs-scroller" role="tablist">${tabs.map(item).join('')}</div>`;
+  host.innerHTML = `<div class="${wrap} tabs-scroller scroll-row" role="tablist">${tabs.map(item).join('')}</div>`;
   const el = host.firstElementChild;
-  el.scrollLeft = left;
   bindTabsScroller(el);
-  // Bring the active tab into view only when the selection changed (not on every re-render).
-  if (host.dataset.active !== String(active)) {
-    host.dataset.active = String(active);
-    const on = el.querySelector('[aria-selected="true"]');
-    if (on) el.scrollLeft = Math.max(0, on.offsetLeft - (el.clientWidth - on.offsetWidth) / 2);
-  }
+  // the active tab is kept in view by watchScrollRows (below)
 }
 
-/** Momentum touch scroll is native; add mouse-drag, wheel-to-horizontal and edge fades. */
+/**
+ * Keep the active item of every .scroll-row in view, with its row's 16px edge: when a tab, pill or chip becomes active (on load, on tap, after a
+ * re-render) and is not fully visible, the row scrolls it into view smoothly. Manual scrolling never changes the selection or triggers a reveal.
+ * Call once at start-up; it watches the whole page.
+ */
+export function watchScrollRows() {
+  const ACTIVE = '.active, .is-selected, .is-on, [aria-selected="true"]';
+  const selections = new WeakMap();
+  const reveal = (row) => {
+    const on = row.querySelector(ACTIVE);
+    if (!on || row.scrollWidth <= row.clientWidth) return;
+    const edge = 16;
+    const r = row.getBoundingClientRect();
+    const o = on.getBoundingClientRect();
+    let dx = 0;
+    if (o.left < r.left + edge) dx = o.left - r.left - edge;
+    else if (o.right > r.right - edge) dx = o.right - r.right + edge;
+    if (Math.abs(dx) > 1) row.scrollTo({ left: row.scrollLeft + dx, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  };
+  const queued = new Set();
+  const flush = () => {
+    const rows = [...queued];
+    queued.clear();
+    rows.forEach((row) => {
+      if (!row.isConnected) return;
+      const selected = row.querySelector(ACTIVE);
+      if (selections.get(row) === selected) return;
+      selections.set(row, selected);
+      reveal(row);
+    });
+  };
+  const queue = (node) => {
+    const el = node.nodeType === 1 ? node : node.parentElement;
+    const row = el?.closest?.('.scroll-row');
+    if (row) { if (!queued.size) requestAnimationFrame(() => requestAnimationFrame(flush)); queued.add(row); }
+    if (el?.querySelectorAll) el.querySelectorAll('.scroll-row').forEach((r) => { if (!queued.size) requestAnimationFrame(() => requestAnimationFrame(flush)); queued.add(r); });
+  };
+  const selectedClasses = (value) => (value || '').split(/\s+/).filter((c) => ['active', 'is-selected', 'is-on'].includes(c)).sort().join(' ');
+  new MutationObserver((list) => list.forEach((m) => {
+    if (m.type === 'attributes') {
+      // Edge fades change while scrolling. They must never scroll back to the active chip.
+      if (m.attributeName === 'class' && selectedClasses(m.oldValue) === selectedClasses(m.target.getAttribute('class'))) return;
+      queue(m.target);
+    } else {
+      queue(m.target);
+      m.addedNodes.forEach(queue);
+    }
+  }))
+    .observe(document.body, { subtree: true, childList: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'aria-selected'] });
+  // A gesture can start before the initial reveal is painted; the user's scroll wins.
+  const rememberSelection = (e) => {
+    const row = e.target.closest?.('.scroll-row');
+    if (row) selections.set(row, row.querySelector(ACTIVE));
+  };
+  document.addEventListener('pointerdown', rememberSelection, { capture: true, passive: true });
+  document.addEventListener('wheel', rememberSelection, { capture: true, passive: true });
+  queue(document.body);
+  window.addEventListener('layout-changed', () => document.querySelectorAll('.scroll-row').forEach(reveal));
+}
+
+/**
+ * Momentum touch scroll is native; add mouse-drag (mouse only), wheel-to-horizontal and edge fades.
+ * The window listeners exist once for the whole app and act on whichever scroller the mouse went down on,
+ * so re-rendering a tab row never adds more of them.
+ */
+let drag = null;
+window.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const dx = e.clientX - drag.startX;
+  if (Math.abs(dx) > 4) drag.moved = true;
+  drag.el.scrollLeft = drag.startLeft - dx;
+});
+window.addEventListener('pointerup', () => { if (drag) { const d = drag; drag = null; if (d.moved) d.el.dataset.dragged = '1'; } });
+window.addEventListener('pointercancel', () => { drag = null; });
+window.addEventListener('blur', () => { drag = null; });
+// Run before the page's capture-phase tab handlers, so a mouse drag cannot also select a tab.
+window.addEventListener('click', (e) => {
+  const row = e.target.closest?.('.tabs-scroller[data-dragged]');
+  if (!row || !e.detail) return;
+  delete row.dataset.dragged;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+}, true);
+
 function bindTabsScroller(el) {
+  let fadeQueued = false;
   const fade = () => {
+    fadeQueued = false;
     el.classList.toggle('fade-left', el.scrollLeft > 4);
     el.classList.toggle('fade-right', el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
   };
+  const queueFade = () => { if (!fadeQueued) { fadeQueued = true; requestAnimationFrame(fade); } };
   fade();
-  el.addEventListener('scroll', fade, { passive: true });
-  let down = false, startX = 0, startLeft = 0, moved = false;
+  el.addEventListener('scroll', queueFade, { passive: true });
+  el.addEventListener('selectstart', (e) => e.preventDefault());
   el.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse') return;
-    down = true; moved = false; startX = e.clientX; startLeft = el.scrollLeft;
+    delete el.dataset.dragged;
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    drag = { el, startX: e.clientX, startLeft: el.scrollLeft, moved: false };
   });
-  window.addEventListener('pointermove', (e) => {
-    if (!down) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > 4) moved = true;
-    el.scrollLeft = startLeft - dx;
-  });
-  window.addEventListener('pointerup', () => { down = false; });
-  el.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
   el.addEventListener('wheel', (e) => {
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && el.scrollWidth > el.clientWidth) { el.scrollLeft += e.deltaY; e.preventDefault(); }
   }, { passive: false });
@@ -68,6 +168,23 @@ function bindTabsScroller(el) {
 export const avatar = (name, cls = '') => `<div class="row-avatar ${cls}" aria-hidden="true">${esc(initials(name))}</div>`;
 export const categoryBadge = (b, extra = '') => `<span class="card-type-badge ${b.typeClass}" ${extra}>${esc(b.type)}</span>`;
 export const statusPill = (b) => `<span class="status-pill ${b.statusClass}"><span class="dot"></span>${esc(b.status)}</span>`;
+
+/** Route or Pax line */
+export const paxLine = (b) => {
+  if (b.freight_details || b.kind === 'inquiry') {
+    const fd = b.freight_details || {};
+    const req = fd.requirements || {};
+    const mode = req.service_type || fd.mode || 'Sea Freight';
+    const origin = req.pol_origin ? req.pol_origin.split('(')[0].trim() : (fd.origin || 'Mumbai');
+    const dest = req.pod_destination ? req.pod_destination.split('(')[0].trim() : (fd.destination || 'Dubai');
+    const container = req.shipment_mode || req.container_type || fd.container || (b.pax ? `${b.pax} TEU` : 'FCL 40ft');
+    return `${mode} • ${origin} to ${dest} • ${container}`;
+  }
+  return (b.pax ? `${b.pax} Pax${b.duration ? ` • ${b.duration}` : ''}` : '—');
+};
+
+/** The tag an inquiry carries for a few seconds after it was added. */
+export const justAddedTag = (b) => (b.justAdded ? '<span class="just-added-tag">JUST ADDED</span>' : '');
 
 /* ---------- Row actions: Phone, WhatsApp, ⋮ ---------- */
 
@@ -97,20 +214,30 @@ export function assignItems(list) {
 
 export function quickNote(b, cls = '') {
   return `<form class="quick-note ${cls}" data-quick-note="${esc(b.id)}" autocomplete="off">
-    <input type="text" maxlength="500" placeholder="Add a note..." enterkeyhint="send" aria-label="Quick note for ${esc(b.guest.name)}" />
-    <button type="submit" class="quick-note-send card-circle-action-btn" aria-label="Send note">${icon('send', { size: 15 })}</button>
+    <input type="text" maxlength="500" placeholder="Type a quick note…" enterkeyhint="send" aria-label="Quick note for ${esc(b.guest.name)}" />
+    <button type="submit" class="quick-note-send" aria-label="Send note" disabled>${icon('send', { size: 15 })}</button>
   </form>`;
 }
 
-/* ---------- Mobile row card (Bookings + Inquiries) ---------- */
+/** Keep every Send button disabled while its note is empty. One listener per view root. */
+export function bindQuickNotes(root) {
+  root.addEventListener('input', (e) => {
+    const input = e.target.closest?.('.quick-note input');
+    if (input) input.form.querySelector('.quick-note-send').disabled = !input.value.trim();
+  });
+}
 
-export function mobileRowCard(b) {
+/* ---------- Row card (Bookings + Inquiries, phone list and PC split list) ---------- */
+
+/** `split` = the card in the PC split list (own data attributes for its click and checkbox handlers); `active` = the open record. */
+export function rowCard(b, { split = false, active = false } = {}) {
   const inquiry = b.kind === 'inquiry';
   return `
-    <div class="booking-card list-row-card ${inquiry ? 'is-inquiry' : ''} ${b.selected ? 'card-selected' : ''}" data-booking-id="${esc(b.id)}">
+    <div class="booking-card list-row-card ${inquiry ? 'is-inquiry' : ''} ${b.selected ? 'card-selected' : ''} ${active ? 'active' : ''} ${b.justAdded ? 'is-fresh' : ''}" ${split ? 'data-compact-booking-id' : 'data-booking-id'}="${esc(b.id)}"${split ? ` id="opt-${esc(b.id)}" role="option" aria-selected="${!!active}"` : ''}>
+      ${justAddedTag(b)}
       <div class="row-lead-col">
         ${avatar(b.guest.name)}
-        ${checkbox({ checked: b.selected, attr: 'data-select-id', id: b.id, label: `Select ${b.guest.name}` })}
+        ${checkbox({ checked: b.selected, attr: split ? 'data-desktop-select-id' : 'data-select-id', id: b.id, label: `Select ${b.guest.name}` })}
       </div>
       <div class="card-info-col">
         <div class="row-name-line">
@@ -118,14 +245,13 @@ export function mobileRowCard(b) {
           ${inquiry ? statusPill(b) : categoryBadge(b)}
         </div>
         <p class="row-trip">${esc(b.title)}</p>
-        <div class="card-meta-row">${icon('user', { size: 13 })}<span>${b.pax} Pax • ${esc(b.duration)}</span></div>
+        <div class="card-meta-row">${icon(b.kind === 'inquiry' || b.freight_details ? 'ship' : 'user', { size: 13 })}<span>${esc(paxLine(b))}</span></div>
         <div class="card-meta-row">${icon('calendar', { size: 13 })}<span>${esc(b.dates)}</span></div>
       </div>
       <div class="card-right-col">
         <div class="card-action-btns-row">${rowActionButtons(b, 15)}</div>
         ${inquiry ? quickNote(b) : `<div class="card-price-status-row"><span class="card-price">${esc(b.price)}</span>${statusPill(b)}</div>`}
       </div>
-      ${inquiry ? quickNote(b, 'qn-row') : ''}
     </div>`;
 }
 
@@ -147,14 +273,39 @@ export function bulkBar(prefix, { desktop = false } = {}) {
     </div>`;
 }
 
-/** Wire the bulk bar: the count menu (Select all / Clear) and Assign. */
-export function bindBulkBar(root, prefix, { onSelectAll, onClear, onAssign }) {
+/** The same bar, inline: it overlays the split list's search row while rows are selected (same height, no layout shift). */
+export function inlineSelectionBar(prefix) {
+  return `
+    <div class="mobile-selection-bar bulk-bar compact-selection-bar" id="${prefix}-selection-bar" inert>
+      <button type="button" class="bulk-count-btn" id="${prefix}-count-btn" aria-haspopup="menu" aria-expanded="false">
+        <span id="${prefix}-selected-count">0 selected</span>${icon('chevronDown', { size: 14, stroke: 2.5 })}
+      </button>
+      <div class="bulk-actions">
+        <button type="button" class="btn-primary-desktop bulk-assign-btn" data-bulk-assign>${icon('assign', { size: 16 })}<span>Assign</span></button>
+      </div>
+    </div>`;
+}
+
+/** Show the inline bar (and hide the controls it covers) when something is selected; update its count in place. */
+export function updateInlineBar(root, prefix, selectedCount) {
+  const bar = root.querySelector(`#${prefix}-selection-bar`);
+  if (!bar) return;
+  const on = selectedCount > 0;
+  const top = bar.parentElement;
+  top.classList.toggle('is-selecting', on);
+  bar.toggleAttribute('inert', !on);
+  [...top.children].forEach((el) => { if (el !== bar) el.toggleAttribute('inert', on); });
+  if (on) root.querySelector(`#${prefix}-selected-count`).textContent = `${selectedCount} selected`;
+}
+
+/** Wire the bulk bar: the count menu (Select all / Clear) and Assign. `selectAllLabel` can show the real count. */
+export function bindBulkBar(root, prefix, { onSelectAll, onClear, onAssign, selectAllLabel = () => 'Select all' }) {
   const btn = root.querySelector(`#${prefix}-count-btn`);
   if (!btn) return;
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     openRowMenu(btn, [
-      { key: 'all', label: 'Select all', icon: 'check' },
+      { key: 'all', label: selectAllLabel(), icon: 'check' },
       { key: 'clear', label: 'Clear selection', icon: 'close', danger: true },
     ], (key) => (key === 'all' ? onSelectAll() : onClear()));
   });

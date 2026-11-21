@@ -1,8 +1,9 @@
 // The one Assign flow for Bookings and Inquiries (single from the ⋮ menu, many from the bulk bar).
 // Bottom sheet on phones, centered modal on larger screens (CSS decides); same markup everywhere.
+import { placeAsPushed } from './push.js';
 import { STAFF_MEMBERS, VENDORS_LIST, CONTACTS_LIST } from '../data.js';
 import { icon } from './icons.js';
-import { esc, toast, initials, dismissOnOutside, openWhatsApp, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
+import { esc, toast, initials, dismissOnOutside, backdropDismiss, openWhatsApp, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { applyInquiryUpdates } from './inquiry-store.js';
 
@@ -51,17 +52,18 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
   const first = items[0];
   const ov = document.createElement('div');
   ov.className = 'asg-overlay';
+  if (kind === 'itinerary') ov.dataset.centered = ''; // a centred popup for an itinerary event, on the phone and on the PC
   ov.innerHTML = `
     <div class="asg-sheet" role="dialog" aria-modal="true" aria-labelledby="asg-title">
       <div class="filter-handle" aria-hidden="true"></div>
       <header class="asg-header"><h3 id="asg-title">Assign to</h3>
         <button type="button" class="sheet-close-btn" data-asg-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button></header>
       <div class="asg-summary">
-        ${summary ? `<div class="asg-thumb asg-icon">${summary.iconHtml || ''}</div>` : first.image ? `<div class="asg-thumb"><img src="${esc(first.image)}" alt="" width="48" height="48" /></div>` : `<div class="row-avatar">${esc(initials(first.name))}</div>`}
+        ${summary ? `<div class="asg-thumb asg-icon">${summary.iconHtml || ''}</div>` : first.image ? `<div class="asg-thumb" data-crm-logo="true" data-logo-src="${esc(first.image)}"><img src="${esc(first.image)}" alt="" width="48" height="48" /></div>` : `<div class="row-avatar">${esc(initials(first.name))}</div>`}
         <div class="asg-summary-info"><h4>${summary ? esc(summary.title) : `${items.length} ${noun} Selected`}</h4><p>${summary ? esc(summary.subtitle || '') : esc(items.map((i) => i.id).join(', '))}</p></div>
         ${summary && summary.badge ? `<span class="tag-activity-pill">${esc(summary.badge)}</span>` : items.length === 1 && first.badge ? `<span class="status-pill ${esc(first.badgeClass || '')}"><span class="dot"></span>${esc(first.badge)}</span>` : ''}
       </div>
-      <div class="assign-tabs-row asg-tabs" role="tablist">${TABS.map((t) => `<button type="button" role="tab" class="assign-tab-btn ${t === tab ? 'active' : ''}" aria-selected="${t === tab}" data-asg-tab="${t}">${t}</button>`).join('')}</div>
+      <div class="assign-tabs-row asg-tabs scroll-row" role="tablist">${TABS.map((t) => `<button type="button" role="tab" class="assign-tab-btn ${t === tab ? 'active' : ''}" aria-selected="${t === tab}" data-asg-tab="${t}">${t}</button>`).join('')}</div>
       <div class="asg-search-row">
         <div class="vendor-search-input-box">${icon('search', { size: 16 })}<input type="text" id="asg-search" aria-label="Search" /></div>
         <span id="asg-filter"></span>
@@ -85,6 +87,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
       </div>
     </div>`;
   document.body.appendChild(ov);
+  queueMicrotask(() => placeAsPushed(ov)); // opened from inside a sheet (a screen pushed into its place), not stacked on top of it
   const unlock = lockScroll();
   const trigger = document.activeElement;
   afterPaint(() => ov.classList.add('open'));
@@ -106,7 +109,7 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
       return `<div class="vendor-item-card ${on ? 'selected' : ''}" role="radio" aria-checked="${on}" tabindex="0" data-asg-pick="${esc(p.id)}">
         <div class="vendor-item-left">
           <div class="custom-radio ${on ? 'checked' : ''}">${on ? icon('check', { size: 10, stroke: 3 }) : ''}</div>
-          ${p.avatar ? `<img src="${esc(p.avatar)}" class="vendor-avatar" style="border-radius:50%;" alt="" />` : `<div class="row-avatar asg-mini-avatar">${esc(initials(p.name))}</div>`}
+          ${p.avatar ? `<img src="${esc(p.avatar)}" class="vendor-avatar" data-crm-logo="true" data-logo-src="${esc(p.avatar)}" style="border-radius:50%;" alt="" />` : `<div class="row-avatar asg-mini-avatar">${esc(initials(p.name))}</div>`}
           <div class="vendor-info"><h4>${esc(p.name)}</h4><p>${esc(p.sub)}</p></div>
         </div>
         ${p.badge ? `<span class="asg-badge">${esc(p.badge)}</span>` : ''}
@@ -117,10 +120,11 @@ export function openAssign({ kind, items, summary, persist, onApply, onRevert, o
 
   const stopOutside = dismissOnOutside($('.asg-sheet'), closeAssign);
   const stopSheet = bindSheet(ov, $('.asg-sheet'), closeAssign);
-  const stop = () => { stopOutside(); stopSheet(); };
+  const stopBackdrop = backdropDismiss(ov, closeAssign);
+  const stop = () => { stopOutside(); stopSheet(); stopBackdrop(); };
 
   ov.addEventListener('click', (e) => {
-    if (e.target === ov || e.target.closest('[data-asg-close]')) return closeAssign();
+    if (e.target.closest('[data-asg-close]')) return closeAssign();
     const t = e.target.closest('[data-asg-tab]');
     if (t) {
       tab = t.dataset.asgTab; query = ''; filter = ''; $('#asg-search').value = '';

@@ -21,12 +21,12 @@ class StayController extends Controller
 
     public function index(): JsonResponse
     {
-        if ($this->ruyiOn()) {
-            return $this->fromRuyi(fn () => array_map(fn (array $h) => $this->ruyiRow($h), $this->ruyi()->all('hotels')));
-        }
-
         if (DummyData::on()) {
             return response()->json(['success' => true, 'data' => DummyData::list('stays')]);
+        }
+
+        if ($this->ruyiOn()) {
+            return $this->fromRuyi(fn () => array_map(fn (array $h) => $this->ruyiRow($h), $this->ruyi()->all('hotels')));
         }
 
         return response()->json(['success' => true, 'data' => Cache::remember('pages.stays.index', 60, fn () => SavedHotel::query()->orderBy('id')->get()->map(fn ($h) => $this->row($h))->values()->all())]);
@@ -35,6 +35,10 @@ class StayController extends Controller
     /** The id is text: a Ruyi hotel is HTL_537, a record of this app's own table is a number. */
     public function show(string $id): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::detail('stays', $id) ?? abort(404)]);
+        }
+
         if ($this->ruyiOn() && ! ctype_digit($id)) {
             return $this->fromRuyi(function () use ($id) {
                 foreach ($this->ruyi()->all('hotels') as $hotel) {
@@ -50,10 +54,6 @@ class StayController extends Controller
             abort(404);
         }
         $id = (int) $id;
-
-        if (DummyData::on()) {
-            return response()->json(['success' => true, 'data' => DummyData::detail('stays', $id) ?? abort(404)]);
-        }
 
         $stay = SavedHotel::query()->findOrFail($id);
         $stay->load('rooms');

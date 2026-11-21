@@ -21,16 +21,16 @@ class BlogController extends Controller
 
     public function index(): JsonResponse
     {
+        if (DummyData::on()) {
+            return response()->json(['success' => true, 'data' => DummyData::file('blogs')]);
+        }
+
         if ($this->ruyiOn()) {
             return $this->fromRuyi(function () {
                 $posts = array_map([RuyiPages::class, 'blogPost'], $this->ruyi()->all('blogs'));
 
                 return ['stats' => ['total' => count($posts), 'views' => 0, 'leads' => 0, 'converted' => 0], 'posts' => $posts];
             });
-        }
-
-        if (DummyData::on()) {
-            return response()->json(['success' => true, 'data' => DummyData::file('blogs')]);
         }
 
         $totals = BlogPost::query()->selectRaw('count(*) as total, coalesce(sum(views), 0) as views, coalesce(sum(leads), 0) as leads, coalesce(sum(converted), 0) as converted')->first();

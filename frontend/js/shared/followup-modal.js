@@ -1,6 +1,7 @@
 // Schedule / Follow-up: the same shared sheet as Assign (bottom sheet below 1100px, centered modal above).
+import { placeAsPushed } from './push.js';
 import { icon } from './icons.js';
-import { esc, toast, dismissOnOutside, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
+import { esc, toast, dismissOnOutside, backdropDismiss, bindSheet, afterPaint, afterTransition, lockScroll } from './ui.js';
 import { createDropdown } from './dropdown-filter.js';
 import { addFollowUpLocal } from './followups.js';
 
@@ -27,7 +28,7 @@ const fmtTime = (v) => {
   return new Date(2000, 0, 1, h, m).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 };
 
-export function openFollowUpModal(inquiry, { onSaved } = {}) {
+export function openFollowUpModal(inquiry, { onSaved, onSubmit } = {}) {
   closeFollowUpModal();
   lastFocus = document.activeElement;
   let type = 'follow_up';
@@ -45,16 +46,16 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
     <div class="fu-card asg-sheet" role="dialog" aria-modal="true" aria-labelledby="fu-title">
       <div class="filter-handle" aria-hidden="true"></div>
       <header class="fu-header">
-        <div style="min-width:0;">
+        <div class="fu-title-col">
           <h3 id="fu-title">Schedule / Follow-up</h3>
-          <p class="fu-sub">${esc(inquiry.customer_name)} • ${esc(inquiry.trip)}</p>
+          <p class="fu-sub">${esc(`${inquiry.customer_name} • ${inquiry.trip}`)}</p>
         </div>
         <button type="button" class="sheet-close-btn" data-fu-close aria-label="Close">${icon('close', { size: 16, stroke: 2.5 })}</button>
       </header>
       <form class="fu-body" novalidate>
         <div class="fu-toggle" role="radiogroup" aria-label="Entry type">
           <button type="button" role="radio" aria-checked="true" class="active" data-fu-type="follow_up">Follow-up</button>
-          <button type="button" role="radio" aria-checked="false" data-fu-type="called">Called ${icon('chevronDown', { size: 14, stroke: 2.5 })}</button>
+          <button type="button" role="radio" aria-checked="false" data-fu-type="called">Called</button>
           <button type="button" role="radio" aria-checked="false" data-fu-type="cc">CC</button>
         </div>
         <div class="fu-field" data-fu-outcome-row hidden>
@@ -84,6 +85,7 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
       </footer>
     </div>`;
   document.body.appendChild(overlay);
+  queueMicrotask(() => placeAsPushed(overlay)); // opened from inside a sheet: pushed into its place, not stacked on top of it
   unlockScroll = lockScroll();
   const shown = overlay;
   afterPaint(() => shown.classList.add('open'));
@@ -112,7 +114,7 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
   outcome.setValue(OUTCOMES[0]);
 
   overlay.addEventListener('click', async (e) => {
-    if (e.target === overlay || e.target.closest('[data-fu-close]')) return closeFollowUpModal();
+    if (e.target.closest('[data-fu-close]')) return closeFollowUpModal();
 
     const t = e.target.closest('[data-fu-type]');
     if (t) {
@@ -132,7 +134,8 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
   overlay.addEventListener('keydown', trapTab);
   const stopOutside = dismissOnOutside($('.fu-card'), closeFollowUpModal);
   const stopSheet = bindSheet(overlay, $('.fu-card'), closeFollowUpModal);
-  dispose = () => { stopOutside(); stopSheet(); outcome.close(); };
+  const stopBackdrop = backdropDismiss(overlay, closeFollowUpModal);
+  dispose = () => { stopOutside(); stopSheet(); stopBackdrop(); outcome.close(); };
   $('.fu-card').tabIndex = -1;
   $('.fu-card').focus({ preventScroll: true }); // the dialog, not a field
 
@@ -142,6 +145,13 @@ export function openFollowUpModal(inquiry, { onSaved } = {}) {
     if (!date || !time) return showError(!date ? 'Pick a follow-up date.' : 'Pick a follow-up time.');
     if (comment.value.length > MAX) return showError(`Comment can be at most ${MAX} characters.`);
     showError('');
+
+    if (onSubmit) { // a booking: no follow-up API, the entry goes straight into its Lead Flow
+      onSubmit({ type, date, time, comment: comment.value.trim(), outcome: type === 'called' ? outcome.getValue() : null });
+      closeFollowUpModal();
+      toast('Follow-up saved', 'success');
+      return;
+    }
 
     const btn = $('[data-fu-save]');
     btn.disabled = true;

@@ -1,13 +1,22 @@
 // Main Application Orchestrator
-import { createMobileView } from './mobile.js';
-import { createDesktopView } from './desktop.js';
+// mobile.js and desktop.js (about 115 KB each) are loaded only for the layout that is showing; the other one is loaded if the screen flips.
 import { INITIAL_BOOKINGS, STAFF_MEMBERS } from './data.js';
 import { refresh } from './shared/page-state.js';
 import { initKeyboard } from './shared/keyboard.js';
+import { watchScrollRows } from './shared/list-ui.js';
+import { watchStaticOverlays } from './shared/push.js';
+import { initLayout, applyLayout } from './shared/layout.js';
 import { enhanceSelects } from './shared/dropdown-filter.js';
 import { closeRowMenu } from './shared/ui.js';
 import { closeAssign } from './shared/assign-sheet.js';
 import { closeFollowUpModal } from './shared/followup-modal.js';
+import { initAccountMenu } from './shared/account-menu.js';
+import { isHostedPage } from './shared/nav.js';
+import { mountPage, unmountPage, prefetchPages, warmPage } from './shared/page-host.js';
+import { syncNavActive } from './shared/nav-ui.js';
+import { currentPage, subscribe as subscribePage } from './shared/page-state.js';
+import { initBranding } from './shared/branding.js';
+import { initLogoObserver } from './shared/logo.js';
 
 // Wait (briefly) for the web fonts before the first render, so text never reflows when they arrive.
 // The boot skeleton stays on screen meanwhile; after 1.5s we render with the fallback anyway.
@@ -19,27 +28,33 @@ const fontsReady = () => Promise.race([
   new Promise((r) => setTimeout(r, 1500)),
 ]);
 
+applyLayout();
+initBranding();
+initLogoObserver();
+
 document.addEventListener('DOMContentLoaded', async () => {
   const appContainer = document.getElementById('app');
   if (!appContainer) return;
   await fontsReady();
+  watchScrollRows();
+  watchStaticOverlays();
 
-  // Layout can change live (fold/unfold, rotate, resize). CSS swaps the layout; here we reset open
-  // overlays so nothing is left in a state that does not exist in the new layout.
-  ['(min-width: 700px)', '(min-width: 1100px)'].forEach((q) => {
-    matchMedia(q).addEventListener('change', () => {
-      closeRowMenu();
-      closeAssign();
-      closeFollowUpModal();
-      window.dispatchEvent(new Event('layout-changed'));
-      refresh();
-    });
+  // Layout can change live (fold/unfold, rotate, resize). CSS swaps the layout from <html data-layout>; here we reset
+  // open overlays so nothing is left in a state that does not exist in the new layout.
+  initLayout(async () => {
+    closeRowMenu();
+    closeAssign();
+    closeFollowUpModal();
+    await ensureView();
+    window.dispatchEvent(new Event('layout-changed'));
+    refresh();
   });
 
   // Global Toast Dispatcher
   window.addEventListener('show-toast', (e) => {
-    const { message, type } = e.detail;
-    showToast(message, type);
+    const { message, type, action } = e.detail;
+    if ((type === 'success' || !type || type === 'info') && !action) return; // the screen shows the result itself; only warnings and errors speak up
+    showToast(message, type, action);
   });
 
   // Modal State
@@ -117,12 +132,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('boot')?.remove();
   initKeyboard();
+  initAccountMenu();
   const desktopSlot = document.getElementById('desktop-view-slot');
   const mobileSlot = document.getElementById('mobile-view-slot');
 
-  // Initialize Views
-  const mobileView = createMobileView(mobileSlot);
-  const desktopView = createDesktopView(desktopSlot);
+  // Build the view for the layout that is showing (the other one is built only if the screen flips).
+  let mobileView = null;
+  let desktopView = null;
+  async function ensureView() {
+    if (document.documentElement.dataset.layout === 'mobile') {
+      if (!mobileView) { const { createMobileView } = await import('./mobile.js'); mobileView = createMobileView(mobileSlot); }
+    } else if (!desktopView) {
+      const { createDesktopView } = await import('./desktop.js');
+      desktopView = createDesktopView(desktopSlot);
+    }
+  }
+  await ensureView();
+  initBranding();
+
+  // Pages outside Bookings / Inquiries / Calendar live in a host: the PC one beside the sidebar, the phone one under the header.
+  function syncHostedPage() {
+    const key = currentPage();
+    const hosted = isHostedPage(key);
+    const phone = document.documentElement.dataset.layout === 'mobile';
+    document.querySelector('.desktop-content-col')?.classList.toggle('page-mode', hosted && !phone);
+    document.querySelector('.phone-device')?.classList.toggle('page-mode', hosted && phone);
+    if (hosted) mountPage(key, document.querySelector(phone ? '#mobile-page-host' : '#desktop-page-host'));
+    else unmountPage();
+    syncNavActive(key);
+  }
+  subscribePage(syncHostedPage);
+  window.addEventListener('layout-changed', syncHostedPage);
+  syncHostedPage();
+  prefetchPages(currentPage()); // once idle: the other pages' scripts, styles and data
+  // A nav item that is being touched or hovered: its page is loaded before the tap lands
+  const warmFrom = (e) => { const el = e.target.closest?.('[data-route], [data-nav]'); warmPage(el?.dataset.route || el?.dataset.nav); };
+  document.addEventListener('touchstart', warmFrom, { passive: true, capture: true });
+  document.addEventListener('mouseover', warmFrom, { passive: true, capture: true });
 
   enhanceSelects(document); // no unstyled OS lists: every <select> uses the shared dropdown
 
@@ -131,6 +177,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     targetBookingForGuest = e.detail.bookingId;
     document.getElementById('modal-add-guest').classList.add('open');
   });
+
+  // Backdrop tap and Esc close the Add Guest popup like its X
+  const guestModal = document.getElementById('modal-add-guest');
+  guestModal.addEventListener('click', (e) => { if (e.target === guestModal) document.getElementById('close-add-guest-modal').click(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && guestModal.classList.contains('open')) { e.stopImmediatePropagation(); document.getElementById('close-add-guest-modal').click(); } }, true);
 
   // Close Add Guest Modal
   document.getElementById('close-add-guest-modal').addEventListener('click', () => {
@@ -141,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Handle Add Guest Form Submission
-  document.getElementById('form-add-guest').addEventListener('submit', (e) => {
+  document.getElementById('form-add-guest').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('guest-input-name').value.trim();
     const age = parseInt(document.getElementById('guest-input-age').value) || 25;
@@ -150,23 +201,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!name) return;
 
-    const booking = INITIAL_BOOKINGS.find(b => b.id === targetBookingForGuest);
-    if (booking) {
-      const newGuest = {
-        id: booking.guests.length + 1,
-        name,
-        age,
-        role,
-        phone
-      };
-      booking.guests.push(newGuest);
-      booking.pax = booking.guests.length;
+    try {
+      const res = await fetch(`/api/bookings/${encodeURIComponent(targetBookingForGuest)}/guests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ name, age, role, phone })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to add guest');
+      const updated = data.data;
 
-      // Update both views
-      mobileView.updateBooking(booking);
-      desktopView.updateBooking(booking);
+      const booking = INITIAL_BOOKINGS.find(b => b.id === targetBookingForGuest);
+      if (booking) {
+        Object.assign(booking, updated);
+      } else {
+        INITIAL_BOOKINGS.push(updated);
+      }
 
-      showToast(`Added ${name} to ${booking.title}!`, 'success');
+      mobileView?.updateBooking(updated);
+      desktopView?.updateBooking(updated);
+
+      showToast(`Added ${name} to ${updated.title || targetBookingForGuest}!`, 'success');
+    } catch (err) {
+      // Fallback in case of network issue
+      const booking = INITIAL_BOOKINGS.find(b => b.id === targetBookingForGuest);
+      if (booking) {
+        const newGuest = { id: (booking.guests?.length || 0) + 1, name, age, role, phone };
+        booking.guests = booking.guests || [];
+        booking.guests.push(newGuest);
+        booking.pax = booking.guests.length;
+        mobileView?.updateBooking(booking);
+        desktopView?.updateBooking(booking);
+      }
+      showToast(err.message || `Added ${name}!`, 'info');
     }
 
     document.getElementById('form-add-guest').reset();
@@ -174,7 +241,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Toast Helper
-  function showToast(msg, type = 'info') {
+  function showToast(msg, type = 'info', action = null) {
     const container = document.getElementById('toast-container');
     if (!container) return;
     const toast = document.createElement('div');
@@ -184,13 +251,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         ${type === 'success' ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>' : '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>'}
       </svg>
       <span>${msg}</span>
+      ${action ? '<button type="button" class="toast-action"></button>' : ''}
     `;
+    if (action) {
+      const link = toast.querySelector('.toast-action');
+      link.textContent = action.label;
+      link.addEventListener('click', () => { action.onClick?.(); toast.remove(); });
+    }
     container.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(10px)';
-      toast.style.transition = 'all 0.3s ease';
+      toast.style.transition = 'opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out)';
       setTimeout(() => toast.remove(), 300);
-    }, 3200);
+    }, action ? 6000 : 3200);
   }
 });
