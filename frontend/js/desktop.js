@@ -1272,21 +1272,7 @@ export function createDesktopView(container) {
     } else if (activeDetailTab === 'itinerary') {
       bodyEl.innerHTML = scheduleHtml(b.itineraryDays || [], { side: 'desktop', openItemId: openDropdownItemId });
     } else if (activeDetailTab === 'updates') {
-      bodyEl.innerHTML = `
-        <div class="updates-list">
-          ${b.updates.length === 0 ? '<p style="font-size: 13px; color: #94A3B8; text-align: center; padding: 24px 0;">No updates yet.</p>' : ''}
-          ${b.updates.map(u => `
-            <div class="update-log-card">
-              <div class="update-log-header">
-                <span class="update-log-title">${u.title}</span>
-                <span class="update-log-time">${u.time || ''}</span>
-              </div>
-              <p class="update-log-desc">${u.desc}</p>
-              <div class="update-log-user">By ${u.user}</div>
-            </div>
-          `).join('')}
-        </div>
-      `;
+      bodyEl.innerHTML = renderFreightBodyHtml(b, 'updates');
     }
   }
 

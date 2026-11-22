@@ -714,8 +714,7 @@ function renderShipmentDocsTabHtml(b) {
 function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
   const d = getFreightData(b);
 
-  if (isMobile) {
-    return `
+  return `
       <div class="freight-tab-pane freight-phased-updates-pane">
         <!-- Phase 1 Header -->
         <div class="phase-divider-row phase-divider-top">
@@ -887,38 +886,6 @@ function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
         </div>
       </div>
     `;
-  }
-
-  const updates = d.updates || [];
-
-  return `
-    <div class="freight-tab-pane">
-      <div class="freight-updates-header-row">
-        <h3 class="updates-header-title">Activity &amp; Operational Log</h3>
-        <span class="updates-live-sync">Live Sync</span>
-      </div>
-
-      <div class="freight-timeline">
-        ${updates.map((up, idx) => {
-    const isLast = idx === updates.length - 1;
-    const dotClass = up.dot === 'green' ? 'dot-green' : up.dot === 'blue' ? 'dot-blue' : 'dot-grey';
-    return `
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <span class="timeline-dot ${dotClass}"></span>
-                ${isLast ? '' : '<span class="timeline-line"></span>'}
-              </div>
-              <div class="timeline-body">
-                <h4 class="timeline-item-title">${esc(up.title)}</h4>
-                <p class="timeline-item-desc">${esc(up.desc)}</p>
-                <span class="timeline-item-meta">${esc(up.time)}</span>
-              </div>
-            </div>
-          `;
-  }).join('')}
-      </div>
-    </div>
-  `;
 }
 
 /** Render Body content based on active tab */

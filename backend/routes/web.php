@@ -15,11 +15,15 @@ Route::get('/health', function () {
     ], 200);
 });
 
+// One-click Demo & View links for company owners and clients (instant sign-in without credentials)
+Route::match(['get', 'post'], '/demo', [AuthController::class, 'demo'])->name('demo.auto');
+Route::match(['get', 'post'], '/view', [AuthController::class, 'demo'])->name('view.auto');
+
 // Sign in. The app itself (the shell below) needs a signed-in user; its JSON API is unchanged for now.
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'show'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1')->name('login.attempt');
-    Route::post('/login/demo', [AuthController::class, 'demo'])->middleware('throttle:10,1')->name('login.demo');
+    Route::match(['get', 'post'], '/login/demo', [AuthController::class, 'demo'])->middleware('throttle:10,1')->name('login.demo');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
