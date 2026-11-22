@@ -36,8 +36,17 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Force HTTPS in production environments or when Render sets HTTPS
-        if (config('app.env') === 'production' || str_starts_with((string) config('app.url', ''), 'https://')) {
+        if (config('app.env') === 'production' || request()->server('HTTP_X_FORWARDED_PROTO') === 'https' || str_starts_with((string) config('app.url', ''), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
+        // Force clean root URL without internal container port (e.g. :10000)
+        if (! $this->app->runningInConsole() && request()->getHost()) {
+            \Illuminate\Support\Facades\URL::forceRootUrl('https://'.request()->getHost());
+        } elseif ($appUrl = config('app.url')) {
+            if (! str_contains($appUrl, 'localhost')) {
+                \Illuminate\Support\Facades\URL::forceRootUrl(rtrim($appUrl, '/'));
+            }
         }
 
         // Every Places search is a billed Google call, so each visitor gets a small allowance (there is no login to key it on yet).
