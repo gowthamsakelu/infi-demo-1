@@ -1094,9 +1094,9 @@ export function createMobileView(container, options = {}) {
       }
       if (footerEl) {
         if (activeModalTab === 'updates') {
-          footerEl.style.display = 'none';
+          footerEl.style.setProperty('display', 'none', 'important');
         } else {
-          footerEl.style.display = '';
+          footerEl.style.removeProperty('display');
           footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: true });
           bindFreightMobileFooter(footerEl, b);
         }
@@ -2544,9 +2544,9 @@ export function createMobileView(container, options = {}) {
     const footerEl = container.querySelector('.sheet-sticky-footer');
     if (footerEl) {
       if (tab === 'updates') {
-        footerEl.style.display = 'none';
+        footerEl.style.setProperty('display', 'none', 'important');
       } else {
-        footerEl.style.display = '';
+        footerEl.style.removeProperty('display');
         if (!footerEl.querySelector('#mobile-freight-primary-btn')) {
           footerEl.innerHTML = renderFreightFooterHtml(activeModalBooking || bookings[0], { isMobile: true });
           bindFreightMobileFooter(footerEl, activeModalBooking || bookings[0]);
