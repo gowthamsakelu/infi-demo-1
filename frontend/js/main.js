@@ -32,7 +32,7 @@ applyLayout();
 initBranding();
 initLogoObserver();
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function startApp() {
   const appContainer = document.getElementById('app');
   if (!appContainer) return;
   await fontsReady();
@@ -266,4 +266,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => toast.remove(), 300);
     }, action ? 6000 : 3200);
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startApp);
+} else {
+  startApp();
+}

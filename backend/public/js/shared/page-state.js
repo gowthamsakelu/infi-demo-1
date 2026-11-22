@@ -31,7 +31,7 @@ const ALIASES = {
 export function currentPage() {
   const raw = location.hash.replace(/^#/, '').split('?')[0].toLowerCase();
   const page = ALIASES[raw] || raw;
-  return PAGES.includes(page) ? page : 'dashboard'; // no (or an unknown) page in the address: the Dashboard is the home page
+  return PAGES.includes(page) ? page : 'inquiries'; // default to inquiries so live shipment leads display immediately
 }
 
 export function getParams() {
