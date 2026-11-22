@@ -811,8 +811,8 @@ export function createDesktopView(container) {
             updateInquiry(b.id, {
               status: 'ongoing',
               freight_details: b.freight_details,
-            }).catch(() => {});
-          } catch (_) {}
+            }).catch(() => { });
+          } catch (_) { }
           window.dispatchEvent(new CustomEvent('show-toast', {
             detail: { message: `Shipment confirmed! Operational work order generated.`, type: 'success' }
           }));
@@ -876,9 +876,7 @@ export function createDesktopView(container) {
         bindDesktopFreightFooter(footerEl, b);
       }
 
-      headerEl.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: 'close-desktop-detail-btn', isMobile: false });
-      const closeBtn = headerEl.querySelector('#close-desktop-detail-btn');
-      if (closeBtn) closeBtn.addEventListener('click', () => closeDrawer());
+      headerEl.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: '', isMobile: false });
 
       bodyEl.classList.add('is-freight-scroll');
       bodyEl.innerHTML = renderFreightBodyHtml(b, activeDetailTab);
@@ -1921,8 +1919,8 @@ export function createDesktopView(container) {
             updateInquiry(activeBooking.id, {
               status: 'ongoing',
               freight_details: activeBooking.freight_details,
-            }).catch(() => {});
-          } catch (_) {}
+            }).catch(() => { });
+          } catch (_) { }
           window.dispatchEvent(new CustomEvent('show-toast', {
             detail: { message: `Shipment confirmed! Operational work order generated.`, type: 'success' }
           }));

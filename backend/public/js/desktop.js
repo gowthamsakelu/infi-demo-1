@@ -876,9 +876,7 @@ export function createDesktopView(container) {
         bindDesktopFreightFooter(footerEl, b);
       }
 
-      headerEl.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: 'close-desktop-detail-btn', isMobile: false });
-      const closeBtn = headerEl.querySelector('#close-desktop-detail-btn');
-      if (closeBtn) closeBtn.addEventListener('click', () => closeDrawer());
+      headerEl.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: '', isMobile: false });
 
       bodyEl.classList.add('is-freight-scroll');
       bodyEl.innerHTML = renderFreightBodyHtml(b, activeDetailTab);

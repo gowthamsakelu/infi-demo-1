@@ -471,7 +471,6 @@ function renderRequirementsTabHtml(b, { isMobile = false } = {}) {
           </div>
           ${cargoBadgeHtml}
         </div>
-        ${isMobile ? `
         <div class="freight-spec-rows">
           <div class="spec-row">
             <span class="spec-label">Container Load :</span>
@@ -486,22 +485,6 @@ function renderRequirementsTabHtml(b, { isMobile = false } = {}) {
             <span class="spec-value">${esc(r.cargo_classification || 'Electronics & Industrial Machinery parts')}</span>
           </div>
         </div>
-        ` : `
-        <div class="freight-2col-grid">
-          <div class="freight-grid-item">
-            <span class="fg-label">Container Load</span>
-            <span class="fg-value-bold">${esc(r.container_type || '1x 40ft High Cube (HC)')}</span>
-          </div>
-          <div class="freight-grid-item">
-            <span class="fg-label">Gross Weight</span>
-            <span class="fg-value-bold">${esc(r.gross_weight || '24 Metric Tons (MT)')}</span>
-          </div>
-          <div class="freight-grid-item" style="grid-column: span 2;">
-            <span class="fg-label">Cargo Classification</span>
-            <span class="fg-value-bold">${esc(r.cargo_classification || 'Electronics & Industrial Machinery parts')}</span>
-          </div>
-        </div>
-        `}
       </div>
 
       <!-- Card 2: Temperature & Handling -->
