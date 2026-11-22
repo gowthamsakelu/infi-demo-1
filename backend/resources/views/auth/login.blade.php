@@ -24,7 +24,7 @@
     body.login-page {
       min-height: 100dvh;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #F8FAFC;
+      background: #F4F6FB;
       color: #0F172A;
       display: flex;
       flex-direction: column;
@@ -46,10 +46,10 @@
     .login-card {
       width: 100%;
       background: #FFFFFF;
-      border-radius: 26px;
-      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+      border-radius: 28px;
+      box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.04), 0 4px 10px -2px rgba(15, 23, 42, 0.02);
       border: 1px solid #EEF2F6;
-      padding: 34px 28px 30px 28px;
+      padding: 38px 30px 32px 30px;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
@@ -65,7 +65,7 @@
     }
 
     .card-logo-img {
-      width: 180px;
+      width: 145px;
       max-width: 100%;
       height: auto;
       object-fit: contain;
@@ -75,7 +75,7 @@
     .card-crm-badge {
       font-size: 11px;
       font-weight: 800;
-      color: #1E3A8A;
+      color: #35478C;
       letter-spacing: 0.16em;
       text-transform: uppercase;
       text-align: center;
@@ -107,11 +107,11 @@
 
     .field-input {
       width: 100%;
-      height: 42px;
+      height: 44px;
       padding: 0 14px;
       background: #FFFFFF;
       border: 1.5px solid #E2E8F0;
-      border-radius: 9px;
+      border-radius: 10px;
       font-family: inherit;
       font-size: 13.5px;
       color: #1E293B;
@@ -144,7 +144,7 @@
 
     /* Remember Me Checkbox */
     .remember-row {
-      margin-top: 0px;
+      margin-top: 2px;
       margin-bottom: 18px;
       display: flex;
       align-items: center;
@@ -176,7 +176,7 @@
       background: #2563EB;
       color: #FFFFFF;
       border: none;
-      border-radius: 9px;
+      border-radius: 10px;
       font-family: inherit;
       font-size: 14px;
       font-weight: 600;
@@ -205,20 +205,20 @@
     }
 
     .demo-label {
-      font-size: 12.5px;
-      color: #64748B;
+      font-size: 12px;
+      color: #94A3B8;
       text-align: center;
       margin-top: 22px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       font-weight: 500;
     }
 
     .btn-press-login {
       width: 100%;
-      height: 42px;
+      height: 44px;
       background: #FFFFFF;
       border: 1.5px solid #E2E8F0;
-      border-radius: 9px;
+      border-radius: 10px;
       color: #1E293B;
       font-family: inherit;
       font-size: 13.5px;
@@ -246,7 +246,7 @@
       font-size: 11.5px;
       color: #94A3B8;
       text-align: center;
-      margin-top: 18px;
+      margin-top: 20px;
       font-weight: 400;
       letter-spacing: 0.01em;
     }
@@ -259,7 +259,7 @@
       <!-- Full Logo with Tagline inside Card -->
       <div class="card-logo-wrap">
         <img 
-          src="{{ asset('images/infinity-logo.png') }}" 
+          src="{{ asset('images/infinity-login-logo.png') }}" 
           alt="INFINITY - Infinite Freight, Infinite Ways" 
           class="card-logo-img"
         />

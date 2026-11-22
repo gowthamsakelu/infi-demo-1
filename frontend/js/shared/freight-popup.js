@@ -902,25 +902,25 @@ export function renderFreightFooterHtml(b, { isMobile = false } = {}) {
   const prefix = isMobile ? 'mobile' : 'desktop';
 
   return `
-    <div class="freight-footer-inner">
+    <div class="freight-footer-inner ${isMobile ? 'is-mobile-footer' : 'is-desktop-footer'}">
       <button type="button" class="btn-confirm-shipment" id="${prefix}-freight-primary-btn" data-freight-action="confirm-shipment">
         Confirm Shipment
       </button>
-      <div class="freight-bottom-actions-row">
-        <button type="button" class="freight-action-pill-btn act-call" id="${prefix}-freight-act-call" title="Call ${esc(d.phone)}">
-          ${icon('phone', { size: 17, stroke: 2.2 })}
+      <div class="freight-bottom-actions-row ${isMobile ? 'mobile-actions-row' : 'desktop-actions-row'}">
+        <button type="button" class="freight-action-pill-btn act-call ${isMobile ? 'btn-mobile-act' : 'btn-desktop-act'}" id="${prefix}-freight-act-call" title="Call ${esc(d.phone)}">
+          ${icon('phone', { size: isMobile ? 16 : 18, stroke: 2.2 })}
           <span>Call</span>
         </button>
-        <button type="button" class="freight-action-pill-btn act-message" id="${prefix}-freight-act-msg" title="Message ${esc(d.name)}">
-          ${icon('message', { size: 17, stroke: 2.2 })}
+        <button type="button" class="freight-action-pill-btn act-message ${isMobile ? 'btn-mobile-act' : 'btn-desktop-act'}" id="${prefix}-freight-act-msg" title="Message ${esc(d.name)}">
+          ${icon('message', { size: isMobile ? 16 : 18, stroke: 2.2 })}
           <span>Message</span>
         </button>
-        <button type="button" class="freight-action-pill-btn act-forward" id="${prefix}-freight-act-fwd" title="Forward to Operations">
-          ${icon('send', { size: 17, stroke: 2.2 })}
+        <button type="button" class="freight-action-pill-btn act-forward ${isMobile ? 'btn-mobile-act' : 'btn-desktop-act'}" id="${prefix}-freight-act-fwd" title="Forward to Operations">
+          ${icon('send', { size: isMobile ? 16 : 18, stroke: 2.2 })}
           <span>Forward</span>
         </button>
-        <button type="button" class="freight-action-pill-btn act-more" id="${prefix}-freight-act-more" title="More Actions">
-          ${icon('more', { size: 17, stroke: 2.2 })}
+        <button type="button" class="freight-action-pill-btn act-more ${isMobile ? 'btn-mobile-act' : 'btn-desktop-act'}" id="${prefix}-freight-act-more" title="More Actions">
+          ${icon('more', { size: isMobile ? 16 : 18, stroke: 2.2 })}
           <span>More</span>
         </button>
       </div>
