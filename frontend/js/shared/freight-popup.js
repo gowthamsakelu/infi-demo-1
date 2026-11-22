@@ -735,11 +735,9 @@ function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
     return `
       <div class="freight-tab-pane freight-phased-updates-pane">
         <!-- Phase 1 Header -->
-        <div class="phase-top-header-row">
-          <div class="phase-top-line"><span class="audit-node-line line-header"></span></div>
-          <div class="phase-top-text">
-            <span class="phase-top-title">Phase 1: Booking Confirmation &amp; Export Documentation Lodged</span>
-            <span class="phase-top-sub">&bull; Proposal Registered</span>
+        <div class="phase-divider-row phase-divider-top">
+          <div class="phase-divider-pill phase-pill-slate">
+            Phase 1: Booking Confirmation &amp; Export Documentation Lodged &bull; Proposal Registered
           </div>
         </div>
 
@@ -761,7 +759,10 @@ function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
                 <span class="audit-card-time">18 Nov, 12:01 PM</span>
               </div>
               <p class="audit-card-desc">Project registered via Dubai Customs &amp; DGFT EDI Gateway for IIBC/GCC Freight Cohort 2024–25. Consignment: 1x 40ft High Cube Container (24 MT). Shipper: Rajesh Sharma (r.sharma@globaltrade.ae). Commercial Invoice &amp; Packing list uploaded.</p>
-              <div class="audit-card-author">By Customer Portal (EDI Exim)</div>
+              <div class="audit-card-author">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>By Customer Portal (EDI Exim)</span>
+              </div>
             </div>
           </div>
 
@@ -792,7 +793,10 @@ function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
                 <span class="audit-status-tag tag-approved">Approved</span>
               </div>
               <p class="audit-card-desc">Dubai Customs EDI transaction ID #AE-DXB-98319 processed successfully. Chamber of Commerce Certificate of Origin (COO-IN-7721) verified &amp; electronically sealed. Duty exemption code pre-lodged with MoIAT ECAS compliance conformity.</p>
-              <div class="audit-card-author">By Port Customs Authority</div>
+              <div class="audit-card-author">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>By Port Customs Authority</span>
+              </div>
             </div>
           </div>
 
@@ -823,7 +827,10 @@ function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
                 <span class="audit-status-tag tag-revision">Needs Revision</span>
               </div>
               <p class="audit-card-desc">Terminal weighbridge recorded gross tare weight discrepancy of +0.3 MT against packing list manifest. Terminal gate-in held pending updated certified weighbridge slip from shipper. Driver &amp; transport coordinator notified.</p>
-              <div class="audit-card-author">By JNPT Terminal Operations</div>
+              <div class="audit-card-author">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>By JNPT Terminal Operations</span>
+              </div>
             </div>
           </div>
 
@@ -854,13 +861,16 @@ function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
                 <span class="audit-status-tag tag-not-approved">Not Approved</span>
               </div>
               <p class="audit-card-desc">Port inspection committee flagged commercial invoice tare discrepancy. Supplementary tare cert rejected due to missing surveyor stamp. Resubmission required within 24 hours.</p>
-              <div class="audit-card-author">By Port Compliance Committee</div>
+              <div class="audit-card-author">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>By Port Compliance Committee</span>
+              </div>
             </div>
           </div>
 
           <!-- Shift to Phase 5 Banner -->
           <div class="phase-divider-row">
-            <div class="phase-divider-pill phase-pill-amber">
+            <div class="phase-divider-pill phase-pill-blue">
               Shifted to Phase 5: Resubmission &amp; Fast-Track Loading
             </div>
           </div>
@@ -885,7 +895,10 @@ function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
                 <span class="audit-status-tag tag-revision">Needs Revision</span>
               </div>
               <p class="audit-card-desc">Calibrated weight slip and SGS inspection re-filed. Berth assignment queued for MSC ALTAIR v.2408W.</p>
-              <div class="audit-card-author">By Freight Review Committee</div>
+              <div class="audit-card-author">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>By Freight Review Committee</span>
+              </div>
             </div>
           </div>
         </div>

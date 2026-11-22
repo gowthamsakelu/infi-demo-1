@@ -1,133 +1,93 @@
-# Deploying INFINITY CRM on Render
+# Deploying INFINITY CRM (infi-demo-1) on Render
 
-This guide outlines the complete process to deploy **INFINITY CRM** (Laravel 12 + Livewire 4 Backend & Standalone Frontend) to [Render](https://render.com/).
-
----
-
-## 📋 Architecture Overview
-
-The repository is structured to deploy smoothly on Render:
-
-| Service | Type on Render | Description | Port / Path |
-| :--- | :--- | :--- | :--- |
-| **`infinity-crm-backend`** | **Web Service (Docker)** | Complete Laravel 12 application with Livewire 4 UI & REST APIs | Dynamic `$PORT` / `/` & `/api` |
-| **`infinity-crm-frontend`** | **Static Site** | Standalone HTML5/CSS3/JS demonstration UI | Free Static Site / `index.html` |
+This guide provides the complete production configuration and deployment instructions for **INFINITY CRM** on [Render](https://render.com/).
 
 ---
 
-## 🚀 Method 1: 1-Click Deployment via Render Blueprint (Recommended)
+## 📋 Architecture & Overview
 
-Render Blueprints use the pre-configured [render.yaml](render.yaml) file in the root of the repository to automatically create and deploy all services.
-
-### Steps:
-1. **Push your code to GitHub or GitLab**:
-   ```bash
-   git add .
-   git commit -m "INFINITY CRM: Ready for Render deployment"
-   git push origin main
-   ```
-2. Log in to your [Render Dashboard](https://dashboard.render.com/).
-3. Click the **"New +"** button at the top right and select **"Blueprint"**.
-4. Connect your GitHub/GitLab repository.
-5. Render will automatically detect [`render.yaml`](render.yaml) and list:
-   - `infinity-crm-backend` (Docker Web Service)
-   - `infinity-crm-frontend` (Static Site)
-6. Click **"Apply"**. Render will build the Docker container, run migrations and database seeders, and bring the site online!
+- **Service Name**: `infi-demo-1`
+- **Repository**: `gowthamsakelu/infi-demo-1`
+- **Branch**: `main`
+- **Runtime**: `Docker` (Multi-stage build)
+- **Web Stack**: `PHP 8.2-FPM` + `Nginx` + `Supervisor`
+- **Framework**: `Laravel 12`
+- **Database**: `SQLite` (with `/var/data` persistent disk support)
+- **Health Check Path**: `/health` (returns HTTP 200 JSON)
 
 ---
 
-## 🛠️ Method 2: Manual Setup on Render Dashboard
+## 🚀 Deployment Instructions
 
-If you prefer to configure services manually:
+### Method 1: Connect as a Web Service (Recommended)
 
-### Deploying the Laravel Backend:
-1. In the Render Dashboard, click **New +** > **Web Service**.
-2. Connect your Git repository.
-3. Configure the service settings:
-   - **Name**: `infinity-crm-backend`
+1. Log in to [Render Dashboard](https://dashboard.render.com/).
+2. Click **New +** > **Web Service**.
+3. Select your GitHub repository: `gowthamsakelu/infi-demo-1`.
+4. Configure the service settings:
+   - **Name**: `infi-demo-1`
    - **Language / Runtime**: `Docker`
-   - **Branch**: `main` (or your active branch)
-   - **Root Directory**: `backend` (or leave empty to use root Dockerfile)
-   - **Dockerfile Path**: `./backend/Dockerfile` (or `./Dockerfile` if Root Directory is empty)
-   - **Docker Context**: `./backend` (or `.` if Root Directory is empty)
-   - **Instance Type**: `Free` (or higher)
-4. Under **Advanced** > **Health Check Path**, enter:
-   ```text
-   /up
-   ```
-5. Add the following **Environment Variables**:
+   - **Branch**: `main`
+   - **Root Directory**: *(leave blank/empty)*
+   - **Dockerfile Path**: `./Dockerfile`
+   - **Docker Build Context**: `.`
+   - **Instance Type**: `Free` (or Starter / Standard)
+5. Expand **Advanced**:
+   - **Health Check Path**: `/health`
+   - **Auto-Deploy**: `Yes` (On Commit)
+6. Add the following **Environment Variables**:
 
-| Key | Value | Description |
+| Variable | Value | Description |
 | :--- | :--- | :--- |
-| `APP_NAME` | `INFINITY CRM` | Application Title |
+| `APP_NAME` | `INFINITY` | Application name |
 | `APP_ENV` | `production` | Production environment |
-| `APP_DEBUG` | `false` | Disable debug output for security |
-| `APP_KEY` | *(Click "Generate" or run `php artisan key:generate --show`)* | 32-character encryption key |
+| `APP_DEBUG` | `false` | Security: disable debug mode |
+| `APP_KEY` | *(Click "Generate" or paste 32-char key)* | Application encryption key |
+| `APP_URL` | `https://infi-demo-1.onrender.com` | Your public Render URL |
 | `LOG_CHANNEL` | `stderr` | Streams logs directly to Render log viewer |
-| `DB_CONNECTION` | `sqlite` | Database driver (or `pgsql` if using Render Postgres) |
-| `DB_DATABASE` | `/var/www/html/database/database.sqlite` | SQLite database filepath |
-| `SESSION_DRIVER` | `database` | Stores user sessions in the database |
-| `CACHE_STORE` | `database` | Caching driver |
+| `DB_CONNECTION` | `sqlite` | Database driver |
+| `DB_DATABASE` | `/var/www/html/database/database.sqlite` | SQLite file path (or `/var/data/database.sqlite`) |
+| `SESSION_DRIVER` | `file` | File-based sessions |
+| `CACHE_STORE` | `file` | File-based cache |
+| `QUEUE_CONNECTION` | `sync` | Synchronous queue |
+| `DEMO_LOGIN` | `true` | Enables 1-click demo access |
 
-6. Click **Create Web Service**.
-
----
-
-### Deploying the Frontend (Optional Standalone):
-1. In Render Dashboard, click **New +** > **Static Site**.
-2. Connect your Git repository.
-3. Configure:
-   - **Name**: `infinity-crm-frontend`
-   - **Publish Directory**: `frontend`
-   - **Build Command**: *(leave empty)*
-4. Click **Create Static Site**.
+7. Click **Create Web Service**. Render will build the Docker container and start your service automatically!
 
 ---
 
-## 🗄️ Database Options
+### Method 2: 1-Click Blueprint (`render.yaml`)
 
-### Option A: Embedded SQLite (Default & Zero Setup)
-The container automatically initializes `/var/www/html/database/database.sqlite` and runs migrations and seeders on first boot.
-
-> [!NOTE]
-> On Render's Free tier, the local filesystem resets when the container spins down due to inactivity. If you require persistent file storage across container restarts on SQLite, attach a **Persistent Disk** in Render Dashboard:
-> - **Mount Path**: `/var/www/html/database`
-> - **Size**: 1 GB
-
-### Option B: Render Managed PostgreSQL (Recommended for Production)
-1. In Render Dashboard, click **New +** > **PostgreSQL Database**.
-2. Name it (e.g. `infinity-crm-db`) and create it.
-3. Once provisioned, copy the **Internal Database URL** (e.g. `postgres://user:password@host/db`).
-4. In your `infinity-crm-backend` Web Service:
-   - Set `DB_CONNECTION`: `pgsql`
-   - Set `DATABASE_URL`: paste the copied PostgreSQL internal URL.
-5. The container startup will automatically migrate and seed the PostgreSQL database!
+1. In Render Dashboard, click **New +** > **Blueprint**.
+2. Connect `gowthamsakelu/infi-demo-1`.
+3. Render automatically detects `render.yaml` with the `infi-demo-1` web service, health check `/health`, and environment variables.
+4. Click **Apply**.
 
 ---
 
-## 🔍 Verification & Health Check
+## 🗄️ SQLite Database Persistence
 
-1. **Check Live UI**:
-   Visit your Render URL: `https://<your-service-name>.onrender.com`
-   The Laravel Livewire booking operations dashboard will load with sample bookings, filters, and slide-over drawers.
-2. **Check REST API**:
-   - `https://<your-service-name>.onrender.com/api/bookings`
-   - `https://<your-service-name>.onrender.com/api/metadata`
-3. **Health Check**:
-   - `https://<your-service-name>.onrender.com/up` returns HTTP 200 `OK`.
-4. **View Logs**:
-   In your Render Dashboard, click on **Logs** to view startup output and live request streams.
+### On Render Free Tier
+Render's free tier provides an ephemeral local container disk. The SQLite database at `/var/www/html/database/database.sqlite` will persist during normal operation, but resets if the free instance spins down due to inactivity or when a new deployment is triggered.
+
+The startup script (`docker/entrypoint.sh`) safely initializes the database without destructive commands (`migrate --force --isolated`), ensuring smooth operation on every cold start.
+
+### Enabling 100% Persistent Storage (Paid Plan)
+If you attach a **Persistent Disk** on Render:
+1. In your `infi-demo-1` service on Render, go to **Disks** > **Add Disk**.
+2. Set:
+   - **Name**: `sqlite-data`
+   - **Mount Path**: `/var/data`
+   - **Size**: `1 GB`
+3. In **Environment Variables**, set:
+   - `DB_DATABASE`: `/var/data/database.sqlite`
+4. The startup script will automatically detect `/var/data`, copy the seed database on first boot, and preserve all modifications across every restart and redeployment!
 
 ---
 
-## 🐳 Local Container Testing
+## 🔍 Verification & Health Checks
 
-To test the exact Docker setup on your local machine before pushing:
-
-```bash
-# Build and run with Docker Compose
-docker compose up --build
-
-# Open in browser:
-http://localhost:8000
-```
+- **Health Check**: `https://<your-service>.onrender.com/health` (Returns HTTP 200 JSON `{"status": "ok", "app": "INFINITY"}`)
+- **Sign In Page**: `https://<your-service>.onrender.com/login` (Features the Infinity logo, tagline, credentials login, and 1-click Instant Demo)
+- **Dashboard & CRM**: `https://<your-service>.onrender.com/` (Authenticated operations dashboard with live customer enquiries, cargo specifications, and updates audit trail)
+- **Live Logs**: Render Dashboard > **Logs** tab streams all startup progress, Nginx access logs, and PHP-FPM messages in real time.

@@ -1,23 +1,20 @@
-
-# Render Infrastructure as Code (Blueprint)
+# Render Blueprint Specification for INFINITY CRM (infi-demo-1)
 # Documentation: https://render.com/docs/blueprint-spec
 
 services:
-  # ---------------------------------------------------------------------------
-  # 1. Laravel 12 Backend + Livewire Web Service (Docker)
-  # ---------------------------------------------------------------------------
   - type: web
-    name: infinity-crm-backend
+    name: infi-demo-1
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     plan: free
     region: oregon
-    healthCheckPath: /up
+    healthCheckPath: /health
+    autoDeploy: true
 
     envVars:
       - key: APP_NAME
-        value: "INFINITY CRM"
+        value: "INFINITY"
 
       - key: APP_ENV
         value: production
@@ -38,24 +35,25 @@ services:
         value: /var/www/html/database/database.sqlite
 
       - key: SESSION_DRIVER
-        value: database
+        value: file
 
       - key: CACHE_STORE
-        value: database
+        value: file
 
       - key: QUEUE_CONNECTION
-        value: database
+        value: sync
 
-  # ---------------------------------------------------------------------------
-  # 2. Standalone Frontend Demo (Static Site)
-  # ---------------------------------------------------------------------------
-  - type: web
-    name: infinity-crm-frontend
-    runtime: static
-    buildCommand: ""
-    staticPublishPath: ./frontend
+      - key: DEMO_LOGIN
+        value: "true"
 
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+      - key: DEMO_LOGIN_EMAIL
+        value: "sa08gautam23@gmail.com"
+
+      - key: DEMO_LOGIN_NAME
+        value: "Gautham"
+
+    # Optional: If you attach a Persistent Disk on Render paid plan:
+    # disk:
+    #   name: sqlite-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

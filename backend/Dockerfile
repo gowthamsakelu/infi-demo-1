@@ -1,5 +1,4 @@
-# Multi-stage Dockerfile for Laravel 12 on Render (backend context)
-# Stage 1: Dependency resolution with Composer
+# Multi-stage Production Dockerfile for Laravel 12 on Render (backend context)
 FROM composer:2 AS vendor
 
 WORKDIR /app
@@ -14,14 +13,17 @@ RUN composer install \
     --prefer-dist \
     --optimize-autoloader
 
-# Stage 2: Final Production Apache Image
-FROM php:8.2-apache
+# Stage 2: Final Production Image (PHP-FPM + Nginx + Supervisor)
+FROM php:8.2-fpm-bookworm
 
-LABEL maintainer="Ruyi Admin Team"
+LABEL maintainer="INFINITY Logistics Team"
 WORKDIR /var/www/html
 
-# Install system dependencies & PHP extension development headers
+# Install Nginx, Supervisor, SQLite3, and required PHP extension dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx \
+    supervisor \
+    sqlite3 \
     git \
     curl \
     unzip \
@@ -30,26 +32,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libzip-dev \
     libsqlite3-dev \
-    libpq-dev \
     libicu-dev \
+    libonig-dev \
+    libxml2-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo \
         pdo_sqlite \
-        pdo_mysql \
-        pdo_pgsql \
         zip \
         bcmath \
         opcache \
         gd \
         intl \
+        mbstring \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Enable Apache rewrite module
-RUN a2enmod rewrite headers deflate expires
-
-# Configure Apache virtual host
-COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # Install Composer binary from official composer image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -60,9 +56,16 @@ COPY --from=vendor /app/vendor /var/www/html/vendor
 # Copy application source code
 COPY . /var/www/html
 
-# Copy startup script and make executable
-COPY docker/start.sh /var/www/html/docker/start.sh
-RUN chmod +x /var/www/html/docker/start.sh
+# Configure Nginx, PHP-FPM pool, and Supervisor
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/default.conf /etc/nginx/conf.d/default.conf
+COPY docker/www.conf /usr/local/etc/php-fpm.d/zz-docker.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Remove default nginx site
+RUN rm -f /etc/nginx/sites-enabled/default
 
 # Ensure storage, cache, and database directories exist with proper write permissions
 RUN mkdir -p /var/www/html/storage/framework/cache/data \
@@ -78,15 +81,17 @@ RUN mkdir -p /var/www/html/storage/framework/cache/data \
 RUN composer dump-autoload --optimize --no-dev \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache /var/www/html/storage
 
-# Default environment variables
-ENV PORT=80 \
-    APACHE_DOCUMENT_ROOT=/var/www/html/public \
+# Default production environment variables
+ENV PORT=10000 \
     APP_ENV=production \
     APP_DEBUG=false \
-    LOG_CHANNEL=stderr
+    LOG_CHANNEL=stderr \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/var/www/html/database/database.sqlite \
+    SESSION_DRIVER=file \
+    CACHE_STORE=file \
+    QUEUE_CONNECTION=sync
 
-# Expose Render standard ports (dynamic $PORT, typically 10000)
 EXPOSE 80 10000
 
-# Execute start.sh on container launch
-CMD ["/var/www/html/docker/start.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

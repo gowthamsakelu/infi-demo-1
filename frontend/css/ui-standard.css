@@ -3011,8 +3011,9 @@ flex-shrink: 0;
   text-overflow: ellipsis !important;
   display: block !important;
 }
-  word-break: break-word !important;
-  display: block !important;
+
+word-break: break-word !important;
+display: block !important;
 }
 
 .corridor-mid {
@@ -3383,89 +3384,122 @@ flex-shrink: 0;
   padding: 8px 12px 16px 12px !important;
 }
 
-.phase-top-header-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 2px;
+/* Phased Updates Pane - Fully Harmonized with INFINITY CRM Theme */
+.freight-phased-updates-pane {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  padding: 10px 14px 28px 14px !important;
+  box-sizing: border-box !important;
 }
 
-.phase-top-line {
-  width: 24px;
-  display: flex;
-  justify-content: center;
-  height: 22px;
-  flex-shrink: 0;
+.phase-divider-row {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  margin: 10px 0 8px 0 !important;
+  position: relative !important;
+  box-sizing: border-box !important;
 }
 
-.phase-top-line .line-header {
-  width: 1.5px;
-  background: #CBD5E1;
-  height: 100%;
+.phase-divider-row.phase-divider-top {
+  margin-top: 2px !important;
+  margin-bottom: 8px !important;
 }
 
-.phase-top-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5px;
-  flex: 1;
+.phase-divider-row::before,
+.phase-divider-row::after {
+  content: '' !important;
+  flex: 1 1 0% !important;
+  height: 1px !important;
+  background: #E2E8F0 !important;
 }
 
-.phase-top-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: #64748B;
-  line-height: 1.35;
+.phase-divider-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 3.5px 12px !important;
+  border-radius: 9999px !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+  text-align: center !important;
+  max-width: 88% !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
 }
 
-.phase-top-sub {
-  font-size: 10px;
-  font-weight: 500;
-  color: #94A3B8;
-  line-height: 1.25;
+.phase-pill-slate {
+  background: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #475569 !important;
+}
+
+.phase-pill-green {
+  background: #ECFDF5 !important;
+  border: 1px solid #A7F3D0 !important;
+  color: #059669 !important;
+}
+
+.phase-pill-amber {
+  background: #FFFBEB !important;
+  border: 1px solid #FDE68A !important;
+  color: #B45309 !important;
+}
+
+.phase-pill-red {
+  background: #FEF2F2 !important;
+  border: 1px solid #FECACA !important;
+  color: #DC2626 !important;
+}
+
+.phase-pill-blue {
+  background: #EFF6FF !important;
+  border: 1px solid #BFDBFE !important;
+  color: #1D4ED8 !important;
 }
 
 .phase-audit-timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  width: 100%;
-  position: relative;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  width: 100% !important;
+  position: relative !important;
 }
 
 .audit-step-row {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-  position: relative;
-  width: 100%;
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  position: relative !important;
+  width: 100% !important;
 }
 
 .audit-step-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 24px;
-  flex-shrink: 0;
-  position: relative;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 24px !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
 }
 
 .audit-node-line {
-  width: 1.5px;
-  background: #CBD5E1;
-  flex: 1 1 auto;
+  width: 2px !important;
+  background: #E2E8F0 !important;
+  flex: 1 1 auto !important;
 }
 
-.audit-node-line.line-top {
-  min-height: 10px;
-}
-
-.audit-node-line.line-start {
-  min-height: 10px;
-}
-
+.audit-node-line.line-top,
+.audit-node-line.line-start,
 .audit-node-line.line-bottom {
-  min-height: 10px;
+  min-height: 8px !important;
 }
 
 .audit-node-line.line-end {
@@ -3473,178 +3507,133 @@ flex-shrink: 0;
 }
 
 .audit-node-circle {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: #FFFFFF;
-  z-index: 2;
-  margin: 0;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  background: #FFFFFF !important;
+  z-index: 2 !important;
+  margin: 0 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
 }
 
 .circle-purple {
-  border: 1.5px solid #8B5CF6;
-  color: #8B5CF6;
-  background: #FFFFFF;
+  border: 2px solid #8B5CF6 !important;
+  color: #7C3AED !important;
+  background: #FFFFFF !important;
 }
 
 .circle-green {
-  border: 1.5px solid #10B981;
-  color: #10B981;
-  background: #FFFFFF;
+  border: 2px solid #10B981 !important;
+  color: #059669 !important;
+  background: #FFFFFF !important;
 }
 
 .circle-amber {
-  border: 1.5px solid #F59E0B;
-  color: #F59E0B;
-  background: #FFFFFF;
+  border: 2px solid #F59E0B !important;
+  color: #D97706 !important;
+  background: #FFFFFF !important;
 }
 
 .circle-red {
-  border: 1.5px solid #EF4444;
-  color: #EF4444;
-  background: #FFFFFF;
+  border: 2px solid #EF4444 !important;
+  color: #DC2626 !important;
+  background: #FFFFFF !important;
 }
 
 .audit-step-card {
-  flex: 1 1 auto;
-  min-width: 0;
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 10px;
-  padding: 9px 11px;
-  margin-bottom: 2px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  padding: 11px 13px !important;
+  margin-bottom: 4px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  transition: all 0.15s ease !important;
 }
 
 .audit-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 6px;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
 }
 
 .audit-card-title {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #0F172A;
-  margin: 0;
-  line-height: 1.35;
-  flex: 1;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  margin: 0 !important;
+  line-height: 1.35 !important;
+  flex: 1 1 auto !important;
 }
 
 .audit-card-time {
-  font-size: 10px;
-  font-weight: 500;
-  color: #64748B;
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-top: 1px;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #64748B !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  margin-top: 1px !important;
 }
 
 .audit-status-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 1.5px 7px;
-  border-radius: 999px;
-  font-size: 9.5px;
-  font-weight: 700;
-  line-height: 1.3;
-  width: fit-content;
-  margin: 1px 0 2px 0;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 2px 8px !important;
+  border-radius: 9999px !important;
+  font-size: 9.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  width: fit-content !important;
+  margin: 2px 0 3px 0 !important;
 }
 
 .audit-status-tag.tag-approved {
-  background: #ECFDF5;
-  color: #059669;
-  border: 1px solid #A7F3D0;
+  background: #ECFDF5 !important;
+  color: #059669 !important;
+  border: 1px solid #A7F3D0 !important;
 }
 
 .audit-status-tag.tag-revision {
-  background: #FEF3C7;
-  color: #D97706;
-  border: 1px solid #FDE68A;
+  background: #FFFBEB !important;
+  color: #B45309 !important;
+  border: 1px solid #FDE68A !important;
 }
 
 .audit-status-tag.tag-not-approved {
-  background: #FEE2E2;
-  color: #DC2626;
-  border: 1px solid #FECACA;
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+  border: 1px solid #FECACA !important;
 }
 
 .audit-card-desc {
-  font-size: 10.5px;
-  color: #475569;
-  line-height: 1.45;
-  margin: 2px 0;
+  font-size: 10.5px !important;
+  color: #475569 !important;
+  line-height: 1.45 !important;
+  margin: 2px 0 !important;
 }
 
 .audit-card-author {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #991B1B;
-  line-height: 1.3;
-  margin-top: 2px;
-}
-
-/* Phase Divider Banners (No background, small colored text only) */
-.phase-divider-row {
-  width: 100%;
-  padding: 4px 0 2px 0;
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.phase-divider-row::before {
-  content: '';
-  position: absolute;
-  left: 11px;
-  top: 0;
-  bottom: 0;
-  width: 1.5px;
-  background: #CBD5E1;
-  z-index: 0;
-}
-
-.phase-divider-pill {
-  width: 100%;
-  padding: 2px 0 2px 28px !important;
-  border-radius: 0 !important;
   font-size: 10px !important;
   font-weight: 600 !important;
-  text-align: left !important;
-  line-height: 1.35 !important;
-  box-sizing: border-box !important;
-  position: relative !important;
-  z-index: 1 !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.phase-pill-green {
-  background: transparent !important;
-  border: none !important;
-  color: #059669 !important;
-}
-
-.phase-pill-amber {
-  background: transparent !important;
-  border: none !important;
-  color: #D97706 !important;
-}
-
-.phase-pill-red {
-  background: transparent !important;
-  border: none !important;
-  color: #DC2626 !important;
+  color: #64748B !important;
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 6px !important;
+  padding: 2.5px 8px !important;
+  width: fit-content !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4.5px !important;
+  margin-top: 3px !important;
 }
 
 /* Bottom Action Bar */

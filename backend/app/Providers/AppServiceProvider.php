@@ -35,6 +35,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Force HTTPS in production environments or when Render sets HTTPS
+        if (config('app.env') === 'production' || str_starts_with((string) config('app.url', ''), 'https://')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // Every Places search is a billed Google call, so each visitor gets a small allowance (there is no login to key it on yet).
         RateLimiter::for('places', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
 

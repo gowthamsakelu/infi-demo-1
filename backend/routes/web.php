@@ -5,6 +5,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PageController;
 use App\Livewire\BookingsManager;
 
+// Render and Docker Health Check Endpoint
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'app' => config('app.name', 'INFINITY'),
+        'timestamp' => now()->toIso8601String(),
+    ], 200);
+});
+
 // Sign in. The app itself (the shell below) needs a signed-in user; its JSON API is unchanged for now.
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'show'])->name('login');
