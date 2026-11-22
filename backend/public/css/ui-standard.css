@@ -3011,8 +3011,9 @@ flex-shrink: 0;
   text-overflow: ellipsis !important;
   display: block !important;
 }
-  word-break: break-word !important;
-  display: block !important;
+
+word-break: break-word !important;
+display: block !important;
 }
 
 .corridor-mid {
