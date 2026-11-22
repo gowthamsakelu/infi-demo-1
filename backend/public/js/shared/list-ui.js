@@ -177,7 +177,7 @@ export const paxLine = (b) => {
     const mode = req.service_type || fd.mode || 'Sea Freight';
     const origin = req.pol_origin ? req.pol_origin.split('(')[0].trim() : (fd.origin || 'Mumbai');
     const dest = req.pod_destination ? req.pod_destination.split('(')[0].trim() : (fd.destination || 'Dubai');
-    const container = req.shipment_mode || req.container_type || fd.container || (b.pax ? `${b.pax} TEU` : 'FCL 40ft');
+    const container = req.shipment_mode || req.container_type || fd.container || (b.pax ? `${b.pax} TEU` : 'FCL 40 ft');
     return `${mode} • ${origin} to ${dest} • ${container}`;
   }
   return (b.pax ? `${b.pax} Pax${b.duration ? ` • ${b.duration}` : ''}` : '—');

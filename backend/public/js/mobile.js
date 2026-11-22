@@ -155,13 +155,19 @@ export function createMobileView(container, options = {}) {
           </svg>
           Quotation
         </button>
+        <button class="nav-item" id="mobile-more-btn" data-more title="More Pages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+          </svg>
+          More
+        </button>
       </div>
 
       <!-- Backdrop for Bottom Sheet Modal -->
       <div class="sheet-backdrop ${isModalOpen ? 'open' : ''}" id="mobile-sheet-backdrop"></div>
 
       <!-- Bottom Sheet Modal (Screens 1, 2, 4) -->
-      <div class="bottom-sheet ${isModalOpen ? 'open' : ''}" id="mobile-bottom-sheet">
+      <div class="bottom-sheet ${isModalOpen ? 'open' : ''}" id="mobile-bottom-sheet" data-active-tab="${activeModalTab}">
         <!-- Sheet Header Card & Controls -->
         <div id="sheet-header-card-content">
           <!-- Populated dynamically -->
@@ -169,12 +175,7 @@ export function createMobileView(container, options = {}) {
 
         <!-- Sheet Navigation Tabs -->
         <div class="sheet-tabs-nav scroll-row">
-          ${(page === 'inquiries' || bookings[0]?.kind === 'inquiry')
-            ? renderFreightTabsHtml('customer-details', { attr: 'data-sheet-tab' })
-            : `<button class="sheet-tab-btn ${activeModalTab === 'customer-details' ? 'active' : ''}" data-sheet-tab="customer-details">Customer Details</button>
-               <button class="sheet-tab-btn ${activeModalTab === 'guests' ? 'active' : ''}" data-sheet-tab="guests">Guests (<span id="sheet-guest-count-badge">12</span>)</button>
-               <button class="sheet-tab-btn ${activeModalTab === 'itinerary' ? 'active' : ''}" data-sheet-tab="itinerary">Itinerary</button>
-               <button class="sheet-tab-btn ${activeModalTab === 'updates' ? 'active' : ''}" data-sheet-tab="updates">Updates</button>`}
+          ${renderFreightTabsHtml('customer-details', { attr: 'data-sheet-tab' })}
         </div>
 
         <!-- Sheet Body Scroll Content -->
@@ -183,33 +184,8 @@ export function createMobileView(container, options = {}) {
         </div>
 
         <!-- Sheet Sticky Footer Action Section -->
-        <div class="sheet-sticky-footer">
-          ${(page === 'inquiries' || bookings[0]?.kind === 'inquiry')
-            ? renderFreightFooterHtml(bookings[0], { isMobile: true })
-            : `<button class="btn-confirm-booking" id="mobile-confirm-booking-btn">Confirm Booking</button>
-               <div class="sheet-quick-actions-grid">
-                 <button class="quick-action-col-btn btn-act-call" id="sheet-act-call">
-                   ${icon('phone', { size: 20, stroke: 2.2 })}
-                   <span>Call</span>
-                 </button>
-                 <button class="quick-action-col-btn btn-act-msg" id="sheet-act-msg">
-                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                   </svg>
-                   <span>Message</span>
-                 </button>
-                 <button class="quick-action-col-btn btn-act-fwd" id="sheet-act-fwd">
-                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                     <path d="m22 2-7 20-4-9-9-4Z"/>
-                     <path d="M22 2 11 13"/>
-                   </svg>
-                   <span>Forward</span>
-                 </button>
-                 <button class="quick-action-col-btn btn-act-more" id="sheet-act-more">
-                   ${icon('more', { size: 20, stroke: 2.2 })}
-                   <span>More</span>
-                 </button>
-               </div>`}
+        <div class="sheet-sticky-footer" style="${activeModalTab === 'updates' ? 'display: none !important;' : ''}">
+          ${renderFreightFooterHtml(bookings[0], { isMobile: true })}
         </div>
       </div>
 
@@ -539,8 +515,10 @@ export function createMobileView(container, options = {}) {
     const catValue = selectedCategory === 'ALL' ? '' : selectedCategory;
 
     const base = bookings.filter(b => {
-      const matchSearch = !q || b.title.toLowerCase().includes(q) || b.destination.toLowerCase().includes(q) || b.id.toLowerCase().includes(q) ||
-        b.guest.name.toLowerCase().includes(q) || (b.guest.phone && b.guest.phone.includes(searchQuery));
+      const gName = (b.guest?.name || b.customer_name || b.customer?.name || '').toLowerCase();
+      const gPhone = b.guest?.phone || b.customer_phone || b.customer?.phone || '';
+      const matchSearch = !q || (b.title || '').toLowerCase().includes(q) || (b.destination || '').toLowerCase().includes(q) || (b.id || '').toLowerCase().includes(q) ||
+        gName.includes(q) || (gPhone && gPhone.includes(searchQuery));
       return matchSearch && matchesCategory(b, catValue);
     });
     const filtered = base.filter(b => activeCategory === allKey() || b.category === activeCategory);
@@ -564,9 +542,7 @@ export function createMobileView(container, options = {}) {
     updateBulkBar(container, 'mobile', bookings.filter(b => b.selected).length);
   }
 
-  const getActiveModalTabs = () => (page === 'inquiries' || activeModalBooking?.kind === 'inquiry')
-    ? ['customer-details', 'requirements', 'shipment-docs', 'updates']
-    : ['customer-details', 'guests', 'itinerary', 'updates'];
+  const getActiveModalTabs = () => ['customer-details', 'requirements', 'shipment-docs', 'updates'];
 
   function bindFreightMobileFooter(footerEl, b) {
     if (!footerEl) return;
@@ -648,7 +624,7 @@ export function createMobileView(container, options = {}) {
     if (!headerCard || !activeModalBooking) return;
 
     const b = activeModalBooking;
-    const isFreight = page === 'inquiries' || b.kind === 'inquiry';
+    const isFreight = true;
 
     if (isFreight) {
       headerCard.innerHTML = renderFreightHeaderHtml(b, { closeBtnId: 'mobile-sheet-close-btn', isMobile: true });
@@ -657,7 +633,7 @@ export function createMobileView(container, options = {}) {
       return;
     }
 
-    const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n=>n[0]).join('') || 'CU');
+    const initials = b.customer?.initials || (b.guest?.name?.split(' ').map(n => n[0]).join('') || 'CU');
     const custName = b.customer?.name || b.guest?.name || 'Customer';
 
     // Uniform Customer Profile Header for ALL tabs: Customer Details, Guests, Itinerary, Updates
@@ -679,11 +655,11 @@ export function createMobileView(container, options = {}) {
     if (!bodyEl || !activeModalBooking) return;
 
     const b = activeModalBooking;
-    const isFreight = page === 'inquiries' || b.kind === 'inquiry';
+    const isFreight = true;
 
     if (isFreight) {
       bodyEl.classList.add('is-freight-scroll');
-      bodyEl.innerHTML = renderFreightBodyHtml(b, activeModalTab);
+      bodyEl.innerHTML = renderFreightBodyHtml(b, activeModalTab, { isMobile: true });
       bindFreightBodyEvents(bodyEl, b, (updated) => {
         if (updated) {
           Object.assign(b, updated);
@@ -701,7 +677,7 @@ export function createMobileView(container, options = {}) {
     if (activeModalTab === 'customer-details') {
       const c = b.customer || {
         name: b.guest.name,
-        initials: b.guest.name.split(' ').map(n=>n[0]).join('') || 'CU',
+        initials: b.guest.name.split(' ').map(n => n[0]).join('') || 'CU',
         phone: b.guest.phone,
         email: b.guest.email,
         location: 'New Delhi, Delhi',
@@ -856,7 +832,7 @@ export function createMobileView(container, options = {}) {
           </div>
         </div>
       `;
-    } 
+    }
     // Guests Tab (Exact match to Image 1 reference with Special Requirements)
     else if (activeModalTab === 'guests') {
       const visibleGuests = showAllGuests ? b.guests : b.guests.slice(0, 4);
@@ -984,7 +960,7 @@ export function createMobileView(container, options = {}) {
       if (addBtnLabel) addBtnLabel.textContent = 'Add New Team Member';
 
       const filtered = teamMembers.filter(m => {
-        return !vendorSearchQuery || 
+        return !vendorSearchQuery ||
           m.name.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
           m.role.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
           m.phone.toLowerCase().includes(vendorSearchQuery.toLowerCase());
@@ -1019,7 +995,7 @@ export function createMobileView(container, options = {}) {
       if (addBtnLabel) addBtnLabel.textContent = 'Add New Vendor';
 
       const filtered = vendors.filter(v => {
-        return !vendorSearchQuery || 
+        return !vendorSearchQuery ||
           v.name.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
           v.service.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
           v.phone.toLowerCase().includes(vendorSearchQuery.toLowerCase());
@@ -1058,7 +1034,7 @@ export function createMobileView(container, options = {}) {
       if (addBtnLabel) addBtnLabel.textContent = 'Add New Contact';
 
       const filtered = contacts.filter(c => {
-        return !vendorSearchQuery || 
+        return !vendorSearchQuery ||
           c.name.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
           c.role.toLowerCase().includes(vendorSearchQuery.toLowerCase()) ||
           (c.details && c.details.toLowerCase().includes(vendorSearchQuery.toLowerCase())) ||
@@ -1096,7 +1072,7 @@ export function createMobileView(container, options = {}) {
   function openModal(booking, tab = 'customer-details') {
     activeModalBooking = booking || bookings[0];
     const b = activeModalBooking;
-    const isFreight = page === 'inquiries' || b?.kind === 'inquiry';
+    const isFreight = true;
 
     if (isFreight) {
       if (!['customer-details', 'requirements', 'shipment-docs', 'updates'].includes(tab)) {
@@ -1117,9 +1093,16 @@ export function createMobileView(container, options = {}) {
         tabsNav.innerHTML = renderFreightTabsHtml(activeModalTab, { attr: 'data-sheet-tab' });
       }
       if (footerEl) {
-        footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: true });
-        bindFreightMobileFooter(footerEl, b);
+        if (activeModalTab === 'updates') {
+          footerEl.style.display = 'none';
+        } else {
+          footerEl.style.display = '';
+          footerEl.innerHTML = renderFreightFooterHtml(b, { isMobile: true });
+          bindFreightMobileFooter(footerEl, b);
+        }
       }
+      const sheetEl = container.querySelector('#mobile-bottom-sheet');
+      if (sheetEl) sheetEl.dataset.activeTab = activeModalTab;
     } else {
       if (tabsNav && !tabsNav.querySelector('[data-sheet-tab="guests"]')) {
         tabsNav.innerHTML = `
@@ -1170,10 +1153,9 @@ export function createMobileView(container, options = {}) {
     container.querySelectorAll('.sheet-tab-btn').forEach(btn => {
       const isActive = btn.dataset.sheetTab === activeModalTab;
       btn.classList.toggle('active', isActive);
-      if (isActive) {
-        btn.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
-      }
     });
+    const tabsNavEl = container.querySelector('.sheet-tabs-nav');
+    if (tabsNavEl) tabsNavEl.scrollLeft = 0;
 
     const backdrop = container.querySelector('#mobile-sheet-backdrop');
     const sheet = container.querySelector('#mobile-bottom-sheet');
@@ -1561,19 +1543,19 @@ export function createMobileView(container, options = {}) {
       container.querySelector('#mobile-team-page').hidden = true;
       container.querySelector('#mobile-screen-scroll')?.classList.remove('calendar-mode');
       if (subtitleEl) {
-        subtitleEl.textContent = page === 'inquiries' 
-          ? `Enquirey & Leads • ${inquiryState.list.length} Total` 
-          : page === 'customers' 
-          ? `Customers • ${getCustomersList().length} Total` 
-          : `Quotation • ${bookingsData.length} Total`;
+        subtitleEl.textContent = page === 'inquiries'
+          ? `Enquirey & Leads • ${inquiryState.list.length} Total`
+          : page === 'customers'
+            ? `Customers • ${getCustomersList().length} Total`
+            : `Quotation • ${bookingsData.length} Total`;
       }
       const confirmBtn = container.querySelector('#mobile-confirm-booking-btn');
       if (confirmBtn) {
-        confirmBtn.textContent = page === 'inquiries' 
-          ? 'Confirm Inquiry' 
-          : page === 'customers' 
-          ? 'Customer Profile' 
-          : 'Confirm Quotation';
+        confirmBtn.textContent = page === 'inquiries'
+          ? 'Confirm Inquiry'
+          : page === 'customers'
+            ? 'Customer Profile'
+            : 'Confirm Quotation';
       }
       applyParams();
       if (needRestore) { const sc = container.querySelector('#mobile-screen-scroll'); if (sc) sc.scrollTop = scrollMemory[page] || 0; needRestore = false; }
@@ -1799,8 +1781,9 @@ export function createMobileView(container, options = {}) {
       container.querySelectorAll('.sheet-tab-btn').forEach((btn) => {
         const on = btn.dataset.sheetTab === activeModalTab;
         btn.classList.toggle('active', on);
-        if (on) btn.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
       });
+      const tabsNavEl2 = container.querySelector('.sheet-tabs-nav');
+      if (tabsNavEl2) tabsNavEl2.scrollLeft = 0;
       const bodyEl2 = container.querySelector('#sheet-body-content');
       if (bodyEl2) bodyEl2.scrollTop = 0;
       slideIn(container.querySelector('#sheet-header-card-content'), step);
@@ -1932,7 +1915,7 @@ export function createMobileView(container, options = {}) {
               trip: destVal || null,
               notes: notesVal || null,
             })
-          }).catch(() => {});
+          }).catch(() => { });
         } else {
           fetch(`/api/bookings/${encodeURIComponent(activeModalBooking.id)}`, {
             method: 'PUT',
@@ -1946,7 +1929,7 @@ export function createMobileView(container, options = {}) {
               budget: budgetVal || null,
               notes: notesVal || null
             })
-          }).catch(() => {});
+          }).catch(() => { });
         }
 
         closeMobileEditCustomerModal();
@@ -2144,9 +2127,9 @@ export function createMobileView(container, options = {}) {
             persist(activeModalBooking, { onRollback: renderSheetBody });
             renderSheetBody();
             window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { 
+              detail: {
                 message: foundItem.completed ? `Marked "${foundItem.title}" as Complete! ✓` : `Marked "${foundItem.title}" as Scheduled`,
-                type: 'success' 
+                type: 'success'
               }
             }));
           }
@@ -2219,7 +2202,7 @@ export function createMobileView(container, options = {}) {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ special_requirements: activeModalBooking.specialRequirements || [] })
-          }).catch(() => {});
+          }).catch(() => { });
         }
         window.dispatchEvent(new CustomEvent('show-toast', {
           detail: { message: 'Special requirements updated successfully!', type: 'success' }
@@ -2254,9 +2237,9 @@ export function createMobileView(container, options = {}) {
           openActivityDetailsModal(modalActiveItem);
           renderSheetBody();
           window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { 
+            detail: {
               message: modalActiveItem.completed ? `Marked "${modalActiveItem.title}" as Complete! ✓` : `Marked as Scheduled`,
-              type: 'success' 
+              type: 'success'
             }
           }));
         }
@@ -2319,7 +2302,7 @@ export function createMobileView(container, options = {}) {
         assignVendorTab = assignTabBtn.dataset.assignTab;
         container.querySelectorAll('.assign-tab-btn').forEach(b => b.classList.remove('active'));
         assignTabBtn.classList.add('active');
-        
+
         // Ensure default selected assignee matches the active tab
         if (assignVendorTab === 'Team Members' && (!selectedAssignee || selectedAssignee.type !== 'Team Members')) {
           selectedAssignee = { type: 'Team Members', id: teamMembers[0].id, name: teamMembers[0].name, avatar: teamMembers[0].avatar, roleOrService: teamMembers[0].role, phone: teamMembers[0].phone };
@@ -2446,9 +2429,9 @@ export function createMobileView(container, options = {}) {
           closeAssignSheet();
           renderCards();
           window.dispatchEvent(new CustomEvent('show-toast', {
-            detail: { 
+            detail: {
               message: `Assigned ${assignee.name} to ${sel.length} booking(s) & WhatsApp details sent!`,
-              type: 'success' 
+              type: 'success'
             }
           }));
           return;
@@ -2476,9 +2459,9 @@ export function createMobileView(container, options = {}) {
         renderSheetBody(); // Re-renders to Screen 4 with Assigned badges!
 
         window.dispatchEvent(new CustomEvent('show-toast', {
-          detail: { 
+          detail: {
             message: `Assigned ${assignee.name} (${assignVendorTab}) to ${targetActivityItem?.title || 'Activity'} & WhatsApp details sent!`,
-            type: 'success' 
+            type: 'success'
           }
         }));
         return;
@@ -2514,7 +2497,7 @@ export function createMobileView(container, options = {}) {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ status: 'hot' })
-          }).catch(() => {});
+          }).catch(() => { });
           toast(`Inquiry ${activeModalBooking.id} (${activeModalBooking.title}) confirmed.`, 'success');
           renderCards();
           renderSheetHeader();
@@ -2528,7 +2511,7 @@ export function createMobileView(container, options = {}) {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ status: 'Confirmed' })
-          }).catch(() => {});
+          }).catch(() => { });
           renderCards();
           renderSheetHeader();
           window.dispatchEvent(new CustomEvent('show-toast', {
@@ -2555,8 +2538,24 @@ export function createMobileView(container, options = {}) {
     openDropdownItemId = null;
     closeAssignSheet();
 
+    const sheetEl = container.querySelector('#mobile-bottom-sheet');
+    if (sheetEl) sheetEl.dataset.activeTab = tab;
+
+    const footerEl = container.querySelector('.sheet-sticky-footer');
+    if (footerEl) {
+      if (tab === 'updates') {
+        footerEl.style.display = 'none';
+      } else {
+        footerEl.style.display = '';
+        if (!footerEl.querySelector('#mobile-freight-primary-btn')) {
+          footerEl.innerHTML = renderFreightFooterHtml(activeModalBooking || bookings[0], { isMobile: true });
+          bindFreightMobileFooter(footerEl, activeModalBooking || bookings[0]);
+        }
+      }
+    }
+
     const b = activeModalBooking;
-    const isFreight = page === 'inquiries' || b?.kind === 'inquiry';
+    const isFreight = true;
     const tabsNav = container.querySelector('.sheet-tabs-nav');
     if (isFreight && tabsNav && !tabsNav.querySelector('[data-sheet-tab="shipment-docs"]')) {
       tabsNav.innerHTML = renderFreightTabsHtml(activeModalTab, { attr: 'data-sheet-tab' });
@@ -2566,10 +2565,8 @@ export function createMobileView(container, options = {}) {
     container.querySelectorAll('.sheet-tab-btn').forEach(btn => {
       const isActive = btn.dataset.sheetTab === activeModalTab;
       btn.classList.toggle('active', isActive);
-      if (isActive) {
-        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
     });
+    if (tabsNav) tabsNav.scrollLeft = 0;
 
     const bodyEl = container.querySelector('#sheet-body-content');
     if (bodyEl && slideDir) {

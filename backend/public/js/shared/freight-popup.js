@@ -63,13 +63,57 @@ export function getFreightData(b) {
   const req = f.requirements || {};
   const serviceType = req.service_type || 'Sea Freight';
   const containerType = req.container_type || '1x 40ft High Cube (HC)';
-  const shipmentMode = req.shipment_mode || 'FCL 40ft';
+  let rawShipmentMode = req.shipment_mode || 'FCL 40 ft';
+  if (
+    !rawShipmentMode ||
+    rawShipmentMode === 'FCL 40ft' ||
+    rawShipmentMode === 'FCL 40 ft' ||
+    rawShipmentMode === 'Reefer Container (RF)' ||
+    rawShipmentMode.toLowerCase().includes('reefer') ||
+    rawShipmentMode.toLowerCase().includes('special equipment') ||
+    rawShipmentMode.toLowerCase().includes('break-bulk') ||
+    rawShipmentMode.toLowerCase().includes('40ft') ||
+    rawShipmentMode.toLowerCase().includes('40 ft')
+  ) {
+    rawShipmentMode = 'FCL 40 ft';
+  }
+  const shipmentMode = rawShipmentMode;
   const origin = req.origin || 'Nhava Sheva (JNPT), Mumbai';
   const destination = req.destination || b.destination || 'Jebel Ali, Dubai';
   const route = req.route || 'Mumbai to Dubai';
   const deliveryWindow = req.expected_shipment_date || req.delivery_window || b.dates || '28 Nov 2026';
 
   const shp = f.shipment || {};
+
+  let polOrigin = req.pol_origin || 'JNPT (Mumbai, IN)';
+  let polSub = req.pol_sub || 'Nhava Sheva Port';
+  if (polSub.includes('DP World Chennai Container Terminal')) {
+    polSub = 'DP World Chennai Terminal';
+  } else if (polSub.includes('Yangshan Deepwater Port')) {
+    polSub = 'Yangshan Port';
+  }
+  let podDest = req.pod_destination || b.destination || 'Jebel Ali (Dubai, UAE)';
+  if (podDest === 'Khalifa Port (Abu Dhabi, UAE)') {
+    podDest = 'Khalifa Port, Abu Dhabi';
+  } else if (podDest.includes('Syama Prasad Mookerjee Port') || podDest.includes('Kolkata')) {
+    podDest = 'Kolkata Port (SMP)';
+  } else if (podDest.includes('Hamriyah Port')) {
+    podDest = 'Hamriyah Port (Sharjah)';
+  } else if (podDest === 'Hamburg (Germany)') {
+    podDest = 'Hamburg Port (DE)';
+  }
+  let customsStatus = req.customs_status || 'Pending Quote Confirmation';
+  if (customsStatus === 'MoHAP Fast-Track Clearance') {
+    customsStatus = 'MoHAP Fast-Track';
+  } else if (customsStatus === 'Pending Quote Confirmation') {
+    customsStatus = 'Pending Quote';
+  } else if (customsStatus === 'Customs Assessment Completed') {
+    customsStatus = 'Assessment Completed';
+  } else if (customsStatus === 'Verified & Gate Cleared') {
+    customsStatus = 'Gate Cleared';
+  } else if (customsStatus === 'Export Shipping Bill Filed') {
+    customsStatus = 'Bill Filed';
+  }
 
   return {
     isLead,
@@ -106,12 +150,12 @@ export function getFreightData(b) {
       cargo_classification: req.cargo_classification || req.cargo_description || 'Electronics & Industrial Machinery parts',
       storage_env: req.storage_env || 'Ambient dry cargo',
       barrier_type: req.barrier_type || 'Moisture-resistant desiccant barrier',
-      pol_origin: req.pol_origin || 'JNPT (Mumbai, IN)',
-      pol_sub: req.pol_sub || 'Nhava Sheva Port',
+      pol_origin: polOrigin,
+      pol_sub: polSub,
       transit_duration: req.transit_duration || '4-5 Days',
-      pod_destination: req.pod_destination || 'Jebel Ali (Dubai, UAE)',
+      pod_destination: podDest,
       pod_sub: req.pod_sub || 'Terminal 2 Berth',
-      customs_status: req.customs_status || 'Pending Quote Confirmation',
+      customs_status: customsStatus,
       customs_checks: req.customs_checks || [
         { label: 'Country of Origin (COO) legalization by Chamber of Commerce', verified: true },
         { label: 'SASO / UAE MoIAT ECAS product conformity certificate', verified: true },
@@ -146,7 +190,7 @@ export function getFreightData(b) {
   };
 }
 
-/** Render Flow Status Stepper matching reference design (img3) */
+/** Render Flow Status Stepper matching reference design (img2: line & dot stepper) */
 export function renderFreightFlowStatusHtml(b) {
   const d = getFreightData(b);
   const stages = [
@@ -157,7 +201,7 @@ export function renderFreightFlowStatusHtml(b) {
     { key: 'deliver', label: 'Deliver' },
   ];
 
-  // Active step: default to 3 ('Transit') matching reference img3
+  // Default active step: 3 ('Transit') matching img2 reference
   let activeIndex = 3;
   const rawStage = String(d.stage || b.status || '').toLowerCase();
   if (rawStage.includes('deliver')) {
@@ -181,11 +225,11 @@ export function renderFreightFlowStatusHtml(b) {
       <div class="freight-flow-track-fill" style="width: ${fillWidthPct}%;"></div>
       <div class="freight-flow-steps">
         ${stages.map((st, i) => {
-          let stateCls = 'pending';
-          if (i < activeIndex) stateCls = 'done';
-          else if (i === activeIndex) stateCls = 'active';
+    let stateCls = 'pending';
+    if (i < activeIndex) stateCls = 'done';
+    else if (i === activeIndex) stateCls = 'active';
 
-          return `
+    return `
             <div class="freight-flow-step is-${stateCls}">
               <div class="freight-flow-dot-box">
                 <span class="freight-flow-dot"></span>
@@ -193,7 +237,7 @@ export function renderFreightFlowStatusHtml(b) {
               <span class="freight-flow-label">${esc(st.label)}</span>
             </div>
           `;
-        }).join('')}
+  }).join('')}
       </div>
     </div>
   `;
@@ -204,18 +248,30 @@ export function renderFreightHeaderHtml(b, { closeBtnId = '', isMobile = false }
   const d = getFreightData(b);
   const tradeClass = d.tradeType === 'EXPORT' ? 'badge-trade-export' : 'badge-trade-import';
 
-  const closeHtml = (closeBtnId && isMobile)
-    ? `<button type="button" class="sheet-close-btn" id="${esc(closeBtnId)}" title="Close" aria-label="Close" style="position: static; margin-left: auto;">
+  const closeHtml = closeBtnId
+    ? `<button type="button" class="sheet-close-btn freight-close-circle" id="${esc(closeBtnId)}" title="Close" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>`
     : '';
 
+  let modeBadge = d.requirements.shipment_mode || 'FCL 40 ft';
+  if (
+    modeBadge === 'FCL 40ft' ||
+    modeBadge === 'FCL 40 ft' ||
+    modeBadge.toLowerCase().includes('40ft') ||
+    modeBadge.toLowerCase().includes('40 ft') ||
+    modeBadge.toLowerCase().includes('reefer')
+  ) {
+    modeBadge = 'FCL 40 ft';
+  }
+
   return `
     ${isMobile ? '<div class="sheet-drag-handle-bar" id="mobile-sheet-handle"><div class="sheet-handle"></div></div>' : ''}
     <div class="freight-header-card">
-      <!-- Row 1: Avatar, Name + Trade Pill, Close button -->
+      ${closeHtml}
+      <!-- Header Top: Avatar, Name + Trade Pill, Subtitle & Meta Chips -->
       <div class="freight-header-top">
         <div class="freight-header-profile">
           <div class="freight-avatar-circle">${esc(d.initials)}</div>
@@ -226,36 +282,34 @@ export function renderFreightHeaderHtml(b, { closeBtnId = '', isMobile = false }
                 <span class="trade-dot"></span>${esc(d.tradeType)}
               </span>
             </div>
-            <!-- Subtitle -->
+            <!-- Subtitle (Designation / Role & Company) -->
             <div class="freight-subtitle-row">
               <span>${esc(d.subtitle || `${d.designation} • ${d.company.name}`)}</span>
             </div>
+            <!-- Meta Chips placed below designation / role line -->
+            <div class="freight-meta-chips">
+              <span class="freight-meta-chip">
+                ${icon('calendar', { size: 12 })}
+                <span>${esc(d.requirements.delivery_window || '28 Nov 2026')}</span>
+              </span>
+              <span class="freight-meta-chip">
+                ${icon('ship', { size: 12 })}
+                <span>${esc(d.requirements.service_type || 'Sea Freight')}</span>
+              </span>
+              <span class="freight-meta-chip">
+                ${icon('route', { size: 12 }) || icon('pin', { size: 12 })}
+                <span>${esc(d.route || 'Mumbai to Dubai')}</span>
+              </span>
+              <span class="freight-meta-chip">
+                ${icon('box', { size: 12 })}
+                <span>${esc(modeBadge)}</span>
+              </span>
+            </div>
           </div>
         </div>
-        ${closeHtml}
       </div>
 
-      <!-- Row 2: Summary Meta Chips (Date, Service, Route, Container) -->
-      <div class="freight-meta-chips">
-        <span class="freight-meta-chip">
-          ${icon('calendar', { size: 14 })}
-          <span>${esc(d.requirements.delivery_window || '28 Nov 2026')}</span>
-        </span>
-        <span class="freight-meta-chip">
-          ${icon('ship', { size: 14 })}
-          <span>${esc(d.requirements.service_type || 'Sea Freight')}</span>
-        </span>
-        <span class="freight-meta-chip">
-          ${icon('route', { size: 14 }) || icon('pin', { size: 14 })}
-          <span>${esc(d.route || 'Mumbai to Dubai')}</span>
-        </span>
-        <span class="freight-meta-chip">
-          ${icon('box', { size: 14 })}
-          <span>${esc(d.requirements.shipment_mode || 'FCL 40ft')}</span>
-        </span>
-      </div>
-
-      <!-- Row 3: Shipment Progress Stepper (matching img3) -->
+      <!-- Shipment Progress Stepper (matching img2) -->
       ${renderFreightFlowStatusHtml(b)}
     </div>
   `;
@@ -380,9 +434,26 @@ function renderCustomerDetailsTabHtml(b) {
 }
 
 /** Render Tab 2: Requirements */
-function renderRequirementsTabHtml(b) {
+function renderRequirementsTabHtml(b, { isMobile = false } = {}) {
   const d = getFreightData(b);
   const r = d.requirements;
+
+  const cargoBadgeHtml = isMobile ? '' : `
+          <span class="status-badge-pill pill-verified">
+            <span class="pill-check">✓</span> Verified
+          </span>`;
+
+  const tempBadgeHtml = isMobile ? '' : `
+          <span class="status-badge-pill pill-spec">
+            <span class="pill-check">✓</span> Spec Approved
+          </span>`;
+
+  const portBadgeHtml = isMobile ? '' : `
+          <span class="status-badge-pill pill-verified">
+            <span class="pill-check">✓</span> Verified
+          </span>`;
+
+  const corridorArrowHtml = isMobile ? '' : `<span class="corridor-arrow">→</span>`;
 
   return `
     <div class="freight-tab-pane">
@@ -398,10 +469,24 @@ function renderRequirementsTabHtml(b) {
               <span class="card-subtitle">Standard High-Cube Volume</span>
             </div>
           </div>
-          <span class="status-badge-pill pill-verified">
-            <span class="pill-check">✓</span> Verified
-          </span>
+          ${cargoBadgeHtml}
         </div>
+        ${isMobile ? `
+        <div class="freight-spec-rows">
+          <div class="spec-row">
+            <span class="spec-label">Container Load :</span>
+            <span class="spec-value">${esc(r.container_type || '1x 40ft High Cube (HC)')}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Gross Weight :</span>
+            <span class="spec-value">${esc(r.gross_weight || '24 Metric Tons (MT)')}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Cargo Classification :</span>
+            <span class="spec-value">${esc(r.cargo_classification || 'Electronics & Industrial Machinery parts')}</span>
+          </div>
+        </div>
+        ` : `
         <div class="freight-2col-grid">
           <div class="freight-grid-item">
             <span class="fg-label">Container Load</span>
@@ -416,6 +501,7 @@ function renderRequirementsTabHtml(b) {
             <span class="fg-value-bold">${esc(r.cargo_classification || 'Electronics & Industrial Machinery parts')}</span>
           </div>
         </div>
+        `}
       </div>
 
       <!-- Card 2: Temperature & Handling -->
@@ -430,18 +516,16 @@ function renderRequirementsTabHtml(b) {
               <span class="card-subtitle">Specialized Care Protocol</span>
             </div>
           </div>
-          <span class="status-badge-pill pill-spec">
-            <span class="pill-check">✓</span> Spec Approved
-          </span>
+          ${tempBadgeHtml}
         </div>
-        <div class="freight-2col-grid">
-          <div class="freight-grid-item">
-            <span class="fg-label">Storage Environment:</span>
-            <span class="fg-value-bold">${esc(r.storage_env || 'Ambient dry cargo')}</span>
+        <div class="freight-spec-rows">
+          <div class="spec-row">
+            <span class="spec-label">Storage Environment :</span>
+            <span class="spec-value">${esc(r.storage_env || 'Ambient dry cargo')}</span>
           </div>
-          <div class="freight-grid-item">
-            <span class="fg-label">Barrier Type:</span>
-            <span class="fg-value-bold">${esc(r.barrier_type || 'Moisture-resistant desiccant barrier')}</span>
+          <div class="spec-row">
+            <span class="spec-label">Barrier Type :</span>
+            <span class="spec-value">${esc(r.barrier_type || 'Moisture-resistant desiccant barrier')}</span>
           </div>
         </div>
       </div>
@@ -458,9 +542,7 @@ function renderRequirementsTabHtml(b) {
               <span class="card-subtitle">Direct Maritime Corridor</span>
             </div>
           </div>
-          <span class="status-badge-pill pill-verified">
-            <span class="pill-check">✓</span> Verified
-          </span>
+          ${portBadgeHtml}
         </div>
         <div class="freight-corridor-row">
           <div class="corridor-col">
@@ -470,7 +552,7 @@ function renderRequirementsTabHtml(b) {
           </div>
           <div class="corridor-mid">
             <span class="corridor-duration">${esc(r.transit_duration || '4-5 Days')}</span>
-            <span class="corridor-arrow">→</span>
+            ${corridorArrowHtml}
           </div>
           <div class="corridor-col corridor-dest">
             <span class="fg-label">POD (Destination)</span>
@@ -497,11 +579,15 @@ function renderRequirementsTabHtml(b) {
           </span>
         </div>
         <div class="customs-checklist">
-          ${(r.customs_checks || []).map((chk) => `
+          ${(r.customs_checks || [
+      { label: 'Country of Origin (COO) legalization by Chamber of Commerce', verified: true },
+      { label: 'SASO / UAE MoIAT ECAS product conformity certificate', verified: true },
+      { label: 'Dubai Customs duty exemption code pre-lodged', verified: false, pending: true },
+    ]).map((chk) => `
             <div class="checklist-item">
               ${chk.verified
-                ? '<span class="check-circle-green">✓</span>'
-                : `<span class="check-clock-amber">${icon('clock', { size: 12, stroke: 2.2 })}</span>`}
+        ? '<span class="check-circle-green">✓</span>'
+        : `<span class="check-clock-amber">${icon('clock', { size: 11, stroke: 2.5 })}</span>`}
               <span class="checklist-text">${esc(chk.label)}</span>
             </div>
           `).join('')}
@@ -531,7 +617,13 @@ function renderRequirementsTabHtml(b) {
 function renderShipmentDocsTabHtml(b) {
   const d = getFreightData(b);
   const shp = d.shipment || {};
-  const docs = shp.docs || [];
+  const docs = shp.docs || [
+    { id: 'doc-1', name: 'Commercial Invoice (CI-2026-9042)', type: 'pdf', meta: 'PDF • 1.2 MB • Electronic Stamped', status: 'Verified' },
+    { id: 'doc-2', name: 'Ocean Bill of Lading (B/L #MEDU98...)', type: 'doc', meta: 'Draft Approved by Shipper & Consignee', status: 'Verified' },
+    { id: 'doc-3', name: 'Certificate of Origin (COO-IN-7721)', type: 'coo', meta: 'Chamber Stamped & Notarized', status: 'Verified' },
+    { id: 'doc-4', name: 'Packing List & Weight Certifi...', type: 'scales', meta: 'Awaiting weighbridge slip revision', status: 'Pending Review' },
+    { id: 'doc-5', name: 'Inspection Certificate (SGS Clean R...)', type: 'shield', meta: 'Quality seal passed • No discrepancy', status: 'Verified' },
+  ];
 
   const docsStackHtml = docs.map((doc) => {
     let iconClass = 'doc-icon-blue';
@@ -569,7 +661,7 @@ function renderShipmentDocsTabHtml(b) {
               <span class="pill-check">✓</span> Verified
             </span>
             <button type="button" class="doc-view-btn btn-view-doc" data-doc-id="${esc(doc.id)}" data-doc-file="${esc(doc.name)}" title="View ${esc(doc.name)}">
-              <span class="doc-view-icon">${icon('eye', { size: 12, stroke: 2 })}</span>
+              ${icon('eye', { size: 13, stroke: 2 })}
             </button>
           ` : `
             <span class="status-badge-pill pill-pending-review">
@@ -609,7 +701,7 @@ function renderShipmentDocsTabHtml(b) {
           </div>
           <div class="freight-grid-item">
             <span class="fg-label">Vessel &amp; Voyage</span>
-            <span class="fg-value-bold">${esc(shp.vessel_voyage || 'MSC ALTAIR v.2408W')}</span>
+            <span class="fg-value-bold fg-value-vessel">${esc(shp.vessel_voyage || 'MSC ALTAIR v.2408W')}</span>
           </div>
         </div>
       </div>
@@ -635,9 +727,172 @@ function renderShipmentDocsTabHtml(b) {
   `;
 }
 
-/** Render Tab 4: Updates */
-function renderUpdatesTabHtml(b) {
+/** Render Tab 4: Updates (Matching img2 phased operational audit trail on mobile) */
+function renderUpdatesTabHtml(b, { isMobile = false } = {}) {
   const d = getFreightData(b);
+
+  if (isMobile) {
+    return `
+      <div class="freight-tab-pane freight-phased-updates-pane">
+        <!-- Phase 1 Header -->
+        <div class="phase-top-header-row">
+          <div class="phase-top-line"><span class="audit-node-line line-header"></span></div>
+          <div class="phase-top-text">
+            <span class="phase-top-title">Phase 1: Booking Confirmation &amp; Export Documentation Lodged</span>
+            <span class="phase-top-sub">&bull; Proposal Registered</span>
+          </div>
+        </div>
+
+        <div class="phase-audit-timeline">
+          <!-- Step 1: External Registration -->
+          <div class="audit-step-row">
+            <div class="audit-step-left">
+              <span class="audit-node-line line-top line-start"></span>
+              <div class="audit-node-circle circle-purple">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+              </div>
+              <span class="audit-node-line line-bottom"></span>
+            </div>
+            <div class="audit-step-card">
+              <div class="audit-card-head">
+                <h4 class="audit-card-title">External Registration &amp; Shipping Order Submitted (REG-2026-4612)</h4>
+                <span class="audit-card-time">18 Nov, 12:01 PM</span>
+              </div>
+              <p class="audit-card-desc">Project registered via Dubai Customs &amp; DGFT EDI Gateway for IIBC/GCC Freight Cohort 2024–25. Consignment: 1x 40ft High Cube Container (24 MT). Shipper: Rajesh Sharma (r.sharma@globaltrade.ae). Commercial Invoice &amp; Packing list uploaded.</p>
+              <div class="audit-card-author">By Customer Portal (EDI Exim)</div>
+            </div>
+          </div>
+
+          <!-- Shift to Phase 2 Banner -->
+          <div class="phase-divider-row">
+            <div class="phase-divider-pill phase-pill-green">
+              Shifted to Phase 2: Customs Assessment &amp; Regulatory Compliance
+            </div>
+          </div>
+
+          <!-- Step 2: Customs Clearance -->
+          <div class="audit-step-row">
+            <div class="audit-step-left">
+              <span class="audit-node-line line-top"></span>
+              <div class="audit-node-circle circle-green">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <span class="audit-node-line line-bottom"></span>
+            </div>
+            <div class="audit-step-card">
+              <div class="audit-card-head">
+                <h4 class="audit-card-title">Customs Clearance &amp; COO Legalization</h4>
+                <span class="audit-card-time">19 Nov, 07:25 AM</span>
+              </div>
+              <div>
+                <span class="audit-status-tag tag-approved">Approved</span>
+              </div>
+              <p class="audit-card-desc">Dubai Customs EDI transaction ID #AE-DXB-98319 processed successfully. Chamber of Commerce Certificate of Origin (COO-IN-7721) verified &amp; electronically sealed. Duty exemption code pre-lodged with MoIAT ECAS compliance conformity.</p>
+              <div class="audit-card-author">By Port Customs Authority</div>
+            </div>
+          </div>
+
+          <!-- Shift to Phase 3 Banner -->
+          <div class="phase-divider-row">
+            <div class="phase-divider-pill phase-pill-amber">
+              Shifted to Phase 3: Weight Verification &amp; Terminal Gate-In (Yard Review)
+            </div>
+          </div>
+
+          <!-- Step 3: Weighbridge & Packing List -->
+          <div class="audit-step-row">
+            <div class="audit-step-left">
+              <span class="audit-node-line line-top"></span>
+              <div class="audit-node-circle circle-amber">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+              </div>
+              <span class="audit-node-line line-bottom"></span>
+            </div>
+            <div class="audit-step-card">
+              <div class="audit-card-head">
+                <h4 class="audit-card-title">Weighbridge &amp; Packing List Verification</h4>
+                <span class="audit-card-time">20 Nov, 10:40 AM</span>
+              </div>
+              <div>
+                <span class="audit-status-tag tag-revision">Needs Revision</span>
+              </div>
+              <p class="audit-card-desc">Terminal weighbridge recorded gross tare weight discrepancy of +0.3 MT against packing list manifest. Terminal gate-in held pending updated certified weighbridge slip from shipper. Driver &amp; transport coordinator notified.</p>
+              <div class="audit-card-author">By JNPT Terminal Operations</div>
+            </div>
+          </div>
+
+          <!-- Shift to Phase 4 Banner -->
+          <div class="phase-divider-row">
+            <div class="phase-divider-pill phase-pill-red">
+              Shifted to Phase 4: Dispute Resolution &amp; Amended Manifest Filing
+            </div>
+          </div>
+
+          <!-- Step 4: Emergency Manifest Tare Review -->
+          <div class="audit-step-row">
+            <div class="audit-step-left">
+              <span class="audit-node-line line-top"></span>
+              <div class="audit-node-circle circle-red">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </div>
+              <span class="audit-node-line line-bottom"></span>
+            </div>
+            <div class="audit-step-card">
+              <div class="audit-card-head">
+                <h4 class="audit-card-title">Emergency Manifest Tare Review</h4>
+                <span class="audit-card-time">21 Nov, 09:15 AM</span>
+              </div>
+              <div>
+                <span class="audit-status-tag tag-not-approved">Not Approved</span>
+              </div>
+              <p class="audit-card-desc">Port inspection committee flagged commercial invoice tare discrepancy. Supplementary tare cert rejected due to missing surveyor stamp. Resubmission required within 24 hours.</p>
+              <div class="audit-card-author">By Port Compliance Committee</div>
+            </div>
+          </div>
+
+          <!-- Shift to Phase 5 Banner -->
+          <div class="phase-divider-row">
+            <div class="phase-divider-pill phase-pill-amber">
+              Shifted to Phase 5: Resubmission &amp; Fast-Track Loading
+            </div>
+          </div>
+
+          <!-- Step 5: Revised Weight Certificate -->
+          <div class="audit-step-row">
+            <div class="audit-step-left">
+              <span class="audit-node-line line-top"></span>
+              <div class="audit-node-circle circle-amber">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+              </div>
+              <span class="audit-node-line line-bottom line-end"></span>
+            </div>
+            <div class="audit-step-card">
+              <div class="audit-card-head">
+                <h4 class="audit-card-title">Revised Weight Certificate &amp; Yard Inspection</h4>
+                <span class="audit-card-time">21 Nov, 02:30 PM</span>
+              </div>
+              <div>
+                <span class="audit-status-tag tag-revision">Needs Revision</span>
+              </div>
+              <p class="audit-card-desc">Calibrated weight slip and SGS inspection re-filed. Berth assignment queued for MSC ALTAIR v.2408W.</p>
+              <div class="audit-card-author">By Freight Review Committee</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   const updates = d.updates || [];
 
   return `
@@ -649,9 +904,9 @@ function renderUpdatesTabHtml(b) {
 
       <div class="freight-timeline">
         ${updates.map((up, idx) => {
-          const isLast = idx === updates.length - 1;
-          const dotClass = up.dot === 'green' ? 'dot-green' : up.dot === 'blue' ? 'dot-blue' : 'dot-grey';
-          return `
+    const isLast = idx === updates.length - 1;
+    const dotClass = up.dot === 'green' ? 'dot-green' : up.dot === 'blue' ? 'dot-blue' : 'dot-grey';
+    return `
             <div class="timeline-item">
               <div class="timeline-left">
                 <span class="timeline-dot ${dotClass}"></span>
@@ -664,18 +919,18 @@ function renderUpdatesTabHtml(b) {
               </div>
             </div>
           `;
-        }).join('')}
+  }).join('')}
       </div>
     </div>
   `;
 }
 
 /** Render Body content based on active tab */
-export function renderFreightBodyHtml(b, activeTab = 'customer-details') {
-  if (activeTab === 'requirements') return renderRequirementsTabHtml(b);
-  if (activeTab === 'shipment-docs') return renderShipmentDocsTabHtml(b);
-  if (activeTab === 'updates') return renderUpdatesTabHtml(b);
-  return renderCustomerDetailsTabHtml(b);
+export function renderFreightBodyHtml(b, activeTab = 'customer-details', { isMobile = false } = {}) {
+  if (activeTab === 'requirements') return renderRequirementsTabHtml(b, { isMobile });
+  if (activeTab === 'shipment-docs') return renderShipmentDocsTabHtml(b, { isMobile });
+  if (activeTab === 'updates') return renderUpdatesTabHtml(b, { isMobile });
+  return renderCustomerDetailsTabHtml(b, { isMobile });
 }
 
 /** Render Footer action buttons */
