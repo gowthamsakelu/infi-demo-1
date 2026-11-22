@@ -9,6 +9,7 @@ use App\Livewire\BookingsManager;
 Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
+        'build' => 'v2-no-port-leak',
         'app' => config('app.name', 'INFINITY'),
         'timestamp' => now()->toIso8601String(),
     ], 200);
